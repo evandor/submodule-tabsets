@@ -1,5 +1,5 @@
-import Command from "src/domain/Command";
-import {ExecutionResult} from "src/domain/ExecutionResult";
+import Command from "src/core/domain/Command";
+import {ExecutionResult} from "src/core/domain/ExecutionResult";
 import _ from "lodash"
 import {Tab} from "src/tabsets/models/Tab";
 import {useUiStore} from "src/stores/uiStore";

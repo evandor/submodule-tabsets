@@ -1,5 +1,5 @@
-import Command from "src/domain/Command";
-import {ExecutionResult} from "src/domain/ExecutionResult";
+import Command from "src/core/domain/Command";
+import {ExecutionResult} from "src/core/domain/ExecutionResult";
 import TabsetService from "src/services/TabsetService";
 import {MarkTabsetAsDefaultCommand} from "src/tabsets/commands/MarkTabsetAsDefault";
 import {Tabset, TabsetType} from "src/tabsets/models/Tabset";
