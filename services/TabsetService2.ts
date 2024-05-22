@@ -13,7 +13,7 @@ import {v5 as uuidv5} from 'uuid';
 import {useSettingsStore} from "src/stores/settingsStore"
 import {Space} from "src/spaces/models/Space";
 import {useSpacesStore} from "src/spaces/stores/spacesStore";
-import {SaveOrReplaceResult} from "src/models/SaveOrReplaceResult";
+import {SaveOrReplaceResult} from "src/tabsets/models/SaveOrReplaceResult";
 import JsUtils from "src/utils/JsUtils";
 import {FeatureIdent} from "src/models/FeatureIdent";
 import {useUiStore} from "stores/uiStore";
