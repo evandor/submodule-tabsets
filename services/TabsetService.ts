@@ -20,10 +20,11 @@ import {useThumbnailsService} from "src/thumbnails/services/ThumbnailsService";
 import {useContentService} from "src/content/services/ContentService";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {useTabsStore2} from "src/tabsets/stores/tabsStore2";
+import {Space} from "src/spaces/models/Space";
 
 const {getTabset, saveTabset, saveCurrentTabset, tabsetsFor, addToTabset} = useTabsetService()
 
-const {db} = useDB()
+// const {db} = useDB()
 
 class TabsetService {
 
@@ -75,7 +76,7 @@ class TabsetService {
   }
 
   async getRequestForUrl(url: string): Promise<any> {
-    return db.getRequest(url)
+    return Promise.reject("not implemented")//db.getRequest(url)
   }
 
   async getContentFor(selectedTab: Tab): Promise<object> {
@@ -98,7 +99,7 @@ class TabsetService {
   }
 
   async getMetaLinksForUrl(url: string): Promise<any> {
-    return db.getMetaLinks(url)
+    return Promise.reject("not implemented")//db.getMetaLinks(url)
   }
 
   async getLinksFor(selectedTab: Tab): Promise<any> {
@@ -109,7 +110,7 @@ class TabsetService {
   }
 
   async getLinksForUrl(url: string): Promise<any> {
-    return db.getLinks(url)
+    return Promise.reject("not implemented") //db.getLinks(url)
   }
 
   setCustomTitle(tab: Tab, title: string, desc: string): Promise<any> {
@@ -203,7 +204,7 @@ class TabsetService {
       console.log("creating bookmarks...")
 
       chrome.bookmarks.getChildren("1", (results: chrome.bookmarks.BookmarkTreeNode[]) => {
-        _.forEach(results, r => {
+        _.forEach(results, (r:any) => {
           if (r.title === "tabsetsBackup") {
             console.log("deleting folder", r.id)
             chrome.bookmarks.removeTree(r.id)
@@ -213,13 +214,13 @@ class TabsetService {
 
       chrome.bookmarks.create({title: 'tabsetsBackup', parentId: '1'}, (result: chrome.bookmarks.BookmarkTreeNode) => {
         // console.log("res", result)
-        _.forEach([...useTabsetsStore().tabsets.values()], ts => {
+        _.forEach([...useTabsetsStore().tabsets.values()], (ts:Tabset) => {
           console.log("ts", ts)
           chrome.bookmarks.create({
             title: ts.name,
             parentId: result.id
           }, (folder: chrome.bookmarks.BookmarkTreeNode) => {
-            _.forEach(ts.tabs, tab => {
+            _.forEach(ts.tabs, (tab:Tab) => {
               chrome.bookmarks.create({
                 title: tab.name || tab.title,
                 parentId: folder.id,
@@ -249,15 +250,15 @@ class TabsetService {
     let failedSpaces = 0
     let failedTabsets = 0
 
-    _.forEach(spaces, space => {
+    _.forEach(spaces, (space:Space) => {
       useSpacesStore().addSpace(space)
     })
 
-    _.forEach(tabsets, tabset => {
+    _.forEach(tabsets, (tabset:Tabset) => {
       useTabsetsStore().addTabset(tabset)
       saveTabset(tabset)
 
-      _.forEach(tabset.tabs, tab => {
+      _.forEach(tabset.tabs, (tab:Tab) => {
         //console.log("adding to index", tab)
         useSearchStore().addToIndex(
           tab.id,
@@ -374,9 +375,9 @@ class TabsetService {
   async moveTo(tabId: string, newIndex: number, column: TabsetColumn) {
     console.log("moving", tabId, newIndex, column.id)
     let tabs = useTabsetsStore().getCurrentTabs
-    console.log("tabs before", _.map(tabs, t => t.url))
+    console.log("tabs before", _.map(tabs, (t:any) => t.url))
     //tabs = _.filter(tabs, (t: Tab) => t.columnId === column.id)
-    const oldIndex = _.findIndex(tabs, t => t.id === tabId)
+    const oldIndex = _.findIndex(tabs, (t:any) => t.id === tabId)
     if (oldIndex >= 0) {
       console.log("found old index", oldIndex)
       const tab = tabs.splice(oldIndex, 1)[0];
@@ -392,9 +393,9 @@ class TabsetService {
 
       await saveCurrentTabset()
     }
-    console.log("tabs after A", _.map(tabs, t => t.url))
-    console.log("tabs after B", _.map(useTabsetsStore().getCurrentTabs, t => t.url))
-    console.log("tabs after C", _.map(useTabsetsStore().tabsets.get('0cfcb9da-50b2-490f-b2dd-2a46aa029943')?.tabs, t => t.url))
+    console.log("tabs after A", _.map(tabs, (t:any) => t.url))
+    console.log("tabs after B", _.map(useTabsetsStore().getCurrentTabs, (t:any) => t.url))
+    console.log("tabs after C", _.map(useTabsetsStore().tabsets.get('0cfcb9da-50b2-490f-b2dd-2a46aa029943')?.tabs, (t:any) => t.url))
   }
 
   setView(tabsetId: string, view: string) {

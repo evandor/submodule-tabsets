@@ -4,12 +4,12 @@ import {ExecutionResult} from "src/core/domain/ExecutionResult";
 import {Tab} from "src/tabsets/models/Tab";
 import _ from "lodash";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
-import {DeleteTabCommand} from "src/domain/tabs/DeleteTabCommand";
 import {useSearchStore} from "src/search/stores/searchStore";
 import {uid} from "quasar";
 import {useUiStore} from "stores/uiStore";
 import {Tabset} from "src/tabsets/models/Tabset";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
+import {DeleteTabCommand} from "src/domain/tabs/DeleteTabCommand";
 
 const {saveCurrentTabset} = useTabsetService()
 
@@ -21,7 +21,7 @@ class UndoCommand implements Command<any> {
   execute(): Promise<ExecutionResult<any>> {
     console.info(this.tab, "execution undo command")
     return new DeleteTabCommand(this.tab, this.tabset).execute()
-      .then(res => Promise.resolve(new ExecutionResult(res, "Tab was deleted again")))
+      .then((res:any) => Promise.resolve(new ExecutionResult(res, "Tab was deleted again")))
   }
 
 }
@@ -34,7 +34,7 @@ export class CreateTabFromOpenTabsCommand implements Command<any> {
   async execute(): Promise<ExecutionResult<any>> {
     console.info(this.tab, 'adding tab by d&d')
     //console.log("tabs", tabsStore.getCurrentTabs)
-    const exists = _.findIndex(useTabsetsStore().getCurrentTabs, t => t.url === this.tab.url) >= 0
+    const exists = _.findIndex(useTabsetsStore().getCurrentTabs, (t:any) => t.url === this.tab.url) >= 0
 
     let useIndex = this.newIndex
     console.log("exists", exists)
@@ -86,7 +86,7 @@ export class CreateTabFromOpenTabsCommand implements Command<any> {
           }
         })
     } else {
-      const oldIndex = _.findIndex(useTabsetsStore().getCurrentTabs, t => t.id === this.tab.id)
+      const oldIndex = _.findIndex(useTabsetsStore().getCurrentTabs, (t:any) => t.id === this.tab.id)
       if (oldIndex >= 0) {
         const tab = useTabsetsStore().getCurrentTabs.splice(oldIndex, 1)[0];
         useTabsetsStore().getCurrentTabs.splice(useIndex, 0, tab);

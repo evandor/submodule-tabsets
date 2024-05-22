@@ -60,7 +60,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
         color.replace(STRIP_CHARS_IN_COLOR_INPUT, '').substring(0, 31)
         : undefined
 
-      const tabsetWithSameName: Tabset | undefined = _.find([...tabsets.value.values()] as Tabset[], ts => ts.name === trustedName)
+      const tabsetWithSameName: Tabset | undefined = _.find([...tabsets.value.values()] as Tabset[], (ts:Tabset) => ts.name === trustedName)
       let ts: Tabset = null as unknown as Tabset
       //const currentSpace = useSpacesStore().space
       if (tabsetWithSameName) {
@@ -135,7 +135,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     }
 
     function selectCurrentTabset(tabsetId: string): Tabset | undefined {
-      const found = _.find([...tabsets.value.values()] as Tabset[], k => {
+      const found = _.find([...tabsets.value.values()] as Tabset[], (k:any) => {
         const ts = k || new Tabset("", "", [])
         return ts.id === tabsetId
       })
@@ -176,7 +176,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       return (url: string): Tab | undefined => {
         if (currentTabsetId.value) {
           const tabs: Tab[] = tabsets.value.get(currentTabsetId.value)?.tabs as Tab[] || []
-          return _.find(tabs, t => t.url === url)
+          return _.find(tabs, (t:any) => t.url === url)
         }
       }
     })
@@ -232,7 +232,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     const tabsetFor = computed(() => {
       return (tabId: string): Tabset | undefined => {
         for (const [key, value] of tabsets.value) {
-          if (_.find(value.tabs, t => t.id === tabId)) {
+          if (_.find(value.tabs, (t:any) => t.id === tabId)) {
             return value as Tabset
           }
         }

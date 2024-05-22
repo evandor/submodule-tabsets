@@ -52,7 +52,9 @@ const props = defineProps({
 })
 
 const {dialogRef, onDialogHide, onDialogCancel} = useDialogPluginComponent()
-const invite = () => useCommandExecutor().executeFromUi(new ShareTabsetCommand(invitationEmail.value, props.tabsetName, props.tabsetId, "author"))
+const invite = () => {}
+// const invite = () => useCommandExecutor()
+//   .executeFromUi(new ShareTabsetCommand(invitationEmail.value, props.tabsetName, props.tabsetId, "author"))
 const invitationEmail = ref('')
 
 </script>

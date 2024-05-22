@@ -40,7 +40,7 @@ export class AddTabToTabsetCommand implements Command<any> {
       }
     }
 
-    const exists = _.findIndex(tabsetOrFolder.tabs, t => t.url === this.tab.url) >= 0
+    const exists = _.findIndex(tabsetOrFolder.tabs, (t:any) => t.url === this.tab.url) >= 0
     console.debug("checking 'tab exists' yields", exists)
     if (!exists) {
       try {
