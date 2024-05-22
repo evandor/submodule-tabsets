@@ -353,7 +353,7 @@ export function useTabsetService() {
     const title = tab.title || ''
     const tabsetIds: string[] = tabsetsFor(tab.url)
 
-    useContentService().saveContent(tab, text, metas, title, tabsetIds)
+    useContentService().saveContent(tab.url, text, metas, title, tabsetIds)
       .catch((err: any) => console.log("err", err))
 
     const tabsets = [...useTabsetsStore().tabsets.values()] as Tabset[]
