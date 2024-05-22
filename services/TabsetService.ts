@@ -6,7 +6,7 @@ import {Tabset, TabsetSharing, TabsetStatus, TabsetType} from "src/tabsets/model
 import {useSearchStore} from "src/stores/searchStore";
 import {useBookmarksStore} from "src/bookmarks/stores/bookmarksStore";
 import {STRIP_CHARS_IN_COLOR_INPUT, STRIP_CHARS_IN_USER_INPUT} from "boot/constants";
-import {useTabsetService} from "src/services/TabsetService2";
+import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {useDB} from "src/services/usePersistenceService";
 import {useSpacesStore} from "src/spaces/stores/spacesStore";
 import PlaceholderUtils from "src/utils/PlaceholderUtils";

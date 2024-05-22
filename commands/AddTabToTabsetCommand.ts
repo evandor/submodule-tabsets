@@ -3,7 +3,7 @@ import TabsetService from "src/tabsets/services/TabsetService";
 import {ExecutionResult} from "src/core/domain/ExecutionResult";
 import {Tab} from "src/tabsets/models/Tab";
 import _ from "lodash";
-import {useTabsetService} from "src/services/TabsetService2";
+import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {Tabset, TabsetSharing} from "src/tabsets/models/Tabset";
 import {useUtils} from "src/core/services/Utils";
 import {useSearchStore} from "stores/searchStore";
