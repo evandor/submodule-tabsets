@@ -89,7 +89,7 @@ import {QForm, useDialogPluginComponent} from "quasar";
 import {STRIP_CHARS_IN_USER_INPUT} from "boot/constants";
 import {Tabset, TabsetStatus} from "src/tabsets/models/Tabset";
 import {ref, watchEffect} from "vue";
-import {useCommandExecutor} from "src/services/CommandExecutor";
+import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {CreateTabsetCommand} from "src/tabsets/commands/CreateTabset";
 import {useTabsetService} from "src/services/TabsetService2";
 import {SidePanelView, useUiStore} from "stores/uiStore";

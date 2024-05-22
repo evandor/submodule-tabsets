@@ -84,7 +84,7 @@ import {useDialogPluginComponent} from "quasar";
 import {STRIP_CHARS_IN_USER_INPUT} from "boot/constants";
 import {RenameTabsetCommand} from "src/tabsets/commands/RenameTabset";
 import {useNotificationHandler} from "src/services/ErrorHandler";
-import {useCommandExecutor} from "src/services/CommandExecutor";
+import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import ColorSelector from "components/dialogues/helper/ColorSelector.vue";
 import {usePermissionsStore} from "stores/permissionsStore";
 import {FeatureIdent} from "src/models/FeatureIdent";
