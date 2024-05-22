@@ -1,7 +1,6 @@
 import {useAuthStore} from "stores/authStore";
 import {collection, deleteDoc, doc, getDoc, getDocs, setDoc, updateDoc} from "firebase/firestore";
 import FirebaseServices from "src/services/firebase/FirebaseServices";
-import IndexedDbPersistenceService from "src/services/IndexedDbPersistenceService";
 import TabsetsPersistence from "src/tabsets/persistence/TabsetsPersistence";
 import {Tabset} from "src/tabsets/models/Tabset";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
@@ -21,8 +20,6 @@ function tabsetsCollection() {
 }
 
 class FirestoreTabsetsPersistence implements TabsetsPersistence {
-
-  private indexedDB: typeof IndexedDbPersistenceService = null as unknown as typeof IndexedDbPersistenceService
 
   getServiceName(): string {
     return "FirestoreTabsetsPersistence"
