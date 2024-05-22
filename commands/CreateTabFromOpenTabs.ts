@@ -9,7 +9,6 @@ import {useSearchStore} from "src/search/stores/searchStore";
 import {uid} from "quasar";
 import {useUiStore} from "stores/uiStore";
 import {Tabset} from "src/tabsets/models/Tabset";
-import {useTabsStore2} from "src/tabsets/stores/tabsStore2";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 
 const {saveCurrentTabset} = useTabsetService()
