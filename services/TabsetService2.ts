@@ -2,12 +2,11 @@ import {STRIP_CHARS_IN_COLOR_INPUT, STRIP_CHARS_IN_USER_INPUT} from "boot/consta
 import {Tab} from "src/tabsets/models/Tab";
 import _ from "lodash";
 import {uid} from "quasar";
-import {useSearchStore} from "src/search/stores/searchStore";
 import ChromeApi from "src/services/ChromeApi";
 import {TabPredicate} from "src/domain/Types";
 import {Tabset, TabsetStatus, TabsetType} from "src/tabsets/models/Tabset";
 import {MetaLink} from "src/models/MetaLink";
-import {SpecialTabsetIdent} from "src/domain/tabsets/CreateSpecialTabset";
+// import {SpecialTabsetIdent} from "src/domain/tabsets/CreateSpecialTabset";
 // @ts-ignore
 import {v5 as uuidv5} from 'uuid';
 import {useSettingsStore} from "src/stores/settingsStore"
@@ -28,6 +27,7 @@ import {useTabsStore2} from "src/tabsets/stores/tabsStore2";
 import TabsetsPersistence from "src/tabsets/persistence/TabsetsPersistence";
 import {useTabsStore} from "src/bookmarks/stores/tabsStore";
 import {useFeaturesStore} from "src/features/stores/featuresStore";
+import {useSearchStore} from "src/search/stores/searchStore";
 
 let db: TabsetsPersistence = null as unknown as TabsetsPersistence
 
@@ -92,7 +92,7 @@ export function useTabsetService() {
       color.replace(STRIP_CHARS_IN_COLOR_INPUT, '').substring(0, 31)
       : undefined
     const tabs: Tab[] = _.filter(
-      _.map(chromeTabs, t => {
+      _.map(chromeTabs, (t:chrome.tabs.Tab) => {
         const tab = new Tab(uid(), t)
         tab.tags.push(name)
         return tab
@@ -172,7 +172,7 @@ export function useTabsetService() {
    */
   const saveOrReplaceFromBookmarks = async (name: string, bms: chrome.bookmarks.BookmarkTreeNode[], merge: boolean = false, dryRun = false): Promise<object> => {
     const now = new Date().getTime()
-    const tabs = _.map(_.filter(bms, bm => bm.url !== undefined), c => {
+    const tabs = _.map(_.filter(bms, (bm:any) => bm.url !== undefined), (c:any) => {
       const tab = new Tab(uid(), ChromeApi.createChromeTabObject(c.title, c.url || '', ""))
       tab.bookmarkUrl = c.url
       tab.bookmarkId = c.id
@@ -197,7 +197,7 @@ export function useTabsetService() {
 
   const getTabset = (tabsetId: string): Tabset | undefined => {
     const tabsStore = useTabsStore()
-    return _.find([...useTabsetsStore().tabsets.values()] as Tabset[], ts => ts.id === tabsetId)
+    return _.find([...useTabsetsStore().tabsets.values()] as Tabset[], (ts:Tabset) => ts.id === tabsetId)
   }
 
   const reloadTabset = async (tabsetId: string) => {
@@ -302,7 +302,7 @@ export function useTabsetService() {
       if (!tabset.type) {
         tabset.type = TabsetType.DEFAULT
       }
-      const additionalInfo = _.map(tabset.tabs, t => t.monitor)
+      const additionalInfo = _.map(tabset.tabs, (t:any) => t.monitor)
       const rootTabset = rootTabsetFor(tabset)
       console.debug(`saving (sub-)tabset '${tabset.name}' with ${tabset.tabs.length} tab(s) at id ${rootTabset?.id}`)
       if (rootTabset) {
@@ -383,7 +383,7 @@ export function useTabsetService() {
                 if (!t.tags) {
                   t.tags = []
                 }
-                t.tags = t.tags.concat(_.union(_.filter(_.map(splits, (split) => split.trim()), (split: string) => split.length > 0)))
+                t.tags = t.tags.concat(_.union(_.filter(_.map(splits, (split:any) => split.trim()), (split: string) => split.length > 0)))
               }
             }
             const author = getIfAvailable(metas, 'author')
@@ -439,7 +439,7 @@ export function useTabsetService() {
                       //useSuggestionsStore().updateSuggestionState(id, SuggestionState.NOTIFICATION)
                     }
                   })
-                  .catch((err) => {
+                  .catch((err:any) => {
                     console.debug("got error", err)
                   })
               }
@@ -475,7 +475,7 @@ export function useTabsetService() {
     const tabsets: string[] = []
     for (let ts of [...useTabsetsStore().tabsets.values()]) {
       if (ts.status === TabsetStatus.DEFAULT || ts.status === TabsetStatus.FAVORITE) {
-        if (_.find(ts.tabs, t => t.url === url)) {
+        if (_.find(ts.tabs, (t:any) => t.url === url)) {
           tabsets.push(ts.id)
         }
       }
@@ -504,7 +504,7 @@ export function useTabsetService() {
    */
   const addToTabset = async (ts: Tabset, tab: Tab, useIndex: number | undefined = undefined): Promise<Tabset> => {
     if (tab.url) {
-      const indexInTabset = _.findIndex(ts.tabs, t => t.url === tab.url)
+      const indexInTabset = _.findIndex(ts.tabs, (t:any) => t.url === tab.url)
       if (indexInTabset >= 0 && !tab.image) {
         return Promise.reject("tab exists already")
       }
@@ -574,7 +574,7 @@ export function useTabsetService() {
 
   const getIfAvailable = (metas: object, key: string): string | undefined => {
     let res = undefined
-    _.forEach(Object.keys(metas), k => {
+    _.forEach(Object.keys(metas), (k:any) => {
       const value = metas[k as keyof object] as string
       if (k.endsWith(key) && value && value.trim().length > 0) {
         //console.log("k>", k, value)
@@ -586,7 +586,7 @@ export function useTabsetService() {
 
   const urlExistsInATabset = (url: string): boolean => {
     for (let ts of [...useTabsetsStore().tabsets.values()]) {
-      if (_.find(ts.tabs, t => t.url === url)) {
+      if (_.find(ts.tabs, (t:any) => t.url === url)) {
         return true;
       }
     }
@@ -596,7 +596,7 @@ export function useTabsetService() {
     const currentTabset = useTabsetsStore().getCurrentTabset
     // console.log("testing exists in current tabset", currentTabset.id, url)
     if (currentTabset) {
-      if (_.find(currentTabset.tabs, t => {
+      if (_.find(currentTabset.tabs, (t:any) => {
         return (t.matcher) ?
           JsUtils.match(t.matcher, url) :
           t.url === url
@@ -638,7 +638,7 @@ export function useTabsetService() {
   }
 
   const removeFolder = (root: Tabset, folderId: string): void => {
-    root.folders = _.filter(root.folders, f => f.id !== folderId)
+    root.folders = _.filter(root.folders, (f:any) => f.id !== folderId)
     for (const f of root.folders) {
       removeFolder(f, folderId)
     }
@@ -670,7 +670,7 @@ export function useTabsetService() {
       console.log("newParentFolder", newParentFolder)
       newParentFolder.tabs.push(tabWithFolder.tab)
       saveTabset(tabset).then(() => {
-        tabWithFolder.folder.tabs = _.filter(tabWithFolder.folder.tabs, t => t.id !== tabIdToDrag)
+        tabWithFolder.folder.tabs = _.filter(tabWithFolder.folder.tabs, (t:any) => t.id !== tabIdToDrag)
         saveTabset(tabset)
       })
     }
