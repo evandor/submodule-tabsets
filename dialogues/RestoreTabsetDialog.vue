@@ -39,7 +39,7 @@ import {useRouter} from "vue-router";
 
 import {useDialogPluginComponent} from 'quasar'
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
-import {RestoreTabsetCommand} from "src/domain/tabsets/RestoreTabset"
+import {RestoreTabsetCommand} from "src/tabsets/commands/RestoreTabset"
 
 defineEmits([
   ...useDialogPluginComponent.emits
