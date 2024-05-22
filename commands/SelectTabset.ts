@@ -3,7 +3,7 @@ import {ExecutionResult} from "src/core/domain/ExecutionResult";
 import _ from "lodash"
 import {Tab} from "src/tabsets/models/Tab";
 import {useUiStore} from "src/stores/uiStore";
-import {useUtils} from "src/services/Utils";
+import {useUtils} from "src/core/services/Utils";
 import {Tabset} from "src/tabsets/models/Tabset";
 import {useSpacesStore} from "src/spaces/stores/spacesStore";
 import {useTabsetService} from "src/services/TabsetService2";

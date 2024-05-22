@@ -5,7 +5,7 @@ import {Tab} from "src/tabsets/models/Tab";
 import _ from "lodash";
 import {useTabsetService} from "src/services/TabsetService2";
 import {Tabset, TabsetSharing} from "src/tabsets/models/Tabset";
-import {useUtils} from "src/services/Utils";
+import {useUtils} from "src/core/services/Utils";
 import {useSearchStore} from "stores/searchStore";
 import {uid, useQuasar} from "quasar";
 import {useGroupsStore} from "stores/groupsStore";
