@@ -5,7 +5,7 @@ import {Tab} from "src/tabsets/models/Tab";
 import _ from "lodash";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {DeleteTabCommand} from "src/domain/tabs/DeleteTabCommand";
-import {useSearchStore} from "stores/searchStore";
+import {useSearchStore} from "src/search/stores/searchStore";
 import {uid} from "quasar";
 import {useUiStore} from "stores/uiStore";
 import {Tabset} from "src/tabsets/models/Tabset";

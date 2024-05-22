@@ -6,7 +6,7 @@ import _ from "lodash";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {Tabset, TabsetSharing} from "src/tabsets/models/Tabset";
 import {useUtils} from "src/core/services/Utils";
-import {useSearchStore} from "stores/searchStore";
+import {useSearchStore} from "src/search/stores/searchStore";
 import {uid, useQuasar} from "quasar";
 import {useGroupsStore} from "stores/groupsStore";
 import PlaceholderUtils from "src/utils/PlaceholderUtils";
