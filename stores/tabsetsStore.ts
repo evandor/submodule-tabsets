@@ -43,7 +43,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       console.debug(" ...initializing tabsetsStore", ps.getServiceName())
       storage = ps
       await storage.init()
-      // TODO remove after version 0.4.12
+      // TODO remove after version 0.5.0
       await storage.migrate()
 
       await storage.loadTabsets()
