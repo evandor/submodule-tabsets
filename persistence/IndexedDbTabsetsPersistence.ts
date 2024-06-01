@@ -69,6 +69,9 @@ class IndexedDbTabsetsPersistence implements TabsetsPersistence {
   async migrate() {
     // 0.4.11 - 0.5.0
     const oldDB = await openDB("db")
+    if (!oldDB || !oldDB.objectStoreNames.contains(this.STORE_IDENT)) {
+      return // no migration necessary, no old data
+    }
     const oldTabsets = await oldDB.getAll('tabsets')
     for(const oldTs of oldTabsets) {
       const optionalTsInNewDb = await this.db.get(this.STORE_IDENT, oldTs.id) as Tabset | undefined
