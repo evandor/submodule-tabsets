@@ -36,14 +36,11 @@ class IndexedDbTabsetsPersistence implements TabsetsPersistence {
 
   async loadTabsets(): Promise<any> {
     console.debug(" loading tabsets...")
-    const keys: IDBValidKey[] = await this.db.getAllKeys(this.STORE_IDENT)
-    _.forEach(keys, (key:any) => {
-      this.db.get(this.STORE_IDENT, key)
-        .then((ts: Tabset) => {
-          useTabsetsStore().setTabset(ts)
-        })
-        .catch(err => console.log("err", err))
+    const tabsets = await this.db.getAll('tabsets')
+    tabsets.forEach((ts: Tabset) => {
+      useTabsetsStore().setTabset(ts)
     })
+    return Promise.resolve()
   }
 
   compactDb(): Promise<any> {
