@@ -191,8 +191,9 @@ class TabsetService {
     let data = ''
     let filename = 'tabsets.' + appVersion + '.json'
     if (exportAs === 'json') {
+      const tabsets = [...useTabsetsStore().tabsets.values()] as Tabset[]
       data = JSON.stringify({
-        tabsets: [...useTabsetsStore().tabsets.values()],
+        tabsets: tabsets.filter((ts:Tabset) => ts.status !== TabsetStatus.DELETED),
         spaces: [...spacesStore.spaces.values()]
       })
       return this.createFile(data, filename);
@@ -214,7 +215,7 @@ class TabsetService {
 
       chrome.bookmarks.create({title: 'tabsetsBackup', parentId: '1'}, (result: chrome.bookmarks.BookmarkTreeNode) => {
         // console.log("res", result)
-        _.forEach([...useTabsetsStore().tabsets.values()], (ts:Tabset) => {
+        _.forEach([...useTabsetsStore().tabsets.values()] as Tabset[], (ts:Tabset) => {
           console.log("ts", ts)
           chrome.bookmarks.create({
             title: ts.name,
