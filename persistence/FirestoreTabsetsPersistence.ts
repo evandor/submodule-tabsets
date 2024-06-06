@@ -1,11 +1,10 @@
-import {useAuthStore} from "stores/authStore";
-import {collection, deleteDoc, doc, getDoc, getDocs, setDoc, updateDoc} from "firebase/firestore";
-import FirebaseServices from "src/services/firebase/FirebaseServices";
+import {collection, deleteDoc, doc, getDoc, getDocs, setDoc} from "firebase/firestore";
 import TabsetsPersistence from "src/tabsets/persistence/TabsetsPersistence";
 import {Tabset} from "src/tabsets/models/Tabset";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {LocalStorage} from "quasar";
 import {APP_INSTALLATION_ID} from "boot/constants";
+import {useAuthStore} from "stores/authStore";
 
 const STORE_IDENT = 'tabsets';
 
