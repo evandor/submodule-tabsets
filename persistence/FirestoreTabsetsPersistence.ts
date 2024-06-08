@@ -5,6 +5,7 @@ import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {LocalStorage} from "quasar";
 import {APP_INSTALLATION_ID} from "boot/constants";
 import {useAuthStore} from "stores/authStore";
+import FirebaseServices from "src/services/firebase/FirebaseServices";
 
 const STORE_IDENT = 'tabsets';
 
