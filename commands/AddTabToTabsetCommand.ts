@@ -55,7 +55,7 @@ export class AddTabToTabsetCommand implements Command<any> {
         const tabset: Tabset = await useTabsetService().addToTabset(tabsetOrFolder, this.tab, 0)
 
         // Analysis
-        if (useAuthStore().isAuthenticated && this.tab.url?.startsWith("https://")) {
+        if (useAuthStore().isAuthenticated() && this.tab.url?.startsWith("https://")) {
           const userId = useAuthStore().user.uid
           setDoc(doc(FirebaseServices.getFirestore(), "users", userId, "queue", uid()),{"event": "new-tab", "url": this.tab.url})
         }
