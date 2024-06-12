@@ -98,7 +98,7 @@ import {FeatureIdent} from "src/models/FeatureIdent";
 import {useWindowsStore} from "src/windows/stores/windowsStore";
 import {useUtils} from "src/core/services/Utils";
 import ColorSelector from "components/dialogues/helper/ColorSelector.vue";
-import DialogButton from "components/buttons/DialogButton.vue";
+import DialogButton from "src/core/dialog/buttons/DialogButton.vue";
 import {MarkTabsetAsDefaultCommand} from "src/tabsets/commands/MarkTabsetAsDefault";
 import {useTabsStore2} from "src/tabsets/stores/tabsStore2";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
