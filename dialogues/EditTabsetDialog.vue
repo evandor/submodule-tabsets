@@ -85,7 +85,7 @@ import {STRIP_CHARS_IN_USER_INPUT} from "boot/constants";
 import {RenameTabsetCommand} from "src/tabsets/commands/RenameTabset";
 import {useNotificationHandler} from "src/core/services/ErrorHandler";
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
-import ColorSelector from "components/dialogues/helper/ColorSelector.vue";
+import ColorSelector from "src/core/dialog/ColorSelector.vue";
 import {usePermissionsStore} from "stores/permissionsStore";
 import {FeatureIdent} from "src/models/FeatureIdent";
 import {useWindowsStore} from "src/windows/stores/windowsStore";
