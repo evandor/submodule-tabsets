@@ -1,4 +1,4 @@
-import {Placeholders} from "src/models/Placeholders";
+import {Placeholders} from "src/tabsets/utils/PlaceholderUtils";
 import {Monitor} from "src/models/Monitor";
 import {uid} from "quasar";
 import {STRIP_CHARS_IN_USER_INPUT} from "boot/constants";
