@@ -64,7 +64,7 @@ const shareTabset = () => {
   useCommandExecutor()
     .executeFromUi(new ShareTabsetCommand(props.tabsetId, props.sharedId, TabsetSharing.PUBLIC_LINK, author.value, props.republish))
     .then((res: any) => {
-      //useUiStore().sidePanelSetActiveView(SidePanelView.MAIN)
+      //useUiStore().sidePanelSetActiveView(SidePanelViews.MAIN)
     })
 }
 

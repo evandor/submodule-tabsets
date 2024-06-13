@@ -30,7 +30,7 @@
 import {QForm, useDialogPluginComponent} from 'quasar'
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {MarkTabsetDeletedCommand} from "src/tabsets/commands/MarkTabsetDeleted";
-import {SidePanelView, useUiStore} from "src/ui/stores/uiStore";
+import {useUiStore} from "src/ui/stores/uiStore";
 import DialogButton from "src/core/dialog/buttons/DialogButton.vue";
 import {PropType, ref} from "vue";
 import {Tabset} from "src/tabsets/models/Tabset";
@@ -52,7 +52,7 @@ const theForm = ref<QForm>(null as unknown as QForm)
 
 const deleteFolder = () => useCommandExecutor().executeFromUi(new DeleteTabsetFolderCommand(props.tabset, props.folder))
     .then((res: any) => {
-        useUiStore().sidePanelSetActiveView(SidePanelView.MAIN)
+        useUiStore().sidePanelSetActiveView(SidePanelViews.MAIN)
       return res
     })
 

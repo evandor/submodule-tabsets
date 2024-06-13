@@ -31,7 +31,7 @@
 import {QForm, useDialogPluginComponent} from 'quasar'
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {MarkTabsetDeletedCommand} from "src/tabsets/commands/MarkTabsetDeleted";
-import {SidePanelView, useUiStore} from "src/ui/stores/uiStore";
+import {useUiStore} from "src/ui/stores/uiStore";
 import DialogButton from "src/core/dialog/buttons/DialogButton.vue";
 import {ref} from "vue";
 
@@ -53,7 +53,7 @@ const isValid = ref(true)
 const deleteTabset = () => useCommandExecutor().executeFromUi(new MarkTabsetDeletedCommand(props.tabsetId))
     .then((res: any) => {
       if (props.sidePanelMode) {
-        useUiStore().sidePanelSetActiveView(SidePanelView.MAIN)
+        useUiStore().sidePanelSetActiveView(SidePanelViews.MAIN)
       }
       return res
     })

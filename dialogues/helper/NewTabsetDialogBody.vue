@@ -92,8 +92,7 @@ import {ref, watchEffect} from "vue";
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {CreateTabsetCommand} from "src/tabsets/commands/CreateTabset";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
-import {SidePanelView, useUiStore} from "src/ui/stores/uiStore";
-import {usePermissionsStore} from "stores/permissionsStore";
+import {useUiStore} from "src/ui/stores/uiStore";
 import {FeatureIdent} from "src/models/FeatureIdent";
 import {useWindowsStore} from "src/windows/stores/windowsStore";
 import {useUtils} from "src/core/services/Utils";
@@ -103,6 +102,7 @@ import {MarkTabsetAsDefaultCommand} from "src/tabsets/commands/MarkTabsetAsDefau
 import {useTabsStore2} from "src/tabsets/stores/tabsStore2";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {useFeaturesStore} from "src/features/stores/featuresStore";
+import {SidePanelViews} from "src/models/SidePanelViews";
 
 const {dialogRef, onDialogHide, onDialogCancel} = useDialogPluginComponent()
 const {inBexMode} = useUtils()
@@ -162,7 +162,7 @@ const submit = () => {
   const existsInTabset = useTabsetsStore().existingInTabset(newTabsetName.value)
   if (existsInTabset && existsInTabset.status === TabsetStatus.ARCHIVED) {
     unarchiveTabset()
-    useUiStore().sidePanelSetActiveView(SidePanelView.MAIN)
+    useUiStore().sidePanelSetActiveView(SidePanelViews.MAIN)
     useTabsetService().selectTabset(existsInTabset.id)
     //router.push("/sidepanel?first=")
   } else {
@@ -187,7 +187,7 @@ const submit = () => {
         if (!props.fromPanel) {
           router.push("/tabsets/" + res.result?.tabsetId)
         } else {
-          useUiStore().sidePanelSetActiveView(SidePanelView.MAIN)
+          useUiStore().sidePanelSetActiveView(SidePanelViews.MAIN)
           router.push("/sidepanel?first=")
         }
       })
