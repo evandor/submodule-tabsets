@@ -15,7 +15,7 @@ import {useSpacesStore} from "src/spaces/stores/spacesStore";
 import {SaveOrReplaceResult} from "src/tabsets/models/SaveOrReplaceResult";
 import JsUtils from "src/utils/JsUtils";
 import {FeatureIdent} from "src/models/FeatureIdent";
-import {useUiStore} from "stores/uiStore";
+import {useUiStore} from "src/ui/stores/uiStore";
 import {useSuggestionsStore} from "src/suggestions/stores/suggestionsStore";
 import {Suggestion, SuggestionState, SuggestionType} from "src/suggestions/models/Suggestion";
 import {MonitoringType} from "src/models/Monitor";

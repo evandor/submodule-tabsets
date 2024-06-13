@@ -2,7 +2,7 @@ import Command from "src/core/domain/Command";
 import {ExecutionResult} from "src/core/domain/ExecutionResult";
 import _ from "lodash"
 import {Tab} from "src/tabsets/models/Tab";
-import {useUiStore} from "src/stores/uiStore";
+import {useUiStore} from "src/ui/stores/uiStore";
 import {useUtils} from "src/core/services/Utils";
 import {Tabset} from "src/tabsets/models/Tabset";
 import {useSpacesStore} from "src/spaces/stores/spacesStore";

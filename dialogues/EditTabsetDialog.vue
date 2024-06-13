@@ -89,7 +89,7 @@ import ColorSelector from "src/core/dialog/ColorSelector.vue";
 import {usePermissionsStore} from "stores/permissionsStore";
 import {FeatureIdent} from "src/models/FeatureIdent";
 import {useWindowsStore} from "src/windows/stores/windowsStore";
-import {ListDetailLevel, useUiStore} from "stores/uiStore";
+import {ListDetailLevel, useUiStore} from "src/ui/stores/uiStore";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {useFeaturesStore} from "src/features/stores/featuresStore";
 

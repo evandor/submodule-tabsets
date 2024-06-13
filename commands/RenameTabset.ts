@@ -2,7 +2,7 @@ import Command from "src/core/domain/Command";
 import {ExecutionResult} from "src/core/domain/ExecutionResult";
 import TabsetService from "src/tabsets/services/TabsetService";
 import {useUtils} from "src/core/services/Utils";
-import {ListDetailLevel} from "stores/uiStore";
+import {ListDetailLevel} from "src/ui/stores/uiStore";
 
 const {sendMsg} = useUtils()
 

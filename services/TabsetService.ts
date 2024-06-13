@@ -10,7 +10,7 @@ import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {useSpacesStore} from "src/spaces/stores/spacesStore";
 import PlaceholderUtils from "src/tabsets/utils/PlaceholderUtils";
 import {Monitor, MonitoringType} from "src/models/Monitor";
-import {ListDetailLevel, useUiStore} from "stores/uiStore";
+import {ListDetailLevel, useUiStore} from "src/ui/stores/uiStore";
 import {TabsetColumn} from "src/tabsets/models/TabsetColumn";
 import {deleteDoc, doc, Firestore, setDoc} from "firebase/firestore";
 import FirebaseServices from "src/services/firebase/FirebaseServices";
