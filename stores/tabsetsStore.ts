@@ -240,17 +240,17 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       }
     })
 
-    const tabsForUrl = computed((): (url: string) => Tab[] => {
+    const tabsForUrl = computed((): (url: string) => TabAndTabsetId[] => {
       return (url: string) => {
-        const tabs: Tab[] = []
+        const tabsAndTabsetId: TabAndTabsetId[] = []
         forEach([...tabsets.value.values()] as Tabset[], (ts: Tabset) => {
           forEach(ts.tabs, (t: Tab) => {
             if (t.url === url) {
-              tabs.push(t)
+              tabsAndTabsetId.push(new TabAndTabsetId(t, ts.id))
             }
           })
         })
-        return tabs
+        return tabsAndTabsetId
       }
     })
 

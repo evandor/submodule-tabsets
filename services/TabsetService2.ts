@@ -615,7 +615,7 @@ export function useTabsetService() {
         // increasing hit count
         const hits = _.filter(ts.tabs, (t: Tab) => t.url === url) as Tab[]
         let hit = false
-        _.forEach(hits, (h:Hit) => {
+        _.forEach(hits, (h:Tab) => {
           h.activatedCount = 1 + h.activatedCount
           h.lastActive = new Date().getTime()
           hit = true

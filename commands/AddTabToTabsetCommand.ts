@@ -8,7 +8,7 @@ import {Tabset, TabsetSharing} from "src/tabsets/models/Tabset";
 import {useUtils} from "src/core/services/Utils";
 import {useSearchStore} from "src/search/stores/searchStore";
 import {uid, useQuasar} from "quasar";
-import {useGroupsStore} from "stores/groupsStore";
+import {useGroupsStore} from "src/tabsets/stores/groupsStore";
 import PlaceholderUtils from "src/tabsets/utils/PlaceholderUtils";
 import {useAuthStore} from "stores/authStore";
 import {collection, deleteDoc, doc, getDoc, getDocs, setDoc, updateDoc} from "firebase/firestore";
