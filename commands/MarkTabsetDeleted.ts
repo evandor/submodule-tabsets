@@ -39,7 +39,7 @@ export class MarkTabsetDeletedCommand implements Command<Tabset> {
           //console.log("deactivating")
           useFeaturesStore().deactivateFeature(FeatureIdent.BACKUP.toLowerCase())
         } else if (tabset.type === TabsetType.SPECIAL && tabset.id === "IGNORE") {
-          useFeaturesStore().deactivateFeature(FeatureIdent.IGNORE.toLowerCase())
+          //useFeaturesStore().deactivateFeature(FeatureIdent.IGNORE.toLowerCase())
         }
         if (this.tabsetId === useTabsetsStore().currentTabsetId || useTabsetsStore().currentTabsetId === null) {
           useTabsetService().selectTabset(undefined)
@@ -54,7 +54,7 @@ export class MarkTabsetDeletedCommand implements Command<Tabset> {
         new ExecutionResult(
           res,
           "Tabset deleted",
-          new UndoCommand(this.tabsetId)))
+          new Map([["Undo", new UndoCommand(this.tabsetId)]])))
       )
       .catch(err => Promise.reject(err))
   }

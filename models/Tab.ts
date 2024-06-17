@@ -1,8 +1,8 @@
-import {Placeholders} from "src/tabsets/utils/PlaceholderUtils";
 import {Monitor} from "src/models/Monitor";
 import {uid} from "quasar";
 import {STRIP_CHARS_IN_USER_INPUT} from "boot/constants";
 import _ from "lodash"
+import {Placeholders} from "src/tabsets/models/Placeholders";
 
 export enum TabSorting {
   URL = "URL",

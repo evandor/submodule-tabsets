@@ -39,7 +39,7 @@ export class MarkTabsetAsArchivedCommand implements Command<any> {
         new ExecutionResult(
           oldStatus,
           "The tabset has been archived. Check the settings page to revert this decision",
-          new UndoCommand(this.tabsetId, oldStatus)))
+          new Map([["Undo", new UndoCommand(this.tabsetId, oldStatus)]])))
       )
       .catch(err => Promise.reject(err))
   }

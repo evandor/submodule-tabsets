@@ -409,7 +409,8 @@ export function useTabsetService() {
             } else {
               t.contentHash = ""
             }
-            if (useFeaturesStore().hasFeature(FeatureIdent.MONITORING) &&
+            const monitoringFeature = FeatureIdent['MONITORING' as keyof typeof FeatureIdent]
+            if (monitoringFeature && useFeaturesStore().hasFeature(monitoringFeature) &&
               t.monitor && t.monitor.type === MonitoringType.CONTENT_HASH) {
               if (oldContentHash && oldContentHash !== '' &&
                 t.contentHash !== oldContentHash &&
@@ -607,6 +608,26 @@ export function useTabsetService() {
     return false;
   }
 
+  const urlWasActivated = (url: string): void => {
+    _.forEach([...useTabsetsStore().tabsets.keys()], key => {
+      const ts = useTabsetsStore().tabsets.get(key)
+      if (ts && ts.status !== TabsetStatus.DELETED) {
+        // increasing hit count
+        const hits = _.filter(ts.tabs, (t: Tab) => t.url === url) as Tab[]
+        let hit = false
+        _.forEach(hits, h => {
+          h.activatedCount = 1 + h.activatedCount
+          h.lastActive = new Date().getTime()
+          hit = true
+        })
+        if (hit) {
+          console.debug("saving tabset on activated", ts.name)
+          saveTabset(ts as Tabset)
+        }
+      }
+    })
+  }
+
   const tabsToShow = (tabset: Tabset): Tab[] => {
 
     let tabs: Tab[] = tabset.tabs
@@ -708,7 +729,8 @@ export function useTabsetService() {
     findFolder,
     findTabInFolder,
     moveTabToFolder,
-    deleteTabsetFolder
+    deleteTabsetFolder,
+    urlWasActivated
   }
 
 }

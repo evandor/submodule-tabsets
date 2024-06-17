@@ -40,7 +40,7 @@ export class RenameTabsetCommand implements Command<any> {
                 new ExecutionResult(
                     oldValues.oldName,
                     "Tabset was updated",
-                    new UndoRenameTabsetCommand(this.tabsetId, oldValues.oldName, oldValues.oldColor)))
+                  new Map([["Undo", new UndoRenameTabsetCommand(this.tabsetId, oldValues.oldName, oldValues.oldColor)]])))
             )
             .catch(err => Promise.reject(err))
     }

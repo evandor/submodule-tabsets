@@ -74,11 +74,13 @@ export class CreateTabFromOpenTabsCommand implements Command<any> {
                   return useTabsetService()
                     .saveText(this.tab, content['content' as keyof object], content['metas' as keyof object])
                     .then((res) => {
-                      return new ExecutionResult("result", "Tab was added", new UndoCommand(this.tab, currentTabset))
+                      return new ExecutionResult("result", "Tab was added",
+                        new Map([["Undo", new UndoCommand(this.tab,currentTabset)]]))
                     })
                 } else {
                   return saveCurrentTabset()
-                    .then(result => new ExecutionResult(result, "Tab was added", new UndoCommand(this.tab, currentTabset)))
+                    .then(result => new ExecutionResult(result, "Tab was added",
+                      new Map([["Undo", new UndoCommand(this.tab, currentTabset)]])))
                 }
               })
           } else {
@@ -95,7 +97,7 @@ export class CreateTabFromOpenTabsCommand implements Command<any> {
         .then(result => new ExecutionResult(
           result,
           "Tab was added",
-          new UndoCommand(this.tab, currentTabset || null as unknown as Tabset)))
+          new Map([["Undo", new UndoCommand(this.tab, currentTabset || null as unknown as Tabset)]])))
     }
 
 
