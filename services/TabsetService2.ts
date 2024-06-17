@@ -6,7 +6,6 @@ import ChromeApi from "src/services/ChromeApi";
 import {TabPredicate} from "src/domain/Types";
 import {Tabset, TabsetStatus, TabsetType} from "src/tabsets/models/Tabset";
 import {MetaLink} from "src/models/MetaLink";
-// import {SpecialTabsetIdent} from "src/domain/tabsets/CreateSpecialTabset";
 // @ts-ignore
 import {v5 as uuidv5} from 'uuid';
 import {useSettingsStore} from "src/stores/settingsStore"
@@ -28,6 +27,7 @@ import TabsetsPersistence from "src/tabsets/persistence/TabsetsPersistence";
 import {useTabsStore} from "src/bookmarks/stores/tabsStore";
 import {useFeaturesStore} from "src/features/stores/featuresStore";
 import {useSearchStore} from "src/search/stores/searchStore";
+import {Hit} from "src/search/models/Hit";
 
 let db: TabsetsPersistence = null as unknown as TabsetsPersistence
 
@@ -609,13 +609,13 @@ export function useTabsetService() {
   }
 
   const urlWasActivated = (url: string): void => {
-    _.forEach([...useTabsetsStore().tabsets.keys()], key => {
+    _.forEach([...useTabsetsStore().tabsets.keys()], (key:string) => {
       const ts = useTabsetsStore().tabsets.get(key)
       if (ts && ts.status !== TabsetStatus.DELETED) {
         // increasing hit count
         const hits = _.filter(ts.tabs, (t: Tab) => t.url === url) as Tab[]
         let hit = false
-        _.forEach(hits, h => {
+        _.forEach(hits, (h:Hit) => {
           h.activatedCount = 1 + h.activatedCount
           h.lastActive = new Date().getTime()
           hit = true

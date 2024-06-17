@@ -34,6 +34,7 @@ import {MarkTabsetDeletedCommand} from "src/tabsets/commands/MarkTabsetDeleted";
 import {useUiStore} from "src/ui/stores/uiStore";
 import DialogButton from "src/core/dialog/buttons/DialogButton.vue";
 import {ref} from "vue";
+import {SidePanelViews} from "src/models/SidePanelViews";
 
 defineEmits([
   ...useDialogPluginComponent.emits

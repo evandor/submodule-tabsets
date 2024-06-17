@@ -23,7 +23,7 @@ import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 
 const emit = defineEmits(['domainSelected']);
 
-const groupedTabs = ref<Map<String, Tab[]>>(new Map())
+const groupedTabs = ref<Map<string, Tab[]>>(new Map())
 
 onMounted(() => {
   Analytics.firePageViewEvent('SidePanelByDomainList', document.location.href);

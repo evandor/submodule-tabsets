@@ -11,7 +11,7 @@ class IndexedDbTabsetsPersistence implements TabsetsPersistence {
   private db: IDBPDatabase = null as unknown as IDBPDatabase
 
   getServiceName(): string {
-    return "IndexedDbTabsetsStorage";
+    return this.constructor.name
   }
 
   async init() {

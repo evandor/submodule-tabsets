@@ -32,7 +32,8 @@ export class DeleteTabsetDescriptionCommand implements Command<string> {
         //sendMsg('...', {tabsetId: this.tabsetId})
         return res
       })
-      .then(res => Promise.resolve(new ExecutionResult(res, "Description deleted", new UndoCommand(this.tabsetId, this.tabsetPage))))
+      .then(res => Promise.resolve(new ExecutionResult(res, "Description deleted",
+        new Map([["Undo", new UndoCommand(this.tabsetId, this.tabsetId)]]))))
       .catch(err => Promise.reject(err))
   }
 }
