@@ -36,7 +36,7 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
   }
 
   async loadTabsets(): Promise<any> {
-    console.log("loading tabsets", this.getServiceName());
+    console.log(" ...loading tabsets", this.getServiceName());
     // useUiStore().syncing = true
     const docs = await getDocs(tabsetsCollection())
     docs.forEach((doc:any) => {

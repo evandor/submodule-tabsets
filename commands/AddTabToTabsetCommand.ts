@@ -75,47 +75,22 @@ export class AddTabToTabsetCommand implements Command<any> {
         let res: any = null
         if (content) {
           const res2 = await useTabsetService().saveText(this.tab, content['content' as keyof object], content['metas' as keyof object])
-          // add to search index
-          //useQuasar().bex.send('some.event', { someKey: 'aValue' })
-          AppEventDispatcher.dispatchEvent('add-to-search',{
-            name: this.tab.name || '',
-            title: this.tab.title || '',
-            url: this.tab.url || '',
-            description: this.tab.description,
-            content: content['content' as keyof object],
-            tabsets: [this.tabset.id],
-            favIconUrl: this.tab.favIconUrl || ''
-          })
-          // useSearchStore().addToIndex(
-          //   uid(), this.tab.name || '',
-          //   this.tab.title || '',
-          //   this.tab.url || '',
-          //   this.tab.description, content['content' as keyof object],
-          //   [this.tabset.id],
-          //   this.tab.favIconUrl || '')
           res = new ExecutionResult("result", "Tab was added",)
         } else {
           const res2 = saveTabset(this.tabset)
-          AppEventDispatcher.dispatchEvent('add-to-search',{
-            name: this.tab.name || '',
-            title: this.tab.title || '',
-            url: this.tab.url || '',
-            description: this.tab.description,
-            content: '',
-            tabsets: [this.tabset.id],
-            favIconUrl: this.tab.favIconUrl || ''
-          })
-          // useSearchStore().addToIndex(
-          //   uid(), this.tab.name || '',
-          //   this.tab.title || '',
-          //   this.tab.url || '',
-          //   this.tab.description, '',
-          //   [this.tabset.id],
-          //   this.tab.favIconUrl || '')
           res = new ExecutionResult(res2, "Tab was added")
         }
+        // add to search index via App Dispatcher
+        AppEventDispatcher.dispatchEvent('add-to-search',{
+          name: this.tab.name || '',
+          title: this.tab.title || '',
+          url: this.tab.url || '',
+          description: this.tab.description,
+          content: content['content' as keyof object] || '',
+          tabsets: [this.tabset.id],
+          favIconUrl: this.tab.favIconUrl || ''
+        })
         sendMsg('tab-added', {tabsetId: this.tabset.id})
-
         return res
       } catch (err) {
         return Promise.reject("error: " + err)

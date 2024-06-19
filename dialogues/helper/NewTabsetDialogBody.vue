@@ -158,7 +158,7 @@ const doesNotExistYet = (val: string) => {
 }
 
 const submit = () => {
-  console.log("submit", addAllOpenTabs.value, tabsStore2.browserTabs, windowModel.value)
+  //console.log("submit", addAllOpenTabs.value, tabsStore2.browserTabs, windowModel.value)
   const existsInTabset = useTabsetsStore().existingInTabset(newTabsetName.value)
   if (existsInTabset && existsInTabset.status === TabsetStatus.ARCHIVED) {
     unarchiveTabset()
