@@ -6,13 +6,14 @@ import _ from "lodash";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {Tabset, TabsetSharing} from "src/tabsets/models/Tabset";
 import {useUtils} from "src/core/services/Utils";
-import {useSearchStore} from "src/search/stores/searchStore";
 import {uid, useQuasar} from "quasar";
 import {useGroupsStore} from "src/tabsets/stores/groupsStore";
 import PlaceholderUtils from "src/tabsets/utils/PlaceholderUtils";
 import {useAuthStore} from "stores/authStore";
-import {collection, deleteDoc, doc, getDoc, getDocs, setDoc, updateDoc} from "firebase/firestore";
+import { doc, setDoc} from "firebase/firestore";
 import FirebaseServices from "src/services/firebase/FirebaseServices";
+import AppService from "src/services/AppService";
+import AppEventDispatcher from "src/services/AppEventDispatcher";
 
 const {saveTabset} = useTabsetService()
 const {sendMsg} = useUtils()
@@ -75,23 +76,42 @@ export class AddTabToTabsetCommand implements Command<any> {
         if (content) {
           const res2 = await useTabsetService().saveText(this.tab, content['content' as keyof object], content['metas' as keyof object])
           // add to search index
-          useSearchStore().addToIndex(
-            uid(), this.tab.name || '',
-            this.tab.title || '',
-            this.tab.url || '',
-            this.tab.description, content['content' as keyof object],
-            [this.tabset.id],
-            this.tab.favIconUrl || '')
+          //useQuasar().bex.send('some.event', { someKey: 'aValue' })
+          AppEventDispatcher.dispatchEvent('add-to-search',{
+            name: this.tab.name || '',
+            title: this.tab.title || '',
+            url: this.tab.url || '',
+            description: this.tab.description,
+            content: content['content' as keyof object],
+            tabsets: [this.tabset.id],
+            favIconUrl: this.tab.favIconUrl || ''
+          })
+          // useSearchStore().addToIndex(
+          //   uid(), this.tab.name || '',
+          //   this.tab.title || '',
+          //   this.tab.url || '',
+          //   this.tab.description, content['content' as keyof object],
+          //   [this.tabset.id],
+          //   this.tab.favIconUrl || '')
           res = new ExecutionResult("result", "Tab was added",)
         } else {
           const res2 = saveTabset(this.tabset)
-          useSearchStore().addToIndex(
-            uid(), this.tab.name || '',
-            this.tab.title || '',
-            this.tab.url || '',
-            this.tab.description, '',
-            [this.tabset.id],
-            this.tab.favIconUrl || '')
+          AppEventDispatcher.dispatchEvent('add-to-search',{
+            name: this.tab.name || '',
+            title: this.tab.title || '',
+            url: this.tab.url || '',
+            description: this.tab.description,
+            content: '',
+            tabsets: [this.tabset.id],
+            favIconUrl: this.tab.favIconUrl || ''
+          })
+          // useSearchStore().addToIndex(
+          //   uid(), this.tab.name || '',
+          //   this.tab.title || '',
+          //   this.tab.url || '',
+          //   this.tab.description, '',
+          //   [this.tabset.id],
+          //   this.tab.favIconUrl || '')
           res = new ExecutionResult(res2, "Tab was added")
         }
         sendMsg('tab-added', {tabsetId: this.tabset.id})

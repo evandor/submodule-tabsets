@@ -24,10 +24,8 @@ import {useContentService} from "src/content/services/ContentService";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {useTabsStore2} from "src/tabsets/stores/tabsStore2";
 import TabsetsPersistence from "src/tabsets/persistence/TabsetsPersistence";
-import {useTabsStore} from "src/bookmarks/stores/tabsStore";
 import {useFeaturesStore} from "src/features/stores/featuresStore";
 import {useSearchStore} from "src/search/stores/searchStore";
-import {Hit} from "src/search/models/Hit";
 
 let db: TabsetsPersistence = null as unknown as TabsetsPersistence
 
@@ -35,7 +33,7 @@ export function useTabsetService() {
 
   const init = async (providedDb: TabsetsPersistence,
                       doNotInitSearchIndex: boolean = false) => {
-    console.log(" ...initializing tabsetService2 as", providedDb.getServiceName())
+    console.debug(" ...initializing tabsetService2 as", providedDb.getServiceName())
     db = providedDb
 
    // useTabsStore().clearTabsets()
@@ -196,7 +194,6 @@ export function useTabsetService() {
   }
 
   const getTabset = (tabsetId: string): Tabset | undefined => {
-    const tabsStore = useTabsStore()
     return _.find([...useTabsetsStore().tabsets.values()] as Tabset[], (ts:Tabset) => ts.id === tabsetId)
   }
 
@@ -215,7 +212,6 @@ export function useTabsetService() {
 
   const selectTabset = (tabsetId: string | undefined): void => {
     console.debug("selecting tabset", tabsetId)
-    const tabsStore = useTabsStore()
     resetSelectedTabs()
     if (tabsetId) {
       useTabsetsStore().selectCurrentTabset(tabsetId)
@@ -232,7 +228,6 @@ export function useTabsetService() {
   const deleteTabset = async (tabsetId: string): Promise<string> => {
     const tabset = getTabset(tabsetId)
     if (tabset) {
-      const tabsStore = useTabsStore()
       _.forEach(useTabsetsStore().getTabset(tabsetId)?.tabs, (t: Tab) => {
         console.debug(t, "removing thumbnails")
         useThumbnailsService().removeThumbnailsFor(t?.url || '')

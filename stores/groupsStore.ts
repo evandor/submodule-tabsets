@@ -41,7 +41,7 @@ export const useGroupsStore = defineStore('groups', () => {
    * @param providedDb a persistence storage
    */
   async function initialize(providedDb: TabsetsGroupsPersistence) {
-    console.log(" ...initializing groupsStore")
+    console.debug(" ...initializing groupsStore")
     storage = providedDb
     await init("initialization")
   }
@@ -114,7 +114,7 @@ export const useGroupsStore = defineStore('groups', () => {
 
   function initListeners() {
     if (inBexMode() && chrome && chrome.tabGroups) {
-      console.log(" ...initializing GroupsStore Listeners")
+      console.debug(" ...initializing GroupsStore Listeners")
       chrome.tabGroups.onCreated.addListener((group: chrome.tabGroups.TabGroup) => onCreated(group))
       chrome.tabGroups.onRemoved.addListener((group: chrome.tabGroups.TabGroup) => init("onRemoved"))
       chrome.tabGroups.onMoved.addListener((group: chrome.tabGroups.TabGroup) => init("onMoved"))

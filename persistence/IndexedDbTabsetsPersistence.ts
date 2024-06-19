@@ -15,7 +15,7 @@ class IndexedDbTabsetsPersistence implements TabsetsPersistence {
   }
 
   async init() {
-    console.log(" ...initializing tabsets (IndexedDbSpacesStorage)" )
+    console.debug(" ...initializing tabsets (IndexedDbSpacesStorage)" )
     this.db = await this.initDatabase()
     return Promise.resolve()
   }
