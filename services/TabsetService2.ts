@@ -25,7 +25,6 @@ import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {useTabsStore2} from "src/tabsets/stores/tabsStore2";
 import TabsetsPersistence from "src/tabsets/persistence/TabsetsPersistence";
 import {useFeaturesStore} from "src/features/stores/featuresStore";
-import {useSearchStore} from "src/search/stores/searchStore";
 
 let db: TabsetsPersistence = null as unknown as TabsetsPersistence
 
@@ -40,8 +39,10 @@ export function useTabsetService() {
 
     await db.loadTabsets()
     if (!doNotInitSearchIndex) {
-      useSearchStore().populateFromContent(useContentService().getContents())
-      useSearchStore().populateFromTabsets()
+      // moving to content module
+      //useSearchStore().populateFromContent(useContentService().getContents())
+
+      //useSearchStore().populateFromTabsets()
     }
 
     // check TODO!
@@ -115,7 +116,7 @@ export function useTabsetService() {
       //   console.info(tab, "created tab")
       // })
       selectTabset(tabset.id)
-      useSearchStore().indexTabs(tabset.id, tabs)
+      //useSearchStore().indexTabs(tabset.id, tabs)
       return new SaveOrReplaceResult(false, tabset, false)
     } catch (err) {
       return Promise.reject("problem updating or creating tabset: " + err)
@@ -140,7 +141,7 @@ export function useTabsetService() {
       }
       await saveTabset(tabsetCopy)
       selectTabset(tabsetCopy.id)
-      useSearchStore().indexTabs(tabsetCopy.id, tabsetCopy.tabs)
+      //useSearchStore().indexTabs(tabsetCopy.id, tabsetCopy.tabs)
       return {
         replaced: false,
         tabset: tabsetCopy,

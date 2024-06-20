@@ -407,7 +407,7 @@ const suggestTabsetImport = () => {
 }
 
 const updateSelectedTabset = (tabsetId: string, open: boolean, index: number | undefined = undefined) => {
-  console.log("updated...", tabsetId, open, index, Object.keys(tabsetExpanded.value))
+  console.log(`updating: selectedTabset=${tabsetId} ${open ? 'open':'closed'}`)
   tabsetExpanded.value.set(tabsetId, open)
   if (open) {
     if (index) {
