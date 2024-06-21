@@ -281,7 +281,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       return _.map(
         _.flatMap(
           [...useTabsetsStore().tabsets.values()] as Tabset[],
-          (ts => ts.tabs)),
+          ((ts:Tabset) => ts.tabs)),
         (t: Tab) => t.url || '')
     }
 

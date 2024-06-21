@@ -359,7 +359,7 @@ watchEffect(() => {
     const tabsetIds = useTabsetService().tabsetsFor(url)
     tsBadges.value = []
     //created.value = undefined
-    _.forEach(tabsetIds, tsId => {
+    _.forEach(tabsetIds, (tsId:string) => {
       tsBadges.value.push({
         label: TabsetService.nameForTabsetId(tsId),
         tabsetId: tsId,

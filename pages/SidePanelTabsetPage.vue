@@ -118,7 +118,7 @@ const tabset = ref<Tabset | undefined>(undefined)
 const currentChromeTabs = ref<chrome.tabs.Tab[]>([])
 const openTabs = ref<chrome.tabs.Tab[]>([])
 const currentTabset = ref<Tabset | undefined>(undefined)
-const currentChromeTab = ref<chrome.tabs.Tab>(null as unknown as chrome.tabs.Tab)
+const currentChromeTab = ref<chrome.tabs.Tab | undefined>(undefined)
 
 const sorting = ref<TabSorting>(TabSorting.CUSTOM)
 const descending = ref<boolean>(false)
@@ -138,12 +138,12 @@ watchEffect(() => {
 const tabsets = ref<Tabset[]>([])
 const selectedTab = ref<Tab | undefined>(undefined)
 
-watchEffect(() => {
-  selectedTab.value = useUiStore().getSelectedTab
-  if (selectedTab.value) {
-    currentChromeTab.value = null as unknown as chrome.tabs.Tab
-  }
-})
+// watchEffect(() => {
+//   selectedTab.value = useUiStore().getSelectedTab
+//   if (selectedTab.value) {
+//     currentChromeTab.value = null as unknown as chrome.tabs.Tab
+//   }
+// })
 
 watchEffect(() => {
   openTabs.value = useTabsStore2().browserTabs
@@ -197,7 +197,7 @@ const saveInTabset = () => {
     return
   }
   const useTS = useTabsetsStore().getTabset(tabsetId.value)
-  if (useTS) {
+  if (useTS && currentChromeTab.value) {
     useCommandExecutor().execute(new AddTabToTabsetCommand(new Tab(uid(), currentChromeTab.value), useTS))
   } else {
     console.warn("expected to find tabsetId", tabsetId)

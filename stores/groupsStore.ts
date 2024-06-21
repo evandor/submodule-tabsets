@@ -142,7 +142,7 @@ export const useGroupsStore = defineStore('groups', () => {
 
   function groupForName(groupTitle: string | undefined): chrome.tabGroups.TabGroup | undefined {
     if (inBexMode() && chrome && chrome.tabGroups && groupTitle) {
-      return _.find([...tabGroups.value.values()], g => g.title === groupTitle)
+      return _.find([...tabGroups.value.values()], (g:chrome.tabGroups.TabGroup) => g.title === groupTitle)
     }
     return undefined
   }

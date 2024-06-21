@@ -1,3 +1,4 @@
+
 <template>
   <q-menu :offset="[0, 0]">
     <q-list dense style="min-width: 200px">
@@ -146,7 +147,7 @@ const openSimilar = async () => {
     const data = res.data
     console.log("res", res, data['similar_sites'])
     if (data['similar_sites']) {
-      const urls = _.map(data['similar_sites'], u => "https://" + u)
+      const urls = _.map(data['similar_sites'], (u:any) => "https://" + u)
       NavigationService.openOrCreateTab(urls)
       handleSuccess(new ExecutionResult("done", "opening " + urls.length + " similar page(s)"))
     }
@@ -158,7 +159,7 @@ const openSimilar = async () => {
 
 const deleteTab = async () => {
   const useTab = await tabToUse(props.tab)
-  useCommandExecutor().executeFromUi(new DeleteTabCommand(useTab, props.tabset))
+  useCommandExecutor().executeFromUi(new DeleteTabCommand(useTab, props.tabset!))
   if (useTab && useTab.url) {
     const res = await useBookmarksStore().findBookmarksForUrl(useTab.url)
     console.log("existing bookmarks", res)

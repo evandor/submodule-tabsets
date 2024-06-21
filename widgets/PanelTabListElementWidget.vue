@@ -379,15 +379,15 @@ import {LocalStorage, useQuasar} from "quasar";
 import {useSuggestionsStore} from "src/suggestions/stores/suggestionsStore";
 import {Suggestion, SuggestionState} from "src/suggestions/models/Suggestion";
 import PdfService from "src/snapshots/services/PdfService";
-import {SavedBlob} from "src/models/SavedBlob";
 import CommentDialog from "components/dialogues/CommentDialog.vue";
-import {DeleteCommentCommand} from "src/domain/tabs/DeleteCommentCommand";
-import {UpdateTabNameCommand} from "src/domain/tabs/UpdateTabName";
 import {useThumbnailsService} from "src/thumbnails/services/ThumbnailsService";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {useFeaturesStore} from "src/features/stores/featuresStore";
 import TabService from "src/services/TabService";
 import TabDetailsSearchIndex from "pages/sidepanel/helper/TabDetailsSearchIndex.vue";
+import {DeleteCommentCommand} from "src/domain/tabs/DeleteCommentCommand";
+import {UpdateTabNameCommand} from "src/domain/tabs/UpdateTabName";
+import {SavedBlob} from "src/snapshots/models/SavedBlob";
 
 const {inBexMode} = useUtils()
 
@@ -451,7 +451,7 @@ onMounted(() => {
   // }
 })
 
-const thumbnailFor = async (tab: Tab): Promise<object> => {
+const thumbnailFor = async (tab: Tab): Promise<string> => {
   return await useThumbnailsService().getThumbnailFor(tab.url)
 }
 
@@ -459,7 +459,7 @@ watchEffect(() => {
   if (props.tab && props.tab.preview === TabPreview.THUMBNAIL) {
     // @ts-ignore
     thumbnailFor(props.tab)
-      .then((tn: object) => {
+      .then((tn: string) => {
         //console.log("tn", tn)
         if (tn && tn['thumbnail' as keyof object]) {
           thumbnail.value = tn['thumbnail' as keyof object]
@@ -500,7 +500,7 @@ watchEffect(() => {
     const url = props.tab.url
     const tabsetIds = useTabsetService().tabsetsFor(url)
     tsBadges.value = []
-    _.forEach(tabsetIds, tsId => tsBadges.value.push({
+    _.forEach(tabsetIds, (tsId:string) => tsBadges.value.push({
       label: TabsetService.nameForTabsetId(tsId),
       tabsetId: tsId,
       encodedUrl: btoa(url || '')

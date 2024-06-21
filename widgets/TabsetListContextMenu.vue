@@ -170,16 +170,13 @@ import _ from "lodash";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {openURL, useQuasar} from "quasar";
 import DeleteTabsetDialog from "src/tabsets/dialogues/DeleteTabsetDialog.vue";
-import {ShareTabsetCommand} from "src/tabsets/commands/ShareTabsetCommand"
-import {UnShareTabsetCommand} from "src/tabsets/commands/UnShareTabsetCommand"
 import {CopyToClipboardCommand} from "src/core/domain/commands/CopyToClipboard";
-import {StopSessionCommand} from "src/domain/commands/StopSessionCommand";
 import {DrawerTabs, useUiStore} from "src/ui/stores/uiStore";
-import {CopyTabsetCommand} from "src/domain/tabsets/CopyTabset";
 import {RestoreTabsetCommand} from "src/tabsets/commands/RestoreTabset";
 import {Tab} from "src/tabsets/models/Tab";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {useFeaturesStore} from "src/features/stores/featuresStore";
+import {CopyTabsetCommand} from "src/domain/tabsets/CopyTabset";
 
 const {inBexMode} = useUtils()
 
@@ -205,17 +202,21 @@ const markAsFavorite = (tabsetId: string) => useCommandExecutor().executeFromUi(
 const markAsDefault = (tabsetId: string) => useCommandExecutor().executeFromUi(new MarkTabsetAsDefaultCommand(tabsetId))
 const archiveTabset = (tabsetId: string) => useCommandExecutor().executeFromUi(new MarkTabsetAsArchivedCommand(tabsetId))
 
-const showDetails = (tabsetId: string) => useUiStore().rightDrawerSetActiveTab(DrawerTabs.TABSET_DETAILS, {tabsetId})
+const showDetails = (tabsetId: string) => useUiStore().rightDrawerSetActiveTab(DrawerTabs.TABSET_DETAILS)
 
 const stopSession = (tabsetId: string) => {
   const tabset = useTabsetsStore().getTabset(tabsetId)
   if (tabset) {
-    useCommandExecutor().executeFromUi(new StopSessionCommand(tabset))
+    //useCommandExecutor().executeFromUi(new StopSessionCommand(tabset))
   }
 }
 
-const sharePublicly = (tabsetId: string) => useCommandExecutor().executeFromUi(new ShareTabsetCommand(tabsetId, TabsetSharing.PUBLIC))
-const removePublicShare = (tabsetId: string) => useCommandExecutor().executeFromUi(new UnShareTabsetCommand(tabsetId))
+const sharePublicly = (tabsetId: string) => {
+  //useCommandExecutor().executeFromUi(new ShareTabsetCommand(tabsetId, TabsetSharing.PUBLIC))
+}
+const removePublicShare = (tabsetId: string) => {
+  //useCommandExecutor().executeFromUi(new UnShareTabsetCommand(tabsetId))
+}
 
 const publictabsetsPath = "https://tabsets.web.app/#/tabsets/"
 
