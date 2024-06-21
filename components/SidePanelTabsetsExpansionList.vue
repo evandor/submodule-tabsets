@@ -285,7 +285,7 @@ const tsBadges = ref<object[]>([])
 const editHeaderDescription = ref<boolean>(false)
 const tabsetName = ref<object>(null as unknown as object)
 const tabsetNameOptions = ref<object[]>([])
-const currentChromeTab = ref<chrome.tabs.Tab>(null as unknown as chrome.tabs.Tab)
+const currentChromeTab = ref<chrome.tabs.Tab | undefined>(undefined)
 const hoveredPublicLink = ref(false)
 const headerDescription = ref<string>('')
 
@@ -322,13 +322,13 @@ watchEffect(() => {
   useUiStore().tabsetsExpanded = true
 })
 
-watchEffect(() => {
-  //console.log(" >>> change in getSelectedTab", useUiStore().getSelectedTab)
-  selectedTab.value = useUiStore().getSelectedTab
-  if (selectedTab.value) {
-    currentChromeTab.value = null as unknown as chrome.tabs.Tab
-  }
-})
+// watchEffect(() => {
+//   //console.log(" >>> change in getSelectedTab", useUiStore().getSelectedTab)
+//   selectedTab.value = useUiStore().getSelectedTab
+//   if (selectedTab.value) {
+//     currentChromeTab.value = null as unknown as chrome.tabs.Tab
+//   }
+// })
 
 watchEffect(() => {
   if (useTabsetsStore().tabsets) {
@@ -345,13 +345,13 @@ watchEffect(() => {
   }
 })
 
-watchEffect(() => {
-  //console.log(" >>> change in getSelectedTab", useUiStore().getSelectedTab)
-  selectedTab.value = useUiStore().getSelectedTab
-  if (selectedTab.value) {
-    currentChromeTab.value = null as unknown as chrome.tabs.Tab
-  }
-})
+// watchEffect(() => {
+//   //console.log(" >>> change in getSelectedTab", useUiStore().getSelectedTab)
+//   selectedTab.value = useUiStore().getSelectedTab
+//   if (selectedTab.value) {
+//     currentChromeTab.value = null as unknown as chrome.tabs.Tab
+//   }
+// })
 
 watchEffect(() => {
   if (currentChromeTab.value?.url) {
@@ -568,7 +568,7 @@ const copyPublicShareToClipboard = (tabsetId: string) => {
   }
 }
 
-const showAddTabButton = (tabset: Tabset, currentChromeTab: chrome.tabs.Tab) => {
+const showAddTabButton = (tabset: Tabset, currentChromeTab: chrome.tabs.Tab | undefined) => {
   return inBexMode() &&
     tabset.type !== TabsetType.DYNAMIC &&
     currentChromeTab &&
@@ -621,7 +621,7 @@ const alreadyInTabset = () => {
 
 const saveInTabset = (tabsetId: string, activeFolder: string | undefined) => {
   const useTS: Tabset | undefined = useTabsetsStore().getTabset(tabsetId)
-  if (useTS) {
+  if (useTS && currentChromeTab.value) {
     // if (alreadyInTabset()) {
     //   return
     // }
@@ -633,7 +633,7 @@ const saveInTabset = (tabsetId: string, activeFolder: string | undefined) => {
 
 const addURL = (tabsetId: string, activeFolder: string | undefined) => {
   const useTS: Tabset | undefined = useTabsetsStore().getTabset(tabsetId)
-  if (useTS) {
+  if (useTS && currentChromeTab.value) {
     useCommandExecutor().execute(new AddTabToTabsetCommand(new Tab(uid(), currentChromeTab.value), useTS, activeFolder))
   } else {
     console.warn("expected to find tabsetId", tabsetId)
