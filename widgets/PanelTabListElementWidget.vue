@@ -378,7 +378,6 @@ import {PlaceholdersType} from "src/tabsets/models/Placeholders";
 import {LocalStorage, useQuasar} from "quasar";
 import {useSuggestionsStore} from "src/suggestions/stores/suggestionsStore";
 import {Suggestion, SuggestionState} from "src/suggestions/models/Suggestion";
-import PdfService from "src/snapshots/services/PdfService";
 import CommentDialog from "components/dialogues/CommentDialog.vue";
 import {useThumbnailsService} from "src/thumbnails/services/ThumbnailsService";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
@@ -388,6 +387,7 @@ import TabDetailsSearchIndex from "pages/sidepanel/helper/TabDetailsSearchIndex.
 import {DeleteCommentCommand} from "src/domain/tabs/DeleteCommentCommand";
 import {UpdateTabNameCommand} from "src/domain/tabs/UpdateTabName";
 import {SavedBlob} from "src/snapshots/models/SavedBlob";
+import {useSnapshotsService} from "src/snapshots/services/SnapshotsService";
 
 const {inBexMode} = useUtils()
 
@@ -538,7 +538,7 @@ watchEffect(() => {
 
 watchEffect(async () => {
   if (props.tab) {
-    pngs.value = await PdfService.getPngsForTab(props.tab.id)
+    pngs.value = await useSnapshotsService().getPngsForTab(props.tab.id)
   }
 })
 
