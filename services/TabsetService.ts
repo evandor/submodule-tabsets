@@ -3,7 +3,6 @@ import ChromeApi from "src/services/ChromeApi";
 import _ from "lodash";
 import {Tab, UrlExtension} from "src/tabsets/models/Tab";
 import {Tabset, TabsetSharing, TabsetStatus, TabsetType} from "src/tabsets/models/Tabset";
-import {useSearchStore} from "src/search/stores/searchStore";
 import {useBookmarksStore} from "src/bookmarks/stores/bookmarksStore";
 import {STRIP_CHARS_IN_COLOR_INPUT, STRIP_CHARS_IN_USER_INPUT} from "boot/constants";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
@@ -20,6 +19,8 @@ import {useContentService} from "src/content/services/ContentService";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {useTabsStore2} from "src/tabsets/stores/tabsStore2";
 import {Space} from "src/spaces/models/Space";
+import AppEventDispatcher from "src/services/AppEventDispatcher";
+import {ContentItem} from "src/content/models/ContentItem";
 
 const {getTabset, saveTabset, saveCurrentTabset, tabsetsFor, addToTabset} = useTabsetService()
 
@@ -55,7 +56,7 @@ class TabsetService {
   }
 
   saveSelectedPendingTabs() {
-   // this.saveAllPendingTabs(true)
+    // this.saveAllPendingTabs(true)
   }
 
   setOnlySelectedTab(tab: Tab) {
@@ -78,14 +79,14 @@ class TabsetService {
     return Promise.reject("not implemented")//db.getRequest(url)
   }
 
-  async getContentFor(selectedTab: Tab): Promise<object> {
+  async getContentFor(selectedTab: Tab): Promise<ContentItem> {
     if (selectedTab.url) {
       return this.getContentForUrl(selectedTab.url)
     }
     return Promise.reject("url not provided");
   }
 
-  async getContentForUrl(url: string): Promise<object> {
+  async getContentForUrl(url: string): Promise<ContentItem> {
     return useContentService().getContent(url)
   }
 
@@ -143,7 +144,7 @@ class TabsetService {
   ): Promise<any> {
     tab.url = url
     tab.extension = extension,
-    tab = PlaceholderUtils.apply(tab, placeholders, placeholderValues)
+      tab = PlaceholderUtils.apply(tab, placeholders, placeholderValues)
     return saveCurrentTabset()
   }
 
@@ -192,7 +193,7 @@ class TabsetService {
     if (exportAs === 'json') {
       const tabsets = [...useTabsetsStore().tabsets.values()] as Tabset[]
       data = JSON.stringify({
-        tabsets: tabsets.filter((ts:Tabset) => ts.status !== TabsetStatus.DELETED),
+        tabsets: tabsets.filter((ts: Tabset) => ts.status !== TabsetStatus.DELETED),
         spaces: [...spacesStore.spaces.values()]
       })
       return this.createFile(data, filename);
@@ -204,7 +205,7 @@ class TabsetService {
       console.log("creating bookmarks...")
 
       chrome.bookmarks.getChildren("1", (results: chrome.bookmarks.BookmarkTreeNode[]) => {
-        _.forEach(results, (r:any) => {
+        _.forEach(results, (r: any) => {
           if (r.title === "tabsetsBackup") {
             console.log("deleting folder", r.id)
             chrome.bookmarks.removeTree(r.id)
@@ -214,13 +215,13 @@ class TabsetService {
 
       chrome.bookmarks.create({title: 'tabsetsBackup', parentId: '1'}, (result: chrome.bookmarks.BookmarkTreeNode) => {
         // console.log("res", result)
-        _.forEach([...useTabsetsStore().tabsets.values()] as Tabset[], (ts:Tabset) => {
+        _.forEach([...useTabsetsStore().tabsets.values()] as Tabset[], (ts: Tabset) => {
           console.log("ts", ts)
           chrome.bookmarks.create({
             title: ts.name,
             parentId: result.id
           }, (folder: chrome.bookmarks.BookmarkTreeNode) => {
-            _.forEach(ts.tabs, (tab:Tab) => {
+            _.forEach(ts.tabs, (tab: Tab) => {
               chrome.bookmarks.create({
                 title: tab.name || tab.title,
                 parentId: folder.id,
@@ -250,25 +251,25 @@ class TabsetService {
     let failedSpaces = 0
     let failedTabsets = 0
 
-    _.forEach(spaces, (space:Space) => {
+    _.forEach(spaces, (space: Space) => {
       useSpacesStore().addSpace(space)
     })
 
-    _.forEach(tabsets, (tabset:Tabset) => {
+    _.forEach(tabsets, (tabset: Tabset) => {
       useTabsetsStore().addTabset(tabset)
       saveTabset(tabset)
 
-      _.forEach(tabset.tabs, (tab:Tab) => {
-        //console.log("adding to index", tab)
-        useSearchStore().addToIndex(
-          tab.id,
-          tab.title || '',
-          tab.title || '',
-          tab.url || '',
-          '',
-          '',
-          [tabset.id],
-          tab.favIconUrl || '')
+      _.forEach(tabset.tabs, (tab: Tab) => {
+        AppEventDispatcher.dispatchEvent('add-to-search', {
+          id: tab.id,
+          name: tab.title || '',
+          title: tab.title || '',
+          url: tab.url || '',
+          description: tab.description,
+          content: '',
+          tabsets: [tabset.id],
+          favIconUrl: tab.favIconUrl || ''
+        })
       })
     })
   }
@@ -375,9 +376,9 @@ class TabsetService {
   async moveTo(tabId: string, newIndex: number, column: TabsetColumn) {
     console.log("moving", tabId, newIndex, column.id)
     let tabs = useTabsetsStore().getCurrentTabs
-    console.log("tabs before", _.map(tabs, (t:any) => t.url))
+    console.log("tabs before", _.map(tabs, (t: any) => t.url))
     //tabs = _.filter(tabs, (t: Tab) => t.columnId === column.id)
-    const oldIndex = _.findIndex(tabs, (t:any) => t.id === tabId)
+    const oldIndex = _.findIndex(tabs, (t: any) => t.id === tabId)
     if (oldIndex >= 0) {
       console.log("found old index", oldIndex)
       const tab = tabs.splice(oldIndex, 1)[0];
@@ -393,9 +394,9 @@ class TabsetService {
 
       await saveCurrentTabset()
     }
-    console.log("tabs after A", _.map(tabs, (t:any) => t.url))
-    console.log("tabs after B", _.map(useTabsetsStore().getCurrentTabs, (t:any) => t.url))
-    console.log("tabs after C", _.map(useTabsetsStore().tabsets.get('0cfcb9da-50b2-490f-b2dd-2a46aa029943')?.tabs, (t:any) => t.url))
+    console.log("tabs after A", _.map(tabs, (t: any) => t.url))
+    console.log("tabs after B", _.map(useTabsetsStore().getCurrentTabs, (t: any) => t.url))
+    console.log("tabs after C", _.map(useTabsetsStore().tabsets.get('0cfcb9da-50b2-490f-b2dd-2a46aa029943')?.tabs, (t: any) => t.url))
   }
 
   setView(tabsetId: string, view: string) {
@@ -460,7 +461,8 @@ class TabsetService {
         tab.scheduledFor = scheduledFor.getTime()
       }
       if (tab.url) {
-        useSearchStore().update(tab.url, 'note', note)
+        // TODO
+        //useSearchStore().update(tab.url, 'note', note)
       }
       return saveCurrentTabset()
     }

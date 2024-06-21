@@ -138,9 +138,9 @@ export class Tab {
     this.updated = new Date().getTime()
     this.lastActive = new Date().getTime()
     this.activatedCount = 1
-    this.loadedCount = 0
+    this.loadedCount = 0 //?
 
-    this.chromeTabId = chromeTab.id
+    this.chromeTabId = chromeTab.id // needed?
     this.favIconUrl = chromeTab.favIconUrl
     this.url = chromeTab.url
     this.title = chromeTab.title
@@ -148,8 +148,7 @@ export class Tab {
     this.groupId = chromeTab.groupId
     this.groupName = undefined // to be set from 'outside'
 
-    //this.chromeTab = chromeTab
-    this.history = []
+    this.history = [] // not used (yet)
     this.name = undefined
     this.description = ''
     this.keywords = ''

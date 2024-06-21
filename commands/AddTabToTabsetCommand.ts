@@ -12,7 +12,6 @@ import PlaceholderUtils from "src/tabsets/utils/PlaceholderUtils";
 import {useAuthStore} from "stores/authStore";
 import { doc, setDoc} from "firebase/firestore";
 import FirebaseServices from "src/services/firebase/FirebaseServices";
-import AppService from "src/services/AppService";
 import AppEventDispatcher from "src/services/AppEventDispatcher";
 
 const {saveTabset} = useTabsetService()
@@ -56,16 +55,16 @@ export class AddTabToTabsetCommand implements Command<any> {
         const tabset: Tabset = await useTabsetService().addToTabset(tabsetOrFolder, this.tab, 0)
 
         // Analysis
-        if (useAuthStore().isAuthenticated && this.tab.url?.startsWith("https://")) {
-          const userId = useAuthStore().user.uid
-          setDoc(doc(FirebaseServices.getFirestore(), "users", userId, "queue", uid()),{"event": "new-tab", "url": this.tab.url})
-        }
+        // if (useAuthStore().isAuthenticated && this.tab.url?.startsWith("https://")) {
+        //   const userId = useAuthStore().user.uid
+        //   setDoc(doc(FirebaseServices.getFirestore(), "users", userId, "queue", uid()),{"event": "new-tab", "url": this.tab.url})
+        // }
 
         // Sharing
-        if (tabset.sharedId && tabset.sharing === TabsetSharing.PUBLIC_LINK && !this.activeFolder) {
-          tabset.sharing = TabsetSharing.PUBLIC_LINK_OUTDATED
-          tabset.sharedAt = new Date().getTime()
-        }
+        // if (tabset.sharedId && tabset.sharing === TabsetSharing.PUBLIC_LINK && !this.activeFolder) {
+        //   tabset.sharing = TabsetSharing.PUBLIC_LINK_OUTDATED
+        //   tabset.sharedAt = new Date().getTime()
+        // }
 
         // Placeholder Defaults Application
         this.tab = PlaceholderUtils.applyForDefaultDomains(this.tab)
@@ -74,7 +73,7 @@ export class AddTabToTabsetCommand implements Command<any> {
         const content = await TabsetService.getContentFor(this.tab)
         let res: any = null
         if (content) {
-          const res2 = await useTabsetService().saveText(this.tab, content['content' as keyof object], content['metas' as keyof object])
+          const res2 = await useTabsetService().saveText(this.tab, content.content, content.metas)
           res = new ExecutionResult("result", "Tab was added",)
         } else {
           const res2 = saveTabset(this.tabset)
@@ -86,13 +85,14 @@ export class AddTabToTabsetCommand implements Command<any> {
           title: this.tab.title || '',
           url: this.tab.url || '',
           description: this.tab.description,
-          content: content['content' as keyof object] || '',
+          content: content ? content['content' as keyof object] : '',
           tabsets: [this.tabset.id],
           favIconUrl: this.tab.favIconUrl || ''
         })
         sendMsg('tab-added', {tabsetId: this.tabset.id})
         return res
       } catch (err) {
+        console.warn("hier: ", err)
         return Promise.reject("error: " + err)
       }
     } else {

@@ -336,6 +336,13 @@
       </template>
     </q-item-label>
 
+    <!-- === debug === -->
+    <q-item-label>
+      <div class="row q-mx-sm">
+        <TabDetailsSearchIndex :tabId="tab.id" />
+      </div>
+    </q-item-label>
+
   </q-item-section>
 
 </template>
@@ -380,6 +387,7 @@ import {useThumbnailsService} from "src/thumbnails/services/ThumbnailsService";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {useFeaturesStore} from "src/features/stores/featuresStore";
 import TabService from "src/services/TabService";
+import TabDetailsSearchIndex from "pages/sidepanel/helper/TabDetailsSearchIndex.vue";
 
 const {inBexMode} = useUtils()
 

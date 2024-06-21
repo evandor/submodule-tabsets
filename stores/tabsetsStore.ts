@@ -1,7 +1,7 @@
 import {defineStore} from 'pinia';
 import _, {forEach} from 'lodash'
-import {computed, ref, watch, watchEffect} from "vue";
-import {LocalStorage, uid} from "quasar";
+import {computed, ref} from "vue";
+import {uid} from "quasar";
 import {Tabset, TabsetSharing, TabsetStatus} from "src/tabsets/models/Tabset";
 import TabsetsPersistence from "src/tabsets/persistence/TabsetsPersistence";
 import {Tab, TabComment, UrlExtension} from "src/tabsets/models/Tab";
@@ -60,7 +60,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
         color.replace(STRIP_CHARS_IN_COLOR_INPUT, '').substring(0, 31)
         : undefined
 
-      const tabsetWithSameName: Tabset | undefined = _.find([...tabsets.value.values()] as Tabset[], (ts:Tabset) => ts.name === trustedName)
+      const tabsetWithSameName: Tabset | undefined = _.find([...tabsets.value.values()] as Tabset[], (ts: Tabset) => ts.name === trustedName)
       let ts: Tabset = null as unknown as Tabset
       //const currentSpace = useSpacesStore().space
       if (tabsetWithSameName) {
@@ -135,7 +135,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     }
 
     function selectCurrentTabset(tabsetId: string): Tabset | undefined {
-      const found = _.find([...tabsets.value.values()] as Tabset[], (k:any) => {
+      const found = _.find([...tabsets.value.values()] as Tabset[], (k: any) => {
         const ts = k || new Tabset("", "", [])
         return ts.id === tabsetId
       })
@@ -157,7 +157,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
 
     // *** getters ***
 
-    const getCurrentTabs = computed(():Tab[] => {
+    const getCurrentTabs = computed((): Tab[] => {
       if (currentTabsetId.value) {
         return tabsets.value.get(currentTabsetId.value)?.tabs as Tab[] || []
       }
@@ -176,7 +176,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       return (url: string): Tab | undefined => {
         if (currentTabsetId.value) {
           const tabs: Tab[] = tabsets.value.get(currentTabsetId.value)?.tabs as Tab[] || []
-          return _.find(tabs, (t:any) => t.url === url)
+          return _.find(tabs, (t: any) => t.url === url)
         }
       }
     })
@@ -232,7 +232,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     const tabsetFor = computed(() => {
       return (tabId: string): Tabset | undefined => {
         for (const [key, value] of tabsets.value) {
-          if (_.find(value.tabs, (t:any) => t.id === tabId)) {
+          if (_.find(value.tabs, (t: any) => t.id === tabId)) {
             return value as Tabset
           }
         }
@@ -277,6 +277,14 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       return res
     })
 
+    const getAllUrls = (): string[] => {
+      return _.map(
+        _.flatMap(
+          [...useTabsetsStore().tabsets.values()] as Tabset[],
+          (ts => ts.tabs)),
+        (t: Tab) => t.url || '')
+    }
+
     return {
       initialize,
       tabsets,
@@ -298,7 +306,8 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       tabsetFor,
       tabsForUrl,
       allTabsCount,
-      rssTabs
+      rssTabs,
+      getAllUrls
     }
   }
 )
