@@ -538,7 +538,7 @@ watchEffect(() => {
 
 watchEffect(async () => {
   if (props.tab) {
-    pngs.value = await useSnapshotsService().getPngsForTab(props.tab.id)
+    //pngs.value = await useSnapshotsService().getPngsForTab(props.tab.id)
   }
 })
 
