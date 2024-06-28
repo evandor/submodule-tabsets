@@ -103,11 +103,8 @@ import {PlaceholdersType} from "src/tabsets/models/Placeholders";
 import ColorSelector from "src/core/dialog/ColorSelector.vue";
 import {UpdateTabColorCommand} from "src/domain/tabs/UpdateTabColor";
 import CommentDialog from "components/dialogues/CommentDialog.vue";
-import {api} from "boot/axios";
-import _ from "lodash"
 import {useAuthStore} from "stores/authStore";
-import {NotificationType, useNotificationHandler} from "src/core/services/ErrorHandler";
-import {ExecutionResult} from "src/core/domain/ExecutionResult";
+import { useNotificationHandler} from "src/core/services/ErrorHandler";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {useFeaturesStore} from "src/features/stores/featuresStore";
 
@@ -138,22 +135,22 @@ async function tabToUse(tab: Tab) {
 }
 
 const openSimilar = async () => {
-  console.log("finding similar websites for", props.tab.url)
-  try {
-    const url = new URL(props.tab.url || '')
-    const hostname = url.hostname
-    const res = await api.post("https://us-central1-tabsets-dev.cloudfunctions.net/app/ra/similar", {"domain": hostname})
-    const data = res.data
-    console.log("res", res, data['similar_sites'])
-    if (data['similar_sites']) {
-      const urls = _.map(data['similar_sites'], (u:any) => "https://" + u)
-      NavigationService.openOrCreateTab(urls)
-      handleSuccess(new ExecutionResult("done", "opening " + urls.length + " similar page(s)"))
-    }
-  } catch (err) {
-    console.log("got error", err)
-    handleError("not able to find similar pages", NotificationType.TOAST)
-  }
+  // console.log("finding similar websites for", props.tab.url)
+  // try {
+  //   const url = new URL(props.tab.url || '')
+  //   const hostname = url.hostname
+  //   const res = await api.post("https://us-central1-tabsets-dev.cloudfunctions.net/app/ra/similar", {"domain": hostname})
+  //   const data = res.data
+  //   console.log("res", res, data['similar_sites'])
+  //   if (data['similar_sites']) {
+  //     const urls = _.map(data['similar_sites'], (u:any) => "https://" + u)
+  //     NavigationService.openOrCreateTab(urls)
+  //     handleSuccess(new ExecutionResult("done", "opening " + urls.length + " similar page(s)"))
+  //   }
+  // } catch (err) {
+  //   console.log("got error", err)
+  //   handleError("not able to find similar pages", NotificationType.TOAST)
+  // }
 }
 
 const deleteTab = async () => {

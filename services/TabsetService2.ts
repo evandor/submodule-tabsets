@@ -19,7 +19,6 @@ import {useSuggestionsStore} from "src/suggestions/stores/suggestionsStore";
 import {Suggestion, SuggestionState, SuggestionType} from "src/suggestions/models/Suggestion";
 import {MonitoringType} from "src/models/Monitor";
 import {TabInFolder} from "src/tabsets/models/TabInFolder";
-import {useThumbnailsService} from "src/thumbnails/services/ThumbnailsService";
 import {useContentService} from "src/content/services/ContentService";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {useTabsStore2} from "src/tabsets/stores/tabsStore2";

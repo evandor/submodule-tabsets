@@ -387,7 +387,6 @@ import TabDetailsSearchIndex from "pages/sidepanel/helper/TabDetailsSearchIndex.
 import {DeleteCommentCommand} from "src/domain/tabs/DeleteCommentCommand";
 import {UpdateTabNameCommand} from "src/domain/tabs/UpdateTabName";
 import {SavedBlob} from "src/snapshots/models/SavedBlob";
-import {useSnapshotsService} from "src/snapshots/services/SnapshotsService";
 
 const {inBexMode} = useUtils()
 
