@@ -3,7 +3,6 @@ import ChromeApi from "src/services/ChromeApi";
 import _ from "lodash";
 import {Tab, UrlExtension} from "src/tabsets/models/Tab";
 import {Tabset, TabsetSharing, TabsetStatus, TabsetType} from "src/tabsets/models/Tabset";
-import {useBookmarksStore} from "src/bookmarks/stores/bookmarksStore";
 import {STRIP_CHARS_IN_COLOR_INPUT, STRIP_CHARS_IN_USER_INPUT} from "boot/constants";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {useSpacesStore} from "src/spaces/stores/spacesStore";
@@ -232,8 +231,8 @@ class TabsetService {
         })
       })
 
-      useBookmarksStore().loadBookmarks()
-        .then(() => console.log("loaded in service"))
+      // useBookmarksStore().loadBookmarks()
+      //   .then(() => console.log("loaded in service"))
 
     }
     return Promise.resolve('done')

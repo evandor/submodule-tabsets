@@ -98,7 +98,6 @@ import {useRouter} from "vue-router";
 import NavigationService from "src/services/NavigationService";
 import {Tabset, TabsetType} from "src/tabsets/models/Tabset";
 import {FeatureIdent} from "src/models/FeatureIdent";
-import {useBookmarksStore} from "src/bookmarks/stores/bookmarksStore";
 import EditUrlDialog from "components/dialogues/EditUrlDialog.vue";
 import {PlaceholdersType} from "src/tabsets/models/Placeholders";
 import ColorSelector from "src/core/dialog/ColorSelector.vue";
@@ -160,29 +159,29 @@ const openSimilar = async () => {
 const deleteTab = async () => {
   const useTab = await tabToUse(props.tab)
   useCommandExecutor().executeFromUi(new DeleteTabCommand(useTab, props.tabset!))
-  if (useTab && useTab.url) {
-    const res = await useBookmarksStore().findBookmarksForUrl(useTab.url)
-    console.log("existing bookmarks", res)
-    if (res.length > 0) {
-      $q.dialog({
-        title: res.length === 1 ? 'Found Bookmark with same URL' : 'Found Bookmarks with same URL',
-        cancel: true,
-        message: res.length === 1 ?
-          'Do you want to delete this bookmark as well?' :
-          'Do you want to delete these ' + res.length + ' bookmarks as well?'
-      }).onOk(() => {
-        res.forEach(bm => {
-          chrome.bookmarks.remove(bm.id)
-        })
-        Notify.create({
-          color: 'positive',
-          message: res.length === 1 ? 'Deleted one bookmark' : 'Deleted ' + res.length + ' bookmarks'
-        })
-      }).onCancel(() => {
-      }).onDismiss(() => {
-      })
-    }
-  }
+  // if (useTab && useTab.url) {
+  //   const res = await useBookmarksStore().findBookmarksForUrl(useTab.url)
+  //   console.log("existing bookmarks", res)
+  //   if (res.length > 0) {
+  //     $q.dialog({
+  //       title: res.length === 1 ? 'Found Bookmark with same URL' : 'Found Bookmarks with same URL',
+  //       cancel: true,
+  //       message: res.length === 1 ?
+  //         'Do you want to delete this bookmark as well?' :
+  //         'Do you want to delete these ' + res.length + ' bookmarks as well?'
+  //     }).onOk(() => {
+  //       res.forEach(bm => {
+  //         chrome.bookmarks.remove(bm.id)
+  //       })
+  //       Notify.create({
+  //         color: 'positive',
+  //         message: res.length === 1 ? 'Deleted one bookmark' : 'Deleted ' + res.length + ' bookmarks'
+  //       })
+  //     }).onCancel(() => {
+  //     }).onDismiss(() => {
+  //     })
+  //   }
+  // }
 }
 
 
