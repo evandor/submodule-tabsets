@@ -64,9 +64,6 @@ export class Tabset {
   sharedAt: number | undefined = undefined
   sharedPath: string | undefined = undefined // e.g. /pwa/imp/AlCYSrGGmOnsOnf0htA9?n=c2hvcHBpbmc=
 
-  // messaging
-  mqttUrl: string | undefined = undefined
-
   importedAt: number | undefined = undefined
 
   canvas: object | undefined = undefined

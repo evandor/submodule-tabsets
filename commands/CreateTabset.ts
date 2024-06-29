@@ -3,7 +3,6 @@ import {ExecutionResult} from "src/core/domain/ExecutionResult";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {SaveOrReplaceResult} from "src/tabsets/models/SaveOrReplaceResult";
 import {useUtils} from "src/core/services/Utils";
-import {usePermissionsStore} from "stores/permissionsStore";
 import {FeatureIdent} from "src/models/FeatureIdent";
 import {useSuggestionsStore} from "src/suggestions/stores/suggestionsStore";
 import {StaticSuggestionIdent, Suggestion} from "src/suggestions/models/Suggestion";
