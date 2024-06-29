@@ -87,7 +87,7 @@ export class Tab {
   columnId: string | undefined
 
   history: string[] = []
-  selected: boolean = false
+  // selected: boolean = false -- selections should be handled 'outside' of this entity
   name: string | undefined
   bookmarkUrl: string | undefined
   bookmarkId: string | undefined

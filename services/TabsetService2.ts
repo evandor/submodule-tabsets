@@ -25,6 +25,7 @@ import {useTabsStore2} from "src/tabsets/stores/tabsStore2";
 import TabsetsPersistence from "src/tabsets/persistence/TabsetsPersistence";
 import {useFeaturesStore} from "src/features/stores/featuresStore";
 import AppEventDispatcher from "src/services/AppEventDispatcher";
+import {useThumbnailsService} from "src/thumbnails/services/ThumbnailsService";
 
 let db: TabsetsPersistence = null as unknown as TabsetsPersistence
 
@@ -52,7 +53,7 @@ export function useTabsetService() {
       useTabsetsStore().selectCurrentTabset(selectedTS)
     }
 
-    ChromeApi.buildContextMenu("tabsetService2")
+    //ChromeApi.buildContextMenu("tabsetService2")
 
     useTabsetsStore().tabsets.forEach(ts => {
       if (ts.sharedId) {

@@ -107,17 +107,17 @@
             <q-tooltip class="tooltip-small" v-else-if="tsBadges.length > 0">
               {{ tooltipAlreadyInOtherTabsets(tabset.name) }}
             </q-tooltip>
-            <q-tooltip v-else-if="useTabsetsStore().allTabsCount === 0"
-                       transition-show="flip-right"
-                       transition-hide="flip-left"
-                       v-model="showAddCurrentTabTooltip"
-                       class="tooltip-tour"
-                       anchor="bottom right" self="top middle" :offset="[-26, 3 ]">
-              Click here
-              <q-icon name="keyboard_arrow_up"/>
-              to<br> add the current<br>tab to this tabset
-            </q-tooltip>
-            <q-tooltip class="tooltip-small" v-else>
+<!--            <q-tooltip v-else-if="useTabsetsStore().allTabsCount === 0"-->
+<!--                       transition-show="flip-right"-->
+<!--                       transition-hide="flip-left"-->
+<!--                       v-model="showAddCurrentTabTooltip"-->
+<!--                       class="tooltip-tour"-->
+<!--                       anchor="bottom right" self="top middle" :offset="[-26, 3 ]">-->
+<!--              Click here-->
+<!--              <q-icon name="keyboard_arrow_up"/>-->
+<!--              to<br> add the current<br>tab to this tabset-->
+<!--            </q-tooltip>-->
+            <q-tooltip class="tooltip-small">
               Add current Tab to '{{ tabsetNameOrChain(tabset as Tabset) }}'
             </q-tooltip>
 
@@ -229,7 +229,6 @@
 
 import {Tabset, TabsetSharing, TabsetStatus, TabsetType} from "src/tabsets/models/Tabset";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
-import SidePanelPageContextMenu from "pages/sidepanel/SidePanelPageContextMenu.vue";
 import SidePanelPageTabList from "components/layouts/SidePanelPageTabList.vue";
 import {onMounted, PropType, ref, watchEffect} from "vue";
 import {useUiStore} from "src/ui/stores/uiStore";
@@ -255,6 +254,7 @@ import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {SelectTabsetCommand} from "src/tabsets/commands/SelectTabset";
 import {useFeaturesStore} from "src/features/stores/featuresStore";
 import SidePanelSubfolderContextMenu from "src/tabsets/widgets/SidePanelSubfolderContextMenu.vue";
+import SidePanelPageContextMenu from "src/projects/components/SidePanelPageContextMenu.vue";
 
 const props = defineProps({
   tabsets: {type: Array as PropType<Array<Tabset>>, required: true}

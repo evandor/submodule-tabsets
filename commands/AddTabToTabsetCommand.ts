@@ -4,15 +4,12 @@ import {ExecutionResult} from "src/core/domain/ExecutionResult";
 import {Tab} from "src/tabsets/models/Tab";
 import _ from "lodash";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
-import {Tabset, TabsetSharing} from "src/tabsets/models/Tabset";
+import {Tabset} from "src/tabsets/models/Tabset";
 import {useUtils} from "src/core/services/Utils";
-import {uid, useQuasar} from "quasar";
 import {useGroupsStore} from "src/tabsets/stores/groupsStore";
 import PlaceholderUtils from "src/tabsets/utils/PlaceholderUtils";
-import {useAuthStore} from "stores/authStore";
-import { doc, setDoc} from "firebase/firestore";
-import FirebaseServices from "src/services/firebase/FirebaseServices";
 import AppEventDispatcher from "src/services/AppEventDispatcher";
+import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 
 const {saveTabset} = useTabsetService()
 const {sendMsg} = useUtils()
@@ -26,21 +23,29 @@ export class AddTabToTabsetCommand implements Command<any> {
 
   constructor(
     public tab: Tab,
-    public tabset: Tabset,
+    public tabset: Tabset | undefined = undefined,
     public activeFolder: string | undefined = undefined) {
+
+    if (!tabset) {
+      this.tabset = useTabsetsStore().getCurrentTabset
+    }
+    if (!this.tabset) {
+      throw new Error("could not set current tabset")
+    }
+
   }
 
   async execute(): Promise<ExecutionResult<any>> {
-    console.info(`adding tab '${this.tab.id}' to tabset '${this.tabset.id}', active folder: ${this.activeFolder}`)
-    let tabsetOrFolder = this.tabset
+    console.info(`adding tab '${this.tab.id}' to tabset '${this.tabset!.id}', active folder: ${this.activeFolder}`)
+    let tabsetOrFolder = this.tabset!
     if (this.activeFolder) {
-      const folder = useTabsetService().findFolder(this.tabset.folders, this.activeFolder)
+      const folder = useTabsetService().findFolder(this.tabset!.folders, this.activeFolder)
       if (folder) {
         tabsetOrFolder = folder
       }
     }
 
-    const exists = _.findIndex(tabsetOrFolder.tabs, (t:any) => t.url === this.tab.url) >= 0
+    const exists = _.findIndex(tabsetOrFolder.tabs, (t: any) => t.url === this.tab.url) >= 0
     console.debug("checking 'tab exists' yields", exists)
     if (!exists) {
       try {
@@ -76,20 +81,20 @@ export class AddTabToTabsetCommand implements Command<any> {
           const res2 = await useTabsetService().saveText(this.tab, content.content, content.metas)
           res = new ExecutionResult("result", "Tab was added",)
         } else {
-          const res2 = saveTabset(this.tabset)
+          const res2 = saveTabset(this.tabset!)
           res = new ExecutionResult(res2, "Tab was added")
         }
         // add to search index via App Dispatcher
-        AppEventDispatcher.dispatchEvent('add-to-search',{
+        AppEventDispatcher.dispatchEvent('add-to-search', {
           name: this.tab.name || '',
           title: this.tab.title || '',
           url: this.tab.url || '',
           description: this.tab.description,
           content: content ? content['content' as keyof object] : '',
-          tabsets: [this.tabset.id],
+          tabsets: [this.tabset!.id],
           favIconUrl: this.tab.favIconUrl || ''
         })
-        sendMsg('tab-added', {tabsetId: this.tabset.id})
+        sendMsg('tab-added', {tabsetId: this.tabset!.id})
         return res
       } catch (err) {
         console.warn("hier: ", err)

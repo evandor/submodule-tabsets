@@ -2,7 +2,6 @@ import Command from "src/core/domain/Command";
 import {ExecutionResult} from "src/core/domain/ExecutionResult";
 import _ from "lodash"
 import {Tab} from "src/tabsets/models/Tab";
-import {useUiStore} from "src/ui/stores/uiStore";
 import {useUtils} from "src/core/services/Utils";
 import {Tabset} from "src/tabsets/models/Tabset";
 import {useSpacesStore} from "src/spaces/stores/spacesStore";
@@ -25,12 +24,12 @@ export class SelectTabsetCommand implements Command<Tabset | undefined> {
     console.debug(this.toString())
 
     const currentTabset = useTabsetsStore().getCurrentTabset
-    if (currentTabset) {
-      _.forEach(currentTabset.tabs as Tab[], (t: Tab) => t.selected = false)
-    }
+    // if (currentTabset) {
+    //   _.forEach(currentTabset.tabs as Tab[], (t: Tab) => t.selected = false)
+    // }
     //useNotificationsStore().setSelectedTab(null as unknown as Tab)
 
-    useUiStore().clearHighlights()
+    // useUiStore().clearHighlights()
 
     useTabsetService().selectTabset(this.tabsetId)
     useSpacesStore().setSpace(this.spaceId)

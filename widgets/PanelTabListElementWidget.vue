@@ -78,14 +78,14 @@
     <!-- === description === -->
     <template v-if="props.tab?.extension !== UrlExtension.NOTE">
       <q-item-label class="ellipsis-2-lines text-grey-8"
-                    v-if="useUiStore().listDetailLevelGreaterEqual(ListDetailLevel.MAXIMAL,props.tabset?.details)"
+
                     @click.stop="gotoTab()">
         {{ props.tab.longDescription || props.tab.description }}
       </q-item-label>
     </template>
     <template else>
       <q-item-label class="ellipsis-2-lines text-grey-8"
-                    v-if="useUiStore().listDetailLevelGreaterEqual(ListDetailLevel.MAXIMAL,props.tabset?.details)"
+
                     @click.stop="gotoTab()">
         {{ props.tab.description }}
       </q-item-label>
@@ -159,7 +159,7 @@
       <div class="row q-ma-none" @click="gotoTab()">
         <div class="col-12 q-pr-lg q-mt-none q-pt-none cursor-pointer">
           <div class="text-caption text-grey-5 ellipsis"
-               v-if="useUiStore().listDetailLevelGreaterEqual(ListDetailLevel.SOME, props.tabset?.details)">
+               >
 
             <span v-if="props.sorting === TabSorting.AGE">
               <q-icon name="arrow_right" size="16px"/>
@@ -236,7 +236,7 @@
               -
             </template>
 
-            <span v-if="useUiStore().listDetailLevelGreaterEqual(ListDetailLevel.MAXIMAL, props.tabset?.details)">
+            <span >
               last active: {{ formatDate(props.tab.lastActive) }}
             </span>
 
