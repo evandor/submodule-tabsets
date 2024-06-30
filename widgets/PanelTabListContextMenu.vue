@@ -103,6 +103,7 @@ import {PlaceholdersType} from "src/tabsets/models/Placeholders";
 import ColorSelector from "src/core/dialog/ColorSelector.vue";
 import {UpdateTabColorCommand} from "src/domain/tabs/UpdateTabColor";
 import CommentDialog from "components/dialogues/CommentDialog.vue";
+import _ from "lodash"
 import {useAuthStore} from "stores/authStore";
 import { useNotificationHandler} from "src/core/services/ErrorHandler";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";

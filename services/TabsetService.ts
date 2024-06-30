@@ -58,7 +58,7 @@ class TabsetService {
     const currentTabset = useTabsetsStore().getCurrentTabset as Tabset | undefined
     if (currentTabset) {
       _.forEach(currentTabset.tabs, (t: Tab) => {
-        t.selected = t.id === tab.id;
+        //t.selected = t.id === tab.id;
       })
     }
   }
@@ -493,7 +493,7 @@ class TabsetService {
     return Promise.reject("could not change status : " + tabsetId)
   }
 
-  // async share(tabsetId: string, sharing: TabsetSharing, sharedId: string | undefined, sharedBy: string | undefined): Promise<TabsetSharing | void> {
+  async share(tabsetId: string, sharing: TabsetSharing, sharedId: string | undefined, sharedBy: string | undefined): Promise<TabsetSharing | void> {
   //   console.log(`setting property 'sharing' to ${sharing} for tabset  ${tabsetId} with sharedId ${sharedId}`)
   //   const ts = getTabset(tabsetId)
   //   if (ts) {
@@ -564,8 +564,8 @@ class TabsetService {
   //       console.error("Error adding document: ", e);
   //     }
   //   }
-  //   return Promise.reject("could not change sharing : " + tabsetId)
-  // }
+     return Promise.reject("could not change sharing : " + tabsetId)
+  }
 
   createInvitation(email: string, tabsetName: string, tabsetId: string): Promise<void> {
     // TODO
