@@ -49,8 +49,12 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
     return Promise.resolve(undefined);
   }
 
-  addTabset(ts: Tabset): Promise<any> {
-    return Promise.resolve(undefined);
+  async addTabset(tabset: Tabset): Promise<any> {
+    // useUiStore().syncing = true
+    // tabset.origin = this.installationId
+    console.log(`saving tabset ${tabset.id} in installation {this.installationId}`)
+    await setDoc(tabsetDoc(tabset.id), JSON.parse(JSON.stringify(tabset)))
+    // useUiStore().syncing = false
   }
 
   migrate(): any {

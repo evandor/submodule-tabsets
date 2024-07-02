@@ -2,6 +2,9 @@
 <template>
   <q-menu :offset="[0, 0]">
     <q-list dense style="min-width: 200px">
+
+      <PanelTabListContextMenuHook :tab="props.tab" :tabset="props.tabset"/>
+
       <template v-if="showTabDetailsMenuEntry(props['tab' as keyof object])">
         <q-item clickable v-close-popup @click.stop="showTabDetails(props['tab' as keyof object])">
           <q-item-section style="padding-right:0;min-width:25px;max-width: 25px;">
@@ -108,6 +111,7 @@ import {useAuthStore} from "stores/authStore";
 import { useNotificationHandler} from "src/core/services/ErrorHandler";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {useFeaturesStore} from "src/features/stores/featuresStore";
+import PanelTabListContextMenuHook from "components/hooks/PanelTabListContextMenuHook.vue";
 
 const {handleSuccess, handleError} = useNotificationHandler()
 
