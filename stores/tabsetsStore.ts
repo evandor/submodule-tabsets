@@ -215,7 +215,6 @@ export const useTabsetsStore = defineStore('tabsets', () => {
 
     const getTabAndTabsetId = computed(() => {
       return (tabId: string): TabAndTabsetId | undefined => {
-        console.log("call to getTab1", tabId)
         for (const [key, value] of tabsets.value) {
           const found = useTabsetService().findTabInFolder([value as Tabset], tabId)
           // const found: Tab | undefined = _.find(value.tabs, t => {
