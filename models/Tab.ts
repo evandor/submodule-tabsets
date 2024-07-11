@@ -127,7 +127,7 @@ export class Tab {
   canvasWidth: number | undefined
   canvasHeight: number | undefined
 
-  annotations: HTMLSelection[] = []
+  // annotations: HTMLSelection[] = []
 
   comments: TabComment[] = []
 

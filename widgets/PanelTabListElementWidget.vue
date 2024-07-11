@@ -158,8 +158,7 @@
       @mouseleave="showButtonsProp = false">
       <div class="row q-ma-none" @click="gotoTab()">
         <div class="col-12 q-pr-lg q-mt-none q-pt-none cursor-pointer">
-          <div class="text-caption text-grey-5 ellipsis"
-               >
+          <div class="text-caption text-grey-5 ellipsis">
 
             <span v-if="props.sorting === TabSorting.AGE">
               <q-icon name="arrow_right" size="16px"/>
@@ -195,20 +194,20 @@
                   class="q-mr-sm">({{ (props.tab as Tab).comments.length }})</span>
 
 
-            <q-icon v-if="(props.tab as Tab).annotations && (props.tab as Tab).annotations.length > 0"
-                    name="feedback" class="q-mr-xs" color="warning" @click.stop="toggleLists('annotations')">
-              <q-tooltip class="tooltip-small">This tab has annotations</q-tooltip>
-            </q-icon>
-            <span v-if="(props.tab as Tab).annotations && (props.tab as Tab).annotations.length > 1"
-                  @click.stop="toggleLists('annotations')"
-                  class="q-mr-sm">({{ (props.tab as Tab).annotations.length }})</span>
+<!--            <q-icon v-if="(props.tab as Tab).annotations && (props.tab as Tab).annotations.length > 0"-->
+<!--                    name="feedback" class="q-mr-xs" color="warning" @click.stop="toggleLists('annotations')">-->
+<!--              <q-tooltip class="tooltip-small">This tab has annotations</q-tooltip>-->
+<!--            </q-icon>-->
+<!--            <span v-if="(props.tab as Tab).annotations && (props.tab as Tab).annotations.length > 1"-->
+<!--                  @click.stop="toggleLists('annotations')"-->
+<!--                  class="q-mr-sm">({{ (props.tab as Tab).annotations.length }})</span>-->
 
-            <template v-if="(props.tab as Tab).monitor || suggestion || (props.tab as Tab).placeholders
-                              || (props.tab as Tab).annotations && (props.tab as Tab).annotations.length > 0
-                              || (props.tab as Tab).comments && (props.tab as Tab).comments.length > 0
-                              || pngs.length > 0">
-              <span> | </span>
-            </template>
+<!--            <template v-if="(props.tab as Tab).monitor || suggestion || (props.tab as Tab).placeholders-->
+<!--                              || (props.tab as Tab).annotations && (props.tab as Tab).annotations.length > 0-->
+<!--                              || (props.tab as Tab).comments && (props.tab as Tab).comments.length > 0-->
+<!--                              || pngs.length > 0">-->
+<!--              <span> | </span>-->
+<!--            </template>-->
 
             <template v-if="groupName && useFeaturesStore().hasFeature(FeatureIdent.TAB_GROUPS)">
               Group <em>{{ groupName }}</em>
@@ -236,7 +235,8 @@
               -
             </template>
 
-            <span >
+            <span>
+              <TabListIconIndicatorsHook :tabId="props.tab.id" />
               last active: {{ formatDate(props.tab.lastActive) }}
             </span>
 
@@ -277,54 +277,30 @@
     </q-item-label>
 
     <!-- === annotations === -->
-    <q-item-label v-if="showAnnotations()"
-                  class="text-grey-10" text-subtitle1>
-      <div class="row" v-for="a in (props.tab as Tab).annotations"
-           @mouseover="hoveredAnnotation = a['id' as keyof object]"
-           @mouseleave="hoveredAnnotation = undefined">
-        <div class="col-10 ellipsis" @click="showAnnotation(props.tab as Tab, a)">{{ a.text }}</div>
-        <div class="col-2 text-right" v-if="hoveredOverAnnotation(a['id' as keyof object])">
-          <q-icon name="delete" color="negative" @click="deleteAnnotation(props.tab as Tab, a)"/>
-        </div>
-        <div class="col-12 q-ml-md" v-if="selectedAnnotation === a">
-          <div v-for="comment in selectedAnnotation.comments">
-            <div class="row">
-              <div class="col-10">
-                {{ comment.comment }}
-              </div>
-              <div class="col-2">
-                .
-              </div>
-            </div>
-          </div>
-          <!--          <span class="text-blue">-->
-          <!--            {{ label }}-->
-          <!--              <q-popup-edit v-model="newComment" v-slot="scope">-->
-          <!--              <q-input-->
-          <!--                type="textarea"-->
-          <!--                autofocus-->
-          <!--                dense-->
-          <!--                v-model="scope.value"-->
-          <!--                :model-value="scope.value"-->
-          <!--                hint="Add a comment">-->
-          <!--                <template v-slot:after>-->
-          <!--                  <q-btn-->
-          <!--                    flat dense color="negative" icon="cancel"-->
-          <!--                    @click.stop.prevent="scope.cancel"-->
-          <!--                  />-->
-
-          <!--                  <q-btn-->
-          <!--                    flat dense color="positive" icon="check_circle"-->
-          <!--                    @click.stop.prevent="scope.set"-->
-          <!--                    :disable="scope.initialValue === scope.value"-->
-          <!--                  />-->
-          <!--                </template>-->
-          <!--              </q-input>-->
-          <!--            </q-popup-edit>-->
-          <!--          </span>-->
-        </div>
-      </div>
-    </q-item-label>
+<!--    <q-item-label v-if="showAnnotations()"-->
+<!--                  class="text-grey-10" text-subtitle1>-->
+<!--      <div class="row" v-for="a in (props.tab as Tab).annotations"-->
+<!--           @mouseover="hoveredAnnotation = a['id' as keyof object]"-->
+<!--           @mouseleave="hoveredAnnotation = undefined">-->
+<!--        <div class="col-10 ellipsis" @click="showAnnotation(props.tab as Tab, a)">{{ a.text }}</div>-->
+<!--        <div class="col-2 text-right" v-if="hoveredOverAnnotation(a['id' as keyof object])">-->
+<!--          <q-icon name="delete" color="negative" @click="deleteAnnotation(props.tab as Tab, a)"/>-->
+<!--        </div>-->
+<!--        <div class="col-12 q-ml-md" v-if="selectedAnnotation === a">-->
+<!--          <div v-for="comment in selectedAnnotation.comments">-->
+<!--            <div class="row">-->
+<!--              <div class="col-10">-->
+<!--                {{ comment.comment }}-->
+<!--              </div>-->
+<!--              <div class="col-2">-->
+<!--                .-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--         -->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </q-item-label>-->
 
     <!-- === badges === -->
     <q-item-label v-if="props.showTabsets">
@@ -387,6 +363,7 @@ import TabDetailsSearchIndex from "pages/sidepanel/helper/TabDetailsSearchIndex.
 import {DeleteCommentCommand} from "src/domain/tabs/DeleteCommentCommand";
 import {UpdateTabNameCommand} from "src/domain/tabs/UpdateTabName";
 import {SavedBlob} from "src/snapshots/models/SavedBlob";
+import TabListIconIndicatorsHook from "components/hooks/TabListIconIndicatorsHook.vue";
 
 const {inBexMode} = useUtils()
 
@@ -651,11 +628,11 @@ const showSuggestion = () => {
 
 const openImage = () => window.open(chrome.runtime.getURL('www/index.html#/mainpanel/png/' + props.tab.id + "/" + pngs.value[0].id))
 
-const deleteAnnotation = async (tab: Tab, annotationToDelete: any) => {
-  //console.log("deleting annotatin", tab, annotationToDelete)
-  tab.annotations = _.filter(tab.annotations, (a:any) => a.id !== annotationToDelete.id)
-  useTabsetService().saveCurrentTabset()
-}
+// const deleteAnnotation = async (tab: Tab, annotationToDelete: any) => {
+//   //console.log("deleting annotatin", tab, annotationToDelete)
+//   tab.annotations = _.filter(tab.annotations, (a:any) => a.id !== annotationToDelete.id)
+//   useTabsetService().saveCurrentTabset()
+// }
 
 const showAnnotation = async (tab: Tab, a: HTMLSelection) => {
   selectedAnnotation.value = selectedAnnotation.value === a ? undefined : a;
@@ -669,10 +646,10 @@ const showAnnotation = async (tab: Tab, a: HTMLSelection) => {
   });
 }
 
-const showAnnotations = () =>
-  showAnnotationList.value &&
-  useUiStore().listDetailLevelGreaterEqual(ListDetailLevel.SOME, props.tabset?.details) &&
-  (props.tab as Tab).annotations && (props.tab as Tab).annotations.length > 0
+// const showAnnotations = () =>
+//   showAnnotationList.value &&
+//   useUiStore().listDetailLevelGreaterEqual(ListDetailLevel.SOME, props.tabset?.details) &&
+//   (props.tab as Tab).annotations && (props.tab as Tab).annotations.length > 0
 
 const showComments = () =>
   showCommentList.value &&
