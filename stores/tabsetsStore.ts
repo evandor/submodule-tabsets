@@ -75,6 +75,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       ts = new Tabset(uid(), trustedName, tabs, [])
       ts.color = trustedColor
       tabsets.value.set(ts.id, ts)
+      console.log("storage", storage)
       await storage.addTabset(ts)
 
       // TODO

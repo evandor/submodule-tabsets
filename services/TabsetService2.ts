@@ -108,7 +108,6 @@ export function useTabsetService() {
       //   .createTabset(trustedName, tabs, trustedColor)
       //   //.updateOrCreateTabset(trustedName, tabs, merge, windowId, tsType, trustedColor)
 
-      // TODO in progress: NEW APPROACH
       const tabset = await useTabsetsStore().createTabset(trustedName, tabs, trustedColor)
 
 
