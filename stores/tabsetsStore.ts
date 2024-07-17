@@ -40,12 +40,12 @@ export const useTabsetsStore = defineStore('tabsets', () => {
      * @param ps a persistence storage
      */
     async function initialize(ps: TabsetsPersistence) {
-      console.debug(" ...initializing tabsetsStore", ps.getServiceName())
       storage = ps
       await storage.init()
       // TODO remove after version 0.5.0
       await storage.migrate()
 
+      console.debug(" ...initialized tabsets: Store",'✅')
       await storage.loadTabsets()
     }
 
@@ -53,7 +53,16 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       tabsets.value.set(ts.id, ts)
     }
 
+    async function loadTabsets() {
+      await storage.loadTabsets()
+    }
+
     async function createTabset(tabsetName: string, tabs: Tab[], color: string | undefined = undefined): Promise<Tabset> {
+      const currentTabsetsCount = tabsets.value.size
+      if (currentTabsetsCount > 3) {
+        return Promise.reject("tabsetLimitExceeded")
+      }
+
       const trustedName = tabsetName.replace(STRIP_CHARS_IN_USER_INPUT, '')
         .substring(0, 31)
       const trustedColor = color ?
@@ -141,7 +150,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
         return ts.id === tabsetId
       })
       if (found) {
-        console.log("found", found)
+        //console.log("found", found)
         currentTabsetId.value = found.id //this.tabsets.get(found) || new Tabset("", "", [])
 
         //ChromeApi.buildContextMenu("tabsStore")
@@ -307,7 +316,8 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       tabsForUrl,
       allTabsCount,
       rssTabs,
-      getAllUrls
+      getAllUrls,
+      loadTabsets
     }
   }
 )

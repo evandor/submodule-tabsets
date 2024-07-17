@@ -79,10 +79,10 @@ export class AddTabToTabsetCommand implements Command<any> {
         let res: any = null
         if (content) {
           const res2 = await useTabsetService().saveText(this.tab, content.content, content.metas)
-          res = new ExecutionResult("result", "Tab was added",)
+          res = new ExecutionResult("result", "Link was added",)
         } else {
           const res2 = saveTabset(this.tabset!)
-          res = new ExecutionResult(res2, "Tab was added")
+          res = new ExecutionResult(res2, "Link was added")
         }
         // add to search index via App Dispatcher
         AppEventDispatcher.dispatchEvent('add-to-search', {

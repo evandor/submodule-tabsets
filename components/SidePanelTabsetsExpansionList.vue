@@ -129,7 +129,7 @@
                         @mouseover="hoveredTabset = tabset.id"
                         @mouseleave="hoveredTabset = undefined">
           <q-item-label v-if="useTabsetsStore().getCurrentTabset?.id === tabset.id">
-            <q-icon class="cursor-pointer" name="more_horiz" size="16px"/>
+            <q-icon class="cursor-pointer" name="more_vert" size="16px"/>
             <SidePanelPageContextMenu :tabset="tabset as Tabset" />
           </q-item-label>
         </q-item-section>
@@ -202,7 +202,7 @@
                             @mouseover="hoveredTabset = tabset.id"
                             @mouseleave="hoveredTabset = undefined">
               <q-item-label>
-                <q-icon class="cursor-pointer" name="more_horiz" size="16px"/>
+                <q-icon class="cursor-pointer" name="more_vert" size="16px"/>
                 <SidePanelSubfolderContextMenu :tabset="tabset as Tabset" :folder="folder"/>
               </q-item-label>
             </q-item-section>

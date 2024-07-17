@@ -134,12 +134,13 @@
              @mouseover="hoveredTab = tab.id"
              @mouseleave="hoveredTab = undefined"
              style="max-width:25px;font-size: 12px;color:#bfbfbf">
-            <span v-if="hoveredOver(tab.id)">
-              <q-icon name="more_horiz" class="cursor-pointer" color="black" size="16px"/>
+<!--            <span v-if="hoveredOver(tab.id)">-->
+            <span>
+              <q-icon name="more_vert" class="cursor-pointer" color="black" size="16px"/>
             </span>
-          <span v-else>
-              <q-icon color="primary" size="16px"/>
-            </span>
+<!--          <span v-else>-->
+<!--              <q-icon color="primary" size="16px"/>-->
+<!--            </span>-->
           <PanelTabListContextMenu
             :tabset="props.tabset"
             :tab="tab" v-if="!props.hideMenu"/>
@@ -237,7 +238,7 @@
 
             <span>
               <TabListIconIndicatorsHook :tabId="props.tab.id" />
-              last active: {{ formatDate(props.tab.lastActive) }}
+              <span v-if="useUiStore().listDetailLevelGreaterEqual(ListDetailLevel.MAXIMAL, props.tabset?.details)">last active: {{ formatDate(props.tab.lastActive) }}</span>
             </span>
 
           </div>

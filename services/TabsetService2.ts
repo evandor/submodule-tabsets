@@ -22,23 +22,22 @@ import {TabInFolder} from "src/tabsets/models/TabInFolder";
 import {useContentService} from "src/content/services/ContentService";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {useTabsStore2} from "src/tabsets/stores/tabsStore2";
-import TabsetsPersistence from "src/tabsets/persistence/TabsetsPersistence";
 import {useFeaturesStore} from "src/features/stores/featuresStore";
 import AppEventDispatcher from "src/services/AppEventDispatcher";
 import {useThumbnailsService} from "src/thumbnails/services/ThumbnailsService";
 
-let db: TabsetsPersistence = null as unknown as TabsetsPersistence
+// let db: TabsetsPersistence = null as unknown as TabsetsPersistence
 
 export function useTabsetService() {
 
-  const init = async (providedDb: TabsetsPersistence,
-                      doNotInitSearchIndex: boolean = false) => {
-    console.debug(" ...initializing tabsetService2 as", providedDb.getServiceName())
-    db = providedDb
+  const init = async (doNotInitSearchIndex: boolean = false) => {
+    console.debug(" ...initializing tabsetService2 as (TODO)")
 
     // useTabsStore().clearTabsets()
 
-    await db.loadTabsets()
+    //await db.loadTabsets()
+    await useTabsetsStore().loadTabsets()
+
     if (!doNotInitSearchIndex) {
       // moving to content module
       //useSearchStore().populateFromContent(useContentService().getContents())
@@ -49,7 +48,7 @@ export function useTabsetService() {
     // check TODO!
     const selectedTS = localStorage.getItem("selectedTabset")
     if (selectedTS) {
-      console.debug("setting selected tabset from storage", selectedTS)
+      console.debug(` ...config: setting selected tabset from storage: ${selectedTS}`)
       useTabsetsStore().selectCurrentTabset(selectedTS)
     }
 
@@ -239,7 +238,7 @@ export function useTabsetService() {
       // TODO in progress: NEW APPROACH
       await useTabsetsStore().deleteTabset(tabsetId)
 
-      await db.deleteTabset(tabsetId)
+      //await db.deleteTabset(tabsetId)
 
       //this.db.delete('tabsets', tabsetId)
       const nextKey: string = useTabsetsStore().tabsets.keys().next().value
