@@ -118,7 +118,7 @@
 <!--              to<br> add the current<br>tab to this tabset-->
 <!--            </q-tooltip>-->
             <q-tooltip class="tooltip-small">
-              Add current Tab to '{{ tabsetNameOrChain(tabset as Tabset) }}'
+              Add current Tab to '{{ tabsetNameOrChain(tabset as Tabset) }}'...
             </q-tooltip>
 
           </q-item-label>

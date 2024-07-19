@@ -1,5 +1,4 @@
 import Command from "src/core/domain/Command";
-import TabsetService from "src/tabsets/services/TabsetService";
 import {ExecutionResult} from "src/core/domain/ExecutionResult";
 import {Tab} from "src/tabsets/models/Tab";
 import _ from "lodash";
@@ -10,6 +9,7 @@ import {useGroupsStore} from "src/tabsets/stores/groupsStore";
 import PlaceholderUtils from "src/tabsets/utils/PlaceholderUtils";
 import AppEventDispatcher from "src/services/AppEventDispatcher";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
+import ContentUtils from "src/core/utils/ContentUtils";
 
 const {saveTabset} = useTabsetService()
 const {sendMsg} = useUtils()
@@ -32,7 +32,6 @@ export class AddTabToTabsetCommand implements Command<any> {
     if (!this.tabset) {
       throw new Error("could not set current tabset")
     }
-
   }
 
   async execute(): Promise<ExecutionResult<any>> {
@@ -75,22 +74,30 @@ export class AddTabToTabsetCommand implements Command<any> {
         this.tab = PlaceholderUtils.applyForDefaultDomains(this.tab)
 
         // the tab has been added to the tabset, but not saved yet
-        const content = await TabsetService.getContentFor(this.tab)
         let res: any = null
-        if (content) {
-          const res2 = await useTabsetService().saveText(this.tab, content.content, content.metas)
+        let content: any = undefined
+        if (this.tab.chromeTabId) {
+          const contentResult = await chrome.tabs.sendMessage(this.tab.chromeTabId, 'getContent')
+          console.log("=== contentResult", contentResult)
+
+          const tokens = ContentUtils.html2tokens(contentResult.html)
+          content = [...tokens].join(" ")
+
+          await useTabsetService().saveText(this.tab, content, contentResult.metas)
           res = new ExecutionResult("result", "Link was added",)
         } else {
           const res2 = saveTabset(this.tabset!)
           res = new ExecutionResult(res2, "Link was added")
+
         }
+
         // add to search index via App Dispatcher
         AppEventDispatcher.dispatchEvent('add-to-search', {
           name: this.tab.name || '',
           title: this.tab.title || '',
           url: this.tab.url || '',
           description: this.tab.description,
-          content: content ? content['content' as keyof object] : '',
+          content: content ? content : '',
           tabsets: [this.tabset!.id],
           favIconUrl: this.tab.favIconUrl || ''
         })
