@@ -10,6 +10,7 @@ import PlaceholderUtils from "src/tabsets/utils/PlaceholderUtils";
 import AppEventDispatcher from "src/services/AppEventDispatcher";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import ContentUtils from "src/core/utils/ContentUtils";
+import {useThumbnailsService} from "src/thumbnails/services/ThumbnailsService";
 
 const {saveTabset} = useTabsetService()
 const {sendMsg} = useUtils()
@@ -77,14 +78,25 @@ export class AddTabToTabsetCommand implements Command<any> {
         let res: any = null
         let content: any = undefined
         if (this.tab.chromeTabId) {
+          // saving content excerpt and meta data
           const contentResult = await chrome.tabs.sendMessage(this.tab.chromeTabId, 'getContent')
           console.log("=== contentResult", contentResult)
-
           const tokens = ContentUtils.html2tokens(contentResult.html)
           content = [...tokens].join(" ")
-
           await useTabsetService().saveText(this.tab, content, contentResult.metas)
-          res = new ExecutionResult("result", "Link was added",)
+          res = new ExecutionResult("result", "Link was added")
+
+          // saving thumbnail
+          const ctx = this
+          chrome.tabs.captureVisibleTab(
+            {},
+            function (dataUrl) {
+              //handleCaptureCallback(dataUrl, sender, sendResponse);
+              useThumbnailsService().handleCaptureCallback(ctx.tab?.url || '', dataUrl)
+              console.log("dataUrl", dataUrl)
+            }
+          )
+
         } else {
           const res2 = saveTabset(this.tabset!)
           res = new ExecutionResult(res2, "Link was added")
