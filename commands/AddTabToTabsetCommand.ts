@@ -10,7 +10,6 @@ import PlaceholderUtils from "src/tabsets/utils/PlaceholderUtils";
 import AppEventDispatcher from "src/services/AppEventDispatcher";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import ContentUtils from "src/core/utils/ContentUtils";
-import {useThumbnailsService} from "src/thumbnails/services/ThumbnailsService";
 
 const {saveTabset} = useTabsetService()
 const {sendMsg} = useUtils()
@@ -92,8 +91,12 @@ export class AddTabToTabsetCommand implements Command<any> {
             {},
             function (dataUrl) {
               //handleCaptureCallback(dataUrl, sender, sendResponse);
-              useThumbnailsService().handleCaptureCallback(ctx.tab?.url || '', dataUrl)
-              console.log("dataUrl", dataUrl)
+              //useThumbnailsService().handleCaptureCallback(ctx.tab?.url || '', dataUrl)
+              AppEventDispatcher.dispatchEvent('capture-screenshot', {
+                tabId: ctx.tab.id,
+                data: dataUrl
+              })
+              //console.log("dataUrl", dataUrl)
             }
           )
 

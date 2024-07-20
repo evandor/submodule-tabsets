@@ -24,7 +24,6 @@ import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {useTabsStore2} from "src/tabsets/stores/tabsStore2";
 import {useFeaturesStore} from "src/features/stores/featuresStore";
 import AppEventDispatcher from "src/services/AppEventDispatcher";
-import {useThumbnailsService} from "src/thumbnails/services/ThumbnailsService";
 
 // let db: TabsetsPersistence = null as unknown as TabsetsPersistence
 
@@ -231,7 +230,10 @@ export function useTabsetService() {
     if (tabset) {
       _.forEach(useTabsetsStore().getTabset(tabsetId)?.tabs, (t: Tab) => {
         console.debug(t, "removing thumbnails")
-        useThumbnailsService().removeThumbnailsFor(t?.url || '')
+        AppEventDispatcher.dispatchEvent('remove-captured-screenshot', {
+          tabId: t.id
+        })
+        //useThumbnailsService().removeThumbnailsFor(t.id)
       })
       useTabsetsStore().deleteTabset(tabsetId)
 
@@ -556,9 +558,13 @@ export function useTabsetService() {
     console.log("deleting tab", tab.id, tab.chromeTabId, tabset.id)
     const tabUrl = tab.url || ''
     if (tabsetsFor(tabUrl).length <= 1) {
-      useThumbnailsService().removeThumbnailsFor(tabUrl)
-        .then(() => console.debug("deleting thumbnail for ", tabUrl))
-        .catch(err => console.log("error deleting thumbnail", err))
+
+      AppEventDispatcher.dispatchEvent('remove-captured-screenshot', {
+        tabId: tab.id
+      })
+      // useThumbnailsService().removeThumbnailsFor(tab.id)
+      //  .then(() => console.debug("deleting thumbnail for ", tabUrl))
+      //  .catch(err => console.log("error deleting thumbnail", err))
 
       removeContentFor(tabUrl)
         .then(() => console.debug("deleting content for ", tabUrl))
