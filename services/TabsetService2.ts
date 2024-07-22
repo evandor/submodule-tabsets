@@ -351,7 +351,7 @@ export function useTabsetService() {
     const title = tab.title || ''
     const tabsetIds: string[] = tabsetsFor(tab.url)
 
-    useContentService().saveContent(tab.url, text, metas, title, tabsetIds)
+    useContentService().saveContent(tab.id, text, metas, title, tabsetIds)
       .catch((err: any) => console.log("err", err))
 
     const tabsets = [...useTabsetsStore().tabsets.values()] as Tabset[]
@@ -550,8 +550,8 @@ export function useTabsetService() {
   //   }
   // }
 
-  const removeContentFor = (url: string): Promise<any> => {
-    return useContentService().deleteContent(url)
+  const removeContentFor = (tabId: string): Promise<any> => {
+    return useContentService().deleteContent(tabId)
   }
 
   const deleteTab = (tab: Tab, tabset: Tabset): Promise<Tabset> => {
@@ -566,8 +566,8 @@ export function useTabsetService() {
       //  .then(() => console.debug("deleting thumbnail for ", tabUrl))
       //  .catch(err => console.log("error deleting thumbnail", err))
 
-      removeContentFor(tabUrl)
-        .then(() => console.debug("deleting content for ", tabUrl))
+      removeContentFor(tab.id)
+        .then(() => console.debug("deleting content for ", tab.id))
         .catch(err => console.log("error deleting content", err))
     }
     useTabsStore2().removeTab(tabset, tab.id)

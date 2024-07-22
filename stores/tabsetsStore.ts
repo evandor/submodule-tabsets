@@ -10,6 +10,8 @@ import {useWindowsStore} from "src/windows/stores/windowsStore";
 import {STRIP_CHARS_IN_COLOR_INPUT, STRIP_CHARS_IN_USER_INPUT} from "boot/constants";
 import {Space} from "src/spaces/models/Space";
 import {TabAndTabsetId} from "src/tabsets/models/TabAndTabsetId";
+import NavigationService from "src/services/NavigationService";
+import {AccessItem, useAuthStore} from "stores/authStore";
 
 /**
  * a pinia store for "Tabsets".
@@ -59,7 +61,8 @@ export const useTabsetsStore = defineStore('tabsets', () => {
 
     async function createTabset(tabsetName: string, tabs: Tab[], color: string | undefined = undefined): Promise<Tabset> {
       const currentTabsetsCount = tabsets.value.size
-      if (currentTabsetsCount > 3) {
+      if (useAuthStore().limitExceeded(AccessItem.TABSETS, currentTabsetsCount)) {
+        await NavigationService.openOrCreateTab([chrome.runtime.getURL("/www/index.html#/mainpanel/settings?tab=account")])
         return Promise.reject("tabsetLimitExceeded")
       }
 
