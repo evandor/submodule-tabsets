@@ -5,6 +5,7 @@ export default defineConfig({
   title: "Features Submodule",
   description: "submodule documentation",
   base: '/submodule-features/',
+  ignoreDeadLinks: true,
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
