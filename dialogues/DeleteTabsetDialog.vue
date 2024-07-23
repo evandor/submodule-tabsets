@@ -6,7 +6,10 @@
             <div class="text-h6">Delete Tabset</div>
           </q-card-section>
           <q-card-section>
-            <div class="text-body">Would you like to delete the tabset: {{ props.tabsetName }}?</div>
+            <div class="text-body">Would you like to delete the tabset: <em>{{ props.tabsetName }}</em>?</div>
+          </q-card-section>
+          <q-card-section>
+            <div class="text-body2">This tabset contains {{props.tabsCount}} tabs which will be deleted as well, including their comments and snapshots</div>
           </q-card-section>
           <q-card-actions align="right">
 
@@ -30,11 +33,12 @@
 
 import {QForm, useDialogPluginComponent} from 'quasar'
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
-import {MarkTabsetDeletedCommand} from "src/tabsets/commands/MarkTabsetDeleted";
 import {useUiStore} from "src/ui/stores/uiStore";
 import DialogButton from "src/core/dialog/buttons/DialogButton.vue";
 import {ref} from "vue";
 import {SidePanelViews} from "src/models/SidePanelViews";
+import {DeleteTabsetCommand} from "src/tabsets/commands/DeleteTabset";
+import {useRouter} from "vue-router";
 
 defineEmits([
   ...useDialogPluginComponent.emits
@@ -43,21 +47,26 @@ defineEmits([
 const props = defineProps({
   tabsetId: {type: String, required: true},
   tabsetName: {type: String, required: true},
+  tabsCount: {type: Number, default: 0},
   sidePanelMode: {type: Boolean, default: true}
 })
 
 const {dialogRef, onDialogHide} = useDialogPluginComponent()
 
-const theForm = ref<QForm>(null as unknown as QForm)
 const isValid = ref(true)
 
-const deleteTabset = () => useCommandExecutor().executeFromUi(new MarkTabsetDeletedCommand(props.tabsetId))
+// const deleteTabset = () => useCommandExecutor().executeFromUi(new MarkTabsetDeletedCommand(props.tabsetId))
+//     .then((res: any) => {
+//       if (props.sidePanelMode) {
+//         useUiStore().sidePanelSetActiveView(SidePanelViews.MAIN)
+//       }
+//       return res
+//     })
+
+const deleteTabset = () => useCommandExecutor().executeFromUi(new DeleteTabsetCommand(props.tabsetId))
     .then((res: any) => {
-      if (props.sidePanelMode) {
-        useUiStore().sidePanelSetActiveView(SidePanelViews.MAIN)
-      }
+      useRouter().push("/sidepanel")
       return res
     })
-
 
 </script>
