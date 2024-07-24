@@ -364,6 +364,7 @@ import {DeleteCommentCommand} from "src/domain/tabs/DeleteCommentCommand";
 import {UpdateTabNameCommand} from "src/domain/tabs/UpdateTabName";
 import {SavedBlob} from "src/snapshots/models/SavedBlob";
 import TabListIconIndicatorsHook from "components/hooks/TabListIconIndicatorsHook.vue";
+import {useThumbnailsService} from "src/thumbnails/services/ThumbnailsService";
 
 const {inBexMode} = useUtils()
 
@@ -428,7 +429,7 @@ onMounted(() => {
 })
 
 const thumbnailFor = async (tab: Tab): Promise<string> => {
-  return await useThumbnailsService().getThumbnailFor(tab.url)
+  return useThumbnailsService().getThumbnailFor(tab.id)
 }
 
 watchEffect(() => {
@@ -436,9 +437,8 @@ watchEffect(() => {
     // @ts-ignore
     thumbnailFor(props.tab)
       .then((tn: string) => {
-        //console.log("tn", tn)
-        if (tn && tn['thumbnail' as keyof object]) {
-          thumbnail.value = tn['thumbnail' as keyof object]
+        if (tn) {
+          thumbnail.value = tn
         }
       })
       .catch((err) => {
