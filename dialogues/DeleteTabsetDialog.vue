@@ -33,10 +33,8 @@
 
 import {QForm, useDialogPluginComponent} from 'quasar'
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
-import {useUiStore} from "src/ui/stores/uiStore";
 import DialogButton from "src/core/dialog/buttons/DialogButton.vue";
 import {ref} from "vue";
-import {SidePanelViews} from "src/models/SidePanelViews";
 import {DeleteTabsetCommand} from "src/tabsets/commands/DeleteTabset";
 import {useRouter} from "vue-router";
 
@@ -48,11 +46,13 @@ const props = defineProps({
   tabsetId: {type: String, required: true},
   tabsetName: {type: String, required: true},
   tabsCount: {type: Number, default: 0},
+  redirectTo: {type: String, default: "/sidepanel"},
   sidePanelMode: {type: Boolean, default: true}
 })
 
 const {dialogRef, onDialogHide} = useDialogPluginComponent()
 
+const router = useRouter()
 const isValid = ref(true)
 
 // const deleteTabset = () => useCommandExecutor().executeFromUi(new MarkTabsetDeletedCommand(props.tabsetId))
@@ -65,7 +65,7 @@ const isValid = ref(true)
 
 const deleteTabset = () => useCommandExecutor().executeFromUi(new DeleteTabsetCommand(props.tabsetId))
     .then((res: any) => {
-      useRouter().push("/sidepanel")
+      router.push(props.redirectTo)
       return res
     })
 

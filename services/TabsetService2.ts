@@ -235,9 +235,7 @@ export function useTabsetService() {
         })
         //useThumbnailsService().removeThumbnailsFor(t.id)
       })
-      useTabsetsStore().deleteTabset(tabsetId)
 
-      // TODO in progress: NEW APPROACH
       await useTabsetsStore().deleteTabset(tabsetId)
 
       //await db.deleteTabset(tabsetId)

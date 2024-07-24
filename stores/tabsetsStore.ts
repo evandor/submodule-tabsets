@@ -140,6 +140,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     function deleteTabset(tsId: string) {
       return storage.deleteTabset(tsId)
         .then((res) => {
+          tabsets.value.delete(tsId)
           if (currentTabsetId.value && currentTabsetId.value === tsId) {
             currentTabsetId.value = undefined
           }
