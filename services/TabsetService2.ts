@@ -83,7 +83,6 @@ export function useTabsetService() {
     tsType: TabsetType = TabsetType.DEFAULT,
     color: string | undefined = undefined
   ): Promise<SaveOrReplaceResult> => {
-
     const trustedName = name.replace(STRIP_CHARS_IN_USER_INPUT, '')
       .substring(0, 31)
     const trustedColor = color ?
