@@ -134,13 +134,13 @@
              @mouseover="hoveredTab = tab.id"
              @mouseleave="hoveredTab = undefined"
              style="max-width:25px;font-size: 12px;color:#bfbfbf">
-<!--            <span v-if="hoveredOver(tab.id)">-->
-            <span>
+          <!--            <span v-if="hoveredOver(tab.id)">-->
+          <span>
               <q-icon name="more_vert" class="cursor-pointer" color="black" size="16px"/>
             </span>
-<!--          <span v-else>-->
-<!--              <q-icon color="primary" size="16px"/>-->
-<!--            </span>-->
+          <!--          <span v-else>-->
+          <!--              <q-icon color="primary" size="16px"/>-->
+          <!--            </span>-->
           <PanelTabListContextMenu
             :tabset="props.tabset"
             :tab="tab" v-if="!props.hideMenu"/>
@@ -195,20 +195,20 @@
                   class="q-mr-sm">({{ (props.tab as Tab).comments.length }})</span>
 
 
-<!--            <q-icon v-if="(props.tab as Tab).annotations && (props.tab as Tab).annotations.length > 0"-->
-<!--                    name="feedback" class="q-mr-xs" color="warning" @click.stop="toggleLists('annotations')">-->
-<!--              <q-tooltip class="tooltip-small">This tab has annotations</q-tooltip>-->
-<!--            </q-icon>-->
-<!--            <span v-if="(props.tab as Tab).annotations && (props.tab as Tab).annotations.length > 1"-->
-<!--                  @click.stop="toggleLists('annotations')"-->
-<!--                  class="q-mr-sm">({{ (props.tab as Tab).annotations.length }})</span>-->
+            <!--            <q-icon v-if="(props.tab as Tab).annotations && (props.tab as Tab).annotations.length > 0"-->
+            <!--                    name="feedback" class="q-mr-xs" color="warning" @click.stop="toggleLists('annotations')">-->
+            <!--              <q-tooltip class="tooltip-small">This tab has annotations</q-tooltip>-->
+            <!--            </q-icon>-->
+            <!--            <span v-if="(props.tab as Tab).annotations && (props.tab as Tab).annotations.length > 1"-->
+            <!--                  @click.stop="toggleLists('annotations')"-->
+            <!--                  class="q-mr-sm">({{ (props.tab as Tab).annotations.length }})</span>-->
 
-<!--            <template v-if="(props.tab as Tab).monitor || suggestion || (props.tab as Tab).placeholders-->
-<!--                              || (props.tab as Tab).annotations && (props.tab as Tab).annotations.length > 0-->
-<!--                              || (props.tab as Tab).comments && (props.tab as Tab).comments.length > 0-->
-<!--                              || pngs.length > 0">-->
-<!--              <span> | </span>-->
-<!--            </template>-->
+            <!--            <template v-if="(props.tab as Tab).monitor || suggestion || (props.tab as Tab).placeholders-->
+            <!--                              || (props.tab as Tab).annotations && (props.tab as Tab).annotations.length > 0-->
+            <!--                              || (props.tab as Tab).comments && (props.tab as Tab).comments.length > 0-->
+            <!--                              || pngs.length > 0">-->
+            <!--              <span> | </span>-->
+            <!--            </template>-->
 
             <template v-if="groupName && useFeaturesStore().hasFeature(FeatureIdent.TAB_GROUPS)">
               Group <em>{{ groupName }}</em>
@@ -237,8 +237,10 @@
             </template>
 
             <span>
-              <TabListIconIndicatorsHook :tabId="props.tab.id" />
-              <span v-if="useUiStore().listDetailLevelGreaterEqual(ListDetailLevel.MAXIMAL, props.tabset?.details)">last active: {{ formatDate(props.tab.lastActive) }}</span>
+              <TabListIconIndicatorsHook :tabId="props.tab.id"/>
+              <span v-if="useUiStore().listDetailLevelGreaterEqual(ListDetailLevel.MAXIMAL, props.tabset?.details)">last active: {{
+                  formatDate(props.tab.lastActive)
+                }}</span>
             </span>
 
           </div>
@@ -278,30 +280,30 @@
     </q-item-label>
 
     <!-- === annotations === -->
-<!--    <q-item-label v-if="showAnnotations()"-->
-<!--                  class="text-grey-10" text-subtitle1>-->
-<!--      <div class="row" v-for="a in (props.tab as Tab).annotations"-->
-<!--           @mouseover="hoveredAnnotation = a['id' as keyof object]"-->
-<!--           @mouseleave="hoveredAnnotation = undefined">-->
-<!--        <div class="col-10 ellipsis" @click="showAnnotation(props.tab as Tab, a)">{{ a.text }}</div>-->
-<!--        <div class="col-2 text-right" v-if="hoveredOverAnnotation(a['id' as keyof object])">-->
-<!--          <q-icon name="delete" color="negative" @click="deleteAnnotation(props.tab as Tab, a)"/>-->
-<!--        </div>-->
-<!--        <div class="col-12 q-ml-md" v-if="selectedAnnotation === a">-->
-<!--          <div v-for="comment in selectedAnnotation.comments">-->
-<!--            <div class="row">-->
-<!--              <div class="col-10">-->
-<!--                {{ comment.comment }}-->
-<!--              </div>-->
-<!--              <div class="col-2">-->
-<!--                .-->
-<!--              </div>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--         -->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </q-item-label>-->
+    <!--    <q-item-label v-if="showAnnotations()"-->
+    <!--                  class="text-grey-10" text-subtitle1>-->
+    <!--      <div class="row" v-for="a in (props.tab as Tab).annotations"-->
+    <!--           @mouseover="hoveredAnnotation = a['id' as keyof object]"-->
+    <!--           @mouseleave="hoveredAnnotation = undefined">-->
+    <!--        <div class="col-10 ellipsis" @click="showAnnotation(props.tab as Tab, a)">{{ a.text }}</div>-->
+    <!--        <div class="col-2 text-right" v-if="hoveredOverAnnotation(a['id' as keyof object])">-->
+    <!--          <q-icon name="delete" color="negative" @click="deleteAnnotation(props.tab as Tab, a)"/>-->
+    <!--        </div>-->
+    <!--        <div class="col-12 q-ml-md" v-if="selectedAnnotation === a">-->
+    <!--          <div v-for="comment in selectedAnnotation.comments">-->
+    <!--            <div class="row">-->
+    <!--              <div class="col-10">-->
+    <!--                {{ comment.comment }}-->
+    <!--              </div>-->
+    <!--              <div class="col-2">-->
+    <!--                .-->
+    <!--              </div>-->
+    <!--            </div>-->
+    <!--          </div>-->
+    <!--         -->
+    <!--        </div>-->
+    <!--      </div>-->
+    <!--    </q-item-label>-->
 
     <!-- === badges === -->
     <q-item-label v-if="props.showTabsets">
@@ -316,7 +318,7 @@
     <!-- === debug === -->
     <q-item-label>
       <div class="row q-mx-sm">
-        <TabDetailsSearchIndex :tabId="tab.id" />
+        <TabDetailsSearchIndex :tabId="tab.id"/>
       </div>
     </q-item-label>
 
@@ -352,7 +354,7 @@ import {useRouter} from "vue-router";
 import {useGroupsStore} from "src/tabsets/stores/groupsStore";
 import {DeleteChromeGroupCommand} from "src/tabsets/commands/DeleteChromeGroupCommand";
 import {PlaceholdersType} from "src/tabsets/models/Placeholders";
-import {LocalStorage, useQuasar} from "quasar";
+import {useQuasar} from "quasar";
 import {useSuggestionsStore} from "src/suggestions/stores/suggestionsStore";
 import {Suggestion, SuggestionState} from "src/suggestions/models/Suggestion";
 import CommentDialog from "components/dialogues/CommentDialog.vue";
@@ -411,21 +413,6 @@ onMounted(() => {
     }
     setTimeout(() => newState.value = false, 2000)
   }
-  // const blobImgPath = props.tab.image
-  // if (blobImgPath && blobImgPath.startsWith('blob://')) {
-  //   useTabsetService().getBlob(blobImgPath.replace("blob://", ""))
-  //       .then((res) => {
-  //         let reader = new FileReader();
-  //         reader.readAsDataURL(res.content);
-  //         reader.onloadend = function () {
-  //           const base64data = reader.result;
-  //           if (base64data) {
-  //             imgFromBlob.value = base64data.toString()
-  //           }
-  //         }
-  //       })
-  //       .catch((err) => console.error(err))
-  // }
 })
 
 const thumbnailFor = async (tab: Tab): Promise<string> => {
@@ -476,7 +463,7 @@ watchEffect(() => {
     const url = props.tab.url
     const tabsetIds = useTabsetService().tabsetsFor(url)
     tsBadges.value = []
-    _.forEach(tabsetIds, (tsId:string) => tsBadges.value.push({
+    _.forEach(tabsetIds, (tsId: string) => tsBadges.value.push({
       label: TabsetService.nameForTabsetId(tsId),
       tabsetId: tsId,
       encodedUrl: btoa(url || '')
