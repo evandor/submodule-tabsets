@@ -26,7 +26,7 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
   }
 
   async init() {
-    console.debug(` ...initializing ${this.getServiceName()}`)
+    console.debug(` ...initialized Tabsets: ${this.getServiceName()}`, '✅')
     //this.indexedDB = useDB(undefined).db as typeof IndexedDbPersistenceService
     return Promise.resolve("")
   }
