@@ -1,5 +1,4 @@
 import {LocalStorage, uid} from "quasar";
-import ChromeApi from "src/services/ChromeApi";
 import _ from "lodash";
 import {Tab, UrlExtension} from "src/tabsets/models/Tab";
 import {Tabset, TabsetSharing, TabsetStatus, TabsetType} from "src/tabsets/models/Tabset";
@@ -20,10 +19,13 @@ import FirebaseServices from "src/services/firebase/FirebaseServices";
 import {deleteDoc, doc, Firestore, setDoc} from "firebase/firestore";
 import {useAuthStore} from "stores/authStore";
 import {useThumbnailsService} from "src/thumbnails/services/ThumbnailsService";
+import {useNotesStore} from "src/notes/stores/NotesStore";
+import {useUtils} from "src/core/services/Utils";
 
 const {getTabset, saveTabset, saveCurrentTabset, tabsetsFor, addToTabset} = useTabsetService()
 
 // const {db} = useDB()
+const {throwIdNotFound} = useUtils()
 
 class TabsetService {
 
@@ -495,77 +497,92 @@ class TabsetService {
   }
 
   async share(tabsetId: string, sharing: TabsetSharing, sharedId: string | undefined, sharedBy: string | undefined): Promise<TabsetSharing | void> {
-      console.log(`setting property 'sharing' to ${sharing} for tabset  ${tabsetId} with sharedId ${sharedId}`)
-      const ts = getTabset(tabsetId)
-      if (ts) {
-        const firestore: Firestore = FirebaseServices.getFirestore()
+    console.log(`setting property 'sharing' to ${sharing} for tabset  ${tabsetId} with sharedId ${sharedId}`)
+    const ts = getTabset(tabsetId) ?? throwIdNotFound("tabset", tabsetId)
 
-        const oldSharing = ts.sharing
-        ts.sharing = sharing
-        ts.sharedBy = sharedBy
-        ts.view = "list"
+    const firestore: Firestore = FirebaseServices.getFirestore()
 
-        if (sharing === TabsetSharing.UNSHARED) {
-          console.log("deleting share for tabset", ts.sharedId)
-          if (sharedId) {
-            await deleteDoc(doc(firestore, "publictabsets", sharedId))
-            ts.sharedBy = undefined
-            ts.sharedById = undefined
-            ts.sharedId = undefined
-            await saveTabset(ts)
-          }
-          return
-          // return FirebaseCall.delete("/share/public/" + ts.sharedId)
-          //   .then(() => {
-          //     console.log("unshared tabset", ts)
-          //     saveTabset(ts)
-          //   })
-        }
+    const oldSharing = ts.sharing
+    ts.sharing = sharing
+    ts.sharedBy = sharedBy
+    ts.view = "list"
 
-        console.log("setting author and avatar for comments")
-        for (const tab of ts.tabs) {
-          for (const c of tab.comments) {
-            console.log("found comment", c.author, c)
-            if (c.author === "<me>") {
-              c.author = useUiStore().sharingAuthor || '---'
-              c.avatar = useUiStore().sharingAvatar
-            }
-          }
-        }
+    if (sharing === TabsetSharing.UNSHARED) {
+      console.log("deleting share for tabset", ts.sharedId)
+      if (sharedId) {
+        await deleteDoc(doc(firestore, "public-tabsets", sharedId))
+        ts.sharedBy = undefined
+        ts.sharedById = undefined
+        ts.sharedId = undefined
+        await saveTabset(ts)
+      }
+      return
+      // return FirebaseCall.delete("/share/public/" + ts.sharedId)
+      //   .then(() => {
+      //     console.log("unshared tabset", ts)
+      //     saveTabset(ts)
+      //   })
+    }
 
-        console.log("setting thumbnails as images")
-        for (const tab of ts.tabs) {
-          const thumb = await useThumbnailsService().getThumbnailFor(tab.url)
-          if (thumb) {
-            if (thumb && thumb['thumbnail' as keyof object]) {
-              tab.image = thumb['thumbnail' as keyof object]
-            }
-          }
-        }
-
-        try {
-          if (sharedId) {
-            ts.sharedAt = new Date().getTime()
-            console.log("updating with ts", ts)
-            await setDoc(doc(firestore, "publictabsets", sharedId), JSON.parse(JSON.stringify(ts)))
-            await saveTabset(ts)
-            return
-          } else {
-            ts.sharedAt = new Date().getTime()
-
-            const publicId = uid()
-            console.log("setting shared id to ", publicId)
-            ts.sharedId = publicId
-            ts.sharedById = useAuthStore().user.uid
-            await setDoc(doc(firestore, "publictabsets", publicId), JSON.parse(JSON.stringify(ts)))
-            await saveTabset(ts)//.then(() => oldSharing)
-            return
-          }
-        } catch (e) {
-          console.error("Error adding document: ", e);
+    console.log("setting author and avatar for comments")
+    for (const tab of ts.tabs) {
+      for (const c of tab.comments) {
+        console.log("found comment", c.author, c)
+        if (c.author === "<me>") {
+          c.author = useUiStore().sharingAuthor || '---'
+          c.avatar = useUiStore().sharingAvatar
         }
       }
-    return Promise.reject("could not change sharing : " + tabsetId)
+    }
+
+    console.log("setting thumbnails as images")
+    for (const tab of ts.tabs) {
+      const thumb = await useThumbnailsService().getThumbnailFor(tab.url)
+      if (thumb) {
+        if (thumb && thumb['thumbnail' as keyof object]) {
+          tab.image = thumb['thumbnail' as keyof object]
+        }
+      }
+    }
+
+    try {
+      if (sharedId) {
+        ts.sharedAt = new Date().getTime()
+        console.log("updating with ts", ts)
+        await setDoc(doc(firestore, "public-tabsets", sharedId), JSON.parse(JSON.stringify(ts)))
+        await saveTabset(ts)
+
+        const notesForTabset = await useNotesStore().getNotesFor(tabsetId)
+        console.log("found notes for tabset", tabsetId, notesForTabset)
+        for (const note of notesForTabset) {
+          //await setDoc(doc(firestore, "public-notes", note.id), JSON.parse(JSON.stringify(note)))
+        }
+
+
+        return
+      } else {
+        ts.sharedAt = new Date().getTime()
+
+        const publicId = uid()
+        console.log("setting shared id to ", publicId)
+        ts.sharedId = publicId
+        ts.sharedById = useAuthStore().user.uid
+        await setDoc(doc(firestore, "public-tabsets", publicId), JSON.parse(JSON.stringify(ts)))
+        await saveTabset(ts)//.then(() =
+
+        const notesForTabset = await useNotesStore().getNotesFor(tabsetId)
+        console.log("found notes for tabset", tabsetId, notesForTabset)
+        for (const note of notesForTabset) {
+          note.sharedById = useAuthStore().user.uid
+          await setDoc(doc(firestore, "public-notes", note.id), JSON.parse(JSON.stringify(note)))
+        }
+
+        return
+      }
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
+
   }
 
   createInvitation(email: string, tabsetName: string, tabsetId: string): Promise<void> {

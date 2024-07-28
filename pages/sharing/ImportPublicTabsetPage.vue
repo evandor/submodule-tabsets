@@ -136,7 +136,7 @@ const start = async () => {
   state.value = 'importing'
   console.log("shareId", shareId.value, name.value)
 
-  const sharedTabset = await getDoc(doc(FirebaseServices.getFirestore(), "publictabsets", shareId.value))
+  const sharedTabset = await getDoc(doc(FirebaseServices.getFirestore(), "public-tabsets", shareId.value))
   tabset.value = sharedTabset.data() as Tabset
 
 
