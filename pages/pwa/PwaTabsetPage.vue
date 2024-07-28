@@ -161,9 +161,9 @@
         <div id="editorjs"/>
       </div>
     </template>
-<!--    <TabsetPageCards :tabset="tabset as unknown as Tabset" :simple-ui="true"/>-->
-    TabsetPageCards
-
+    <TabsetPageCards :tabset="tabset as unknown as Tabset" :simple-ui="true"/>
+    <hr>
+  {{tabset}}
 </template>
 
 <script setup lang="ts">
@@ -175,7 +175,6 @@ import AddUrlDialog from "components/dialogues/AddUrlDialog.vue";
 import InfoMessageWidget from "components/widgets/InfoMessageWidget.vue";
 import OpenRightDrawerWidget from "components/widgets/OpenRightDrawerWidget.vue";
 import JsUtils from "src/utils/JsUtils";
-import DynamicTabsetPageCards from "pages/DynamicTabsetPageCards.vue";
 import EditorJS, {OutputData} from "@editorjs/editorjs";
 import { useMeta } from 'quasar'
 import {Tabset, TabsetType} from "src/tabsets/models/Tabset";
@@ -184,6 +183,7 @@ import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {useUiStore} from "src/ui/stores/uiStore";
 import TabsetService from "src/tabsets/services/TabsetService";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
+import TabsetPageCards from "src/tabsets/pages/pwa/TabsetPageCards.vue";
 
 const route = useRoute()
 const router = useRouter()

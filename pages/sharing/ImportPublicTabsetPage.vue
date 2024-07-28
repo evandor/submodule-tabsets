@@ -48,11 +48,13 @@
 <script setup lang="ts">
 import {onMounted, ref} from 'vue'
 import {useRoute, useRouter} from "vue-router";
-import {uid, useMeta} from "quasar";
+import {uid} from "quasar";
 import _ from "lodash"
 import {Tabset} from "src/tabsets/models/Tabset";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
+import {doc, getDoc} from "firebase/firestore";
+import FirebaseServices from "src/services/firebase/FirebaseServices";
 
 const route = useRoute();
 const router = useRouter();
@@ -73,13 +75,13 @@ async function setupTabset(importedTS: Tabset) {
   console.log("setup Tabset", waitCounter)
 
   try {
-    console.log("useTabsetService()", useTabsetService())
     const res = await useTabsetService().saveTabset(importedTS)
     console.log("res", res)
     useTabsetService().selectTabset(importedTS.id)
-    useTabsetService().reloadTabset(importedTS.id)
+    // useTabsetService().reloadTabset(importedTS.id)
     router.push("/pwa/tabsets/" + tabset.value.id)
   } catch (err) {
+    console.log("got error:", err)
     if (waitCounter++ < 5) {
       setTimeout(() => {
         setupTabset(importedTS as Tabset)
@@ -106,7 +108,7 @@ onMounted(() => {
     )
     // skip intro ?
     if (paramNotSet('a') && paramNotSet('n')) {
-      start()
+      // start()
     }
     //console.log("%cfound", "color:green", maybeTabset.value)
   }
@@ -130,9 +132,14 @@ onMounted(() => {
 //   }
 // })
 
-const start = () => {
-//state.value = 'importing'
+const start = async () => {
+  state.value = 'importing'
   console.log("shareId", shareId.value, name.value)
+
+  const sharedTabset = await getDoc(doc(FirebaseServices.getFirestore(), "publictabsets", shareId.value))
+  tabset.value = sharedTabset.data() as Tabset
+
+
   // cb = cache buster, do not cache
   // FirebaseCall.get("/share/public/" + shareId.value + "?cb=" + new Date().getTime(), false)
   //   .then((res: any) => {
@@ -140,28 +147,28 @@ const start = () => {
   //
   //
   //     //const exists = useTabsetService().getTabset(tabset.value.id)
-      if (!maybeTabset.value) {
-        console.log("shared tabset does not exist yet, creating...")
-        const importedTS = tabset.value //new Tabset(tabset.value.id, tabset.value.name, tabset.value.tabs as Tab[])
-        importedTS.sharedId = shareId.value
-        importedTS.importedAt = new Date().getTime()
-        importedTS.sharedPath = route.fullPath
-        console.log("importedTS", importedTS)
-        setupTabset(importedTS as Tabset)
-      } else if (maybeTabset.value) {
-        console.log("...", maybeTabset.value?.sharedAt, tabset.value.sharedAt, (maybeTabset.value?.sharedAt || 0) - (tabset.value?.sharedAt || 0))
-        //if (maybeTabset.value?.sharedAt && (maybeTabset.value.sharedAt < (tabset.value.sharedAt || 0))) {
-        const updatedTS = tabset.value
-        updatedTS.sharedId = shareId.value
-        updatedTS.importedAt = new Date().getTime()
-        console.log("updatedTS", updatedTS)
-        setupTabset(updatedTS as Tabset)
-        // } else {
-        //   router.push("/pwa/tabsets/" + tabset.value.id)
-        // }
-      } else {
-        router.push("/pwa/tabsets/" + tabset.value.id)
-      }
+  if (!maybeTabset.value) {
+    console.log("shared tabset does not exist yet, creating from...", tabset.value)
+    const importedTS = tabset.value //new Tabset(tabset.value.id, tabset.value.name, tabset.value.tabs as Tab[])
+    importedTS.sharedId = shareId.value
+    importedTS.importedAt = new Date().getTime()
+    importedTS.sharedPath = route.fullPath
+    console.log("importedTS", importedTS)
+    setupTabset(importedTS as Tabset)
+  } else if (maybeTabset.value) {
+    console.log("...", maybeTabset.value?.sharedAt, tabset.value.sharedAt, (maybeTabset.value?.sharedAt || 0) - (tabset.value?.sharedAt || 0))
+    //if (maybeTabset.value?.sharedAt && (maybeTabset.value.sharedAt < (tabset.value.sharedAt || 0))) {
+    const updatedTS = tabset.value
+    updatedTS.sharedId = shareId.value
+    updatedTS.importedAt = new Date().getTime()
+    console.log("updatedTS", updatedTS)
+    setupTabset(updatedTS as Tabset)
+    // } else {
+    //   router.push("/pwa/tabsets/" + tabset.value.id)
+    // }
+  } else {
+    router.push("/pwa/tabsets/" + tabset.value.id)
+  }
   //   })
   //   .catch((err) => {
   //     console.log("got error", err)
