@@ -162,8 +162,6 @@
       </div>
     </template>
     <TabsetPageCards :tabset="tabset as unknown as Tabset" :simple-ui="true"/>
-    <hr>
-  {{tabset}}
 </template>
 
 <script setup lang="ts">
@@ -184,6 +182,10 @@ import {useUiStore} from "src/ui/stores/uiStore";
 import TabsetService from "src/tabsets/services/TabsetService";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import TabsetPageCards from "src/tabsets/pages/pwa/TabsetPageCards.vue";
+import {collection, doc, getDocs, query, where} from "firebase/firestore";
+import FirebaseServices from "src/services/firebase/FirebaseServices";
+import {useAuthStore} from "stores/authStore";
+import {Note} from "src/notes/models/Note";
 
 const route = useRoute()
 const router = useRouter()
@@ -268,13 +270,25 @@ onUpdated(() => {
   JsUtils.runCssHighlight()
 })
 
-watchEffect(() => {
+watchEffect(async () => {
   if (!route || !route.params) {
     return
   }
   tabsetId.value = route?.params.tabsetId as string
   tabset.value = useTabsetService().getTabset(tabsetId.value) || new Tabset(uid(), "empty", [])
   console.log("watch effect in tabsetpage", tabsetId.value)
+
+  // handle public notes
+  const res: Note[] = []
+  const cr = collection(FirebaseServices.getFirestore(), "public-notes")
+  const r = query(cr, where("sourceId", "==", tabset.value.sharedId))
+  const querySnapshot = await getDocs(r);
+  querySnapshot.forEach((doc) => {
+    let newItem = doc.data() as Note
+    res.push(newItem)
+  });
+  console.log("found notes", res, tabsetId.value)
+
 })
 
 

@@ -21,6 +21,7 @@ import {useAuthStore} from "stores/authStore";
 import {useThumbnailsService} from "src/thumbnails/services/ThumbnailsService";
 import {useNotesStore} from "src/notes/stores/NotesStore";
 import {useUtils} from "src/core/services/Utils";
+import {sha256} from "js-sha256";
 
 const {getTabset, saveTabset, saveCurrentTabset, tabsetsFor, addToTabset} = useTabsetService()
 
@@ -565,15 +566,21 @@ class TabsetService {
 
         const publicId = uid()
         console.log("setting shared id to ", publicId)
+
         ts.sharedId = publicId
         ts.sharedById = useAuthStore().user.uid
-        await setDoc(doc(firestore, "public-tabsets", publicId), JSON.parse(JSON.stringify(ts)))
         await saveTabset(ts)//.then(() =
+
+        // avoid id leakage
+        ts.id = ts.sharedById
+        //ts.sharedById = sha256(ts.sharedById)
+        await setDoc(doc(firestore, "public-tabsets", publicId), JSON.parse(JSON.stringify(ts)))
 
         const notesForTabset = await useNotesStore().getNotesFor(tabsetId)
         console.log("found notes for tabset", tabsetId, notesForTabset)
         for (const note of notesForTabset) {
-          note.sharedById = useAuthStore().user.uid
+          note.sharedById = sha256(ts.sharedById)
+          note.sharedId = publicId
           await setDoc(doc(firestore, "public-notes", note.id), JSON.parse(JSON.stringify(note)))
         }
 

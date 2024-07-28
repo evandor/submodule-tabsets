@@ -3,7 +3,7 @@ import {ExecutionResult} from "src/core/domain/ExecutionResult";
 import {Tab} from "src/tabsets/models/Tab";
 import _ from "lodash";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
-import {Tabset} from "src/tabsets/models/Tabset";
+import {Tabset, TabsetSharing} from "src/tabsets/models/Tabset";
 import {useUtils} from "src/core/services/Utils";
 import {useGroupsStore} from "src/tabsets/stores/groupsStore";
 import PlaceholderUtils from "src/tabsets/utils/PlaceholderUtils";
@@ -67,10 +67,10 @@ export class AddTabToTabsetCommand implements Command<any> {
       // }
 
       // Sharing
-      // if (tabset.sharedId && tabset.sharing === TabsetSharing.PUBLIC_LINK && !this.activeFolder) {
-      //   tabset.sharing = TabsetSharing.PUBLIC_LINK_OUTDATED
-      //   tabset.sharedAt = new Date().getTime()
-      // }
+      if (tabset.sharedId && tabset.sharing === TabsetSharing.PUBLIC_LINK && !this.activeFolder) {
+        tabset.sharing = TabsetSharing.PUBLIC_LINK_OUTDATED
+        tabset.sharedAt = new Date().getTime()
+      }
 
       // Placeholder Defaults Application
       this.tab = PlaceholderUtils.applyForDefaultDomains(this.tab)
