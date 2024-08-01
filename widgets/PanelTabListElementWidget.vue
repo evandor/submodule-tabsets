@@ -237,7 +237,7 @@
             </template>
 
             <span>
-              <TabListIconIndicatorsHook :tabId="props.tab.id"/>
+              <TabListIconIndicatorsHook :tabId="props.tab.id" :tabUrl="props.tab.url"/>
               <span v-if="useUiStore().listDetailLevelGreaterEqual(ListDetailLevel.MAXIMAL, props.tabset?.details)">last active: {{
                   formatDate(props.tab.lastActive)
                 }}</span>
