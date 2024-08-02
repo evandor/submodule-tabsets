@@ -1,4 +1,4 @@
-# The Features Submodule
+# The Tabsets Submodule
 
 used as submodule in
 

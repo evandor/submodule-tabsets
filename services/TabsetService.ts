@@ -19,9 +19,9 @@ import FirebaseServices from "src/services/firebase/FirebaseServices";
 import {deleteDoc, doc, Firestore, setDoc} from "firebase/firestore";
 import {useAuthStore} from "stores/authStore";
 import {useThumbnailsService} from "src/thumbnails/services/ThumbnailsService";
-import {useNotesStore} from "src/notes/stores/NotesStore";
 import {useUtils} from "src/core/services/Utils";
 import {sha256} from "js-sha256";
+import {useNotesStore} from "src/notes/stores/NotesStore";
 
 const {getTabset, saveTabset, saveCurrentTabset, tabsetsFor, addToTabset} = useTabsetService()
 

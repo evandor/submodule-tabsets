@@ -315,12 +315,12 @@
       </template>
     </q-item-label>
 
-    <!-- === debug === -->
+    <!-- === debug ===
     <q-item-label>
       <div class="row q-mx-sm">
         <TabDetailsSearchIndex :tabId="tab.id"/>
       </div>
-    </q-item-label>
+    </q-item-label>-->
 
   </q-item-section>
 
