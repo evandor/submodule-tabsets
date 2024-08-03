@@ -569,7 +569,7 @@ class TabsetService {
 
         ts.sharedId = publicId
         ts.sharedById = useAuthStore().user.uid
-        await saveTabset(ts)//.then(() =
+        await saveTabset(ts)
 
         // avoid id leakage
         ts.id = ts.sharedById
