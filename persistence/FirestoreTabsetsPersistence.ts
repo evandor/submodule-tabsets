@@ -1,11 +1,15 @@
-import {collection, deleteDoc, doc, getDoc, getDocs, setDoc} from "firebase/firestore";
+import {collection, deleteDoc, doc, Firestore, getDocs, setDoc} from "firebase/firestore";
 import TabsetsPersistence from "src/tabsets/persistence/TabsetsPersistence";
-import {Tabset} from "src/tabsets/models/Tabset";
+import {Tabset, TabsetSharing} from "src/tabsets/models/Tabset";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
-import {LocalStorage} from "quasar";
+import {LocalStorage, uid} from "quasar";
 import {APP_INSTALLATION_ID} from "boot/constants";
 import {useAuthStore} from "stores/authStore";
 import FirebaseServices from "src/services/firebase/FirebaseServices";
+import {useUiStore} from "src/ui/stores/uiStore";
+import {useThumbnailsService} from "src/thumbnails/services/ThumbnailsService";
+import {useNotesStore} from "src/notes/stores/NotesStore";
+import {sha256} from "js-sha256"
 
 const STORE_IDENT = 'tabsets';
 
@@ -39,7 +43,7 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
     console.log(" ...loading tabsets", this.getServiceName());
     // useUiStore().syncing = true
     const docs = await getDocs(tabsetsCollection())
-    docs.forEach((doc:any) => {
+    docs.forEach((doc: any) => {
       let newItem = doc.data() as Tabset
       newItem.id = doc.id;
       useTabsetsStore().setTabset(newItem)
@@ -76,6 +80,96 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
   }
 
   clear(name: string): void {
+  }
+
+  async share(ts: Tabset, sharing: TabsetSharing, sharedId: string | undefined, sharedBy: string | undefined): Promise<TabsetSharing | void> {
+    console.log(`setting property 'sharing' to ${sharing} for tabset  ${ts.id} with sharedId ${sharedId}`)
+    // const ts = getTabset(tabsetId) ?? throwIdNotFound("tabset", tabsetId)
+
+    const firestore: Firestore = FirebaseServices.getFirestore()
+
+    const oldSharing = ts.sharing
+    ts.sharing = sharing
+    ts.sharedBy = sharedBy
+    ts.view = "list"
+
+    if (sharing === TabsetSharing.UNSHARED) {
+      console.log("deleting share for tabset", ts.sharedId)
+      if (sharedId) {
+        await deleteDoc(doc(firestore, "public-tabsets", sharedId))
+        ts.sharedBy = undefined
+        ts.sharedById = undefined
+        ts.sharedId = undefined
+        await this.saveTabset(ts)
+      }
+      return
+    }
+
+    console.log("setting author and avatar for comments")
+    for (const tab of ts.tabs) {
+      for (const c of tab.comments) {
+        console.log("found comment", c.author, c)
+        if (c.author === "<me>") {
+          c.author = useUiStore().sharingAuthor || '---'
+          c.avatar = useUiStore().sharingAvatar
+        }
+      }
+    }
+
+    console.log("setting thumbnails as images")
+    for (const tab of ts.tabs) {
+      const thumb = await useThumbnailsService().getThumbnailFor(tab.url)
+      if (thumb) {
+        if (thumb && thumb['thumbnail' as keyof object]) {
+          tab.image = thumb['thumbnail' as keyof object]
+        }
+      }
+    }
+
+    try {
+      if (sharedId) {
+        ts.sharedAt = new Date().getTime()
+        console.log("updating with ts", ts)
+        await setDoc(doc(firestore, "public-tabsets", sharedId), JSON.parse(JSON.stringify(ts)))
+        await this.saveTabset(ts)
+
+        const notesForTabset = await useNotesStore().getNotesFor(ts.id)
+        console.log("found notes for tabset", ts.id, notesForTabset)
+        for (const note of notesForTabset) {
+          //await setDoc(doc(firestore, "public-notes", note.id), JSON.parse(JSON.stringify(note)))
+        }
+
+
+        return
+      } else {
+        ts.sharedAt = new Date().getTime()
+
+        const publicId = uid()
+        console.log("setting shared id to ", publicId)
+
+        ts.sharedId = publicId
+        ts.sharedById = useAuthStore().user.uid
+        await this.saveTabset(ts)
+
+        // avoid id leakage
+        ts.id = ts.sharedById!
+        //ts.sharedById = sha256(ts.sharedById)
+        await setDoc(doc(firestore, "public-tabsets", publicId), JSON.parse(JSON.stringify(ts)))
+
+        const notesForTabset = await useNotesStore().getNotesFor(ts.id)
+        console.log("found notes for tabset", ts.id, notesForTabset)
+        for (const note of notesForTabset) {
+          note.sharedById = sha256(ts.sharedById!)
+          note.sharedId = publicId
+          await setDoc(doc(firestore, "public-notes", note.id), JSON.parse(JSON.stringify(note)))
+        }
+
+        return
+      }
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
+
   }
 
 

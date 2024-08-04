@@ -7,7 +7,7 @@ import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {useSpacesStore} from "src/spaces/stores/spacesStore";
 import PlaceholderUtils from "src/tabsets/utils/PlaceholderUtils";
 import {Monitor, MonitoringType} from "src/models/Monitor";
-import {ListDetailLevel, useUiStore} from "src/ui/stores/uiStore";
+import {ListDetailLevel} from "src/ui/stores/uiStore";
 import {TabsetColumn} from "src/tabsets/models/TabsetColumn";
 import {useContentService} from "src/content/services/ContentService";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
@@ -15,15 +15,9 @@ import {useTabsStore2} from "src/tabsets/stores/tabsStore2";
 import {Space} from "src/spaces/models/Space";
 import AppEventDispatcher from "src/services/AppEventDispatcher";
 import {ContentItem} from "src/content/models/ContentItem";
-import FirebaseServices from "src/services/firebase/FirebaseServices";
-import {deleteDoc, doc, Firestore, setDoc} from "firebase/firestore";
-import {useAuthStore} from "stores/authStore";
-import {useThumbnailsService} from "src/thumbnails/services/ThumbnailsService";
 import {useUtils} from "src/core/services/Utils";
-import {sha256} from "js-sha256";
-import {useNotesStore} from "src/notes/stores/NotesStore";
 
-const {getTabset, saveTabset, saveCurrentTabset, tabsetsFor, addToTabset} = useTabsetService()
+const {saveTabset, saveCurrentTabset, tabsetsFor, addToTabset} = useTabsetService()
 
 // const {db} = useDB()
 const {throwIdNotFound} = useUtils()
@@ -347,7 +341,7 @@ class TabsetService {
       trustedColor?.substring(0, 19) :
       trustedColor
 
-    const tabset = getTabset(tabsetId)
+    const tabset = useTabsetsStore().getTabset(tabsetId)
     if (tabset) {
       const oldName = tabset.name
       const oldColor = tabset.color
@@ -366,7 +360,7 @@ class TabsetService {
   }
 
   canvasPosition(tabsetId: string, tabsetName: string) {
-    const tabset = getTabset(tabsetId)
+    const tabset = useTabsetsStore().getTabset(tabsetId)
     if (tabset) {
       tabset.name = tabsetName
       saveTabset(tabset)
@@ -470,7 +464,7 @@ class TabsetService {
   }
 
   markAsDeleted(tabsetId: string): Promise<Tabset> {
-    const ts = getTabset(tabsetId)
+    const ts = useTabsetsStore().getTabset(tabsetId)
     if (ts) {
       ts.status = TabsetStatus.DELETED
       return saveTabset(ts)
@@ -486,7 +480,7 @@ class TabsetService {
 
   markAs(tabsetId: string, status: TabsetStatus, type: TabsetType = TabsetType.DEFAULT): Promise<TabsetStatus> {
     console.debug(`marking ${tabsetId} as ${status}`)
-    const ts = getTabset(tabsetId)
+    const ts = useTabsetsStore().getTabset(tabsetId)
     if (ts) {
       const oldStatus = ts.status
       ts.status = status
@@ -495,107 +489,6 @@ class TabsetService {
         .then(() => oldStatus)
     }
     return Promise.reject("could not change status : " + tabsetId)
-  }
-
-  async share(tabsetId: string, sharing: TabsetSharing, sharedId: string | undefined, sharedBy: string | undefined): Promise<TabsetSharing | void> {
-    console.log(`setting property 'sharing' to ${sharing} for tabset  ${tabsetId} with sharedId ${sharedId}`)
-    const ts = getTabset(tabsetId) ?? throwIdNotFound("tabset", tabsetId)
-
-    const firestore: Firestore = FirebaseServices.getFirestore()
-
-    const oldSharing = ts.sharing
-    ts.sharing = sharing
-    ts.sharedBy = sharedBy
-    ts.view = "list"
-
-    if (sharing === TabsetSharing.UNSHARED) {
-      console.log("deleting share for tabset", ts.sharedId)
-      if (sharedId) {
-        await deleteDoc(doc(firestore, "public-tabsets", sharedId))
-        ts.sharedBy = undefined
-        ts.sharedById = undefined
-        ts.sharedId = undefined
-        await saveTabset(ts)
-      }
-      return
-      // return FirebaseCall.delete("/share/public/" + ts.sharedId)
-      //   .then(() => {
-      //     console.log("unshared tabset", ts)
-      //     saveTabset(ts)
-      //   })
-    }
-
-    console.log("setting author and avatar for comments")
-    for (const tab of ts.tabs) {
-      for (const c of tab.comments) {
-        console.log("found comment", c.author, c)
-        if (c.author === "<me>") {
-          c.author = useUiStore().sharingAuthor || '---'
-          c.avatar = useUiStore().sharingAvatar
-        }
-      }
-    }
-
-    console.log("setting thumbnails as images")
-    for (const tab of ts.tabs) {
-      const thumb = await useThumbnailsService().getThumbnailFor(tab.url)
-      if (thumb) {
-        if (thumb && thumb['thumbnail' as keyof object]) {
-          tab.image = thumb['thumbnail' as keyof object]
-        }
-      }
-    }
-
-    try {
-      if (sharedId) {
-        ts.sharedAt = new Date().getTime()
-        console.log("updating with ts", ts)
-        await setDoc(doc(firestore, "public-tabsets", sharedId), JSON.parse(JSON.stringify(ts)))
-        await saveTabset(ts)
-
-        const notesForTabset = await useNotesStore().getNotesFor(tabsetId)
-        console.log("found notes for tabset", tabsetId, notesForTabset)
-        for (const note of notesForTabset) {
-          //await setDoc(doc(firestore, "public-notes", note.id), JSON.parse(JSON.stringify(note)))
-        }
-
-
-        return
-      } else {
-        ts.sharedAt = new Date().getTime()
-
-        const publicId = uid()
-        console.log("setting shared id to ", publicId)
-
-        ts.sharedId = publicId
-        ts.sharedById = useAuthStore().user.uid
-        await saveTabset(ts)
-
-        // avoid id leakage
-        ts.id = ts.sharedById
-        //ts.sharedById = sha256(ts.sharedById)
-        await setDoc(doc(firestore, "public-tabsets", publicId), JSON.parse(JSON.stringify(ts)))
-
-        const notesForTabset = await useNotesStore().getNotesFor(tabsetId)
-        console.log("found notes for tabset", tabsetId, notesForTabset)
-        for (const note of notesForTabset) {
-          note.sharedById = sha256(ts.sharedById)
-          note.sharedId = publicId
-          await setDoc(doc(firestore, "public-notes", note.id), JSON.parse(JSON.stringify(note)))
-        }
-
-        return
-      }
-    } catch (e) {
-      console.error("Error adding document: ", e);
-    }
-
-  }
-
-  createInvitation(email: string, tabsetName: string, tabsetId: string): Promise<void> {
-    // TODO
-    return Promise.reject("not implemented")
-    // return db.createInvitation(email, tabsetName, tabsetId)
   }
 
 }

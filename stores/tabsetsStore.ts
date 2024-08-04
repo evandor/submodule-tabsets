@@ -2,7 +2,7 @@ import {defineStore} from 'pinia';
 import _, {forEach} from 'lodash'
 import {computed, ref} from "vue";
 import {uid} from "quasar";
-import {Tabset, TabsetSharing, TabsetStatus} from "src/tabsets/models/Tabset";
+import {Tabset, TabsetSharing, TabsetStatus, TabsetType} from "src/tabsets/models/Tabset";
 import TabsetsPersistence from "src/tabsets/persistence/TabsetsPersistence";
 import {Tab, TabComment, UrlExtension} from "src/tabsets/models/Tab";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
@@ -47,7 +47,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       // TODO remove after version 0.5.0
       await storage.migrate()
 
-      console.debug(" ...initialized tabsets: Store",'✅')
+      console.debug(" ...initialized tabsets: Store", '✅')
       await storage.loadTabsets()
     }
 
@@ -133,8 +133,30 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       // TODO markDuplicates(ts)
     }
 
-    async function saveTabset(ts: Tabset) {
-      return await storage.saveTabset(JSON.parse(JSON.stringify(ts)))
+    function rootTabsetFor(ts: Tabset): Tabset | undefined {
+      if (!ts) {
+        return undefined
+      }
+      if (ts.folderParent) {
+        debugger
+        const parent = getTabset.value.call(null, ts.folderParent)!
+        return rootTabsetFor(parent)
+      }
+      return ts
+    }
+
+    async function saveTabset(tabset: Tabset) {
+
+      tabset.updated = new Date().getTime()
+      // seems necessary !?
+      if (!tabset.type) {
+        tabset.type = TabsetType.DEFAULT
+      }
+      const rootTabset = rootTabsetFor(tabset)
+      console.debug(`saving (sub-)tabset '${tabset.name}' with ${tabset.tabs.length} tab(s) at id ${rootTabset?.id}`)
+      if (rootTabset) {
+        return await storage.saveTabset(JSON.parse(JSON.stringify(tabset)))
+      }
     }
 
     function deleteTabset(tsId: string) {
@@ -294,7 +316,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       return _.map(
         _.flatMap(
           [...useTabsetsStore().tabsets.values()] as Tabset[],
-          ((ts:Tabset) => ts.tabs)),
+          ((ts: Tabset) => ts.tabs)),
         (t: Tab) => t.url || '')
     }
 

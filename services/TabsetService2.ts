@@ -192,10 +192,6 @@ export function useTabsetService() {
     }
   }
 
-  const getTabset = (tabsetId: string): Tabset | undefined => {
-    return _.find([...useTabsetsStore().tabsets.values()] as Tabset[], (ts: Tabset) => ts.id === tabsetId)
-  }
-
   const reloadTabset = async (tabsetId: string) => {
     //return db.reloadTabset(tabsetId)
     throw new Error("not implemented")
@@ -225,7 +221,7 @@ export function useTabsetService() {
   }
 
   const deleteTabset = async (tabsetId: string): Promise<string> => {
-    const tabset = getTabset(tabsetId)
+    const tabset = useTabsetsStore().getTabset(tabsetId)
     if (tabset) {
       _.forEach(useTabsetsStore().getTabset(tabsetId)?.tabs, (t: Tab) => {
         console.debug(t, "removing thumbnails")
@@ -249,7 +245,7 @@ export function useTabsetService() {
   }
 
   const deleteTabsetDescription = (tabsetId: string): Promise<string> => {
-    const tabset = getTabset(tabsetId)
+    const tabset = useTabsetsStore().getTabset(tabsetId)
     if (tabset) {
       tabset.page = undefined
       useTabsetService().saveTabset(tabset)
@@ -280,39 +276,24 @@ export function useTabsetService() {
 
   }
 
-  const rootTabsetFor = (ts: Tabset | undefined): Tabset | undefined => {
-    if (!ts) {
-      return undefined
-    }
-    if (ts.folderParent) {
-      return rootTabsetFor(getTabset(ts.folderParent))
-    }
-    return ts
-  }
-
   const saveTabset = async (tabset: Tabset): Promise<any> => {
     if (tabset.id) {
-      tabset.updated = new Date().getTime()
-      // seems necessary !?
-      if (!tabset.type) {
-        tabset.type = TabsetType.DEFAULT
-      }
-      const additionalInfo = _.map(tabset.tabs, (t: any) => t.monitor)
-      const rootTabset = rootTabsetFor(tabset)
-      console.debug(`saving (sub-)tabset '${tabset.name}' with ${tabset.tabs.length} tab(s) at id ${rootTabset?.id}`)
-      if (rootTabset) {
-
-        // TODO in progress: NEW APPROACH
-        return await useTabsetsStore().saveTabset(rootTabset)
-
-        //return db.saveTabset(rootTabset)
-      }
+      // tabset.updated = new Date().getTime()
+      // // seems necessary !?
+      // if (!tabset.type) {
+      //   tabset.type = TabsetType.DEFAULT
+      // }
+      // const rootTabset = rootTabsetFor(tabset)
+      // console.debug(`saving (sub-)tabset '${tabset.name}' with ${tabset.tabs.length} tab(s) at id ${rootTabset?.id}`)
+      // if (rootTabset) {
+        return await useTabsetsStore().saveTabset(tabset)
+      // }
     }
     return Promise.reject("tabset id not set")
   }
 
   const addToTabsetId = async (tsId: string, tab: Tab, useIndex: number | undefined = undefined): Promise<Tabset> => {
-    const ts = getTabset(tsId)
+    const ts = useTabsetsStore().getTabset(tsId)
     if (ts) {
       return addToTabset(ts, tab, useIndex)
     }
@@ -792,7 +773,6 @@ export function useTabsetService() {
     copyFromTabset,
     deleteFromTabset,
     deleteTabset,
-    getTabset,
     selectTabset,
     saveTabset,
     saveCurrentTabset,
