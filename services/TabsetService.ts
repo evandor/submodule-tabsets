@@ -491,6 +491,10 @@ class TabsetService {
     return Promise.reject("could not change status : " + tabsetId)
   }
 
+  share(tabsetId: string, sharing: TabsetSharing, sharedId: string | undefined, sharedBy: string) {
+    const tabset = useTabsetsStore().getTabset(tabsetId)!
+    return useTabsetsStore().share(tabset, sharing, sharedId, sharedBy)
+  }
 }
 
 export default new TabsetService();

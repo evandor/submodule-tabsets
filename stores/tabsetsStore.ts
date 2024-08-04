@@ -176,19 +176,24 @@ export const useTabsetsStore = defineStore('tabsets', () => {
         return ts.id === tabsetId
       })
       if (found) {
-        //console.log("found", found)
-        currentTabsetId.value = found.id //this.tabsets.get(found) || new Tabset("", "", [])
-
-        //ChromeApi.buildContextMenu("tabsStore")
+        currentTabsetId.value = found.id
         return found
       } else {
         console.debug("not found:", tabsetId)//, [...this.tabsets.values()])
+        const fromLocalStorage = localStorage.getItem("selectedTabset")
+        if (fromLocalStorage && fromLocalStorage === tabsetId) {
+          localStorage.removeItem("selectedTabset")
+        }
       }
       return undefined
     }
 
     function unsetCurrentTabset(): void {
       currentTabsetId.value = undefined
+    }
+
+    function share(tabset: Tabset, sharing: TabsetSharing, sharedId: string | undefined, sharedBy: string) {
+      return storage.share(tabset, sharing, sharedId, sharedBy)
     }
 
     // *** getters ***
@@ -343,7 +348,8 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       allTabsCount,
       rssTabs,
       getAllUrls,
-      loadTabsets
+      loadTabsets,
+      share
     }
   }
 )

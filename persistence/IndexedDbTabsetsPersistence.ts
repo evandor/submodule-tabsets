@@ -1,7 +1,7 @@
 import {IDBPDatabase, openDB, deleteDB} from "idb";
 import _, {keys} from "lodash";
 import TabsetsPersistence from "src/tabsets/persistence/TabsetsPersistence";
-import {Tabset} from "src/tabsets/models/Tabset";
+import {Tabset, TabsetSharing} from "src/tabsets/models/Tabset";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 
 class IndexedDbTabsetsPersistence implements TabsetsPersistence {
@@ -39,6 +39,7 @@ class IndexedDbTabsetsPersistence implements TabsetsPersistence {
     tabsets.forEach((ts: Tabset) => {
       useTabsetsStore().setTabset(ts)
     })
+    console.log("loading tabsets, found ", useTabsetsStore().tabsets.size);
     return Promise.resolve()
   }
 
@@ -77,6 +78,10 @@ class IndexedDbTabsetsPersistence implements TabsetsPersistence {
         await this.db.add(this.STORE_IDENT, oldTs, oldTs.id)
       }
     }
+  }
+
+  share(tabset: Tabset, sharing: TabsetSharing, sharedId: string | undefined, sharedBy: string | undefined): Promise<TabsetSharing | void> {
+    return Promise.reject("sharing not possible in local mode");
   }
 
 }
