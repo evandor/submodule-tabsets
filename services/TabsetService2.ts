@@ -267,18 +267,33 @@ export function useTabsetService() {
 
   }
 
+  const rootTabsetFor = (ts: Tabset | undefined): Tabset | undefined => {
+    if (!ts) {
+      return undefined
+    }
+    if (ts.folderParent) {
+      return rootTabsetFor(getTabset(ts.folderParent))
+    }
+    return ts
+  }
+
   const saveTabset = async (tabset: Tabset): Promise<any> => {
     if (tabset.id) {
-      // tabset.updated = new Date().getTime()
-      // // seems necessary !?
-      // if (!tabset.type) {
-      //   tabset.type = TabsetType.DEFAULT
-      // }
-      // const rootTabset = rootTabsetFor(tabset)
-      // console.debug(`saving (sub-)tabset '${tabset.name}' with ${tabset.tabs.length} tab(s) at id ${rootTabset?.id}`)
-      // if (rootTabset) {
-        return await useTabsetsStore().saveTabset(tabset)
-      // }
+      tabset.updated = new Date().getTime()
+      // seems necessary !?
+      if (!tabset.type) {
+        tabset.type = TabsetType.DEFAULT
+      }
+      const additionalInfo = _.map(tabset.tabs, (t: any) => t.monitor)
+      const rootTabset = rootTabsetFor(tabset)
+      console.debug(`saving (sub-)tabset '${tabset.name}' with ${tabset.tabs.length} tab(s) at id ${rootTabset?.id}`)
+      if (rootTabset) {
+
+        // TODO in progress: NEW APPROACH
+        return await useTabsetsStore().saveTabset(rootTabset)
+
+        //return db.saveTabset(rootTabset)
+      }
     }
     return Promise.reject("tabset id not set")
   }
