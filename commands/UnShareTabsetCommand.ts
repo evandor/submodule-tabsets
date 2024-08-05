@@ -12,7 +12,7 @@ export class UnShareTabsetCommand implements Command<any> {
   }
 
   async execute(): Promise<ExecutionResult<any>> {
-    return TabsetService.share(this.tabsetId, TabsetSharing.UNSHARED, this.sharedId, undefined)
+    return TabsetService.share(this.tabsetId, TabsetSharing.UNSHARED, this.sharedId, "undefined")
       .then((oldSharing:any) => Promise.resolve(
         new ExecutionResult(
           oldSharing,

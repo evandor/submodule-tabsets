@@ -39,6 +39,7 @@ class IndexedDbTabsetsPersistence implements TabsetsPersistence {
     tabsets.forEach((ts: Tabset) => {
       useTabsetsStore().setTabset(ts)
     })
+    console.log("loading tabsets, found ", useTabsetsStore().tabsets.size);
     return Promise.resolve()
   }
 

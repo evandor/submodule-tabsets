@@ -347,7 +347,7 @@ class TabsetService {
       trustedColor?.substring(0, 19) :
       trustedColor
 
-    const tabset = getTabset(tabsetId)
+    const tabset = useTabsetsStore().getTabset(tabsetId)
     if (tabset) {
       const oldName = tabset.name
       const oldColor = tabset.color
@@ -366,7 +366,7 @@ class TabsetService {
   }
 
   canvasPosition(tabsetId: string, tabsetName: string) {
-    const tabset = getTabset(tabsetId)
+    const tabset = useTabsetsStore().getTabset(tabsetId)
     if (tabset) {
       tabset.name = tabsetName
       saveTabset(tabset)
@@ -470,7 +470,7 @@ class TabsetService {
   }
 
   markAsDeleted(tabsetId: string): Promise<Tabset> {
-    const ts = getTabset(tabsetId)
+    const ts = useTabsetsStore().getTabset(tabsetId)
     if (ts) {
       ts.status = TabsetStatus.DELETED
       return saveTabset(ts)
@@ -486,7 +486,7 @@ class TabsetService {
 
   markAs(tabsetId: string, status: TabsetStatus, type: TabsetType = TabsetType.DEFAULT): Promise<TabsetStatus> {
     console.debug(`marking ${tabsetId} as ${status}`)
-    const ts = getTabset(tabsetId)
+    const ts = useTabsetsStore().getTabset(tabsetId)
     if (ts) {
       const oldStatus = ts.status
       ts.status = status

@@ -30,35 +30,26 @@ import AppEventDispatcher from "src/services/AppEventDispatcher";
 export function useTabsetService() {
 
   const init = async (doNotInitSearchIndex: boolean = false) => {
-    console.debug(" ...initializing tabsetService2 as (TODO)")
 
-    // useTabsStore().clearTabsets()
-
-    //await db.loadTabsets()
-    await useTabsetsStore().loadTabsets()
-
-    if (!doNotInitSearchIndex) {
-      // moving to content module
-      //useSearchStore().populateFromContent(useContentService().getContents())
-
-      //useSearchStore().populateFromTabsets()
-    }
-
-    // check TODO!
-    const selectedTS = localStorage.getItem("selectedTabset")
-    if (selectedTS) {
-      console.debug(` ...config: setting selected tabset from storage: ${selectedTS}`)
-      useTabsetsStore().selectCurrentTabset(selectedTS)
-    }
-
-    //ChromeApi.buildContextMenu("tabsetService2")
-
-    useTabsetsStore().tabsets.forEach(ts => {
-      if (ts.sharedId) {
-        //console.log("subscribing to topic ", ts.sharedId)
-        //MqttService.subscribe(ts.sharedId)
+    function selectFirstAvailableTabset() {
+      const ts = [...useTabsetsStore().tabsets.values()] as Tabset[]
+      if (ts.length > 0) {
+        useTabsetsStore().selectCurrentTabset(ts[0].id)
       }
-    })
+    }
+
+    console.debug(" ...initializing tabsetService2 as (TODO)")
+    await useTabsetsStore().loadTabsets()
+    const selectedTabsetId = localStorage.getItem("selectedTabset")
+    if (selectedTabsetId) {
+      console.debug(` ...config: setting selected tabset from storage: ${selectedTabsetId}`)
+      const selectedTabset = useTabsetsStore().selectCurrentTabset(selectedTabsetId)
+      if (!selectedTabset) {
+        selectFirstAvailableTabset()
+      }
+    } else {
+      selectFirstAvailableTabset()
+    }
   }
 
   /**
@@ -192,10 +183,6 @@ export function useTabsetService() {
     }
   }
 
-  const getTabset = (tabsetId: string): Tabset | undefined => {
-    return _.find([...useTabsetsStore().tabsets.values()] as Tabset[], (ts: Tabset) => ts.id === tabsetId)
-  }
-
   const reloadTabset = async (tabsetId: string) => {
     //return db.reloadTabset(tabsetId)
     throw new Error("not implemented")
@@ -225,7 +212,7 @@ export function useTabsetService() {
   }
 
   const deleteTabset = async (tabsetId: string): Promise<string> => {
-    const tabset = getTabset(tabsetId)
+    const tabset = useTabsetsStore().getTabset(tabsetId)
     if (tabset) {
       _.forEach(useTabsetsStore().getTabset(tabsetId)?.tabs, (t: Tab) => {
         console.debug(t, "removing thumbnails")
@@ -249,7 +236,7 @@ export function useTabsetService() {
   }
 
   const deleteTabsetDescription = (tabsetId: string): Promise<string> => {
-    const tabset = getTabset(tabsetId)
+    const tabset = useTabsetsStore().getTabset(tabsetId)
     if (tabset) {
       tabset.page = undefined
       useTabsetService().saveTabset(tabset)
@@ -312,7 +299,7 @@ export function useTabsetService() {
   }
 
   const addToTabsetId = async (tsId: string, tab: Tab, useIndex: number | undefined = undefined): Promise<Tabset> => {
-    const ts = getTabset(tsId)
+    const ts = useTabsetsStore().getTabset(tsId)
     if (ts) {
       return addToTabset(ts, tab, useIndex)
     }
@@ -792,7 +779,6 @@ export function useTabsetService() {
     copyFromTabset,
     deleteFromTabset,
     deleteTabset,
-    getTabset,
     selectTabset,
     saveTabset,
     saveCurrentTabset,
