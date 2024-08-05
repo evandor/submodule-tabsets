@@ -101,17 +101,16 @@ import {useRouter} from "vue-router";
 import NavigationService from "src/services/NavigationService";
 import {Tabset, TabsetType} from "src/tabsets/models/Tabset";
 import {FeatureIdent} from "src/models/FeatureIdent";
-import EditUrlDialog from "components/dialogues/EditUrlDialog.vue";
 import {PlaceholdersType} from "src/tabsets/models/Placeholders";
 import ColorSelector from "src/core/dialog/ColorSelector.vue";
 import {UpdateTabColorCommand} from "src/domain/tabs/UpdateTabColor";
-import CommentDialog from "components/dialogues/CommentDialog.vue";
-import _ from "lodash"
 import {useAuthStore} from "stores/authStore";
 import { useNotificationHandler} from "src/core/services/ErrorHandler";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {useFeaturesStore} from "src/features/stores/featuresStore";
 import PanelTabListContextMenuHook from "components/hooks/PanelTabListContextMenuHook.vue";
+import CommentDialog from "src/tabsets/dialogues/CommentDialog.vue";
+import EditUrlDialog from "src/tabsets/dialogues/EditUrlDialog.vue";
 
 const {handleSuccess, handleError} = useNotificationHandler()
 
