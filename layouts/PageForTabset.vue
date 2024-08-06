@@ -19,7 +19,7 @@ import {useUtils} from "src/core/services/Utils";
 import {Tabset, TabsetSharing} from "src/tabsets/models/Tabset";
 import EditorJS, {OutputData} from "@editorjs/editorjs";
 
-import EditorJsConfig from "src/utils/EditorJsConfig";
+import EditorJsConfig from "src/notes/editorjs/EditorJsConfig";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 
