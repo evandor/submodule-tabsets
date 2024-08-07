@@ -364,9 +364,9 @@ import TabDetailsSearchIndex from "pages/sidepanel/helper/TabDetailsSearchIndex.
 import {DeleteCommentCommand} from "src/domain/tabs/DeleteCommentCommand";
 import {UpdateTabNameCommand} from "src/domain/tabs/UpdateTabName";
 import {SavedBlob} from "src/snapshots/models/SavedBlob";
-import TabListIconIndicatorsHook from "components/hooks/TabListIconIndicatorsHook.vue";
 import {useThumbnailsService} from "src/thumbnails/services/ThumbnailsService";
 import CommentDialog from "src/tabsets/dialogues/CommentDialog.vue";
+import TabListIconIndicatorsHook from "src/app/hooks/tabsets/TabListIconIndicatorsHook.vue";
 
 const {inBexMode} = useUtils()
 
