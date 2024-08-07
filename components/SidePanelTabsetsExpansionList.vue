@@ -245,7 +245,6 @@
 
 import {Tabset, TabsetStatus, TabsetType} from "src/tabsets/models/Tabset";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
-import SidePanelPageTabList from "components/layouts/SidePanelPageTabList.vue";
 import {onMounted, PropType, ref, watchEffect} from "vue";
 import {useUiStore} from "src/ui/stores/uiStore";
 import _ from "lodash";
@@ -274,6 +273,7 @@ import AddUrlDialog from "src/tabsets/dialogues/AddUrlDialog.vue";
 import {useNotesStore} from "src/notes/stores/NotesStore";
 import {Note} from "src/notes/models/Note";
 import NavigationService from "src/services/NavigationService";
+import SidePanelPageTabList from "src/tabsets/layouts/SidePanelPageTabList.vue";
 
 const props = defineProps({
   tabsets: {type: Array as PropType<Array<Tabset>>, required: true}

@@ -9,8 +9,6 @@ import {MetaLink} from "src/models/MetaLink";
 // @ts-ignore
 import {v5 as uuidv5} from 'uuid';
 import {useSettingsStore} from "src/stores/settingsStore"
-import {Space} from "src/spaces/models/Space";
-import {useSpacesStore} from "src/spaces/stores/spacesStore";
 import {SaveOrReplaceResult} from "src/tabsets/models/SaveOrReplaceResult";
 import JsUtils from "src/utils/JsUtils";
 import {FeatureIdent} from "src/models/FeatureIdent";
@@ -112,19 +110,19 @@ export function useTabsetService() {
     }
   }
 
-  const copyFromTabset = async (tabset: Tabset, space: Space): Promise<object> => {
+  const copyFromTabset = async (tabset: Tabset, spaceId: string | undefined = undefined): Promise<object> => {
 
     function nameFrom(name: string): string {
       const nameCandidate = name + " - Copy"
-      const existsAlready = useTabsetsStore().existingInTabset(nameCandidate, useSpacesStore().space)
+      const existsAlready = useTabsetsStore().existingInTabset(nameCandidate, spaceId)
       return existsAlready ? nameFrom(nameCandidate) : nameCandidate.replace(STRIP_CHARS_IN_USER_INPUT, '')
     }
 
     const copyName = nameFrom(tabset.name)
     try {
       const tabsetCopy = await useTabsetsStore().createTabset(copyName, tabset.tabs)
-      if (space) {
-        tabset.spaces = [space.id]
+      if (spaceId) {
+        tabset.spaces = [spaceId]
       } else {
         tabset.spaces = []
       }
@@ -272,7 +270,7 @@ export function useTabsetService() {
       return undefined
     }
     if (ts.folderParent) {
-      return rootTabsetFor(getTabset(ts.folderParent))
+      return rootTabsetFor(useTabsetsStore().getTabset(ts.folderParent))
     }
     return ts
   }

@@ -15,15 +15,9 @@ import {useTabsStore2} from "src/tabsets/stores/tabsStore2";
 import {Space} from "src/spaces/models/Space";
 import AppEventDispatcher from "src/services/AppEventDispatcher";
 import {ContentItem} from "src/content/models/ContentItem";
-import FirebaseServices from "src/services/firebase/FirebaseServices";
-import {deleteDoc, doc, Firestore, setDoc} from "firebase/firestore";
-import {useAuthStore} from "stores/authStore";
-import {useThumbnailsService} from "src/thumbnails/services/ThumbnailsService";
 import {useUtils} from "src/core/services/Utils";
-import {sha256} from "js-sha256";
-import {useNotesStore} from "src/notes/stores/NotesStore";
 
-const {getTabset, saveTabset, saveCurrentTabset, tabsetsFor, addToTabset} = useTabsetService()
+const {saveTabset, saveCurrentTabset, tabsetsFor, addToTabset} = useTabsetService()
 
 // const {db} = useDB()
 const {throwIdNotFound} = useUtils()

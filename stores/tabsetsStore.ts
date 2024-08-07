@@ -8,7 +8,6 @@ import {Tab, TabComment, UrlExtension} from "src/tabsets/models/Tab";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {useWindowsStore} from "src/windows/stores/windowsStore";
 import {STRIP_CHARS_IN_COLOR_INPUT, STRIP_CHARS_IN_USER_INPUT} from "boot/constants";
-import {Space} from "src/spaces/models/Space";
 import {TabAndTabsetId} from "src/tabsets/models/TabAndTabsetId";
 import NavigationService from "src/services/NavigationService";
 import {AccessItem, useAuthStore} from "stores/authStore";
@@ -74,7 +73,6 @@ export const useTabsetsStore = defineStore('tabsets', () => {
 
       const tabsetWithSameName: Tabset | undefined = _.find([...tabsets.value.values()] as Tabset[], (ts: Tabset) => ts.name === trustedName)
       let ts: Tabset = null as unknown as Tabset
-      //const currentSpace = useSpacesStore().space
       if (tabsetWithSameName) {
         if (tabsetWithSameName.status === TabsetStatus.DELETED) {
           // TODO
@@ -215,13 +213,13 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     })
 
     const existingInTabset = computed(() => {
-      return (searchName: string, space: Space = null as unknown as Space): Tabset | undefined => {
+      return (searchName: string, spaceId: string | undefined = undefined): Tabset | undefined => {
         const trustedName = searchName.replace(STRIP_CHARS_IN_USER_INPUT, '')
         return _.find([...tabsets.value.values()] as Tabset[], (ts: Tabset) => {
-          if (space === null) {
+          if (!spaceId) {
             return ts.name === trustedName?.trim()
           } else {
-            return ts.name === trustedName?.trim() && ts.spaces.indexOf(space.id) >= 0
+            return ts.name === trustedName?.trim() && ts.spaces.indexOf(spaceId) >= 0
           }
         })
       }
