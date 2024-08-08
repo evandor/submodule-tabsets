@@ -108,9 +108,9 @@ import {useAuthStore} from "stores/authStore";
 import { useNotificationHandler} from "src/core/services/ErrorHandler";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {useFeaturesStore} from "src/features/stores/featuresStore";
-import PanelTabListContextMenuHook from "components/hooks/PanelTabListContextMenuHook.vue";
 import CommentDialog from "src/tabsets/dialogues/CommentDialog.vue";
 import EditUrlDialog from "src/tabsets/dialogues/EditUrlDialog.vue";
+import PanelTabListContextMenuHook from "src/app/hooks/tabsets/PanelTabListContextMenuHook.vue";
 
 const {handleSuccess, handleError} = useNotificationHandler()
 
