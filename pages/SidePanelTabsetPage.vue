@@ -99,7 +99,7 @@ import {uid, useQuasar} from "quasar";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {AddTabToTabsetCommand} from "src/tabsets/commands/AddTabToTabsetCommand"
-import {FeatureIdent} from "src/models/FeatureIdent";
+import {FeatureIdent} from "src/app/models/FeatureIdent";
 import NavigationService from "src/services/NavigationService";
 import {useTabsStore2} from "src/tabsets/stores/tabsStore2";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";

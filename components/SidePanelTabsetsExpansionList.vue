@@ -248,7 +248,7 @@ import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {onMounted, PropType, ref, watchEffect} from "vue";
 import {useUiStore} from "src/ui/stores/uiStore";
 import _ from "lodash";
-import {FeatureIdent} from "src/models/FeatureIdent";
+import {FeatureIdent} from "src/app/models/FeatureIdent";
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {useSpacesStore} from "src/spaces/stores/spacesStore";
 import {Tab} from "src/tabsets/models/Tab";

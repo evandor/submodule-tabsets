@@ -87,7 +87,7 @@ import {BlobMetadata} from "src/snapshots/models/BlobMetadata";
 import {useSnapshotsStore} from "src/snapshots/stores/SnapshotsStore";
 import {openURL} from "quasar";
 import {useFeaturesStore} from "src/features/stores/featuresStore";
-import {FeatureIdent} from "src/models/FeatureIdent";
+import {FeatureIdent} from "src/app/models/FeatureIdent";
 
 const props = defineProps({
   tab: {type: Object as PropType<Tab>, required: true},

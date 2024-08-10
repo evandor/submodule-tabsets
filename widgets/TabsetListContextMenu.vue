@@ -156,7 +156,7 @@
 <script lang="ts" setup>
 
 import {Tabset, TabsetSharing, TabsetStatus, TabsetType} from "src/tabsets/models/Tabset";
-import {FeatureIdent} from "src/models/FeatureIdent";
+import {FeatureIdent} from "src/app/models/FeatureIdent";
 import {PropType, ref} from "vue";
 import {useUtils} from "src/core/services/Utils";
 import {useCommandExecutor} from "src/core/services/CommandExecutor";

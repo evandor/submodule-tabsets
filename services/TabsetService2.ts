@@ -11,7 +11,7 @@ import {v5 as uuidv5} from 'uuid';
 import {useSettingsStore} from "src/stores/settingsStore"
 import {SaveOrReplaceResult} from "src/tabsets/models/SaveOrReplaceResult";
 import JsUtils from "src/utils/JsUtils";
-import {FeatureIdent} from "src/models/FeatureIdent";
+import {FeatureIdent} from "src/app/models/FeatureIdent";
 import {useUiStore} from "src/ui/stores/uiStore";
 import {useSuggestionsStore} from "src/suggestions/stores/suggestionsStore";
 import {Suggestion, SuggestionState, SuggestionType} from "src/suggestions/models/Suggestion";

@@ -77,6 +77,7 @@ import {MoveToTabsetCommand} from "src/domain/tabs/MoveToTabset";
 import TabsetListContextMenu from "src/tabsets/widgets/TabsetListContextMenu.vue";
 import {useUiStore} from "src/ui/stores/uiStore";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
+import {useSpacesStore} from "src/spaces/stores/spacesStore";
 
 const router = useRouter()
 
@@ -96,7 +97,10 @@ watchEffect(() => {
 const selectTS = (tabset: Tabset) => {
   console.log("selecting tabset/space", tabset.id, props.spaceId)
   useCommandExecutor()
-    .execute(new SelectTabsetCommand(tabset.id, props.spaceId))
+    .execute(new SelectTabsetCommand(tabset.id))
+    .then(() => {
+      useSpacesStore().setSpace(props.spaceId)
+    })
     .then(() => {
       console.log("tabset was selected", tabset.id, tabset.type, props.fromPanel)
       activeTabset.value = tabset.id
