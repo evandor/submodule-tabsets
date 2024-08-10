@@ -15,7 +15,6 @@ import {FeatureIdent} from "src/app/models/FeatureIdent";
 import {useUiStore} from "src/ui/stores/uiStore";
 import {useSuggestionsStore} from "src/suggestions/stores/suggestionsStore";
 import {Suggestion, SuggestionState, SuggestionType} from "src/suggestions/models/Suggestion";
-import {MonitoringType} from "src/models/Monitor";
 import {TabInFolder} from "src/tabsets/models/TabInFolder";
 import {useContentService} from "src/content/services/ContentService";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
@@ -390,43 +389,6 @@ export function useTabsetService() {
             } else {
               t.contentHash = ""
             }
-            const monitoringFeature = FeatureIdent['MONITORING' as keyof typeof FeatureIdent]
-            if (monitoringFeature && useFeaturesStore().hasFeature(monitoringFeature) &&
-              t.monitor && t.monitor.type === MonitoringType.CONTENT_HASH) {
-              if (oldContentHash && oldContentHash !== '' &&
-                t.contentHash !== oldContentHash &&
-                t.contentHash !== '' && t.url) {
-
-                console.log("%ccontenthash changed for", "color:yellow", t.url)
-
-                const id = btoa(t.url)
-                const msg = "Info: Something might have changed in '" + (t.name ? t.name : t.title) + "'."
-                const suggestion = new Suggestion(id, 'Content Change Detected',
-                  msg,
-                  t.url, SuggestionType.CONTENT_CHANGE)
-                suggestion.setData({url: t.url, tabId: t.id})
-                suggestion.state = SuggestionState.NOTIFICATION
-                useSuggestionsStore().addSuggestion(suggestion)
-                  .then(() => {
-                    if (useFeaturesStore().hasFeature(FeatureIdent.NOTIFICATIONS)) {
-                      chrome.notifications.create(id, {
-                        title: "Tabset Extension Message",
-                        type: "basic",
-                        iconUrl: chrome.runtime.getURL("www/favicon.ico"),
-                        message: msg,
-                        buttons: [{title: 'show'}, {title: 'ignore'}]
-                      }, (callback: any) => {
-                        //console.log("got callback", callback)
-                      })
-                      //useSuggestionsStore().updateSuggestionState(id, SuggestionState.NOTIFICATION)
-                    }
-                  })
-                  .catch((err: any) => {
-                    console.debug("got error", err)
-                  })
-              }
-            }
-
             savePromises.push(saveTabset(tabset))
           }
         })

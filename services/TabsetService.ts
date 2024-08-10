@@ -6,7 +6,6 @@ import {STRIP_CHARS_IN_COLOR_INPUT, STRIP_CHARS_IN_USER_INPUT} from "boot/consta
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {useSpacesStore} from "src/spaces/stores/spacesStore";
 import PlaceholderUtils from "src/tabsets/utils/PlaceholderUtils";
-import {Monitor, MonitoringType} from "src/models/Monitor";
 import {ListDetailLevel, useUiStore} from "src/ui/stores/uiStore";
 import {TabsetColumn} from "src/tabsets/models/TabsetColumn";
 import {useContentService} from "src/content/services/ContentService";
@@ -109,12 +108,6 @@ class TabsetService {
   setCustomTitle(tab: Tab, title: string, desc: string): Promise<any> {
     tab.name = title
     tab.longDescription = desc
-    return saveCurrentTabset()
-  }
-
-  setMonitoring(tab: Tab, monitor: Monitor): Promise<any> {
-    tab.monitor = monitor.type === MonitoringType.NONE ? undefined : monitor
-    //console.log("tab.monitor", tab.monitor)
     return saveCurrentTabset()
   }
 
