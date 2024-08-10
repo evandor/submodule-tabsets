@@ -53,9 +53,9 @@ import {useRoute} from "vue-router";
 import _ from "lodash"
 import {Tab} from "src/tabsets/models/Tab";
 import {Tabset, TabsetStatus} from "src/tabsets/models/Tabset";
-import TabList from "components/layouts/TabList.vue";
 import Analytics from "src/core/utils/google-analytics";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
+import TabList from "src/tabsets/pages/pwa/TabList.vue";
 
 const route = useRoute();
 

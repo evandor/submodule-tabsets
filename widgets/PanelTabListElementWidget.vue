@@ -348,7 +348,7 @@ import PanelTabListContextMenu from "src/tabsets/widgets/PanelTabListContextMenu
 import _ from "lodash";
 import {formatDistance} from "date-fns";
 import {Tabset} from "src/tabsets/models/Tabset";
-import {FeatureIdent} from "src/models/FeatureIdent";
+import {FeatureIdent} from "src/app/models/FeatureIdent";
 import {useUtils} from "src/core/services/Utils";
 import {useRouter} from "vue-router";
 import {useGroupsStore} from "src/tabsets/stores/groupsStore";
@@ -367,6 +367,8 @@ import {SavedBlob} from "src/snapshots/models/SavedBlob";
 import TabListIconIndicatorsHook from "components/hooks/TabListIconIndicatorsHook.vue";
 import {useThumbnailsService} from "src/thumbnails/services/ThumbnailsService";
 import CommentDialog from "src/tabsets/dialogues/CommentDialog.vue";
+import CommentDialog from "src/tabsets/dialogues/CommentDialog.vue";
+import TabListIconIndicatorsHook from "src/app/hooks/tabsets/TabListIconIndicatorsHook.vue";
 
 const {inBexMode} = useUtils()
 

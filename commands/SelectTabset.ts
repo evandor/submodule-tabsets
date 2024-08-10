@@ -1,10 +1,7 @@
 import Command from "src/core/domain/Command";
 import {ExecutionResult} from "src/core/domain/ExecutionResult";
-import _ from "lodash"
-import {Tab} from "src/tabsets/models/Tab";
 import {useUtils} from "src/core/services/Utils";
 import {Tabset} from "src/tabsets/models/Tabset";
-import {useSpacesStore} from "src/spaces/stores/spacesStore";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 
@@ -14,9 +11,7 @@ export class SelectTabsetCommand implements Command<Tabset | undefined> {
 
   public merge: boolean = true
 
-  constructor(
-    public tabsetId: string,
-    public spaceId: string | undefined = undefined) {
+  constructor(public tabsetId: string) {
   }
 
   // TODO this return the old currentTabset - why? needed?
@@ -32,7 +27,7 @@ export class SelectTabsetCommand implements Command<Tabset | undefined> {
     // useUiStore().clearHighlights()
 
     useTabsetService().selectTabset(this.tabsetId)
-    useSpacesStore().setSpace(this.spaceId)
+    // useSpacesStore().setSpace(this.spaceId)
 
     if (inBexMode()) {
       const data = {
@@ -48,5 +43,5 @@ export class SelectTabsetCommand implements Command<Tabset | undefined> {
 }
 
 SelectTabsetCommand.prototype.toString = function cmdToString() {
-  return `SelectTabsetCommand: {tabsetId=${this.tabsetId}}, {spaceId=${this.spaceId}}`;
+  return `SelectTabsetCommand: {tabsetId=${this.tabsetId}}`;
 };

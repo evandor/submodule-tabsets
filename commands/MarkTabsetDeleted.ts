@@ -3,7 +3,7 @@ import {ExecutionResult} from "src/core/domain/ExecutionResult";
 import TabsetService from "src/tabsets/services/TabsetService";
 import {MarkTabsetAsDefaultCommand} from "src/tabsets/commands/MarkTabsetAsDefault";
 import {Tabset, TabsetType} from "src/tabsets/models/Tabset";
-import {FeatureIdent} from "src/models/FeatureIdent";
+import {FeatureIdent} from "src/app/models/FeatureIdent";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {useUtils} from "src/core/services/Utils";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";

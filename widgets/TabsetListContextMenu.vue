@@ -156,7 +156,7 @@
 <script lang="ts" setup>
 
 import {Tabset, TabsetSharing, TabsetStatus, TabsetType} from "src/tabsets/models/Tabset";
-import {FeatureIdent} from "src/models/FeatureIdent";
+import {FeatureIdent} from "src/app/models/FeatureIdent";
 import {PropType, ref} from "vue";
 import {useUtils} from "src/core/services/Utils";
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
@@ -164,8 +164,6 @@ import {MarkTabsetAsFavoriteCommand} from "src/tabsets/commands/MarkTabsetAsFavo
 import {MarkTabsetAsDefaultCommand} from "src/tabsets/commands/MarkTabsetAsDefault";
 import {MarkTabsetAsArchivedCommand} from "src/tabsets/commands/MarkTabsetAsArchived";
 import RestoreTabsetDialog from "src/tabsets/dialogues/RestoreTabsetDialog.vue";
-import {Space} from "src/spaces/models/Space";
-import {useSpacesStore} from "src/spaces/stores/spacesStore";
 import _ from "lodash";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {openURL, useQuasar} from "quasar";
@@ -177,6 +175,8 @@ import {Tab} from "src/tabsets/models/Tab";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {useFeaturesStore} from "src/features/stores/featuresStore";
 import {CopyTabsetCommand} from "src/domain/tabsets/CopyTabset";
+import {useEntityRegistryStore} from "src/core/stores/entityRegistryStore";
+import {SpaceInfo} from "src/core/models/SpaceInfo";
 
 const {inBexMode} = useUtils()
 
@@ -244,13 +244,14 @@ const restoreDialog = (tabsetId: string) => $q.dialog({
 
 const addToSpaces = (tabset: Tabset) => {
   const hasSpaces: string[] = tabset.spaces
-  const allSpaces: Map<string, Space> = useSpacesStore().spaces
+  // const allSpaces: Map<string, Space> = useSpacesStore().spaces
+  const allSpaces: SpaceInfo[] = useEntityRegistryStore().spacesRegistry
   let addList: object[] = []
-  _.forEach([...allSpaces.keys()], (availableSpace: string) => {
-    if (hasSpaces.indexOf(availableSpace) < 0) {
+  _.forEach(allSpaces, (availableSpace: SpaceInfo) => {
+    if (hasSpaces.indexOf(availableSpace.id) < 0) {
       addList.push({
-        spaceId: availableSpace,
-        spaceName: allSpaces.get(availableSpace)?.label || "---"
+        spaceId: availableSpace.id,
+        spaceName: availableSpace.name //allSpaces.get(availableSpace)?.label || "---"
       })
     }
   })
@@ -259,12 +260,13 @@ const addToSpaces = (tabset: Tabset) => {
 
 const removeFromSpaces = (tabset: Tabset) => {
   const hasSpaces: string[] = tabset.spaces
-  const allSpaces: Map<string, Space> = useSpacesStore().spaces
+  // const allSpaces: Map<string, Space> = useSpacesStore().spaces
+  const allSpaces: SpaceInfo[] = useEntityRegistryStore().spacesRegistry
   let removeList: object[] = []
   _.forEach(hasSpaces, (availableSpace: string) => {
     removeList.push({
       spaceId: availableSpace,
-      spaceName: allSpaces.get(availableSpace)?.label || "---"
+      spaceName: _.filter(allSpaces, (s: SpaceInfo) => s.id === availableSpace)?.name || "---"
     })
   })
   return removeList

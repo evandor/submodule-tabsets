@@ -1,9 +1,10 @@
 # The Tabsets Submodule
 
-used as submodule in
+used as submodule in the following applications:
 
 * [tabsets](https://tabsets.net)
-* bookmrk
+* bookmrkx
+* Bibbly
 * ...
 
 Tests are found in the tabsets project.

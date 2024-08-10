@@ -36,6 +36,22 @@
               tabsetCaption(useTabsetService().tabsToShow(tabset as Tabset), tabset.window, tabset.folders?.length)
             }}
           </q-item-label>
+          <q-item-label class="text-caption text-grey-5" v-if="tabsetExpanded.get(tabset.id)">
+            <template v-for="n in notes">
+              <div class="row">
+                <div
+                  class="col-2 cursor-pointer"
+                  @click.stop="openNote(n)">
+                  <q-icon name="description" class="q-ml-md" color="grey" size="12px"/>
+                </div>
+                <div
+                  class="col vertical-bottom q-ml-xs ellipsis text-caption cursor-pointer text-blue-10"
+                  @click.stop="openNote(n)">
+                  {{ n.title }}
+                </div>
+              </div>
+            </template>
+          </q-item-label>
           <q-item-label v-if="tabset.sharedId" class="q-mb-xs"
                         @mouseover="hoveredPublicLink = true"
                         @mouseleave="hoveredPublicLink = false">
@@ -229,11 +245,10 @@
 
 import {Tabset, TabsetStatus, TabsetType} from "src/tabsets/models/Tabset";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
-import SidePanelPageTabList from "components/layouts/SidePanelPageTabList.vue";
 import {onMounted, PropType, ref, watchEffect} from "vue";
 import {useUiStore} from "src/ui/stores/uiStore";
 import _ from "lodash";
-import {FeatureIdent} from "src/models/FeatureIdent";
+import {FeatureIdent} from "src/app/models/FeatureIdent";
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {useSpacesStore} from "src/spaces/stores/spacesStore";
 import {Tab} from "src/tabsets/models/Tab";
@@ -255,6 +270,10 @@ import {useFeaturesStore} from "src/features/stores/featuresStore";
 import SidePanelSubfolderContextMenu from "src/tabsets/widgets/SidePanelSubfolderContextMenu.vue";
 import SidePanelPageContextMenu from "pages/sidepanel/SidePanelPageContextMenu.vue";
 import AddUrlDialog from "src/tabsets/dialogues/AddUrlDialog.vue";
+import {useNotesStore} from "src/notes/stores/NotesStore";
+import {Note} from "src/notes/models/Note";
+import NavigationService from "src/services/NavigationService";
+import SidePanelPageTabList from "src/tabsets/layouts/SidePanelPageTabList.vue";
 
 const props = defineProps({
   tabsets: {type: Array as PropType<Array<Tabset>>, required: true}
@@ -277,6 +296,7 @@ interface SelectionObject {
 
 const showSearchBox = ref(false)
 const showAddCurrentTabTooltip = ref(false)
+const currentTabsetId = ref<string | undefined>(undefined)
 const tabsetExpanded = ref<Map<string, boolean>>(new Map())
 const selected_model = ref<SelectionObject>({})
 const hoveredTabset = ref<string | undefined>(undefined)
@@ -288,6 +308,7 @@ const tabsetNameOptions = ref<object[]>([])
 const currentChromeTab = ref<chrome.tabs.Tab | undefined>(undefined)
 const hoveredPublicLink = ref(false)
 const headerDescription = ref<string>('')
+const notes = ref<Note[]>([])
 
 onMounted(() => {
   if (useTabsetsStore().allTabsCount === 0) {
@@ -311,15 +332,17 @@ const scrollToElement = (el: any, delay: number) => {
 
 }
 
-watchEffect(() => {
+watchEffect(async () => {
   // should trigger if currentTabsetId is changed from "the outside"
-  const currentTabsetId = useTabsetsStore().getCurrentTabset?.id || ''
+  currentTabsetId.value = useTabsetsStore().getCurrentTabset?.id || ''
   selected_model.value = {}
-  selected_model.value[currentTabsetId] = true
-  tabsetExpanded.value.set(currentTabsetId, true)
-  const index = _.findIndex(props.tabsets as Tabset[], (ts: Tabset) => ts.id === currentTabsetId)
+  selected_model.value[currentTabsetId.value] = true
+  tabsetExpanded.value.set(currentTabsetId.value, true)
+  const index = _.findIndex(props.tabsets as Tabset[], (ts: Tabset) => ts.id === currentTabsetId.value)
   scrollToElement(document.getElementsByClassName("q-expansion-item")[index], 300)
   useUiStore().tabsetsExpanded = true
+  notes.value = await useNotesStore().getNotesFor(currentTabsetId.value)
+
 })
 
 // watchEffect(() => {
@@ -505,10 +528,10 @@ const tabsetSectionName = (tabset: Tabset) => {
 
 const tabsetCaption = (tabs: Tab[], window: string, foldersCount: number) => {
   const filter = useUiStore().tabsFilter
-  if (!tabs) {
-    return '-'
-  }
   let caption = ''
+  if (!tabs) {
+    caption = '-'
+  }
   if (!filter || filter.trim() === '') {
     caption = tabs.length + ' tab' + (tabs.length === 1 ? '' : 's')
   } else {
@@ -519,6 +542,9 @@ const tabsetCaption = (tabs: Tab[], window: string, foldersCount: number) => {
   }
   if (window && window !== 'current') {
     caption = caption + " - opens in: " + window
+  }
+  if (notes.value.length > 0) {
+    return caption + ", " + notes.value.length + " " + (notes.value.length === 1 ? 'note':'notes')
   }
   return caption
 }
@@ -691,6 +717,23 @@ async function handleHeadRequests(selectedTabset: Tabset) {
     }
   }
   useTabsetService().saveTabset(selectedTabset)
+}
+
+const openNote = (note: Note) => {
+  const url = chrome.runtime.getURL(`/www/index.html#/mainpanel/notes/${note.id}`)
+  NavigationService.openOrCreateTab([url])
+}
+
+if (inBexMode()) {
+  // seems we need to define these listeners here to get the matching messages reliably
+  // these messages are created by triggering events in the mainpanel
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    //console.log(" <<< received message", message)
+  if (message.name === "note-changed") {
+      useNotesStore().getNotesFor(currentTabsetId.value!)
+        .then((ns: Note[]) => notes.value = ns)
+    }
+  })
 }
 
 

@@ -91,21 +91,20 @@ import {Tab, TabSorting} from "src/tabsets/models/Tab";
 import {Tabset} from "src/tabsets/models/Tabset";
 import {useRoute} from "vue-router";
 import {useUtils} from "src/core/services/Utils";
-import {useUiStore} from "src/ui/stores/uiStore";
 import FirstToolbarHelper from "pages/sidepanel/helper/FirstToolbarHelper.vue";
 import {useWindowsStore} from "src/windows/stores/windowsStore";
 import Analytics from "src/core/utils/google-analytics";
 import SidePanelTabsetsSelectorWidget from "components/widgets/SidePanelTabsetsSelectorWidget.vue";
 import {uid, useQuasar} from "quasar";
-import SidePanelPageTabList from "components/layouts/SidePanelPageTabList.vue";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {AddTabToTabsetCommand} from "src/tabsets/commands/AddTabToTabsetCommand"
-import {FeatureIdent} from "src/models/FeatureIdent";
+import {FeatureIdent} from "src/app/models/FeatureIdent";
 import NavigationService from "src/services/NavigationService";
 import {useTabsStore2} from "src/tabsets/stores/tabsStore2";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {useFeaturesStore} from "src/features/stores/featuresStore";
+import SidePanelPageTabList from "src/tabsets/layouts/SidePanelPageTabList.vue";
 
 const {inBexMode} = useUtils()
 

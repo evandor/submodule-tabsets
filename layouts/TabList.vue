@@ -17,7 +17,6 @@
         :group="group"
         :tabset-id="tabsetId"
         :tabset-shared-id="tabsetSharedId"
-        :tabset-mqtt-url="tabsetMqttUrl"
         :simpleUi="props.simpleUi"
         :tabs="props.tabs"/>
 
@@ -28,7 +27,6 @@
                  :group="group"
                  :tabset-id="tabsetId"
                  :tabset-shared-id="tabsetSharedId"
-                 :tabset-mqtt-url="tabsetMqttUrl"
                  :simpleUi="props.simpleUi"
                  :tabs="props.tabs"/>
 
@@ -37,20 +35,17 @@
 <script setup lang="ts">
 import {PropType, ref} from "vue";
 import {VueDraggableNext} from 'vue-draggable-next'
-import _ from "lodash"
 import {useQuasar} from "quasar";
-import {useTabsStore2} from "src/tabsets/stores/tabsStore2";
-import {Tab, TabSorting} from "src/tabsets/models/Tab";
-import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
+import _ from "lodash"
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
-import {CreateTabFromOpenTabsCommand} from "src/tabsets/commands/CreateTabFromOpenTabs";
-import TabListHelper from "src/tabsets/pages/pwa/TabListHelper.vue";
 import InfoMessageWidget from "src/ui/widgets/InfoMessageWidget.vue";
+import {Tab, TabSorting} from "src/tabsets/models/Tab";
+import TabsetService from "src/tabsets/services/TabsetService";
+import {CreateTabFromOpenTabsCommand} from "src/tabsets/commands/CreateTabFromOpenTabs";
+import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
+import TabListHelper from "src/tabsets/pages/pwa/TabListHelper.vue";
 
 const $q = useQuasar()
-const tabsStore = useTabsStore2()
-const tabsetsStore = useTabsetsStore()
-
 
 const props = defineProps({
   tabs: {type: Array as PropType<Tab[]>, required: true},
@@ -67,10 +62,10 @@ function adjustIndex(element: any, tabs: Tab[]) {
   //console.log("filtered", tabs)
   if (element.newIndex === 0) { // first element
     //console.log(" 0 - searching for ", tabs[0].id)
-    return _.findIndex(tabsetsStore.getCurrentTabs, (t:Tab) => t.id === tabs[0].id)
+    return _.findIndex(useTabsetsStore().getCurrentTabs, t => t.id === tabs[0].id)
   } else {
     //console.log(" 1 - searching for ", tabs[element.newIndex - 1].id)
-    return 1 + _.findIndex(tabsetsStore.getCurrentTabs, (t:Tab) => t.id === tabs[element.newIndex - 1].id)
+    return 1 + _.findIndex(useTabsetsStore().getCurrentTabs, t => t.id === tabs[element.newIndex - 1].id)
   }
 }
 
@@ -90,7 +85,7 @@ const handleDragAndDrop = (event: any) => {
         }
         break;
       case 'pinnedTabs':
-        const filteredTabs: Tab[] = _.filter(tabsetsStore.getCurrentTabs, (t: Tab) => t.pinned)
+        const filteredTabs: Tab[] = _.filter(tabsStore.getCurrentTabs, (t: Tab) => t.pinned)
         if (filteredTabs.length > 0) {
           useIndex = adjustIndex(moved, filteredTabs);
         }
@@ -106,7 +101,7 @@ const handleDragAndDrop = (event: any) => {
         }
         break
     }
-    // TabsetService.moveTo(moved.element.id, useIndex)
+    TabsetService.moveTo(moved.element.id, useIndex)
   }
   if (added) {
     useCommandExecutor()

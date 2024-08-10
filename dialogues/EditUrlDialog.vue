@@ -79,7 +79,7 @@ import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {Tab, UrlExtension} from "src/tabsets/models/Tab";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {useFeaturesStore} from "src/features/stores/featuresStore";
-import {FeatureIdent} from "src/models/FeatureIdent";
+import {FeatureIdent} from "src/app/models/FeatureIdent";
 
 defineEmits([
   ...useDialogPluginComponent.emits

@@ -93,7 +93,7 @@ import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {CreateTabsetCommand} from "src/tabsets/commands/CreateTabset";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {useUiStore} from "src/ui/stores/uiStore";
-import {FeatureIdent} from "src/models/FeatureIdent";
+import {FeatureIdent} from "src/app/models/FeatureIdent";
 import {useWindowsStore} from "src/windows/stores/windowsStore";
 import {useUtils} from "src/core/services/Utils";
 import ColorSelector from "src/core/dialog/ColorSelector.vue";

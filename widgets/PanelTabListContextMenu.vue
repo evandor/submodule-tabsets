@@ -16,15 +16,15 @@
         </q-item>
       </template>
 
-<!--      <q-separator inset/>-->
-<!--      <q-item clickable v-close-popup @click.stop="editURL(props['tab' as keyof object])">-->
-<!--        <q-item-section style="padding-right:0;min-width:25px;max-width: 25px;">-->
-<!--          <q-icon size="xs" name="o_edit" color="info"/>-->
-<!--        </q-item-section>-->
-<!--        <q-item-section>-->
-<!--          Edit Tab-->
-<!--        </q-item-section>-->
-<!--      </q-item>-->
+      <q-separator inset/>
+      <q-item clickable v-close-popup @click.stop="editURL(props['tab' as keyof object])">
+        <q-item-section style="padding-right:0;min-width:25px;max-width: 25px;">
+          <q-icon size="xs" name="o_edit" color="info"/>
+        </q-item-section>
+        <q-item-section>
+          Edit Tab
+        </q-item-section>
+      </q-item>
 
       <template v-if="props.tabset?.type.toString() !== TabsetType.DYNAMIC.toString()">
         <q-item clickable
@@ -64,17 +64,17 @@
         </q-item>
       </template>
 
-<!--      <template v-if="useAuthStore().isAuthenticated">-->
-<!--        <q-separator inset/>-->
-<!--        <q-item clickable v-close-popup @click.stop="openSimilar()">-->
-<!--          <q-item-section style="padding-right:0;min-width:25px;max-width: 25px;">-->
-<!--            <q-icon size="xs" name="o_equal"/>-->
-<!--          </q-item-section>-->
-<!--          <q-item-section>-->
-<!--            Open similar websites-->
-<!--          </q-item-section>-->
-<!--        </q-item>-->
-<!--      </template>-->
+      <template v-if="useAuthStore().isAuthenticated">
+        <q-separator inset/>
+        <q-item clickable v-close-popup @click.stop="openSimilar()">
+          <q-item-section style="padding-right:0;min-width:25px;max-width: 25px;">
+            <q-icon size="xs" name="o_equal"/>
+          </q-item-section>
+          <q-item-section>
+            Open similar websites
+          </q-item-section>
+        </q-item>
+      </template>
 
       <q-separator inset/>
       <q-item clickable v-close-popup @click.stop="deleteTab()">
@@ -100,7 +100,8 @@ import {DeleteTabCommand} from "src/domain/tabs/DeleteTabCommand";
 import {useRouter} from "vue-router";
 import NavigationService from "src/services/NavigationService";
 import {Tabset, TabsetType} from "src/tabsets/models/Tabset";
-import {FeatureIdent} from "src/models/FeatureIdent";
+import {FeatureIdent} from "src/app/models/FeatureIdent";
+import EditUrlDialog from "components/dialogues/EditUrlDialog.vue";
 import {PlaceholdersType} from "src/tabsets/models/Placeholders";
 import ColorSelector from "src/core/dialog/ColorSelector.vue";
 import {UpdateTabColorCommand} from "src/domain/tabs/UpdateTabColor";
