@@ -324,11 +324,11 @@ export function useTabsetService() {
    * @param text
    * @param metas
    */
-  const saveText = (tab: Tab | undefined, text: string, metas: object): Promise<any> => {
+  const saveText = (tab: Tab | undefined, text: string, metas: object = {}): Promise<any> => {
     if (!tab || !tab.url) {
       return Promise.resolve('done')
     }
-    console.debug("saving text for", tab.id, tab.url)
+    console.debug("saving text for", tab.id, tab.url, metas)
     const title = tab.title || ''
     const tabsetIds: string[] = tabsetsFor(tab.url)
 

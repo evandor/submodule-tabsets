@@ -81,7 +81,7 @@ export class AddTabToTabsetCommand implements Command<any> {
       if (this.tab.chromeTabId) {
         // saving content excerpt and meta data
         try {
-          const contentResult = await chrome.tabs.sendMessage(this.tab.chromeTabId, 'getContent')
+          const contentResult = await chrome.tabs.sendMessage(this.tab.chromeTabId, 'getExcerpt')
           console.log("=== contentResult", contentResult)
           const tokens = ContentUtils.html2tokens(contentResult.html)
           content = [...tokens].join(" ")
