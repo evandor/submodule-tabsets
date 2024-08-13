@@ -20,7 +20,7 @@ import {useContentService} from "src/content/services/ContentService";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {useTabsStore2} from "src/tabsets/stores/tabsStore2";
 import {useFeaturesStore} from "src/features/stores/featuresStore";
-import AppEventDispatcher from "src/services/AppEventDispatcher";
+import AppEventDispatcher from "src/app/AppEventDispatcher";
 
 // let db: TabsetsPersistence = null as unknown as TabsetsPersistence
 

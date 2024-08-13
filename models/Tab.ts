@@ -1,4 +1,3 @@
-import {Monitor} from "src/models/Monitor";
 import {uid} from "quasar";
 import {STRIP_CHARS_IN_USER_INPUT} from "boot/constants";
 import _ from "lodash"
@@ -115,7 +114,6 @@ export class Tab {
   httpInfo: string = 'undefined'
 
   placeholders: Placeholders | undefined
-  monitor: Monitor | undefined
 
   color: string | undefined = undefined
   matcher: string | undefined = undefined

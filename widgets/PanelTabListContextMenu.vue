@@ -96,7 +96,6 @@ import {PropType, ref} from "vue";
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {Notify, useQuasar} from "quasar";
 import {Tab} from "src/tabsets/models/Tab";
-import {DeleteTabCommand} from "src/domain/tabs/DeleteTabCommand";
 import {useRouter} from "vue-router";
 import NavigationService from "src/services/NavigationService";
 import {Tabset, TabsetType} from "src/tabsets/models/Tabset";
@@ -111,6 +110,7 @@ import {useFeaturesStore} from "src/features/stores/featuresStore";
 import CommentDialog from "src/tabsets/dialogues/CommentDialog.vue";
 import EditUrlDialog from "src/tabsets/dialogues/EditUrlDialog.vue";
 import PanelTabListContextMenuHook from "src/app/hooks/tabsets/PanelTabListContextMenuHook.vue";
+import {DeleteTabCommand} from "src/tabsets/commands/DeleteTabCommand";
 
 const {handleSuccess, handleError} = useNotificationHandler()
 
