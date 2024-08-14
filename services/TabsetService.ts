@@ -13,7 +13,7 @@ import {useContentService} from "src/content/services/ContentService";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {useTabsStore2} from "src/tabsets/stores/tabsStore2";
 import {Space} from "src/spaces/models/Space";
-import AppEventDispatcher from "src/services/AppEventDispatcher";
+import AppEventDispatcher from "src/app/AppEventDispatcher";
 import {ContentItem} from "src/content/models/ContentItem";
 import {useUtils} from "src/core/services/Utils";
 
@@ -75,11 +75,11 @@ class TabsetService {
     return Promise.reject("not implemented")//db.getRequest(url)
   }
 
-  async getContentFor(selectedTab: Tab): Promise<ContentItem> {
+  async getContentFor(selectedTab: Tab): Promise<ContentItem | undefined> {
     return this.getContentForUrl(selectedTab.id)
   }
 
-  async getContentForUrl(tabId: string): Promise<ContentItem> {
+  async getContentForUrl(tabId: string): Promise<ContentItem | undefined> {
     return useContentService().getContent(tabId)
   }
 

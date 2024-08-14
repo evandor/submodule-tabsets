@@ -7,7 +7,7 @@ import {Tabset, TabsetSharing} from "src/tabsets/models/Tabset";
 import {useUtils} from "src/core/services/Utils";
 import {useGroupsStore} from "src/tabsets/stores/groupsStore";
 import PlaceholderUtils from "src/tabsets/utils/PlaceholderUtils";
-import AppEventDispatcher from "src/services/AppEventDispatcher";
+import AppEventDispatcher from "src/app/AppEventDispatcher";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import ContentUtils from "src/core/utils/ContentUtils";
 

@@ -101,7 +101,6 @@ import {useRouter} from "vue-router";
 import NavigationService from "src/services/NavigationService";
 import {Tabset, TabsetType} from "src/tabsets/models/Tabset";
 import {FeatureIdent} from "src/app/models/FeatureIdent";
-import EditUrlDialog from "components/dialogues/EditUrlDialog.vue";
 import {PlaceholdersType} from "src/tabsets/models/Placeholders";
 import ColorSelector from "src/core/dialog/ColorSelector.vue";
 import {UpdateTabColorCommand} from "src/domain/tabs/UpdateTabColor";

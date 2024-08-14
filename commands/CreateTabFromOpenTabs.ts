@@ -8,7 +8,7 @@ import {useUiStore} from "src/ui/stores/uiStore";
 import {Tabset} from "src/tabsets/models/Tabset";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {DeleteTabCommand} from "src/domain/tabs/DeleteTabCommand";
-import AppEventDispatcher from "src/services/AppEventDispatcher";
+import AppEventDispatcher from "src/app/AppEventDispatcher";
 
 const {saveCurrentTabset} = useTabsetService()
 
