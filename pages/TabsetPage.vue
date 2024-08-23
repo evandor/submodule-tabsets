@@ -81,15 +81,15 @@
           <q-tooltip class="tooltip">Use grid layout to visualize your tabs</q-tooltip>
         </q-btn>
 
-        <q-btn v-if="tabset?.tabs.length > 0 "
-               @click="setView('group')"
-               style="width:14px"
-               class="q-mr-sm" size="8px"
-               :flat="tabset?.view !== 'group'"
-               :outline="tabset?.view === 'group'"
-               icon="view_week">
-          <q-tooltip class="tooltip">Use group layout to visualize your tabs</q-tooltip>
-        </q-btn>
+<!--        <q-btn v-if="tabset?.tabs.length > 0 "-->
+<!--               @click="setView('group')"-->
+<!--               style="width:14px"-->
+<!--               class="q-mr-sm" size="8px"-->
+<!--               :flat="tabset?.view !== 'group'"-->
+<!--               :outline="tabset?.view === 'group'"-->
+<!--               icon="view_week">-->
+<!--          <q-tooltip class="tooltip">Use group layout to visualize your tabs</q-tooltip>-->
+<!--        </q-btn>-->
 
         <!-- default view, no need to show if there is no alternative -->
         <q-btn v-if="tabset?.tabs.length > 0 "
@@ -245,11 +245,11 @@
         hint="This is a special type of tabset - it's meant for those tabs which you don't want to track. You can add urls and whenever
 a tab's url starts with one of the urls of this tabset, it will be ignored and not added to the tabs to be added."/>
 
-      <DynamicTabsetPageCards
-        v-if="tabset?.type === TabsetType.DYNAMIC"
-        :tabset="tabset as unknown as Tabset"/>
+<!--      <DynamicTabsetPageCards-->
+<!--        v-if="tabset?.type === TabsetType.DYNAMIC"-->
+<!--        :tabset="tabset as unknown as Tabset"/>-->
 
-      <TabsetPageCards v-else
+      <TabsetPageCards
                        :tabset="tabset as unknown as Tabset"
                        :simple-ui="false"/>
 

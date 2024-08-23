@@ -2,7 +2,7 @@ import {STRIP_CHARS_IN_COLOR_INPUT, STRIP_CHARS_IN_USER_INPUT} from "boot/consta
 import {Tab} from "src/tabsets/models/Tab";
 import _ from "lodash";
 import {uid} from "quasar";
-import ChromeApi from "src/services/ChromeApi";
+import ChromeApi from "src/app/BrowserApi";
 import {TabPredicate} from "src/domain/Types";
 import {Tabset, TabsetStatus, TabsetType} from "src/tabsets/models/Tabset";
 import {MetaLink} from "src/models/MetaLink";
@@ -69,7 +69,8 @@ export function useTabsetService() {
     merge: boolean = false,
     windowId: string = 'current',
     tsType: TabsetType = TabsetType.DEFAULT,
-    color: string | undefined = undefined
+    color: string | undefined = undefined,
+    dynamicSource: string | undefined = undefined
   ): Promise<SaveOrReplaceResult> => {
     const trustedName = name.replace(STRIP_CHARS_IN_USER_INPUT, '')
       .substring(0, 31)
@@ -89,11 +90,8 @@ export function useTabsetService() {
         return true
       })
     try {
-      // const result: NewOrReplacedTabset = await useTabsetsStore()
-      //   .createTabset(trustedName, tabs, trustedColor)
-      //   //.updateOrCreateTabset(trustedName, tabs, merge, windowId, tsType, trustedColor)
-
-      const tabset = await useTabsetsStore().createTabset(trustedName, tabs, trustedColor)
+      const dynUrl = dynamicSource ? new URL(dynamicSource) : undefined
+      const tabset = await useTabsetsStore().createTabset(trustedName, tabs, trustedColor, dynUrl)
 
 
       //await saveTabset(result.tabset)
@@ -644,42 +642,31 @@ export function useTabsetService() {
     }
   }
 
-  const populateSearch = () => {
+  const populateSearch = async () => {
 
     const urlSet: Set<string> = new Set()
     const minimalIndex: object[] = []
 
-    _.forEach([...useTabsetsStore().tabsets.values()] as Tabset[], (tabset: Tabset) => {
-        tabset.tabs.forEach((tab: Tab) => {
-          if (!tab.url) {
-            return
-          }
-          if (urlSet.has(tab.url)) {
-            const existingDocIndex = _.findIndex(minimalIndex, (d: any) => {
-              return d.url === tab.title
-            })
-            if (existingDocIndex >= 0) {
-              const existingDoc = minimalIndex[existingDocIndex]
-              // console.log("existingDoc", existingDoc)
-              if ((existingDoc['tabsets' as keyof object] as string[]).indexOf(tabset.id) < 0) {
-                const newTabsetIds = (existingDoc['tabsets' as keyof object] as string[]).concat([tabset.id])
-                //@ts-ignore
-                existingDoc['tabsets'] = newTabsetIds
-                minimalIndex.splice(existingDocIndex, 1, existingDoc)
-              }
-            } else {
-              //const doc = new SearchDoc(uid(), tab.name || '', tab.title || '', tab.url, "", "", "", [tabset.id], '', "")
-              minimalIndex.push({
-                name: tab.name || '',
-                title: tab.title || '',
-                url: tab.url || '',
-                description: tab.description,
-                content: '',
-                tabsets: [tabset.id],
-                favIconUrl: tab.favIconUrl || ''
-              })
+    for (const tabset of [...useTabsetsStore().tabsets.values()] as Tabset[]) {
+      for (const tab of tabset.tabs) {
+        if (!tab.url) {
+          return
+        }
+        if (urlSet.has(tab.url)) {
+          const existingDocIndex = _.findIndex(minimalIndex, (d: any) => {
+            return d.url === tab.title
+          })
+          if (existingDocIndex >= 0) {
+            const existingDoc = minimalIndex[existingDocIndex]
+            // console.log("existingDoc", existingDoc)
+            if ((existingDoc['tabsets' as keyof object] as string[]).indexOf(tabset.id) < 0) {
+              const newTabsetIds = (existingDoc['tabsets' as keyof object] as string[]).concat([tabset.id])
+              //@ts-ignore
+              existingDoc['tabsets'] = newTabsetIds
+              minimalIndex.splice(existingDocIndex, 1, existingDoc)
             }
           } else {
+            //const doc = new SearchDoc(uid(), tab.name || '', tab.title || '', tab.url, "", "", "", [tabset.id], '', "")
             minimalIndex.push({
               name: tab.name || '',
               title: tab.title || '',
@@ -687,11 +674,33 @@ export function useTabsetService() {
               description: tab.description,
               content: '',
               tabsets: [tabset.id],
-              favIconUrl: tab.favIconUrl || ''
+              favIconUrl: tab.favIconUrl || '',
+              tags: tab.tags.join(' ')
             })
-            urlSet.add(tab.url)
           }
+        } else {
+          const content = await useContentService().getContent(tab.id)
+          const addToIndex = {
+            name: tab.name || '',
+            title: tab.title || '',
+            url: tab.url || '',
+            description: tab.description,
+            content: content?.content || '',
+            tabsets: [tabset.id],
+            favIconUrl: tab.favIconUrl || '',
+            tags: tab.tags.join(' ')
+          }
+          //console.log("adding to index: ", addToIndex)
+          minimalIndex.push(addToIndex)
+          urlSet.add(tab.url)
+        }
 
+
+      }
+    }
+
+    _.forEach([...useTabsetsStore().tabsets.values()] as Tabset[], (tabset: Tabset) => {
+        tabset.tabs.forEach((tab: Tab) => {
         })
       }
     )
@@ -717,7 +726,8 @@ export function useTabsetService() {
             description: tab.description,
             content: '',
             tabsets: [tsId],
-            favIconUrl: tab.favIconUrl || ''
+            favIconUrl: tab.favIconUrl || '',
+            tags: tab.tags.join(' ')
           })
           urlSet.add(tab.url)
         }

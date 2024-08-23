@@ -37,8 +37,8 @@ import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {CreateTabFromOpenTabsCommand} from "src/tabsets/commands/CreateTabFromOpenTabs";
 import {useUtils} from "src/core/services/Utils"
-import TabGridWidget from "components/widgets/TabGridWidget.vue";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
+import TabGridWidget from "src/tabsets/widgets/TabGridWidget.vue";
 
 const {inBexMode} = useUtils()
 

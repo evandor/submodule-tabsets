@@ -7,8 +7,11 @@
         style="width:100%;">
 
       <div class="row items-baseline">
-
-        <q-img v-if="props.tab.image && props.tab.image.startsWith('blob://')"
+        <q-img v-if="thumbnail" style="border:0 dotted white;border-radius:3px"
+               :src="thumbnail">
+          <q-tooltip class="tooltip">Webpage Thumbnail</q-tooltip>
+        </q-img>
+        <q-img v-else-if="props.tab.image && props.tab.image.startsWith('blob://')"
                style="border:0 dotted white;border-radius:5px"
                :src="imgFromBlob">
           <q-tooltip class="tooltip">Custom Screenshot</q-tooltip>
@@ -17,10 +20,6 @@
                style="border:0 dotted white;border-radius:5px"
                :src="props.tab.image">
           <q-tooltip class="tooltip">Custom Screenshot</q-tooltip>
-        </q-img>
-        <q-img v-else-if="thumbnail" style="border:0 dotted white;border-radius:3px"
-               :src="thumbnail">
-          <q-tooltip class="tooltip">Webpage Thumbnail</q-tooltip>
         </q-img>
       </div>
 
@@ -85,18 +84,18 @@ const shortUrl = () => {
   }
   return ""
 }
-const thumbnailFor = async (tab: Tab): Promise<object> => {
-  return await useThumbnailsService().getThumbnailFor(tab.url)
+const thumbnailFor = async (tab: Tab): Promise<string> => {
+  return useThumbnailsService().getThumbnailFor(tab.id);
 }
 
 watchEffect(() => {
   if (props.tab) {
     // @ts-ignore
     thumbnailFor(props.tab)
-        .then((tn: object) => {
-          //console.log("tn", tn)
-          if (tn && tn['thumbnail' as keyof object]) {
-            thumbnail.value = tn['thumbnail' as keyof object]
+        .then((tn: string) => {
+          console.log("tn", tn)
+          if (tn) {
+            thumbnail.value = tn
           }
         })
   }

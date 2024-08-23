@@ -122,7 +122,7 @@ import {RenameGroupCommand} from "src/domain/tabs/RenameGroup";
 import {TabsetColumn} from "src/tabsets/models/TabsetColumn";
 import {DeleteGroupCommand} from "src/domain/tabs/DeleteGroup";
 import {SPECIAL_ID_FOR_NO_GROUP_ASSIGNED} from "boot/constants"
-import ChromeApi from "src/services/ChromeApi";
+import ChromeApi from "src/app/BrowserApi";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 
 const {inBexMode} = useUtils()

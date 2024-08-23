@@ -18,10 +18,10 @@
 <!--                 :tabsetId="props.tabset?.id"-->
 <!--                 :tabs="currentTabs()"/>-->
 
-<!--      <TabGrid v-else-if="props.tabset?.view === 'grid'"-->
-<!--               group="otherTabs"-->
-<!--               :highlightUrl="highlightUrl"-->
-<!--               :tabs="currentTabs()"/>-->
+      <TabGrid v-else-if="props.tabset?.view === 'grid'"
+               group="otherTabs"
+               :highlightUrl="highlightUrl"
+               :tabs="currentTabs()"/>
 
 <!--      <TabsExporter v-else-if="props.tabset?.view === 'exporter'"-->
 <!--                    group="otherTabs"-->
@@ -51,6 +51,7 @@ import {Tabset} from "src/tabsets/models/Tabset";
 import {useUiStore} from "src/ui/stores/uiStore";
 import {Tab} from "src/tabsets/models/Tab";
 import TabList from "src/tabsets/pages/pwa/TabList.vue";
+import TabGrid from "src/tabsets/layouts/TabGrid.vue";
 
 const tabsetsStore = useTabsetsStore()
 const route = useRoute()

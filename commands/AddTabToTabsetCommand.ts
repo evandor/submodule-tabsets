@@ -10,6 +10,7 @@ import PlaceholderUtils from "src/tabsets/utils/PlaceholderUtils";
 import AppEventDispatcher from "src/app/AppEventDispatcher";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import ContentUtils from "src/core/utils/ContentUtils";
+import BrowserApi from "src/app/BrowserApi";
 
 const {saveTabset} = useTabsetService()
 const {sendMsg} = useUtils()
@@ -112,6 +113,11 @@ export class AddTabToTabsetCommand implements Command<any> {
         const res2 = saveTabset(this.tabset!)
         res = new ExecutionResult(res2, "Link was added")
 
+      }
+
+      // add indicator icon
+      if (this.tab.chromeTabId && this.tab.url) {
+        BrowserApi.addIndicatorIcon(this.tab.chromeTabId, this.tab.url)
       }
 
       // add to search index via App Dispatcher

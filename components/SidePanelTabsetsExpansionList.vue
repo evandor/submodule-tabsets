@@ -101,7 +101,7 @@
             <!-- workaround for adding URLs in non-bex environments -->
 
             <q-btn outline
-                   v-if="showAddTabButton(tabset as Tabset, currentChromeTab)"
+                   v-if="showAddTabButton(tabset as Tabset, currentChromeTab) && !tabset.dynamicUrl"
                    @click.stop="saveInTabset(tabset.id, tabset.folderActive)"
                    class="q-ma-none q-px-sm q-py-none"
                    name="o_bookmark_add"
@@ -112,30 +112,34 @@
               <div>Add Tab</div>
               <!--                  <q-icon right class="q-ma-none q-pa-none" size="2em" name="o_south" />-->
             </q-btn>
-<!--            <span-->
-<!--              v-if="!alreadyInTabset() && showAddTabButton(tabset as Tabset, currentChromeTab) && tsBadges.length > 0"-->
-<!--              style="color: grey;font-size: 7px;position: relative;top:-2px;left:-11px;">{{-->
-<!--                tsBadges.length-->
-<!--              }}</span>-->
             <q-tooltip class="tooltip-small" v-if="alreadyInTabset()">
               Tab is already contained in tabset '{{ tabset.name }}'
             </q-tooltip>
             <q-tooltip class="tooltip-small" v-else-if="tsBadges.length > 0">
               {{ tooltipAlreadyInOtherTabsets(tabset.name) }}
             </q-tooltip>
-<!--            <q-tooltip v-else-if="useTabsetsStore().allTabsCount === 0"-->
-<!--                       transition-show="flip-right"-->
-<!--                       transition-hide="flip-left"-->
-<!--                       v-model="showAddCurrentTabTooltip"-->
-<!--                       class="tooltip-tour"-->
-<!--                       anchor="bottom right" self="top middle" :offset="[-26, 3 ]">-->
-<!--              Click here-->
-<!--              <q-icon name="keyboard_arrow_up"/>-->
-<!--              to<br> add the current<br>tab to this tabset-->
-<!--            </q-tooltip>-->
             <q-tooltip class="tooltip-small">
               Add current Tab to '{{ tabsetNameOrChain(tabset as Tabset) }}'...
             </q-tooltip>
+
+            <q-btn outline
+                   v-if="showAddTabButton(tabset as Tabset, currentChromeTab) && tabset.dynamicUrl"
+                   @click.stop="loadDynamicTabs(tabset)"
+                   class="q-ma-none q-px-sm q-py-none cursor-pointer"
+                   name="o_bookmark_add"
+                   size="xs"
+                   data-testid="loadDynamicTabset">
+              Dynamic Load
+              <!--                  <q-icon right class="q-ma-none q-pa-none" size="2em" name="o_south" />-->
+            </q-btn>
+            <q-tooltip class="tooltip-small">
+              Load Dynamic Data
+            </q-tooltip>
+<!--            <span-->
+<!--              v-if="!alreadyInTabset() && showAddTabButton(tabset as Tabset, currentChromeTab) && tsBadges.length > 0"-->
+<!--              style="color: grey;font-size: 7px;position: relative;top:-2px;left:-11px;">{{-->
+<!--                tsBadges.length-->
+<!--              }}</span>-->
 
           </q-item-label>
         </q-item-section>
@@ -274,6 +278,7 @@ import {useNotesStore} from "src/notes/stores/NotesStore";
 import {Note} from "src/notes/models/Note";
 import NavigationService from "src/services/NavigationService";
 import SidePanelPageTabList from "src/tabsets/layouts/SidePanelPageTabList.vue";
+import {LoadDynamicTabsCommand} from "src/tabsets/commands/LoadDynamicTabsCommand";
 
 const props = defineProps({
   tabsets: {type: Array as PropType<Array<Tabset>>, required: true}
@@ -655,6 +660,10 @@ const saveInTabset = (tabsetId: string, activeFolder: string | undefined) => {
   } else {
     console.warn("expected to find tabsetId", tabsetId)
   }
+}
+
+const loadDynamicTabs = (tabset: Tabset) => {
+   useCommandExecutor().execute(new LoadDynamicTabsCommand(tabset))
 }
 
 const addURL = (tabsetId: string, activeFolder: string | undefined) => {

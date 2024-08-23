@@ -58,7 +58,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       await storage.loadTabsets()
     }
 
-    async function createTabset(tabsetName: string, tabs: Tab[], color: string | undefined = undefined): Promise<Tabset> {
+    async function createTabset(tabsetName: string, tabs: Tab[], color: string | undefined = undefined, dynamicUrl: URL | undefined = undefined): Promise<Tabset> {
       const currentTabsetsCount = tabsets.value.size
       if (useAuthStore().limitExceeded(AccessItem.TABSETS, currentTabsetsCount)) {
         await NavigationService.openOrCreateTab([chrome.runtime.getURL("/www/index.html#/mainpanel/settings?tab=account")])
@@ -70,6 +70,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       const trustedColor = color ?
         color.replace(STRIP_CHARS_IN_COLOR_INPUT, '').substring(0, 31)
         : undefined
+
 
       const tabsetWithSameName: Tabset | undefined = _.find([...tabsets.value.values()] as Tabset[], (ts: Tabset) => ts.name === trustedName)
       let ts: Tabset = null as unknown as Tabset
@@ -84,6 +85,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
 
       ts = new Tabset(uid(), trustedName, tabs, [])
       ts.color = trustedColor
+      ts.dynamicUrl = dynamicUrl?.toString()
       tabsets.value.set(ts.id, ts)
       console.log("storage", storage)
       await storage.addTabset(ts)

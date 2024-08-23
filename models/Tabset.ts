@@ -75,6 +75,7 @@ export class Tabset {
 
   window: string = 'current'
   color: string | undefined = undefined
+  dynamicUrl: string | undefined = undefined
 
   // can be set (to the installtion.id) when saving the tabset in order to omit triggering an update
   origin: string = ''
