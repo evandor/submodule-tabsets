@@ -37,7 +37,7 @@ import {uid, useQuasar} from "quasar";
 
 import {useDialogPluginComponent} from 'quasar'
 import {Tab} from "src/tabsets/models/Tab";
-import ChromeApi from "src/services/ChromeApi";
+import ChromeApi from "src/app/BrowserApi";
 import {useUtils} from "src/core/services/Utils";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";

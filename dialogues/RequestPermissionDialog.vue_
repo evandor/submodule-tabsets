@@ -33,7 +33,7 @@ import {STRIP_CHARS_IN_USER_INPUT} from "boot/constants";
 import TabsetService from "src/tabsets/services/TabsetService";
 import {Tab} from "src/tabsets/models/Tab";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
-import ChromeApi from "src/services/ChromeApi";
+import ChromeApi from "src/app/BrowserApi";
 
 defineEmits([
   ...useDialogPluginComponent.emits

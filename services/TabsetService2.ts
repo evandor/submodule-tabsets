@@ -2,7 +2,7 @@ import {STRIP_CHARS_IN_COLOR_INPUT, STRIP_CHARS_IN_USER_INPUT} from "boot/consta
 import {Tab} from "src/tabsets/models/Tab";
 import _ from "lodash";
 import {uid} from "quasar";
-import ChromeApi from "src/services/ChromeApi";
+import ChromeApi from "src/app/BrowserApi";
 import {TabPredicate} from "src/domain/Types";
 import {Tabset, TabsetStatus, TabsetType} from "src/tabsets/models/Tabset";
 import {MetaLink} from "src/models/MetaLink";
