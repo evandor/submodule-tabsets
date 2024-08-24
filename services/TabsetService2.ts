@@ -675,7 +675,7 @@ export function useTabsetService() {
               content: '',
               tabsets: [tabset.id],
               favIconUrl: tab.favIconUrl || '',
-              tags: tab.tags.join(' ')
+              tags: tab.tags ? tab.tags.join(' ') : ''
             })
           }
         } else {
@@ -688,7 +688,7 @@ export function useTabsetService() {
             content: content?.content || '',
             tabsets: [tabset.id],
             favIconUrl: tab.favIconUrl || '',
-            tags: tab.tags.join(' ')
+            tags: tab.tags ? tab.tags.join(' ') : ''
           }
           //console.log("adding to index: ", addToIndex)
           minimalIndex.push(addToIndex)
