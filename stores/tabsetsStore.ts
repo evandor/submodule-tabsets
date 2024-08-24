@@ -298,6 +298,23 @@ export const useTabsetsStore = defineStore('tabsets', () => {
         (t: Tab) => t.url || '')
     }
 
+    const  getActiveFolder = (root: Tabset, folderActive: string | undefined = root.folderActive):Tabset | undefined => {
+      if (!folderActive) {
+        return root
+      }
+      for(const f of root.folders) {
+        if (f.id === root.folderActive) {
+          return f
+        } else {
+          const subFolder = getActiveFolder(f, folderActive)
+          if (subFolder) {
+            return subFolder
+          }
+        }
+      }
+      return undefined
+    }
+
     return {
       initialize,
       tabsets,
@@ -321,7 +338,8 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       allTabsCount,
       rssTabs,
       getAllUrls,
-      loadTabsets
+      loadTabsets,
+      getActiveFolder
     }
   }
 )

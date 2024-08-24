@@ -39,7 +39,8 @@ export class AddTabToTabsetCommand implements Command<any> {
     console.info(`adding tab '${this.tab.id}' to tabset '${this.tabset!.id}', active folder: ${this.activeFolder}`)
     let tabsetOrFolder = this.tabset!
     if (this.activeFolder) {
-      const folder = useTabsetService().findFolder(this.tabset!.folders, this.activeFolder)
+      //const folder = useTabsetService().findFolder(this.tabset!.folders, this.activeFolder)
+      const folder = useTabsetsStore().getActiveFolder(this.tabset!, this.activeFolder)
       if (folder) {
         tabsetOrFolder = folder
       }

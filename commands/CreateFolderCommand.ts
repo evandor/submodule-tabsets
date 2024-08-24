@@ -24,7 +24,7 @@ export class CreateFolderCommand implements Command<string> {
   async execute(): Promise<ExecutionResult<string>> {
     try {
       const tabset = useTabsetsStore().getTabset(this.tabsetId)!
-      if (!this.parentFolder) {
+      if (!tabset.folderActive) {
         const tabs = _.map(this.tabsToUse, (t: chrome.tabs.Tab) => new Tab(uid(), t))
         const newFolder = new Tabset(uid(), this.folderName, tabs)
         newFolder.folderParent = tabset.id
@@ -35,11 +35,13 @@ export class CreateFolderCommand implements Command<string> {
         await useTabsetService().saveTabset(tabset)
         return Promise.resolve(new ExecutionResult<string>("result", 'Folder created'))
       }
-      const parentFolder = this.getFolder(tabset, this.parentFolder)
+      //const parentFolder = this.getFolder(tabset, tabset.folderActive)
+      const parentFolder = useTabsetsStore().getActiveFolder(tabset)
+
       //TODO use useTabsetService().findFolder(tabset.folders, tabset.folderActive)
       if (parentFolder) {
         const newFolder = new Tabset(uid(), this.folderName, [])
-        newFolder.folderParent = tabset.id
+        newFolder.folderParent = parentFolder.id
         if (!tabset.folders) {
           tabset.folders = []
         }
@@ -53,16 +55,6 @@ export class CreateFolderCommand implements Command<string> {
     }
   }
 
-  private getFolder(root: Tabset, parentFolder: string):Tabset | undefined {
-    for(const f of root.folders) {
-      if (f.id === parentFolder) {
-        return f
-      } else {
-        return this.getFolder(f, parentFolder)
-      }
-    }
-
-  }
 }
 
 CreateFolderCommand.prototype.toString = function cmdToString() {

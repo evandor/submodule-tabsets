@@ -6,7 +6,7 @@ import {STRIP_CHARS_IN_COLOR_INPUT, STRIP_CHARS_IN_USER_INPUT} from "boot/consta
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {useSpacesStore} from "src/spaces/stores/spacesStore";
 import PlaceholderUtils from "src/tabsets/utils/PlaceholderUtils";
-import {ListDetailLevel, useUiStore} from "src/ui/stores/uiStore";
+import {ListDetailLevel} from "src/ui/stores/uiStore";
 import {TabsetColumn} from "src/tabsets/models/TabsetColumn";
 import {useContentService} from "src/content/services/ContentService";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
@@ -361,8 +361,10 @@ class TabsetService {
   }
 
   async moveTo(tabId: string, newIndex: number, column: TabsetColumn) {
-    console.log("moving", tabId, newIndex, column.id)
-    let tabs = useTabsetsStore().getCurrentTabs
+    console.log(`moving tabId ${tabId} to new index ${newIndex} with columnId ${column.id}`)
+    const currentTabset = useTabsetsStore().getCurrentTabset!
+    const activeFolder = useTabsetsStore().getActiveFolder(currentTabset)
+    let tabs = activeFolder ? activeFolder.tabs : currentTabset.tabs
     console.log("tabs before", _.map(tabs, (t: any) => t.url))
     //tabs = _.filter(tabs, (t: Tab) => t.columnId === column.id)
     const oldIndex = _.findIndex(tabs, (t: any) => t.id === tabId)
@@ -372,18 +374,12 @@ class TabsetService {
       tabs.splice(newIndex, 0, tab);
 
       // Sharing
-      const currentTs = useTabsetsStore().getCurrentTabset
-      if (currentTs) {
-        if (currentTs.sharedId && currentTs.sharing === TabsetSharing.PUBLIC_LINK) {
-          currentTs.sharing = TabsetSharing.PUBLIC_LINK_OUTDATED
-        }
+      if (currentTabset.sharedId && currentTabset.sharing === TabsetSharing.PUBLIC_LINK) {
+        currentTabset.sharing = TabsetSharing.PUBLIC_LINK_OUTDATED
       }
 
       await saveCurrentTabset()
     }
-    console.log("tabs after A", _.map(tabs, (t: any) => t.url))
-    console.log("tabs after B", _.map(useTabsetsStore().getCurrentTabs, (t: any) => t.url))
-    console.log("tabs after C", _.map(useTabsetsStore().tabsets.get('0cfcb9da-50b2-490f-b2dd-2a46aa029943')?.tabs, (t: any) => t.url))
   }
 
   setView(tabsetId: string, view: string) {

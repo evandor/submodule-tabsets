@@ -235,7 +235,9 @@
           v-if="tabsetExpanded.get(tabset.id)"
           :indent="calcFolders(tabset as Tabset)?.length > 0"
           :tabsCount="useTabsetService().tabsToShow(tabset as Tabset).length"
-          :tabset="tabsetForTabList(tabset as Tabset)"/>
+          :tabset="tabsetForTabList(tabset as Tabset)"
+          :activeFolder="(tabset as Tabset).folderActive"
+        />
         <!-- the actual tabs: end -->
 
       </div>
@@ -470,9 +472,9 @@ const toggleEditHeader = (tabset: Tabset, index: number) => {
 }
 
 const calcFolders = (tabset: Tabset): Tabset[] => {
-  //console.log("calcFolders", tabset)
   if (tabset.folderActive) {
-    const af = useTabsetService().findFolder(tabset.folders, tabset.folderActive)
+    // const af = useTabsetService().findFolder(tabset.folders, tabset.folderActive)
+    const af = useTabsetsStore().getActiveFolder(tabset, tabset.folderActive)
     if (af && af.folderParent) {
       return [new Tabset(af.folderParent, "..", [])].concat(af.folders)
     }
@@ -527,8 +529,9 @@ const tabsetSectionName = (tabset: Tabset) => {
   if (!tabset.folderActive || tabset.id === tabset.folderActive) {
     return tabset.name
   }
-  const activeFolder = useTabsetService().findFolder([tabset], tabset.folderActive)
-  return tabset.name + (activeFolder ? " - " + activeFolder.name : "")
+  // const activeFolder = useTabsetService().findFolder([tabset], tabset.folderActive)
+  const activeFolder = useTabsetsStore().getActiveFolder(tabset)
+  return tabset.name + (activeFolder ? " - " + activeFolder.name : "?")
 }
 
 const tabsetCaption = (tabs: Tab[], window: string, foldersCount: number) => {
@@ -626,12 +629,13 @@ const saveTabsetDescription = () => {
 }
 
 const activeFolderNameFor = (ts: Tabset, activeFolder: string) => {
-  const folder = useTabsetService().findFolder(ts.folders, activeFolder)
+  // const folder = useTabsetService().findFolder(ts.folders, activeFolder)
+  const folder = useTabsetsStore().getActiveFolder(ts, activeFolder)
   return folder ? folder.name : ts.name
 }
 
 const selectFolder = (tabset: Tabset, folder: Tabset) => {
-  console.log("selectiong folder", tabset.id, folder.id)
+  console.log("selecting folder", tabset.id, folder.id)
   tabset.folderActive = folder.id
   useTabsetService().saveTabset(tabset)
 }
@@ -677,7 +681,8 @@ const addURL = (tabsetId: string, activeFolder: string | undefined) => {
 
 const tabsetForTabList = (tabset: Tabset) => {
   if (tabset.folderActive) {
-    const af = useTabsetService().findFolder(tabset.folders, tabset.folderActive)
+    // const af = useTabsetService().findFolder(tabset.folders, tabset.folderActive)
+    const af = useTabsetsStore().getActiveFolder(tabset)
     //console.log("result af", af)
     if (af) {
       return af
