@@ -38,7 +38,7 @@
     <q-card>
       <q-card-section>
 
-        <TabList :tabs="groupedTabs" group="groupedTabs" />
+<!--        <TabList :tabs="groupedTabs" group="groupedTabs" />-->
 
       </q-card-section>
 

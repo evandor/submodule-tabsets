@@ -9,7 +9,6 @@
                :tabsetId="props.tabset?.id"
                :tabsetSorting="props.tabset?.sorting"
                :tabsetSharedId="props.tabset?.sharedId"
-               :tabset-mqtt-url="props.tabset?.mqttUrl"
                :simpleUi="props.simpleUi"
                :tabs="currentTabs()"/>
 

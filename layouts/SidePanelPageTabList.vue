@@ -85,7 +85,7 @@ const handleDragAndDrop =  async (event: any, column: TabsetColumn) => {
     console.log("hier: ", props.tabset)
     if (props.tabset) {
       tabs.value = useTabsetService().tabsToShow(props.tabset)
-      console.log("tabs.value", _.map(tabs.value, t => t.url))
+      console.log("tabs.value", _.map(tabs.value, (t:Tab) => t.url))
     }
 
   }

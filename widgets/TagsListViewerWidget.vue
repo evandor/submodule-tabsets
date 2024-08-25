@@ -87,8 +87,9 @@ watchEffect(() => {
   tags.value = new Map([...tags.value.entries()].sort((a, b) => b[1] - a[1]));
 })
 
-const createDynamicTabsetFrom = (tag: string) =>
-    useCommandExecutor().executeFromUi(new CreateDynamicTabset(tag))
+const createDynamicTabsetFrom = (tag: string) => {
+  //  useCommandExecutor().executeFromUi(new CreateDynamicTabset(tag))
+}
 
 const selectTag = (tag: string) => emit('tagSelected', tag)
 

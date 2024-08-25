@@ -85,8 +85,8 @@ const shortUrl = () => {
   }
   return ""
 }
-const thumbnailFor = async (tab: Tab): Promise<object> => {
-  return await useThumbnailsService().getThumbnailFor(tab.url)
+const thumbnailFor = async (tab: Tab): Promise<any> => {
+  return useThumbnailsService().getThumbnailFor(tab.url)
 }
 
 watchEffect(() => {

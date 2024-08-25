@@ -440,7 +440,7 @@ const updateSelectedTabset = (tabsetId: string, open: boolean, index: number | u
     useUiStore().tabsetsExpanded = true
 
     useCommandExecutor()
-      .execute(new SelectTabsetCommand(tabsetId, useSpacesStore().space?.id))
+      .execute(new SelectTabsetCommand(tabsetId))
       .then(() => {
         const promises: Promise<any>[] = []
         //console.log("selecteded tabset > ", tabsetId)

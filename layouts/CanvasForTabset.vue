@@ -161,7 +161,7 @@ watchEffect(() => {
 })
 
 function saveCanvasElements() {
-  const nonTabElements = _.filter(idraw.getData().elements, e => !e.name.startsWith('tab-'))
+  const nonTabElements = _.filter(idraw.getData().elements, (e:any) => !e.name.startsWith('tab-'))
   if (tabset.value) {
     tabset.value.canvas = nonTabElements
     console.log("saving non tab elements", nonTabElements)

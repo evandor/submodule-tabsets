@@ -50,6 +50,7 @@ import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {CreateTabFromOpenTabsCommand} from "src/tabsets/commands/CreateTabFromOpenTabs";
 import {Tabset, TabsetType} from "src/tabsets/models/Tabset";
 import SidePanelTabListHelper from "src/tabsets/layouts/SidePanelTabListHelper.vue";
+import {TabsetColumn} from "src/tabsets/models/TabsetColumn";
 
 const props = defineProps({
   tabs: {type: Array as PropType<Tab[]>, required: true},
@@ -68,7 +69,7 @@ const handleDragAndDrop = (event: any) => {
   if (moved) {
     console.log('d&d tabs moved', moved.element.id, moved.newIndex)
     let useIndex = moved.newIndex
-    TabsetService.moveTo(moved.element.id, useIndex)
+    TabsetService.moveTo(moved.element.id, useIndex, null as unknown as TabsetColumn)
   }
   if (added) {
     useCommandExecutor()
