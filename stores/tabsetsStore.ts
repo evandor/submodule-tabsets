@@ -136,7 +136,6 @@ export const useTabsetsStore = defineStore('tabsets', () => {
         return undefined
       }
       if (ts.folderParent) {
-        debugger
         const parent = getTabset.value.call(null, ts.folderParent)!
         return rootTabsetFor(parent)
       }

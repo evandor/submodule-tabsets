@@ -1,5 +1,5 @@
 import Command from "src/core/domain/Command";
-import {ExecutionResult} from "src/core/domain/ExecutionResult";
+import {ExecutionFailureResult, ExecutionResult} from "src/core/domain/ExecutionResult";
 import {Tab} from "src/tabsets/models/Tab";
 import _ from "lodash";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
@@ -36,6 +36,7 @@ export class AddTabToTabsetCommand implements Command<any> {
 
   async execute(): Promise<ExecutionResult<any>> {
     console.info(`adding tab '${this.tab.id}' to tabset '${this.tabset!.id}', active folder: ${this.activeFolder}`)
+    debugger
     let tabsetOrFolder = this.tabset!
     if (this.activeFolder) {
       const folder = useTabsetService().findFolder(this.tabset!.folders, this.activeFolder)
@@ -80,15 +81,16 @@ export class AddTabToTabsetCommand implements Command<any> {
       let content: any = undefined
       if (this.tab.chromeTabId) {
         // saving content excerpt and meta data
-        try {
-          const contentResult = await chrome.tabs.sendMessage(this.tab.chromeTabId, 'getContent')
+        //try {
+          const contentResult = await chrome.tabs.sendMessage(this.tab.chromeTabId, 'getExcerpt')
           console.log("=== contentResult", contentResult)
           const tokens = ContentUtils.html2tokens(contentResult.html)
           content = [...tokens].join(" ")
           await useTabsetService().saveText(this.tab, content, contentResult.metas)
-        } catch (err) {
-          console.warn("got error when saving content and metadata", err)
-        }
+        // } catch (err) {
+        //   console.warn("got error when saving content and metadata", err)
+        //   return new ExecutionFailureResult("result", "problem saving tabset")
+        // }
         res = new ExecutionResult("result", "Link was added")
 
         // saving thumbnail

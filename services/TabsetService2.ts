@@ -346,16 +346,16 @@ export function useTabsetService() {
         _.forEach(tabset.tabs, (t: Tab) => {
           //console.log("comparing", t.url, tab.url)
           if (t.url === tab.url) {
-            if (metas['description' as keyof object]) {
+            if (metas && metas['description' as keyof object]) {
               t.description = metas['description' as keyof object]
               // @ts-ignore
               // TODO
               //useSearchStore().update(tab.url, 'description', t.description)
             }
-            if (metas['tabsets:longDescription' as keyof object]) {
+            if (metas && metas['tabsets:longDescription' as keyof object]) {
               t.longDescription = metas['tabsets:longDescription' as keyof object]
             }
-            if (metas['keywords' as keyof object]) {
+            if (metas && metas['keywords' as keyof object]) {
               t.keywords = metas['keywords' as keyof object]
               if (t.keywords) {
                 const blankSeparated = t.keywords.split(" ")
