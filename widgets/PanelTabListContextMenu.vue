@@ -1,4 +1,3 @@
-
 <template>
   <q-menu :offset="[0, 0]">
     <q-list dense style="min-width: 200px">
@@ -24,6 +23,20 @@
         <q-item-section>
           Edit Tab
         </q-item-section>
+      </q-item>
+
+      <q-item clickable v-close-popup @click.stop="toggleFav(props['tab' as keyof object])">
+        <q-item-section style="padding-right:0;min-width:25px;max-width: 25px;">
+          <q-icon v-if="!props['tab']?.favorite" size="xs" name="sym_o_star" color="warning"/>
+          <q-icon v-if="props['tab']?.favorite === TabFavorite.NONE" size="xs" name="sym_o_star" color="warning"/>
+          <q-icon v-if="props['tab']?.favorite === TabFavorite.TABSET" size="xs" name="star" color="warning"/>
+          <q-icon v-if="props['tab']?.favorite === TabFavorite.SPACE" size="xs" name="star" color="positive"/>
+        </q-item-section>
+        <q-item-section v-if="!props['tab']?.favorite">Make Favorite</q-item-section>
+        <q-item-section v-if="props['tab']?.favorite === TabFavorite.NONE">Make Favorite</q-item-section>
+        <q-item-section v-if="props['tab']?.favorite === TabFavorite.TABSET && useFeaturesStore().hasFeature(FeatureIdent.SPACES)">Make Spaces Favorite</q-item-section>
+        <q-item-section v-if="props['tab']?.favorite === TabFavorite.TABSET && !useFeaturesStore().hasFeature(FeatureIdent.SPACES)">Remove as Favorite</q-item-section>
+        <q-item-section v-if="props['tab']?.favorite === TabFavorite.SPACE">Remove as Favorite</q-item-section>
       </q-item>
 
       <template v-if="props.tabset?.type.toString() !== TabsetType.DYNAMIC.toString()">
@@ -94,8 +107,8 @@
 
 import {PropType, ref} from "vue";
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
-import {Notify, useQuasar} from "quasar";
-import {Tab} from "src/tabsets/models/Tab";
+import {useQuasar} from "quasar";
+import {Tab, TabFavorite} from "src/tabsets/models/Tab";
 import {useRouter} from "vue-router";
 import NavigationService from "src/services/NavigationService";
 import {Tabset, TabsetType} from "src/tabsets/models/Tabset";
@@ -104,13 +117,14 @@ import {PlaceholdersType} from "src/tabsets/models/Placeholders";
 import ColorSelector from "src/core/dialog/ColorSelector.vue";
 import {UpdateTabColorCommand} from "src/domain/tabs/UpdateTabColor";
 import {useAuthStore} from "stores/authStore";
-import { useNotificationHandler} from "src/core/services/ErrorHandler";
+import {useNotificationHandler} from "src/core/services/ErrorHandler";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {useFeaturesStore} from "src/features/stores/featuresStore";
 import CommentDialog from "src/tabsets/dialogues/CommentDialog.vue";
 import EditUrlDialog from "src/tabsets/dialogues/EditUrlDialog.vue";
 import PanelTabListContextMenuHook from "src/app/hooks/tabsets/PanelTabListContextMenuHook.vue";
 import {DeleteTabCommand} from "src/tabsets/commands/DeleteTabCommand";
+import {ToggleTabFavoriteCommand} from "src/tabsets/commands/ToggleTabFavoriteCommand";
 
 const {handleSuccess, handleError} = useNotificationHandler()
 
@@ -139,22 +153,6 @@ async function tabToUse(tab: Tab) {
 }
 
 const openSimilar = async () => {
-  // console.log("finding similar websites for", props.tab.url)
-  // try {
-  //   const url = new URL(props.tab.url || '')
-  //   const hostname = url.hostname
-  //   const res = await api.post("https://us-central1-tabsets-dev.cloudfunctions.net/app/ra/similar", {"domain": hostname})
-  //   const data = res.data
-  //   console.log("res", res, data['similar_sites'])
-  //   if (data['similar_sites']) {
-  //     const urls = _.map(data['similar_sites'], (u:any) => "https://" + u)
-  //     NavigationService.openOrCreateTab(urls)
-  //     handleSuccess(new ExecutionResult("done", "opening " + urls.length + " similar page(s)"))
-  //   }
-  // } catch (err) {
-  //   console.log("got error", err)
-  //   handleError("not able to find similar pages", NotificationType.TOAST)
-  // }
 }
 
 const deleteTab = async () => {
@@ -216,6 +214,10 @@ const editURL = async (tab: Tab) => {
       tab: useTab
     }
   })
+}
+
+const toggleFav = (tab: Tab) => {
+ useCommandExecutor().execute(new ToggleTabFavoriteCommand(tab.id))
 }
 
 const assignTab = async (tab: Tab) =>

@@ -11,6 +11,7 @@ import AppEventDispatcher from "src/app/AppEventDispatcher";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import ContentUtils from "src/core/utils/ContentUtils";
 import BrowserApi from "src/app/BrowserApi";
+import {useThumbnailsService} from "src/thumbnails/services/ThumbnailsService";
 
 const {saveTabset} = useTabsetService()
 const {sendMsg} = useUtils()
@@ -94,21 +95,7 @@ export class AddTabToTabsetCommand implements Command<any> {
         res = new ExecutionResult("result", "Link was added")
 
         // saving thumbnail
-        try {
-          const ctx = this
-          chrome.tabs.captureVisibleTab(
-            {},
-            function (dataUrl) {
-              AppEventDispatcher.dispatchEvent('capture-screenshot', {
-                tabId: ctx.tab.id,
-                data: dataUrl
-              })
-              //console.log("dataUrl", dataUrl)
-            }
-          )
-        } catch (err) {
-          console.warn("got error when saving thumbnail", err)
-        }
+        useThumbnailsService().captureVisibleTab(this.tab.id)
 
       } else {
         const res2 = saveTabset(this.tabset!)

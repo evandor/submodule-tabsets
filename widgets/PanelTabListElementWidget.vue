@@ -60,13 +60,17 @@
 
           <span v-if="props.tab?.extension === UrlExtension.NOTE"
                 v-html="nameOrTitle(props.tab as Tab)"/>
-          <span v-else :class="TabService.isCurrentTab(props.tab) ? 'text-bold text-blue-9':''">{{
-              nameOrTitle(props.tab as Tab)
-            }}</span>
+          <span v-else :class="TabService.isCurrentTab(props.tab) ? 'text-bold text-blue-9':''">
+            <q-icon v-if="props.tab?.favorite !== TabFavorite.NONE"
+                    :color="props.tab.favorite === TabFavorite.TABSET ? 'warning':'positive'"
+                    name="star" class="q-ma-mone">
+              <q-tooltip class="tooltip_small">This tab is marked as favorite</q-tooltip>
+            </q-icon>
+            {{ nameOrTitle(props.tab as Tab) }}</span>
           <q-popup-edit
             v-if="popModel && props.tab?.extension !== UrlExtension.NOTE && !props.tab.placeholders"
             :model-value="nameOrTitle(props.tab as Tab)" v-slot="scope"
-            @update:model-value="val => setCustomTitle( tab, val)">
+            @update:model-value="(val:string) => setCustomTitle( tab, val)">
             <q-input v-model="scope.value" dense autofocus counter @keyup.enter="scope.set"/>
           </q-popup-edit>
 
@@ -333,6 +337,7 @@ import {
   HTMLSelectionComment,
   Tab,
   TabComment,
+  TabFavorite,
   TabPreview,
   TabSorting,
   UrlExtension
@@ -360,7 +365,6 @@ import {Suggestion, SuggestionState} from "src/suggestions/models/Suggestion";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {useFeaturesStore} from "src/features/stores/featuresStore";
 import TabService from "src/services/TabService";
-import TabDetailsSearchIndex from "pages/sidepanel/helper/TabDetailsSearchIndex.vue";
 import {DeleteCommentCommand} from "src/domain/tabs/DeleteCommentCommand";
 import {UpdateTabNameCommand} from "src/domain/tabs/UpdateTabName";
 import {SavedBlob} from "src/snapshots/models/SavedBlob";

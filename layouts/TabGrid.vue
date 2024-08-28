@@ -30,21 +30,12 @@ import {Tab} from "src/tabsets/models/Tab";
 import TabsetService from "src/tabsets/services/TabsetService";
 import {PropType, ref} from "vue";
 import {VueDraggableNext} from 'vue-draggable-next'
-import {useQuasar} from "quasar";
 import _ from "lodash"
 import {DrawerTabs, useUiStore} from "src/ui/stores/uiStore";
-import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {CreateTabFromOpenTabsCommand} from "src/tabsets/commands/CreateTabFromOpenTabs";
-import {useUtils} from "src/core/services/Utils"
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import TabGridWidget from "src/tabsets/widgets/TabGridWidget.vue";
-
-const {inBexMode} = useUtils()
-
-const $q = useQuasar()
-
-const {saveCurrentTabset} = useTabsetService()
 
 const props = defineProps({
   tabs: {
@@ -61,7 +52,6 @@ const props = defineProps({
   }
 })
 
-const thumbnails = ref<Map<string, string>>(new Map())
 const tabAsTab = (tab: Tab): Tab => tab as unknown as Tab
 
 const showButtonsProp = ref<Map<string, boolean>>(new Map())

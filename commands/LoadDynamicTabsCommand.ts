@@ -41,7 +41,6 @@ export class LoadDynamicTabsCommand implements Command<any> {
   }
 
   async execute(): Promise<ExecutionResult<any>> {
-    console.log("===>", this.toString())
     if (!this.tabset.dynamicUrl) {
       return Promise.resolve(new ExecutionFailureResult("", "not a dynamic tabset"))
     }
