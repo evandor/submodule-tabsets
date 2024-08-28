@@ -61,7 +61,7 @@
           <span v-if="props.tab?.extension === UrlExtension.NOTE"
                 v-html="nameOrTitle(props.tab as Tab)"/>
           <span v-else :class="TabService.isCurrentTab(props.tab) ? 'text-bold text-blue-9':''">
-            <q-icon v-if="props.tab?.favorite !== TabFavorite.NONE"
+            <q-icon v-if="props.tab?.favorite && props.tab?.favorite !== TabFavorite.NONE"
                     :color="props.tab.favorite === TabFavorite.TABSET ? 'warning':'positive'"
                     name="star" class="q-ma-mone">
               <q-tooltip class="tooltip_small">This tab is marked as favorite</q-tooltip>

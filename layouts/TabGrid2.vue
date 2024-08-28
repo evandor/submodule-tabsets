@@ -26,8 +26,8 @@
         context-menu>
         <q-list dense style="min-width: 100px">
           <q-item clickable v-close-popup @click="toggleFavorite(item.tab)">
-            <q-item-section v-if="item.tab.favorite === TabFavorite.NONE">Make Favorite</q-item-section>
-            <q-item-section v-if="item.tab.favorite !== TabFavorite.NONE">Remove as Favorite</q-item-section>
+            <q-item-section v-if="!item.tab.favorite || item.tab.favorite === TabFavorite.NONE">Make Favorite</q-item-section>
+            <q-item-section v-if="item.tab.favorite && item.tab.favorite !== TabFavorite.NONE">Remove as Favorite</q-item-section>
           </q-item>
         </q-list>
       </q-menu>

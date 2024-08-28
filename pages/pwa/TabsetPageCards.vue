@@ -38,7 +38,7 @@
           :key="randomKey1"
           @was-clicked="updateGrids()"
           coordinates-identifier="grid-favorites"
-          :tabs="_.filter(currentTabs(), (t: Tab) => t.favorite !== TabFavorite.NONE)" />
+          :tabs="_.filter(currentTabs(), (t: Tab) => t.favorite && t.favorite !== TabFavorite.NONE)" />
 
         <div class="text-subtitle2 q-ma-md">Rest</div>
         <TabGrid2
@@ -46,7 +46,7 @@
           @was-clicked="updateGrids()"
           coordinates-identifier="grid"
           :tabset="props.tabset"
-          :tabs="_.filter(currentTabs(), (t: Tab) => t.favorite === TabFavorite.NONE)" />
+          :tabs="_.filter(currentTabs(), (t: Tab) => !t.favorite || t.favorite === TabFavorite.NONE)" />
 
       </template>
 

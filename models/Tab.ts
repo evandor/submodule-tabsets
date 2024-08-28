@@ -183,6 +183,10 @@ export class Tab {
     this.extension = this.determineUrlExtension(chromeTab)
     this.contentHash = ''
 
+    if (!this.favorite) {
+      this.favorite = TabFavorite.NONE
+    }
+
     this.preview = TabPreview.FAVICON
 
     this.tags = _.uniq(_.filter(
@@ -250,24 +254,6 @@ export class Tab {
       }
     }
     return ext
-  }
-
-  public toggleFavorite() { // not sure why this does not work...
-    // if (!this.favorite) {
-    //   this.favorite = TabFavorite.NONE
-    // }
-    // switch (this.favorite) {
-    //   case TabFavorite.NONE:
-    //     this.favorite = TabFavorite.TABSET
-    //     break
-    //   case TabFavorite.TABSET:
-    //     useFeaturesStore().hasFeature(FeatureIdent.SPACES) ?
-    //       this.favorite = TabFavorite.SPACE :
-    //       this.favorite = TabFavorite.NONE
-    //     break
-    //   case TabFavorite.SPACE:
-    //     this.favorite = TabFavorite.NONE
-    // }
   }
 }
 
