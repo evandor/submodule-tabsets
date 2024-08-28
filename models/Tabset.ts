@@ -50,7 +50,7 @@ export class Tabset {
   columns: TabsetColumn[] = []
 
   spaces: string[] // got json problems with set<string>
-  view: string = 'list'
+  view: string = 'grid'
   details: ListDetailLevel | undefined = undefined
   sorting: string = 'custom'
   status: TabsetStatus = TabsetStatus.DEFAULT
@@ -98,6 +98,10 @@ export class Tabset {
     this.tabs = tabs
     this.columns = columns
     this.spaces = spaces
+
+    if (!this.view) {
+      this.view = 'grid'
+    }
   }
 
   static newTabsetNameIsValid = (val: string) => {

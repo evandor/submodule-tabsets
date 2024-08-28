@@ -4,7 +4,7 @@
     <div class="row fit">
       <div class="col-xs-12 col-md-6 q-mt-xs">
         <q-toolbar-title>
-          Todo
+          Tabset {{ tabset.name }}
         </q-toolbar-title>
       </div>
       <div class="col-xs-12 col-md-6 text-right">

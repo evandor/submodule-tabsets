@@ -2,7 +2,6 @@
 
   <q-card flat>
     <q-card-section class="q-pa-none">
-
       <TabList v-if="props.tabset?.view === 'list'"
                group="otherTabs"
                :highlightUrl="highlightUrl"

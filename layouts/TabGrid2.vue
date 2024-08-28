@@ -3,7 +3,7 @@
   <GridLayout :layout.sync="layout"
               :key="randomKey"
               :col-num="16"
-              :row-height="20"
+              :row-height="rowHeight"
               :is-draggable="draggable"
               :is-resizable="resizable"
               :vertical-compact="true"
@@ -15,6 +15,8 @@
               :static="item.static"
               :maxH="8"
               :maxW="8"
+              :minW="2"
+              :minH="2"
               :x="item.x"
               :y="item.y"
               :w="item.w"
@@ -26,8 +28,13 @@
         context-menu>
         <q-list dense style="min-width: 100px">
           <q-item clickable v-close-popup @click="toggleFavorite(item.tab)">
-            <q-item-section v-if="!item.tab.favorite || item.tab.favorite === TabFavorite.NONE">Make Favorite</q-item-section>
-            <q-item-section v-if="item.tab.favorite && item.tab.favorite !== TabFavorite.NONE">Remove as Favorite</q-item-section>
+            <q-item-section v-if="!item.tab.favorite || item.tab.favorite === TabFavorite.NONE">Make Favorite
+            </q-item-section>
+            <q-item-section v-if="item.tab.favorite && item.tab.favorite !== TabFavorite.NONE">Remove as Favorite
+            </q-item-section>
+          </q-item>
+          <q-item clickable v-close-popup @click="createThumbnail(item.tab)">
+            <q-item-section>(re-)create thumbnail</q-item-section>
           </q-item>
         </q-list>
       </q-menu>
@@ -40,7 +47,7 @@
 
 import {GridItem, GridLayout} from 'vue-grid-layout-v3';
 
-import {onMounted, PropType, ref} from "vue";
+import {onMounted, onUnmounted, PropType, ref, watchEffect} from "vue";
 import {Tab, TabCoordinate, TabFavorite} from "src/tabsets/models/Tab";
 import TabGridWidget from "src/tabsets/widgets/TabGridWidget.vue";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
@@ -49,6 +56,9 @@ import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {ToggleTabFavoriteCommand} from "src/tabsets/commands/ToggleTabFavoriteCommand";
 import {Tabset} from "src/tabsets/models/Tabset";
 import {uid} from "quasar";
+import {useThumbnailsService} from "src/thumbnails/services/ThumbnailsService";
+import {useTabsStore2} from "src/tabsets/stores/tabsStore2";
+import AppEventDispatcher from "src/app/AppEventDispatcher";
 
 const props = defineProps({
   tabs: {type: Array as PropType<Array<Tab>>, required: true},
@@ -63,17 +73,24 @@ const layout = ref<any[]>([])
 const draggable = ref(true)
 const resizable = true
 const randomKey = ref<string>(uid())
+let windowWidth = ref(window.innerWidth)
+const rowHeight = ref(Math.round(window.innerWidth / 50))
 
-onMounted(() => {
-  function getCoordinate(t: Tab, ident: string, def: number) {
-    if (!t.coordinates) {
-      return def
-    }
-    const coordinates = _.find(t.coordinates, (c: TabCoordinate) => c.identifier === props.coordinatesIdentifier)
-    return coordinates && coordinates.val && (coordinates.val[ident as keyof object] >= 0) ? coordinates.val[ident as keyof object] : def
+const onWidthChange = () => windowWidth.value = window.innerWidth
+onMounted(() => window.addEventListener('resize', onWidthChange))
+onUnmounted(() => window.removeEventListener('resize', onWidthChange))
+
+function getCoordinate(t: Tab, ident: string, def: number) {
+  if (!t.coordinates) {
+    return def
   }
+  const coordinates = _.find(t.coordinates, (c: TabCoordinate) => c.identifier === props.coordinatesIdentifier)
+  return coordinates && coordinates.val && (coordinates.val[ident as keyof object] >= 0) ? coordinates.val[ident as keyof object] : def
+}
 
+watchEffect(() => {
   //console.log("in:", _.map(props.tabs, (t:Tab) => JSON.stringify({id: t.id, data: t.griddata})))
+  layout.value = []
   for (const t of props.tabs) {
     if (!t.coordinates) {
       t.coordinates = []
@@ -92,6 +109,13 @@ onMounted(() => {
   }
 })
 
+watchEffect(() => {
+  // const screenWidth = document.documentElement.clientWidth
+  // console.log("screenWIdth", screenWidth)
+  rowHeight.value = Math.round(windowWidth.value / 50)
+  console.log("rowHeight:", windowWidth.value, rowHeight.value)
+})
+
 const movedEvent = (i: any, newX: any, newY: any) => {
   const msg = "MOVED i=" + i + ", X=" + newX + ", Y=" + newY;
   console.log(msg);
@@ -101,7 +125,7 @@ const movedEvent = (i: any, newX: any, newY: any) => {
       tab.coordinates = []
     }
     const optionalGriddataIndex = _.findIndex(tab.coordinates, (c: TabCoordinate) => c.identifier === props.coordinatesIdentifier)
-    const gd:{[k: string]: any} = (optionalGriddataIndex >= 0)
+    const gd: { [k: string]: any } = (optionalGriddataIndex >= 0)
       ? tab.coordinates.at(optionalGriddataIndex) ? tab.coordinates.at(optionalGriddataIndex)!.val : {}
       : {}
     gd['x'] = newX
@@ -120,7 +144,7 @@ const resizedEvent = (i: any, newH: number, newW: number, newHPx: any, newWPx: a
       tab.coordinates = []
     }
     const optionalGriddataIndex = _.findIndex(tab.coordinates, (c: TabCoordinate) => c.identifier === props.coordinatesIdentifier)
-    const gd:{[k: string]: any} = (optionalGriddataIndex >= 0)
+    const gd: { [k: string]: any } = (optionalGriddataIndex >= 0)
       ? tab.coordinates.at(optionalGriddataIndex) ? tab.coordinates.at(optionalGriddataIndex)!.val : {}
       : {}
     gd['h'] = newH
@@ -141,6 +165,48 @@ const toggleFavorite = async (tab: Tab) => {
   await useCommandExecutor().execute(new ToggleTabFavoriteCommand(tab.id))
   randomKey.value = uid()
   emits('wasClicked')
+}
+
+const createThumbnail = async (tab: Tab) => {
+  if (!tab || !tab.url) {
+    return
+  }
+  const browserTabs = useTabsStore2().getChromeTabs as chrome.tabs.Tab[]
+  console.log("checking for url", tab.url)
+  const openTab: chrome.tabs.Tab | undefined = _.find(browserTabs, (bt: chrome.tabs.Tab) => bt.url === tab.url)
+  const currentTab = await chrome.tabs.getCurrent()
+  if (openTab) {
+    console.log("found open tab", openTab.id)
+    await chrome.tabs.update(openTab.id || 0, {active: true})
+    useThumbnailsService().captureVisibleTab(tab.id, (tabId: string, dataUrl: string) => {
+      AppEventDispatcher.dispatchEvent('capture-screenshot', {
+        tabId: tabId,
+        data: dataUrl
+      })
+      if (currentTab) {
+        setTimeout(() => {
+          console.log("going back to ", currentTab.id)
+          chrome.tabs.update(currentTab.id || 0, {active: true})
+            .then(() => chrome.tabs.reload())
+        }, 1000)
+      }
+    })
+  } else {
+    const newTab:chrome.tabs.Tab = await chrome.tabs.create({url: tab.url})
+    console.log("opened new tab...", newTab.id)
+    setTimeout(() => {
+      useThumbnailsService().captureVisibleTab(tab.id, (tabId: string, dataUrl: string) => {
+        AppEventDispatcher.dispatchEvent('capture-screenshot', {
+          tabId: tabId,
+          data: dataUrl
+        })
+      })
+        setTimeout(() => {
+          chrome.tabs.remove(newTab.id || 0)
+            .then(() => chrome.tabs.reload())
+        }, 1000)
+    }, 2000)
+  }
 }
 
 </script>
