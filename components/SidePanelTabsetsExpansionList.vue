@@ -135,11 +135,11 @@
             <q-tooltip class="tooltip-small">
               Load Dynamic Data
             </q-tooltip>
-<!--            <span-->
-<!--              v-if="!alreadyInTabset() && showAddTabButton(tabset as Tabset, currentChromeTab) && tsBadges.length > 0"-->
-<!--              style="color: grey;font-size: 7px;position: relative;top:-2px;left:-11px;">{{-->
-<!--                tsBadges.length-->
-<!--              }}</span>-->
+            <!--            <span-->
+            <!--              v-if="!alreadyInTabset() && showAddTabButton(tabset as Tabset, currentChromeTab) && tsBadges.length > 0"-->
+            <!--              style="color: grey;font-size: 7px;position: relative;top:-2px;left:-11px;">{{-->
+            <!--                tsBadges.length-->
+            <!--              }}</span>-->
 
           </q-item-label>
         </q-item-section>
@@ -150,7 +150,7 @@
                         @mouseleave="hoveredTabset = undefined">
           <q-item-label v-if="useTabsetsStore().getCurrentTabset?.id === tabset.id">
             <q-icon class="cursor-pointer" name="more_vert" size="16px"/>
-            <SidePanelPageContextMenu :tabset="tabset as Tabset" />
+            <SidePanelPageContextMenu :tabset="tabset as Tabset"/>
           </q-item-label>
         </q-item-section>
       </template>
@@ -263,7 +263,6 @@ import {openURL, scroll, uid, useQuasar} from "quasar";
 import {CopyToClipboardCommand} from "src/core/domain/commands/CopyToClipboard";
 import {AddTabToTabsetCommand} from "src/tabsets/commands/AddTabToTabsetCommand";
 import {useUtils} from "src/core/services/Utils";
-import getScrollTarget = scroll.getScrollTarget;
 
 import {ExecutionResult} from "src/core/domain/ExecutionResult";
 import {useNotificationHandler} from "src/core/services/ErrorHandler";
@@ -281,6 +280,7 @@ import {Note} from "src/notes/models/Note";
 import NavigationService from "src/services/NavigationService";
 import SidePanelPageTabList from "src/tabsets/layouts/SidePanelPageTabList.vue";
 import {LoadDynamicTabsCommand} from "src/tabsets/commands/LoadDynamicTabsCommand";
+import getScrollTarget = scroll.getScrollTarget;
 
 const props = defineProps({
   tabsets: {type: Array as PropType<Array<Tabset>>, required: true}
@@ -389,7 +389,7 @@ watchEffect(() => {
     const tabsetIds = useTabsetService().tabsetsFor(url)
     tsBadges.value = []
     //created.value = undefined
-    _.forEach(tabsetIds, (tsId:string) => {
+    _.forEach(tabsetIds, (tsId: string) => {
       tsBadges.value.push({
         label: TabsetService.nameForTabsetId(tsId),
         tabsetId: tsId,
@@ -448,26 +448,10 @@ const updateSelectedTabset = (tabsetId: string, open: boolean, index: number | u
 
     useCommandExecutor()
       .execute(new SelectTabsetCommand(tabsetId, useSpacesStore().space?.id))
-      .then(() => {
-        const promises: Promise<any>[] = []
-        //console.log("selecteded tabset > ", tabsetId)
-        const selectedTabset = useTabsetsStore().getTabset(tabsetId)
-        if (selectedTabset) {
-          handleHeadRequests(selectedTabset)
-        }
-      })
+      .then(() => handleHeadRequests(useTabsetsStore().getTabset(tabsetId)!))
 
   } else {
     useUiStore().tabsetsExpanded = false
-  }
-}
-
-const toggleEditHeader = (tabset: Tabset, index: number) => {
-  editHeaderDescription.value = !editHeaderDescription.value
-  if (editHeaderDescription.value) {
-    console.log("hier!!")
-    updateSelectedTabset(tabset.id, true, index)
-    headerDescription.value = tabset.headerDescription || ''
   }
 }
 
@@ -552,7 +536,7 @@ const tabsetCaption = (tabs: Tab[], window: string, foldersCount: number) => {
     caption = caption + " - opens in: " + window
   }
   if (notes.value.length > 0) {
-    return caption + ", " + notes.value.length + " " + (notes.value.length === 1 ? 'note':'notes')
+    return caption + ", " + notes.value.length + " " + (notes.value.length === 1 ? 'note' : 'notes')
   }
   return caption
 }
@@ -667,7 +651,7 @@ const saveInTabset = (tabsetId: string, activeFolder: string | undefined) => {
 }
 
 const loadDynamicTabs = (tabset: Tabset) => {
-   useCommandExecutor().execute(new LoadDynamicTabsCommand(tabset))
+  useCommandExecutor().execute(new LoadDynamicTabsCommand(tabset))
 }
 
 const addURL = (tabsetId: string, activeFolder: string | undefined) => {
@@ -743,7 +727,7 @@ if (inBexMode()) {
   // these messages are created by triggering events in the mainpanel
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     //console.log(" <<< received message", message)
-  if (message.name === "note-changed") {
+    if (message.name === "note-changed") {
       useNotesStore().getNotesFor(currentTabsetId.value!)
         .then((ns: Note[]) => notes.value = ns)
     }

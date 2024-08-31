@@ -52,7 +52,7 @@
     <q-item-label @click.stop="(evt:PointerEvent) => checkEvent(evt)">
       <div>
         <div class="q-pr-lg cursor-pointer ellipsis">
-          <span v-if="props.header" class="text-bold">{{ props.header }}<br></span>
+          <span v-if="props.header" class="text-caption">{{ props.header }}<br></span>
           <!--          <span v-if="useTabsStore().getCurrentTabset?.sorting === 'alphabeticalTitle'">-->
           <span v-if="props.sorting === TabSorting.TITLE">
               <q-icon name="arrow_right" size="16px"/>
@@ -199,21 +199,6 @@
                   class="q-mr-sm">({{ (props.tab as Tab).comments.length }})</span>
 
 
-            <!--            <q-icon v-if="(props.tab as Tab).annotations && (props.tab as Tab).annotations.length > 0"-->
-            <!--                    name="feedback" class="q-mr-xs" color="warning" @click.stop="toggleLists('annotations')">-->
-            <!--              <q-tooltip class="tooltip-small">This tab has annotations</q-tooltip>-->
-            <!--            </q-icon>-->
-            <!--            <span v-if="(props.tab as Tab).annotations && (props.tab as Tab).annotations.length > 1"-->
-            <!--                  @click.stop="toggleLists('annotations')"-->
-            <!--                  class="q-mr-sm">({{ (props.tab as Tab).annotations.length }})</span>-->
-
-            <!--            <template v-if="(props.tab as Tab).monitor || suggestion || (props.tab as Tab).placeholders-->
-            <!--                              || (props.tab as Tab).annotations && (props.tab as Tab).annotations.length > 0-->
-            <!--                              || (props.tab as Tab).comments && (props.tab as Tab).comments.length > 0-->
-            <!--                              || pngs.length > 0">-->
-            <!--              <span> | </span>-->
-            <!--            </template>-->
-
             <template v-if="groupName && useFeaturesStore().hasFeature(FeatureIdent.TAB_GROUPS)">
               Group <em>{{ groupName }}</em>
               <q-icon name="arrow_drop_down" class="q-mr-none" size="xs" color="text-grey-5"/>
@@ -251,16 +236,6 @@
         </div>
       </div>
     </q-item-label>
-
-    <!-- === note === -->
-    <!--    <q-item-label v-if="useUiStore().listDetailLevelGreaterEqual(ListDetailLevel.MAXIMAL, props.tabset?.details) &&-->
-    <!--      props['tab' as keyof object]['note']"-->
-    <!--                  class="text-grey-10" text-subtitle1>-->
-    <!--      <q-icon color="blue-10" name="edit_note"/>-->
-    <!--      <div class="ellipsis-2-lines">-->
-    <!--        {{ props['tab']['note'] }}-->
-    <!--      </div>-->
-    <!--    </q-item-label>-->
 
     <!-- === comments === -->
     <q-item-label v-if="showComments()"

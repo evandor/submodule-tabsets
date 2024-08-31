@@ -2,12 +2,12 @@
 
   <q-toolbar>
     <div class="row fit">
-      <div class="col-xs-12 col-md-6 q-mt-xs">
+      <div class="col-xs-12 col-md-8 q-mt-xs">
         <q-toolbar-title>
-          Tabset {{ tabset.name }}
+          Overview (all Tabsets)
         </q-toolbar-title>
       </div>
-      <div class="col-xs-12 col-md-6 text-right">
+      <div class="col-xs-12 col-md-4 text-right">
 
         <q-btn v-if="tabset?.tabs.length > 0 "
                @click="setView('grid')"
@@ -44,8 +44,7 @@
     active-color="primary"
     indicator-color="primary"
     align="left"
-    narrow-indicator
-  >
+    narrow-indicator>
     <q-tab name="tabset" label="Tabs"/>
   </q-tabs>
 
@@ -53,10 +52,16 @@
   <q-tab-panels v-model="tab" animated>
     <q-tab-panel class="q-ma-none q-pa-none" name="tabset">
 
-      <TabsetPageCards
-        :tabset="tabset as unknown as Tabset"
-        :simple-ui="false"/>
-
+      <template v-for="ts in allTabsets">
+        <div v-if="_.filter(ts.tabs, (t: Tab) => t.favorite && t.favorite !== TabFavorite.NONE).length > 0">
+          <div class="text-subtitle2 q-ma-md">{{ ts.name }}</div>
+          <TabGrid2
+            @was-clicked="updateGrids()"
+            coordinates-identifier="grid-alltabsets"
+            :tabset="ts"
+            :tabs="_.filter(ts.tabs, (t: Tab) => t.favorite && t.favorite !== TabFavorite.NONE)"/>
+        </div>
+      </template>
     </q-tab-panel>
 
   </q-tab-panels>
@@ -65,28 +70,29 @@
 
 <script setup lang="ts">
 import {onMounted, ref, watchEffect} from 'vue'
-import {useRoute, useRouter} from "vue-router";
-import {uid, useQuasar} from "quasar";
+import {useRoute} from "vue-router";
+import {uid} from "quasar";
 import TabsetService from "src/tabsets/services/TabsetService";
-import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {Tabset} from "src/tabsets/models/Tabset";
-import {ToggleSortingCommand} from "src/domain/tabsets/ToggleSorting";
 import Analytics from "src/core/utils/google-analytics";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
-import TabsetPageCards from "src/tabsets/pages/pwa/TabsetPageCards.vue";
+import _ from "lodash";
+import {Tab, TabFavorite} from "src/tabsets/models/Tab";
+import TabGrid2 from "src/tabsets/layouts/TabGrid2.vue";
 
 const route = useRoute()
-const router = useRouter()
-const $q = useQuasar()
 
 const tabsetId = ref(null as unknown as string)
 const tabset = ref<Tabset>(new Tabset(uid(), "empty", []))
-const orderDesc = ref(false)
-
+const allTabsets = ref<Tabset[]>([])
 const tab = ref('tabset')
 
 onMounted(() => {
-  Analytics.firePageViewEvent('MainPanelTabsetPage', document.location.href);
+  Analytics.firePageViewEvent('MainPanelTabsetsOverviewPage', document.location.href);
+})
+
+watchEffect(() => {
+  allTabsets.value = [...useTabsetsStore().tabsets.values()]
 })
 
 
@@ -101,9 +107,5 @@ watchEffect(() => {
 })
 
 const setView = (view: string) => TabsetService.setView(tabsetId.value, view)
-
-const toggleSorting = () => useCommandExecutor().executeFromUi(new ToggleSortingCommand(tabsetId.value))
-
-const toggleOrder = () => orderDesc.value = !orderDesc.value
 
 </script>

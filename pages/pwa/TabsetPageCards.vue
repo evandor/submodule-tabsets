@@ -11,11 +11,11 @@
                :simpleUi="props.simpleUi"
                :tabs="currentTabs()"/>
 
-<!--      <TabGroups v-else-if="props.tabset?.view === 'group'"-->
-<!--                 group="otherTabs"-->
-<!--                 :highlightUrl="highlightUrl"-->
-<!--                 :tabsetId="props.tabset?.id"-->
-<!--                 :tabs="currentTabs()"/>-->
+      <!--      <TabGroups v-else-if="props.tabset?.view === 'group'"-->
+      <!--                 group="otherTabs"-->
+      <!--                 :highlightUrl="highlightUrl"-->
+      <!--                 :tabsetId="props.tabset?.id"-->
+      <!--                 :tabs="currentTabs()"/>-->
 
       <TabGrid v-else-if="props.tabset?.view === 'grid-disabled'"
                group="otherTabs"
@@ -27,31 +27,33 @@
         <InfoMessageWidget
           :probability="1"
           ident="tabsetpagecards_taggridinfo">
-          Click the image to move your tabs to your liking; right-click to create or remove favorites and click on the URL to open the page.
+          Click the image to move your tabs to your liking; right-click to create or remove favorites and click on the
+          URL to open the page.
         </InfoMessageWidget>
 
-        <div class="text-subtitle2 q-ma-md">Favorites</div>
-        <TabGrid2
-          v-if="_.filter(currentTabs(), (t: Tab) => t.favorite !== TabFavorite.NONE).length >= 0"
-          :tabset="props.tabset"
-          :key="randomKey1"
-          @was-clicked="updateGrids()"
-          coordinates-identifier="grid-favorites"
-          :tabs="_.filter(currentTabs(), (t: Tab) => t.favorite && t.favorite !== TabFavorite.NONE)" />
+        <template v-if="favoriteTabs().length > 0">
+          <div class="text-subtitle2 q-ma-md">Favorites</div>
+          <TabGrid2
+            :tabset="props.tabset"
+            :key="randomKey1"
+            @was-clicked="updateGrids()"
+            coordinates-identifier="grid-favorites"
+            :tabs="favoriteTabs()"/>
+        </template>
 
-        <div class="text-subtitle2 q-ma-md">Rest</div>
+        <div class="text-subtitle2 q-ma-md">{{ favoriteTabs().length > 0 ? 'Other Tabs' : '' }}</div>
         <TabGrid2
           :key="randomKey2"
           @was-clicked="updateGrids()"
           coordinates-identifier="grid"
           :tabset="props.tabset"
-          :tabs="_.filter(currentTabs(), (t: Tab) => !t.favorite || t.favorite === TabFavorite.NONE)" />
+          :tabs="_.filter(currentTabs(), (t: Tab) => !t.favorite || t.favorite === TabFavorite.NONE)"/>
 
       </template>
 
-<!--      <TabsExporter v-else-if="props.tabset?.view === 'exporter'"-->
-<!--                    group="otherTabs"-->
-<!--                    :tabs="currentTabs()"/>-->
+      <!--      <TabsExporter v-else-if="props.tabset?.view === 'exporter'"-->
+      <!--                    group="otherTabs"-->
+      <!--                    :tabs="currentTabs()"/>-->
 
       <!-- fallback -->
       <TabList v-else
@@ -184,4 +186,7 @@ const updateGrids = () => {
   randomKey1.value = uid()
   randomKey2.value = uid()
 }
+
+const favoriteTabs = () => _.filter(currentTabs(), (t: Tab) => t.favorite !== TabFavorite.NONE)
+
 </script>
