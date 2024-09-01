@@ -8,7 +8,9 @@
         :sorting="sorting"
         :show-tabsets="true"
         :preventDragAndDrop="preventDragAndDrop(sorting)"
-        :tabset="tabset as Tabset"/>
+        :tabset="tabset as Tabset"
+        :activeFolder="(tabset as Tabset).folderActive"
+      />
 
     </div>
 

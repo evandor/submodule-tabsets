@@ -1,14 +1,16 @@
 <template>
-  <q-card flat bordered
-          style="border:0 solid green">
+  <q-card flat bordered style="border:0px solid green;">
 
     <q-card-section
         class="q-ma-none q-pa-xs cursor-pointer bg-primary text-white"
         style="width:100%;">
 
       <div class="row items-baseline">
-
-        <q-img v-if="props.tab.image && props.tab.image.startsWith('blob://')"
+        <q-img v-if="thumbnail" style="border:0 dotted white;border-radius:3px;cursor: move"
+               :ratio="16/9"
+               :src="thumbnail">
+        </q-img>
+        <q-img v-else-if="props.tab.image && props.tab.image.startsWith('blob://')"
                style="border:0 dotted white;border-radius:5px"
                :src="imgFromBlob">
           <q-tooltip class="tooltip">Custom Screenshot</q-tooltip>
@@ -18,10 +20,9 @@
                :src="props.tab.image">
           <q-tooltip class="tooltip">Custom Screenshot</q-tooltip>
         </q-img>
-        <q-img v-else-if="thumbnail" style="border:0 dotted white;border-radius:3px"
-               :src="thumbnail">
-          <q-tooltip class="tooltip">Webpage Thumbnail</q-tooltip>
-        </q-img>
+        <q-img v-else style="border:0 dotted white;border-radius:3px;cursor: move"
+               :ratio="16/9"
+               src="https://placehold.co/600x400?text=no+thumbnail" />
       </div>
 
     </q-card-section>
@@ -85,18 +86,17 @@ const shortUrl = () => {
   }
   return ""
 }
-const thumbnailFor = async (tab: Tab): Promise<any> => {
-  return useThumbnailsService().getThumbnailFor(tab.url)
+const thumbnailFor = async (tab: Tab): Promise<string> => {
+  return useThumbnailsService().getThumbnailFor(tab.id);
 }
 
 watchEffect(() => {
   if (props.tab) {
     // @ts-ignore
     thumbnailFor(props.tab)
-        .then((tn: object) => {
-          //console.log("tn", tn)
-          if (tn && tn['thumbnail' as keyof object]) {
-            thumbnail.value = tn['thumbnail' as keyof object]
+        .then((tn: string) => {
+          if (tn) {
+            thumbnail.value = tn
           }
         })
   }

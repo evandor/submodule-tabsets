@@ -15,7 +15,6 @@ import {FeatureIdent} from "src/app/models/FeatureIdent";
 import {useUiStore} from "src/ui/stores/uiStore";
 import {useSuggestionsStore} from "src/suggestions/stores/suggestionsStore";
 import {Suggestion, SuggestionState, SuggestionType} from "src/suggestions/models/Suggestion";
-import {MonitoringType} from "src/models/Monitor";
 import {TabInFolder} from "src/tabsets/models/TabInFolder";
 import {useContentService} from "src/content/services/ContentService";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
@@ -70,7 +69,8 @@ export function useTabsetService() {
     merge: boolean = false,
     windowId: string = 'current',
     tsType: TabsetType = TabsetType.DEFAULT,
-    color: string | undefined = undefined
+    color: string | undefined = undefined,
+    dynamicSource: string | undefined = undefined
   ): Promise<SaveOrReplaceResult> => {
     const trustedName = name.replace(STRIP_CHARS_IN_USER_INPUT, '')
       .substring(0, 31)
@@ -90,11 +90,8 @@ export function useTabsetService() {
         return true
       })
     try {
-      // const result: NewOrReplacedTabset = await useTabsetsStore()
-      //   .createTabset(trustedName, tabs, trustedColor)
-      //   //.updateOrCreateTabset(trustedName, tabs, merge, windowId, tsType, trustedColor)
-
-      const tabset = await useTabsetsStore().createTabset(trustedName, tabs, trustedColor)
+      const dynUrl = dynamicSource ? new URL(dynamicSource) : undefined
+      const tabset = await useTabsetsStore().createTabset(trustedName, tabs, trustedColor, dynUrl)
 
 
       //await saveTabset(result.tabset)
@@ -325,11 +322,11 @@ export function useTabsetService() {
    * @param text
    * @param metas
    */
-  const saveText = (tab: Tab | undefined, text: string, metas: object): Promise<any> => {
+  const saveText = (tab: Tab | undefined, text: string, metas: object = {}): Promise<any> => {
     if (!tab || !tab.url) {
       return Promise.resolve('done')
     }
-    console.debug("saving text for", tab.id, tab.url)
+    console.debug("saving text for", tab.id, tab.url, metas)
     const title = tab.title || ''
     const tabsetIds: string[] = tabsetsFor(tab.url)
 
@@ -390,43 +387,6 @@ export function useTabsetService() {
             } else {
               t.contentHash = ""
             }
-            const monitoringFeature = FeatureIdent['MONITORING' as keyof typeof FeatureIdent]
-            if (monitoringFeature && useFeaturesStore().hasFeature(monitoringFeature) &&
-              t.monitor && t.monitor.type === MonitoringType.CONTENT_HASH) {
-              if (oldContentHash && oldContentHash !== '' &&
-                t.contentHash !== oldContentHash &&
-                t.contentHash !== '' && t.url) {
-
-                console.log("%ccontenthash changed for", "color:yellow", t.url)
-
-                const id = btoa(t.url)
-                const msg = "Info: Something might have changed in '" + (t.name ? t.name : t.title) + "'."
-                const suggestion = new Suggestion(id, 'Content Change Detected',
-                  msg,
-                  t.url, SuggestionType.CONTENT_CHANGE)
-                suggestion.setData({url: t.url, tabId: t.id})
-                suggestion.state = SuggestionState.NOTIFICATION
-                useSuggestionsStore().addSuggestion(suggestion)
-                  .then(() => {
-                    if (useFeaturesStore().hasFeature(FeatureIdent.NOTIFICATIONS)) {
-                      chrome.notifications.create(id, {
-                        title: "Tabset Extension Message",
-                        type: "basic",
-                        iconUrl: chrome.runtime.getURL("www/favicon.ico"),
-                        message: msg,
-                        buttons: [{title: 'show'}, {title: 'ignore'}]
-                      }, (callback: any) => {
-                        //console.log("got callback", callback)
-                      })
-                      //useSuggestionsStore().updateSuggestionState(id, SuggestionState.NOTIFICATION)
-                    }
-                  })
-                  .catch((err: any) => {
-                    console.debug("got error", err)
-                  })
-              }
-            }
-
             savePromises.push(saveTabset(tabset))
           }
         })
@@ -630,18 +590,20 @@ export function useTabsetService() {
     })
   }
 
-  const findFolder = (folders: Tabset[], folderId: string): Tabset | undefined => {
-    for (const f of folders) {
-      if (f.id === folderId) {
-        //console.log("found active folder", f)
-        return f
-      }
-    }
-    for (const f of folders) {
-      return findFolder(f.folders, folderId)
-    }
-    return undefined
-  }
+  // const findFolder = (folders: Tabset[], folderId: string): Tabset | undefined => {
+  //   for (const f of folders) {
+  //     if (f.id === folderId) {
+  //       //console.log("found active folder", f)
+  //       return f
+  //     }
+  //     const optionalFound = findFolder(f.folders, folderId)
+  //
+  //     if (optionalFound) {
+  //       return optionalFound
+  //     }
+  //   }
+  //   return undefined
+  // }
 
   const removeFolder = (root: Tabset, folderId: string): void => {
     root.folders = _.filter(root.folders, (f: any) => f.id !== folderId)
@@ -671,7 +633,8 @@ export function useTabsetService() {
     console.log(`moving tab ${tabIdToDrag} to folder ${moveToFolderId} in tabset ${tabset.id}`)
     const tabWithFolder = findTabInFolder([tabset], tabIdToDrag)
     console.log("found tabWithFolder", tabWithFolder)
-    const newParentFolder = findFolder([tabset], moveToFolderId)
+    //const newParentFolder = findFolder([tabset], moveToFolderId)
+    const newParentFolder = useTabsetsStore().getActiveFolder(tabset, moveToFolderId)
     if (newParentFolder && tabWithFolder) {
       console.log("newParentFolder", newParentFolder)
       newParentFolder.tabs.push(tabWithFolder.tab)
@@ -682,42 +645,31 @@ export function useTabsetService() {
     }
   }
 
-  const populateSearch = () => {
+  const populateSearch = async () => {
 
     const urlSet: Set<string> = new Set()
     const minimalIndex: object[] = []
 
-    _.forEach([...useTabsetsStore().tabsets.values()] as Tabset[], (tabset: Tabset) => {
-        tabset.tabs.forEach((tab: Tab) => {
-          if (!tab.url) {
-            return
-          }
-          if (urlSet.has(tab.url)) {
-            const existingDocIndex = _.findIndex(minimalIndex, (d: any) => {
-              return d.url === tab.title
-            })
-            if (existingDocIndex >= 0) {
-              const existingDoc = minimalIndex[existingDocIndex]
-              // console.log("existingDoc", existingDoc)
-              if ((existingDoc['tabsets' as keyof object] as string[]).indexOf(tabset.id) < 0) {
-                const newTabsetIds = (existingDoc['tabsets' as keyof object] as string[]).concat([tabset.id])
-                //@ts-ignore
-                existingDoc['tabsets'] = newTabsetIds
-                minimalIndex.splice(existingDocIndex, 1, existingDoc)
-              }
-            } else {
-              //const doc = new SearchDoc(uid(), tab.name || '', tab.title || '', tab.url, "", "", "", [tabset.id], '', "")
-              minimalIndex.push({
-                name: tab.name || '',
-                title: tab.title || '',
-                url: tab.url || '',
-                description: tab.description,
-                content: '',
-                tabsets: [tabset.id],
-                favIconUrl: tab.favIconUrl || ''
-              })
+    for (const tabset of [...useTabsetsStore().tabsets.values()] as Tabset[]) {
+      for (const tab of tabset.tabs) {
+        if (!tab.url) {
+          return
+        }
+        if (urlSet.has(tab.url)) {
+          const existingDocIndex = _.findIndex(minimalIndex, (d: any) => {
+            return d.url === tab.title
+          })
+          if (existingDocIndex >= 0) {
+            const existingDoc = minimalIndex[existingDocIndex]
+            // console.log("existingDoc", existingDoc)
+            if ((existingDoc['tabsets' as keyof object] as string[]).indexOf(tabset.id) < 0) {
+              const newTabsetIds = (existingDoc['tabsets' as keyof object] as string[]).concat([tabset.id])
+              //@ts-ignore
+              existingDoc['tabsets'] = newTabsetIds
+              minimalIndex.splice(existingDocIndex, 1, existingDoc)
             }
           } else {
+            //const doc = new SearchDoc(uid(), tab.name || '', tab.title || '', tab.url, "", "", "", [tabset.id], '', "")
             minimalIndex.push({
               name: tab.name || '',
               title: tab.title || '',
@@ -725,11 +677,33 @@ export function useTabsetService() {
               description: tab.description,
               content: '',
               tabsets: [tabset.id],
-              favIconUrl: tab.favIconUrl || ''
+              favIconUrl: tab.favIconUrl || '',
+              tags: tab.tags ? tab.tags.join(' ') : ''
             })
-            urlSet.add(tab.url)
           }
+        } else {
+          const content = await useContentService().getContent(tab.id)
+          const addToIndex = {
+            name: tab.name || '',
+            title: tab.title || '',
+            url: tab.url || '',
+            description: tab.description,
+            content: content?.content || '',
+            tabsets: [tabset.id],
+            favIconUrl: tab.favIconUrl || '',
+            tags: tab.tags ? tab.tags.join(' ') : ''
+          }
+          //console.log("adding to index: ", addToIndex)
+          minimalIndex.push(addToIndex)
+          urlSet.add(tab.url)
+        }
 
+
+      }
+    }
+
+    _.forEach([...useTabsetsStore().tabsets.values()] as Tabset[], (tabset: Tabset) => {
+        tabset.tabs.forEach((tab: Tab) => {
         })
       }
     )
@@ -755,7 +729,8 @@ export function useTabsetService() {
             description: tab.description,
             content: '',
             tabsets: [tsId],
-            favIconUrl: tab.favIconUrl || ''
+            favIconUrl: tab.favIconUrl || '',
+            tags: tab.tags.join(' ')
           })
           urlSet.add(tab.url)
         }
@@ -797,7 +772,6 @@ export function useTabsetService() {
     //handleAnnotationMessage,
     tabsToShow,
     deleteTabsetDescription,
-    findFolder,
     findTabInFolder,
     moveTabToFolder,
     deleteTabsetFolder,

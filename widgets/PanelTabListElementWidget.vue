@@ -52,7 +52,7 @@
     <q-item-label @click.stop="(evt:PointerEvent) => checkEvent(evt)">
       <div>
         <div class="q-pr-lg cursor-pointer ellipsis">
-          <span v-if="props.header" class="text-bold">{{ props.header }}<br></span>
+          <span v-if="props.header" class="text-caption">{{ props.header }}<br></span>
           <!--          <span v-if="useTabsStore().getCurrentTabset?.sorting === 'alphabeticalTitle'">-->
           <span v-if="props.sorting === TabSorting.TITLE">
               <q-icon name="arrow_right" size="16px"/>
@@ -60,13 +60,17 @@
 
           <span v-if="props.tab?.extension === UrlExtension.NOTE"
                 v-html="nameOrTitle(props.tab as Tab)"/>
-          <span v-else :class="TabService.isCurrentTab(props.tab) ? 'text-bold text-blue-9':''">{{
-              nameOrTitle(props.tab as Tab)
-            }}</span>
+          <span v-else :class="TabService.isCurrentTab(props.tab) ? 'text-bold text-blue-9':''">
+            <q-icon v-if="props.tab?.favorite && props.tab?.favorite !== TabFavorite.NONE"
+                    :color="props.tab.favorite === TabFavorite.TABSET ? 'warning':'positive'"
+                    name="star" class="q-ma-mone">
+              <q-tooltip class="tooltip_small">This tab is marked as favorite</q-tooltip>
+            </q-icon>
+            {{ nameOrTitle(props.tab as Tab) }}</span>
           <q-popup-edit
             v-if="popModel && props.tab?.extension !== UrlExtension.NOTE && !props.tab.placeholders"
             :model-value="nameOrTitle(props.tab as Tab)" v-slot="scope"
-            @update:model-value="val => setCustomTitle( tab, val)">
+            @update:model-value="(val:string) => setCustomTitle( tab, val)">
             <q-input v-model="scope.value" dense autofocus counter @keyup.enter="scope.set"/>
           </q-popup-edit>
 
@@ -195,21 +199,6 @@
                   class="q-mr-sm">({{ (props.tab as Tab).comments.length }})</span>
 
 
-            <!--            <q-icon v-if="(props.tab as Tab).annotations && (props.tab as Tab).annotations.length > 0"-->
-            <!--                    name="feedback" class="q-mr-xs" color="warning" @click.stop="toggleLists('annotations')">-->
-            <!--              <q-tooltip class="tooltip-small">This tab has annotations</q-tooltip>-->
-            <!--            </q-icon>-->
-            <!--            <span v-if="(props.tab as Tab).annotations && (props.tab as Tab).annotations.length > 1"-->
-            <!--                  @click.stop="toggleLists('annotations')"-->
-            <!--                  class="q-mr-sm">({{ (props.tab as Tab).annotations.length }})</span>-->
-
-            <!--            <template v-if="(props.tab as Tab).monitor || suggestion || (props.tab as Tab).placeholders-->
-            <!--                              || (props.tab as Tab).annotations && (props.tab as Tab).annotations.length > 0-->
-            <!--                              || (props.tab as Tab).comments && (props.tab as Tab).comments.length > 0-->
-            <!--                              || pngs.length > 0">-->
-            <!--              <span> | </span>-->
-            <!--            </template>-->
-
             <template v-if="groupName && useFeaturesStore().hasFeature(FeatureIdent.TAB_GROUPS)">
               Group <em>{{ groupName }}</em>
               <q-icon name="arrow_drop_down" class="q-mr-none" size="xs" color="text-grey-5"/>
@@ -247,16 +236,6 @@
         </div>
       </div>
     </q-item-label>
-
-    <!-- === note === -->
-    <!--    <q-item-label v-if="useUiStore().listDetailLevelGreaterEqual(ListDetailLevel.MAXIMAL, props.tabset?.details) &&-->
-    <!--      props['tab' as keyof object]['note']"-->
-    <!--                  class="text-grey-10" text-subtitle1>-->
-    <!--      <q-icon color="blue-10" name="edit_note"/>-->
-    <!--      <div class="ellipsis-2-lines">-->
-    <!--        {{ props['tab']['note'] }}-->
-    <!--      </div>-->
-    <!--    </q-item-label>-->
 
     <!-- === comments === -->
     <q-item-label v-if="showComments()"
@@ -333,6 +312,7 @@ import {
   HTMLSelectionComment,
   Tab,
   TabComment,
+  TabFavorite,
   TabPreview,
   TabSorting,
   UrlExtension

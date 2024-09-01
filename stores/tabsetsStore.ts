@@ -2,7 +2,7 @@ import {defineStore} from 'pinia';
 import _, {forEach} from 'lodash'
 import {computed, ref} from "vue";
 import {uid} from "quasar";
-import {Tabset, TabsetSharing, TabsetStatus, TabsetType} from "src/tabsets/models/Tabset";
+import {Tabset, TabsetSharing, TabsetStatus} from "src/tabsets/models/Tabset";
 import TabsetsPersistence from "src/tabsets/persistence/TabsetsPersistence";
 import {Tab, TabComment, UrlExtension} from "src/tabsets/models/Tab";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
@@ -46,7 +46,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       // TODO remove after version 0.5.0
       await storage.migrate()
 
-      console.debug(" ...initialized tabsets: Store", '✅')
+      console.debug(" ...initialized tabsets: Store",'✅')
       await storage.loadTabsets()
     }
 
@@ -58,7 +58,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       await storage.loadTabsets()
     }
 
-    async function createTabset(tabsetName: string, tabs: Tab[], color: string | undefined = undefined): Promise<Tabset> {
+    async function createTabset(tabsetName: string, tabs: Tab[], color: string | undefined = undefined, dynamicUrl: URL | undefined = undefined): Promise<Tabset> {
       const currentTabsetsCount = tabsets.value.size
       if (useAuthStore().limitExceeded(AccessItem.TABSETS, currentTabsetsCount)) {
         await NavigationService.openOrCreateTab([chrome.runtime.getURL("/www/index.html#/mainpanel/settings?tab=account")])
@@ -70,6 +70,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       const trustedColor = color ?
         color.replace(STRIP_CHARS_IN_COLOR_INPUT, '').substring(0, 31)
         : undefined
+
 
       const tabsetWithSameName: Tabset | undefined = _.find([...tabsets.value.values()] as Tabset[], (ts: Tabset) => ts.name === trustedName)
       let ts: Tabset = null as unknown as Tabset
@@ -84,6 +85,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
 
       ts = new Tabset(uid(), trustedName, tabs, [])
       ts.color = trustedColor
+      ts.dynamicUrl = dynamicUrl?.toString()
       tabsets.value.set(ts.id, ts)
       console.log("storage", storage)
       await storage.addTabset(ts)
@@ -131,29 +133,8 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       // TODO markDuplicates(ts)
     }
 
-    function rootTabsetFor(ts: Tabset): Tabset | undefined {
-      if (!ts) {
-        return undefined
-      }
-      if (ts.folderParent) {
-        const parent = getTabset.value.call(null, ts.folderParent)!
-        return rootTabsetFor(parent)
-      }
-      return ts
-    }
-
-    async function saveTabset(tabset: Tabset) {
-
-      tabset.updated = new Date().getTime()
-      // seems necessary !?
-      if (!tabset.type) {
-        tabset.type = TabsetType.DEFAULT
-      }
-      const rootTabset = rootTabsetFor(tabset)
-      console.debug(`saving (sub-)tabset '${tabset.name}' with ${tabset.tabs.length} tab(s) at id ${rootTabset?.id}`)
-      if (rootTabset) {
-        return await storage.saveTabset(JSON.parse(JSON.stringify(tabset)))
-      }
+    async function saveTabset(ts: Tabset) {
+      return await storage.saveTabset(JSON.parse(JSON.stringify(ts)))
     }
 
     function deleteTabset(tsId: string) {
@@ -173,14 +154,13 @@ export const useTabsetsStore = defineStore('tabsets', () => {
         return ts.id === tabsetId
       })
       if (found) {
-        currentTabsetId.value = found.id
+        //console.log("found", found)
+        currentTabsetId.value = found.id //this.tabsets.get(found) || new Tabset("", "", [])
+
+        //ChromeApi.buildContextMenu("tabsStore")
         return found
       } else {
         console.debug("not found:", tabsetId)//, [...this.tabsets.values()])
-        const fromLocalStorage = localStorage.getItem("selectedTabset")
-        if (fromLocalStorage && fromLocalStorage === tabsetId) {
-          localStorage.removeItem("selectedTabset")
-        }
       }
       return undefined
     }
@@ -318,8 +298,25 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       return _.map(
         _.flatMap(
           [...useTabsetsStore().tabsets.values()] as Tabset[],
-          ((ts: Tabset) => ts.tabs)),
+          ((ts:Tabset) => ts.tabs)),
         (t: Tab) => t.url || '')
+    }
+
+    const  getActiveFolder = (root: Tabset, folderActive: string | undefined = root.folderActive):Tabset | undefined => {
+      if (!folderActive) {
+        return root
+      }
+      for(const f of root.folders) {
+        if (f.id === root.folderActive) {
+          return f
+        } else {
+          const subFolder = getActiveFolder(f, folderActive)
+          if (subFolder) {
+            return subFolder
+          }
+        }
+      }
+      return undefined
     }
 
     return {
@@ -346,6 +343,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       rssTabs,
       getAllUrls,
       loadTabsets,
+      getActiveFolder,
       share
     }
   }

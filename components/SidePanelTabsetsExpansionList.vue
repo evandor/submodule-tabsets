@@ -101,7 +101,7 @@
             <!-- workaround for adding URLs in non-bex environments -->
 
             <q-btn outline
-                   v-if="showAddTabButton(tabset as Tabset, currentChromeTab)"
+                   v-if="showAddTabButton(tabset as Tabset, currentChromeTab) && !tabset.dynamicUrl"
                    @click.stop="saveInTabset(tabset.id, tabset.folderActive)"
                    class="q-ma-none q-px-sm q-py-none"
                    name="o_bookmark_add"
@@ -112,30 +112,34 @@
               <div>Add Tab</div>
               <!--                  <q-icon right class="q-ma-none q-pa-none" size="2em" name="o_south" />-->
             </q-btn>
-<!--            <span-->
-<!--              v-if="!alreadyInTabset() && showAddTabButton(tabset as Tabset, currentChromeTab) && tsBadges.length > 0"-->
-<!--              style="color: grey;font-size: 7px;position: relative;top:-2px;left:-11px;">{{-->
-<!--                tsBadges.length-->
-<!--              }}</span>-->
             <q-tooltip class="tooltip-small" v-if="alreadyInTabset()">
               Tab is already contained in tabset '{{ tabset.name }}'
             </q-tooltip>
             <q-tooltip class="tooltip-small" v-else-if="tsBadges.length > 0">
               {{ tooltipAlreadyInOtherTabsets(tabset.name) }}
             </q-tooltip>
-<!--            <q-tooltip v-else-if="useTabsetsStore().allTabsCount === 0"-->
-<!--                       transition-show="flip-right"-->
-<!--                       transition-hide="flip-left"-->
-<!--                       v-model="showAddCurrentTabTooltip"-->
-<!--                       class="tooltip-tour"-->
-<!--                       anchor="bottom right" self="top middle" :offset="[-26, 3 ]">-->
-<!--              Click here-->
-<!--              <q-icon name="keyboard_arrow_up"/>-->
-<!--              to<br> add the current<br>tab to this tabset-->
-<!--            </q-tooltip>-->
             <q-tooltip class="tooltip-small">
               Add current Tab to '{{ tabsetNameOrChain(tabset as Tabset) }}'...
             </q-tooltip>
+
+            <q-btn outline
+                   v-if="showAddTabButton(tabset as Tabset, currentChromeTab) && tabset.dynamicUrl"
+                   @click.stop="loadDynamicTabs(tabset)"
+                   class="q-ma-none q-px-sm q-py-none cursor-pointer"
+                   name="o_bookmark_add"
+                   size="xs"
+                   data-testid="loadDynamicTabset">
+              Dynamic Load
+              <!--                  <q-icon right class="q-ma-none q-pa-none" size="2em" name="o_south" />-->
+            </q-btn>
+            <q-tooltip class="tooltip-small">
+              Load Dynamic Data
+            </q-tooltip>
+            <!--            <span-->
+            <!--              v-if="!alreadyInTabset() && showAddTabButton(tabset as Tabset, currentChromeTab) && tsBadges.length > 0"-->
+            <!--              style="color: grey;font-size: 7px;position: relative;top:-2px;left:-11px;">{{-->
+            <!--                tsBadges.length-->
+            <!--              }}</span>-->
 
           </q-item-label>
         </q-item-section>
@@ -146,7 +150,7 @@
                         @mouseleave="hoveredTabset = undefined">
           <q-item-label v-if="useTabsetsStore().getCurrentTabset?.id === tabset.id">
             <q-icon class="cursor-pointer" name="more_vert" size="16px"/>
-            <SidePanelPageContextMenu :tabset="tabset as Tabset" />
+            <SidePanelPageContextMenu :tabset="tabset as Tabset"/>
           </q-item-label>
         </q-item-section>
       </template>
@@ -231,7 +235,9 @@
           v-if="tabsetExpanded.get(tabset.id)"
           :indent="calcFolders(tabset as Tabset)?.length > 0"
           :tabsCount="useTabsetService().tabsToShow(tabset as Tabset).length"
-          :tabset="tabsetForTabList(tabset as Tabset)"/>
+          :tabset="tabsetForTabList(tabset as Tabset)"
+          :activeFolder="(tabset as Tabset).folderActive"
+        />
         <!-- the actual tabs: end -->
 
       </div>
@@ -257,7 +263,6 @@ import {openURL, scroll, uid, useQuasar} from "quasar";
 import {CopyToClipboardCommand} from "src/core/domain/commands/CopyToClipboard";
 import {AddTabToTabsetCommand} from "src/tabsets/commands/AddTabToTabsetCommand";
 import {useUtils} from "src/core/services/Utils";
-import getScrollTarget = scroll.getScrollTarget;
 
 import {ExecutionResult} from "src/core/domain/ExecutionResult";
 import {useNotificationHandler} from "src/core/services/ErrorHandler";
@@ -274,6 +279,8 @@ import {useNotesStore} from "src/notes/stores/NotesStore";
 import {Note} from "src/notes/models/Note";
 import NavigationService from "src/services/NavigationService";
 import SidePanelPageTabList from "src/tabsets/layouts/SidePanelPageTabList.vue";
+import {LoadDynamicTabsCommand} from "src/tabsets/commands/LoadDynamicTabsCommand";
+import getScrollTarget = scroll.getScrollTarget;
 
 const props = defineProps({
   tabsets: {type: Array as PropType<Array<Tabset>>, required: true}
@@ -382,7 +389,7 @@ watchEffect(() => {
     const tabsetIds = useTabsetService().tabsetsFor(url)
     tsBadges.value = []
     //created.value = undefined
-    _.forEach(tabsetIds, (tsId:string) => {
+    _.forEach(tabsetIds, (tsId: string) => {
       tsBadges.value.push({
         label: TabsetService.nameForTabsetId(tsId),
         tabsetId: tsId,
@@ -440,34 +447,18 @@ const updateSelectedTabset = (tabsetId: string, open: boolean, index: number | u
     useUiStore().tabsetsExpanded = true
 
     useCommandExecutor()
-      .execute(new SelectTabsetCommand(tabsetId))
-      .then(() => {
-        const promises: Promise<any>[] = []
-        //console.log("selecteded tabset > ", tabsetId)
-        const selectedTabset = useTabsetsStore().getTabset(tabsetId)
-        if (selectedTabset) {
-          handleHeadRequests(selectedTabset)
-        }
-      })
+      .execute(new SelectTabsetCommand(tabsetId, useSpacesStore().space?.id))
+      .then(() => handleHeadRequests(useTabsetsStore().getTabset(tabsetId)!))
 
   } else {
     useUiStore().tabsetsExpanded = false
   }
 }
 
-const toggleEditHeader = (tabset: Tabset, index: number) => {
-  editHeaderDescription.value = !editHeaderDescription.value
-  if (editHeaderDescription.value) {
-    console.log("hier!!")
-    updateSelectedTabset(tabset.id, true, index)
-    headerDescription.value = tabset.headerDescription || ''
-  }
-}
-
 const calcFolders = (tabset: Tabset): Tabset[] => {
-  //console.log("calcFolders", tabset)
   if (tabset.folderActive) {
-    const af = useTabsetService().findFolder(tabset.folders, tabset.folderActive)
+    // const af = useTabsetService().findFolder(tabset.folders, tabset.folderActive)
+    const af = useTabsetsStore().getActiveFolder(tabset, tabset.folderActive)
     if (af && af.folderParent) {
       return [new Tabset(af.folderParent, "..", [])].concat(af.folders)
     }
@@ -522,8 +513,9 @@ const tabsetSectionName = (tabset: Tabset) => {
   if (!tabset.folderActive || tabset.id === tabset.folderActive) {
     return tabset.name
   }
-  const activeFolder = useTabsetService().findFolder([tabset], tabset.folderActive)
-  return tabset.name + (activeFolder ? " - " + activeFolder.name : "")
+  // const activeFolder = useTabsetService().findFolder([tabset], tabset.folderActive)
+  const activeFolder = useTabsetsStore().getActiveFolder(tabset)
+  return tabset.name + (activeFolder ? " - " + activeFolder.name : "?")
 }
 
 const tabsetCaption = (tabs: Tab[], window: string, foldersCount: number) => {
@@ -544,7 +536,7 @@ const tabsetCaption = (tabs: Tab[], window: string, foldersCount: number) => {
     caption = caption + " - opens in: " + window
   }
   if (notes.value.length > 0) {
-    return caption + ", " + notes.value.length + " " + (notes.value.length === 1 ? 'note':'notes')
+    return caption + ", " + notes.value.length + " " + (notes.value.length === 1 ? 'note' : 'notes')
   }
   return caption
 }
@@ -621,12 +613,13 @@ const saveTabsetDescription = () => {
 }
 
 const activeFolderNameFor = (ts: Tabset, activeFolder: string) => {
-  const folder = useTabsetService().findFolder(ts.folders, activeFolder)
+  // const folder = useTabsetService().findFolder(ts.folders, activeFolder)
+  const folder = useTabsetsStore().getActiveFolder(ts, activeFolder)
   return folder ? folder.name : ts.name
 }
 
 const selectFolder = (tabset: Tabset, folder: Tabset) => {
-  console.log("selectiong folder", tabset.id, folder.id)
+  console.log("selecting folder", tabset.id, folder.id)
   tabset.folderActive = folder.id
   useTabsetService().saveTabset(tabset)
 }
@@ -657,6 +650,10 @@ const saveInTabset = (tabsetId: string, activeFolder: string | undefined) => {
   }
 }
 
+const loadDynamicTabs = (tabset: Tabset) => {
+  useCommandExecutor().execute(new LoadDynamicTabsCommand(tabset))
+}
+
 const addURL = (tabsetId: string, activeFolder: string | undefined) => {
   const useTS: Tabset | undefined = useTabsetsStore().getTabset(tabsetId)
   if (useTS && currentChromeTab.value) {
@@ -668,7 +665,8 @@ const addURL = (tabsetId: string, activeFolder: string | undefined) => {
 
 const tabsetForTabList = (tabset: Tabset) => {
   if (tabset.folderActive) {
-    const af = useTabsetService().findFolder(tabset.folders, tabset.folderActive)
+    // const af = useTabsetService().findFolder(tabset.folders, tabset.folderActive)
+    const af = useTabsetsStore().getActiveFolder(tabset)
     //console.log("result af", af)
     if (af) {
       return af
@@ -729,7 +727,7 @@ if (inBexMode()) {
   // these messages are created by triggering events in the mainpanel
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     //console.log(" <<< received message", message)
-  if (message.name === "note-changed") {
+    if (message.name === "note-changed") {
       useNotesStore().getNotesFor(currentTabsetId.value!)
         .then((ns: Note[]) => notes.value = ns)
     }

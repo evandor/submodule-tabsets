@@ -1,5 +1,5 @@
 import Command from "src/core/domain/Command";
-import {ExecutionFailureResult, ExecutionResult} from "src/core/domain/ExecutionResult";
+import {ExecutionResult} from "src/core/domain/ExecutionResult";
 import {Tab} from "src/tabsets/models/Tab";
 import _ from "lodash";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
@@ -10,6 +10,8 @@ import PlaceholderUtils from "src/tabsets/utils/PlaceholderUtils";
 import AppEventDispatcher from "src/app/AppEventDispatcher";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import ContentUtils from "src/core/utils/ContentUtils";
+import BrowserApi from "src/app/BrowserApi";
+import {useThumbnailsService} from "src/thumbnails/services/ThumbnailsService";
 
 const {saveTabset} = useTabsetService()
 const {sendMsg} = useUtils()
@@ -36,10 +38,10 @@ export class AddTabToTabsetCommand implements Command<any> {
 
   async execute(): Promise<ExecutionResult<any>> {
     console.info(`adding tab '${this.tab.id}' to tabset '${this.tabset!.id}', active folder: ${this.activeFolder}`)
-    debugger
     let tabsetOrFolder = this.tabset!
     if (this.activeFolder) {
-      const folder = useTabsetService().findFolder(this.tabset!.folders, this.activeFolder)
+      //const folder = useTabsetService().findFolder(this.tabset!.folders, this.activeFolder)
+      const folder = useTabsetsStore().getActiveFolder(this.tabset!, this.activeFolder)
       if (folder) {
         tabsetOrFolder = folder
       }
@@ -81,39 +83,29 @@ export class AddTabToTabsetCommand implements Command<any> {
       let content: any = undefined
       if (this.tab.chromeTabId) {
         // saving content excerpt and meta data
-        //try {
+        try {
           const contentResult = await chrome.tabs.sendMessage(this.tab.chromeTabId, 'getExcerpt')
           console.log("=== contentResult", contentResult)
           const tokens = ContentUtils.html2tokens(contentResult.html)
           content = [...tokens].join(" ")
           await useTabsetService().saveText(this.tab, content, contentResult.metas)
-        // } catch (err) {
-        //   console.warn("got error when saving content and metadata", err)
-        //   return new ExecutionFailureResult("result", "problem saving tabset")
-        // }
+        } catch (err) {
+          console.warn("got error when saving content and metadata", err)
+        }
         res = new ExecutionResult("result", "Link was added")
 
         // saving thumbnail
-        try {
-          const ctx = this
-          chrome.tabs.captureVisibleTab(
-            {},
-            function (dataUrl) {
-              AppEventDispatcher.dispatchEvent('capture-screenshot', {
-                tabId: ctx.tab.id,
-                data: dataUrl
-              })
-              //console.log("dataUrl", dataUrl)
-            }
-          )
-        } catch (err) {
-          console.warn("got error when saving thumbnail", err)
-        }
+        useThumbnailsService().captureVisibleTab(this.tab.id)
 
       } else {
         const res2 = saveTabset(this.tabset!)
         res = new ExecutionResult(res2, "Link was added")
 
+      }
+
+      // add indicator icon
+      if (this.tab.chromeTabId && this.tab.url) {
+        BrowserApi.addIndicatorIcon(this.tab.chromeTabId, this.tab.url)
       }
 
       // add to search index via App Dispatcher

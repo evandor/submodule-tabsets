@@ -1,8 +1,9 @@
-import {Monitor} from "src/models/Monitor";
 import {uid} from "quasar";
 import {STRIP_CHARS_IN_USER_INPUT} from "boot/constants";
 import _ from "lodash"
 import {Placeholders} from "src/tabsets/models/Placeholders";
+import {useFeaturesStore} from "src/features/stores/featuresStore";
+import {FeatureIdent} from "src/app/models/FeatureIdent";
 
 export enum TabSorting {
   URL = "URL",
@@ -43,6 +44,18 @@ export class HTMLSelection {
   }
 }
 
+export class TabCoordinate {
+
+ // public id: string;
+
+  constructor(
+    public identifier: string,
+    public val: object
+    ) {
+    //this.id = uid()
+  }
+}
+
 export class TabComment {
   date: number = 0
   public id: string;
@@ -66,6 +79,12 @@ export class TabComment {
 export enum TabPreview {
   FAVICON= "FAVICON",
   THUMBNAIL = "THUMBNAIL"
+}
+
+export enum TabFavorite {
+  NONE= "NONE",
+  TABSET = "TABSET",
+  SPACE = "SPACE"
 }
 
 export class Tab {
@@ -105,6 +124,7 @@ export class Tab {
   scheduledFor: number | undefined
   extension: UrlExtension
 
+  favorite: TabFavorite = TabFavorite.NONE
   contentHash: string
 
   httpStatus: number = 200
@@ -115,7 +135,6 @@ export class Tab {
   httpInfo: string = 'undefined'
 
   placeholders: Placeholders | undefined
-  monitor: Monitor | undefined
 
   color: string | undefined = undefined
   matcher: string | undefined = undefined
@@ -132,6 +151,8 @@ export class Tab {
   comments: TabComment[] = []
 
   preview: TabPreview = TabPreview.FAVICON
+
+  coordinates: TabCoordinate[] = []
 
   constructor(public id: string, chromeTab: chrome.tabs.Tab) {
     this.created = new Date().getTime()
@@ -161,6 +182,10 @@ export class Tab {
     this.scheduledFor = undefined
     this.extension = this.determineUrlExtension(chromeTab)
     this.contentHash = ''
+
+    if (!this.favorite) {
+      this.favorite = TabFavorite.NONE
+    }
 
     this.preview = TabPreview.FAVICON
 
@@ -230,7 +255,6 @@ export class Tab {
     }
     return ext
   }
-
 }
 
 Tab.prototype.toString = function tabToString() {

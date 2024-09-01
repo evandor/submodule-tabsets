@@ -67,7 +67,8 @@ const props = defineProps({
   indent: {type: Boolean, default: false},
   preventDragAndDrop: {type: Boolean, default: false},
   tabset: {type: Object as PropType<Tabset>, required: false},
-  tabsCount: {type: Number, default: -1}
+  tabsCount: {type: Number, default: -1},
+  activeFolder: {type: String, required: false}
 })
 
 const tabs = ref<Tab[]>([])
@@ -76,12 +77,12 @@ const handleDragAndDrop =  async (event: any, column: TabsetColumn) => {
   const {moved, added} = event
   console.log("SidePanelPageTabList d&d event:", event)
   if (moved) {
-    console.log(`moved event: '${moved.element.tab.id}' ${moved.oldIndex} -> ${moved.newIndex}`)
+    console.log(`moved event: '${moved.element.tab.id}' ${moved.oldIndex} -> ${moved.newIndex} (${props.activeFolder})`)
     const tabsInColumn = tabsForColumn()
     const movedElement: Tab = tabsInColumn[moved.oldIndex].tab
     const realNewIndex = tabsInColumn[moved.newIndex].index
     console.log(`             '${movedElement.id}' ${moved.oldIndex} -> ${realNewIndex}`)
-    await TabsetService.moveTo(movedElement.id, realNewIndex, column)
+    await TabsetService.moveTo(movedElement.id, realNewIndex, column, props.activeFolder)
     console.log("hier: ", props.tabset)
     if (props.tabset) {
       tabs.value = useTabsetService().tabsToShow(props.tabset)

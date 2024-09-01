@@ -30,22 +30,12 @@ import {Tab} from "src/tabsets/models/Tab";
 import TabsetService from "src/tabsets/services/TabsetService";
 import {PropType, ref} from "vue";
 import {VueDraggableNext} from 'vue-draggable-next'
-import {useQuasar} from "quasar";
 import _ from "lodash"
 import {DrawerTabs, useUiStore} from "src/ui/stores/uiStore";
-import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {CreateTabFromOpenTabsCommand} from "src/tabsets/commands/CreateTabFromOpenTabs";
-import {useUtils} from "src/core/services/Utils"
-import TabGridWidget from "components/widgets/TabGridWidget.vue";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
-import {TabsetColumn} from "src/tabsets/models/TabsetColumn";
-
-const {inBexMode} = useUtils()
-
-const $q = useQuasar()
-
-const {saveCurrentTabset} = useTabsetService()
+import TabGridWidget from "src/tabsets/widgets/TabGridWidget.vue";
 
 const props = defineProps({
   tabs: {
@@ -62,7 +52,6 @@ const props = defineProps({
   }
 })
 
-const thumbnails = ref<Map<string, string>>(new Map())
 const tabAsTab = (tab: Tab): Tab => tab as unknown as Tab
 
 const showButtonsProp = ref<Map<string, boolean>>(new Map())
@@ -73,10 +62,10 @@ function adjustIndex(element: any, tabs: Tab[]) {
   //console.log("filtered", tabs)
   if (element.newIndex === 0) { // first element
     //console.log(" 0 - searching for ", tabs[0].id)
-    return _.findIndex(useTabsetsStore().getCurrentTabs, (t:Tab) => t.id === tabs[0].id)
+    return _.findIndex(useTabsetsStore().getCurrentTabs, t => t.id === tabs[0].id)
   } else {
     //console.log(" 1 - searching for ", tabs[element.newIndex - 1].id)
-    return 1 + _.findIndex(useTabsetsStore().getCurrentTabs, (t:Tab) => t.id === tabs[element.newIndex - 1].id)
+    return 1 + _.findIndex(useTabsetsStore().getCurrentTabs, t => t.id === tabs[element.newIndex - 1].id)
   }
 }
 
@@ -112,7 +101,7 @@ const handleDragAndDrop = (event: any) => {
         }
         break
     }
-    TabsetService.moveTo(moved.element.id, useIndex, null as unknown as TabsetColumn)
+    TabsetService.moveTo(moved.element.id, useIndex)
   }
   if (added) {
     useCommandExecutor()
@@ -132,7 +121,7 @@ const startDrag = (evt: any, tab: Tab) => {
 }
 
 const showDetails = (tab: Tab) => {
-  //useUiStore().setSelectedTab(tab)
+  useUiStore().setSelectedTab(tab)
   useUiStore().rightDrawerSetActiveTab(DrawerTabs.TAB_DETAILS)
 }
 

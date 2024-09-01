@@ -2,7 +2,6 @@
 
   <q-card flat>
     <q-card-section class="q-pa-none">
-
       <TabList v-if="props.tabset?.view === 'list'"
                group="otherTabs"
                :highlightUrl="highlightUrl"
@@ -12,20 +11,49 @@
                :simpleUi="props.simpleUi"
                :tabs="currentTabs()"/>
 
-<!--      <TabGroups v-else-if="props.tabset?.view === 'group'"-->
-<!--                 group="otherTabs"-->
-<!--                 :highlightUrl="highlightUrl"-->
-<!--                 :tabsetId="props.tabset?.id"-->
-<!--                 :tabs="currentTabs()"/>-->
+      <!--      <TabGroups v-else-if="props.tabset?.view === 'group'"-->
+      <!--                 group="otherTabs"-->
+      <!--                 :highlightUrl="highlightUrl"-->
+      <!--                 :tabsetId="props.tabset?.id"-->
+      <!--                 :tabs="currentTabs()"/>-->
 
-<!--      <TabGrid v-else-if="props.tabset?.view === 'grid'"-->
-<!--               group="otherTabs"-->
-<!--               :highlightUrl="highlightUrl"-->
-<!--               :tabs="currentTabs()"/>-->
+      <TabGrid v-else-if="props.tabset?.view === 'grid-disabled'"
+               group="otherTabs"
+               :highlightUrl="highlightUrl"
+               :tabs="currentTabs()"/>
 
-<!--      <TabsExporter v-else-if="props.tabset?.view === 'exporter'"-->
-<!--                    group="otherTabs"-->
-<!--                    :tabs="currentTabs()"/>-->
+      <template v-else-if="props.tabset?.view === 'grid'">
+
+        <InfoMessageWidget
+          :probability="1"
+          ident="tabsetpagecards_taggridinfo">
+          Click the image to move your tabs to your liking; right-click to create or remove favorites and click on the
+          URL to open the page.
+        </InfoMessageWidget>
+
+        <template v-if="favoriteTabs().length > 0">
+          <div class="text-subtitle2 q-ma-md">Favorites</div>
+          <TabGrid2
+            :tabset="props.tabset"
+            :key="randomKey1"
+            @was-clicked="updateGrids()"
+            coordinates-identifier="grid-favorites"
+            :tabs="favoriteTabs()"/>
+        </template>
+
+        <div class="text-subtitle2 q-ma-md">{{ favoriteTabs().length > 0 ? 'Other Tabs' : '' }}</div>
+        <TabGrid2
+          :key="randomKey2"
+          @was-clicked="updateGrids()"
+          coordinates-identifier="grid"
+          :tabset="props.tabset"
+          :tabs="_.filter(currentTabs(), (t: Tab) => !t.favorite || t.favorite === TabFavorite.NONE)"/>
+
+      </template>
+
+      <!--      <TabsExporter v-else-if="props.tabset?.view === 'exporter'"-->
+      <!--                    group="otherTabs"-->
+      <!--                    :tabs="currentTabs()"/>-->
 
       <!-- fallback -->
       <TabList v-else
@@ -45,12 +73,15 @@
 import {PropType, ref, watchEffect} from "vue";
 import _ from "lodash";
 import {useRoute} from "vue-router";
-import {useTabsStore2} from "src/tabsets/stores/tabsStore2";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {Tabset} from "src/tabsets/models/Tabset";
 import {useUiStore} from "src/ui/stores/uiStore";
-import {Tab} from "src/tabsets/models/Tab";
+import {Tab, TabFavorite} from "src/tabsets/models/Tab";
 import TabList from "src/tabsets/pages/pwa/TabList.vue";
+import TabGrid from "src/tabsets/layouts/TabGrid.vue";
+import TabGrid2 from "src/tabsets/layouts/TabGrid2.vue";
+import {uid} from "quasar";
+import InfoMessageWidget from "src/ui/widgets/InfoMessageWidget.vue";
 
 const tabsetsStore = useTabsetsStore()
 const route = useRoute()
@@ -58,6 +89,9 @@ const route = useRoute()
 const highlightUrl = ref('')
 const orderDesc = ref(false)
 const tabsetId = ref(null as unknown as string)
+const randomKey1 = ref<string>(uid())
+const randomKey2 = ref<string>(uid())
+
 
 const props = defineProps({
   tabset: {type: Object as PropType<Tabset>, required: true},
@@ -129,17 +163,6 @@ function getOrder() {
   }
 }
 
-function tabsForGroup(groupId: number): Tab[] {
-  return _.orderBy(
-    _.filter(
-      tabsetsStore.getTabset(tabsetId.value)?.tabs,
-      // @ts-ignore
-      (t: Tab) => t?.groupId === groupId),
-    getOrder(), [orderDesc.value ? 'desc' : 'asc'])
-}
-
-// const toggleSorting = () => useCommandExecutor().executeFromUi(new ToggleSortingCommand(tabsetId.value))
-
 const toggleOrder = () => orderDesc.value = !orderDesc.value
 
 const sortingInfo = (): string => {
@@ -158,5 +181,12 @@ const sortingInfo = (): string => {
       break
   }
 }
+
+const updateGrids = () => {
+  randomKey1.value = uid()
+  randomKey2.value = uid()
+}
+
+const favoriteTabs = () => _.filter(currentTabs(), (t: Tab) => t.favorite !== TabFavorite.NONE)
 
 </script>
