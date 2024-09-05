@@ -1,7 +1,6 @@
 import {defineStore} from 'pinia';
 import {ref} from "vue";
 import {useUtils} from "src/core/services/Utils";
-import PersistenceService from "src/services/PersistenceService";
 import _ from "lodash"
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";

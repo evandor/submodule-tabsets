@@ -49,7 +49,7 @@
 <script lang="ts" setup>
 
 import {ref, watchEffect} from "vue";
-import {date, LocalStorage, useDialogPluginComponent, useQuasar} from "quasar";
+import {LocalStorage, useDialogPluginComponent} from "quasar";
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {AddCommentCommand} from "src/domain/tabs/AddCommentCommand";
 import {useUiStore} from "src/ui/stores/uiStore";

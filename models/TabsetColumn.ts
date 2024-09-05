@@ -3,9 +3,6 @@ import {TABSET_NAME_MAX_LENGTH} from "src/tabsets/models/Tabset";
 
 export class TabsetColumn {
 
-  private created: number;
-  private updated: number;
-
   constructor(
     public id: string,
     public title: string,
@@ -19,8 +16,6 @@ export class TabsetColumn {
       throw new Error(`Column's name '${name}' is too long`)
     }
 
-    this.created = new Date().getTime()
-    this.updated = new Date().getTime()
   }
 
   static titleIsValid = (val: string) => !STRIP_CHARS_IN_USER_INPUT.test(val)

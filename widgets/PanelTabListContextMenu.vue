@@ -117,7 +117,6 @@ import {PlaceholdersType} from "src/tabsets/models/Placeholders";
 import ColorSelector from "src/core/dialog/ColorSelector.vue";
 import {UpdateTabColorCommand} from "src/domain/tabs/UpdateTabColor";
 import {useAuthStore} from "stores/authStore";
-import {useNotificationHandler} from "src/core/services/ErrorHandler";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {useFeaturesStore} from "src/features/stores/featuresStore";
 import CommentDialog from "src/tabsets/dialogues/CommentDialog.vue";
@@ -125,8 +124,6 @@ import EditUrlDialog from "src/tabsets/dialogues/EditUrlDialog.vue";
 import PanelTabListContextMenuHook from "src/app/hooks/tabsets/PanelTabListContextMenuHook.vue";
 import {DeleteTabCommand} from "src/tabsets/commands/DeleteTabCommand";
 import {ToggleTabFavoriteCommand} from "src/tabsets/commands/ToggleTabFavoriteCommand";
-
-const {handleSuccess, handleError} = useNotificationHandler()
 
 const props = defineProps({
   tab: {type: Object as PropType<Tab>, required: true},

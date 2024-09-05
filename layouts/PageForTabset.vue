@@ -23,7 +23,7 @@ import EditorJsConfig from "src/notes/editorjs/EditorJsConfig";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 
-const {formatDate, sendMsg, sanitize} = useUtils()
+const {sendMsg} = useUtils()
 
 const route = useRoute()
 

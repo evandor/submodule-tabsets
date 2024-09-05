@@ -88,7 +88,6 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
 
     const firestore: Firestore = FirebaseServices.getFirestore()
 
-    const oldSharing = ts.sharing
     ts.sharing = sharing
     ts.sharedBy = sharedBy
     ts.view = "list"
@@ -135,9 +134,9 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
 
         const notesForTabset = await useNotesStore().getNotesFor(ts.id)
         console.log("found notes for tabset", ts.id, notesForTabset)
-        for (const note of notesForTabset) {
-          //await setDoc(doc(firestore, "public-notes", note.id), JSON.parse(JSON.stringify(note)))
-        }
+        // for (const note of notesForTabset) {
+        //   //await setDoc(doc(firestore, "public-notes", note.id), JSON.parse(JSON.stringify(note)))
+        // }
 
 
         return

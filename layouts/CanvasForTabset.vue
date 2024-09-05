@@ -106,7 +106,6 @@ onMounted(() => {
 
   idraw.on('changeData', (e: any) => {
     console.log('changeData: event = ', e);
-    let tabId = undefined
     if (selectedTab.value) {
       saveCanvasElements()
       for (const element of e.elements) {
@@ -192,7 +191,7 @@ const deleteFigure = (uuid: string) => {
 
 <style>
 #idraw {
-  margin-top: 0px;
+  margin-top: 0;
   text-align: center;
 }
 

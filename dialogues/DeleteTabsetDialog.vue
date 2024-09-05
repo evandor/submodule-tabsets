@@ -31,7 +31,7 @@
 
 <script lang="ts" setup>
 
-import {QForm, useDialogPluginComponent} from 'quasar'
+import {useDialogPluginComponent} from 'quasar'
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import DialogButton from "src/core/dialog/buttons/DialogButton.vue";
 import {ref} from "vue";

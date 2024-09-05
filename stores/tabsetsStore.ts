@@ -199,19 +199,6 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       }
     })
 
-    const mostAccessedTabs = computed(() => {
-      const allTabs: Tab[] =
-        _.orderBy(
-          _.filter(
-            _.flatMap(
-              _.filter(
-                _.map([...tabsets.value.values()] as Tabset[], (ts: Tabset) => ts),
-                (ts: Tabset) => ts.status === TabsetStatus.DEFAULT || ts.status === TabsetStatus.FAVORITE),
-              (ts: Tabset) => ts.tabs), (t: Tab) => t.activatedCount > 1),
-          (t: Tab) => t.activatedCount, ['desc'])
-      return allTabs.slice(0, 12)
-    })
-
     const getTabset = computed(() => {
       return (tabsetId: string): Tabset | undefined => {
         return tabsets.value.get(tabsetId) as Tabset | undefined
@@ -233,7 +220,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
 
     const getTabAndTabsetId = computed(() => {
       return (tabId: string): TabAndTabsetId | undefined => {
-        for (const [key, value] of tabsets.value) {
+        for (const value of tabsets.value.values()) {
           const found = useTabsetService().findTabInFolder([value as Tabset], tabId)
           // const found: Tab | undefined = _.find(value.tabs, t => {
           //   return t.id === tabId
@@ -248,7 +235,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
 
     const tabsetFor = computed(() => {
       return (tabId: string): Tabset | undefined => {
-        for (const [key, value] of tabsets.value) {
+        for (const value of tabsets.value.values()) {
           if (_.find(value.tabs, (t: any) => t.id === tabId)) {
             return value as Tabset
           }
@@ -273,7 +260,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
 
     const allTabsCount = computed(() => {
       var count = 0
-      for (const [key, value] of tabsets.value) {
+      for (const value of tabsets.value.values()) {
         const nr = value.tabs?.length
         count = count + nr
       }

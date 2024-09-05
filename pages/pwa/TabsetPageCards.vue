@@ -73,7 +73,6 @@
 import {PropType, ref, watchEffect} from "vue";
 import _ from "lodash";
 import {useRoute} from "vue-router";
-import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {Tabset} from "src/tabsets/models/Tabset";
 import {useUiStore} from "src/ui/stores/uiStore";
 import {Tab, TabFavorite} from "src/tabsets/models/Tab";
@@ -83,7 +82,6 @@ import TabGrid2 from "src/tabsets/layouts/TabGrid2.vue";
 import {uid} from "quasar";
 import InfoMessageWidget from "src/ui/widgets/InfoMessageWidget.vue";
 
-const tabsetsStore = useTabsetsStore()
 const route = useRoute()
 
 const highlightUrl = ref('')
@@ -130,7 +128,6 @@ watchEffect(() => {
   tabsetId.value = route?.params.tabsetId as string
   if (tabsetId.value) {
     console.debug("got tabset id", tabsetId.value)
-    const ts = tabsetsStore.selectCurrentTabset(tabsetId.value)
   }
 })
 
@@ -152,33 +149,11 @@ function getOrder() {
     switch (props.tabset?.sorting) {
       case 'alphabeticalUrl':
         return (t: Tab) => t.url?.replace("https://", "").replace("http://", "").toUpperCase()
-        break
       case 'alphabeticalTitle':
         return (t: Tab) => t.title?.toUpperCase()
-        break
       default:
         return (t: Tab) => 1
     }
-    return (t: Tab) => 1
-  }
-}
-
-const toggleOrder = () => orderDesc.value = !orderDesc.value
-
-const sortingInfo = (): string => {
-  switch (props.tabset?.sorting) {
-    case 'custom':
-      return ", sorted by Index" + (orderDesc.value ? ', descending' : '')
-      break
-    case 'alphabeticalUrl':
-      return ", sorted by URL" + (orderDesc.value ? ', descending' : '')
-      break
-    case 'alphabeticalTitle':
-      return ", sorted by Title" + (orderDesc.value ? ', descending' : '')
-      break
-    default:
-      return "";
-      break
   }
 }
 

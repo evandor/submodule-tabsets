@@ -33,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import {PropType, ref} from "vue";
+import {PropType} from "vue";
 import {VueDraggableNext} from 'vue-draggable-next'
 import {useQuasar} from "quasar";
 import _ from "lodash"

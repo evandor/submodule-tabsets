@@ -48,12 +48,9 @@ import TabGrid from "components/layouts/TabGrid.vue";
 import {PropType, ref, watchEffect} from "vue";
 import _ from "lodash";
 import {useRoute} from "vue-router";
-import {ToggleSortingCommand} from "src/domain/tabsets/ToggleSorting";
-import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {useUiStore} from "src/ui/stores/uiStore";
 import {Tab} from "src/tabsets/models/Tab";
 import {Tabset} from "src/tabsets/models/Tabset";
-import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import TabList from "src/tabsets/pages/pwa/TabList.vue";
 
 const route = useRoute()
@@ -99,7 +96,6 @@ watchEffect(() => {
   tabsetId.value = route?.params.tabsetId as string
   if (tabsetId.value) {
     console.debug("got tabset id", tabsetId.value)
-    const ts = useTabsetsStore().selectCurrentTabset(tabsetId.value)
   }
 })
 
@@ -121,44 +117,11 @@ function getOrder() {
     switch (props.tabset?.sorting) {
       case 'alphabeticalUrl':
         return (t: Tab) => t.url?.replace("https://", "").replace("http://", "").toUpperCase()
-        break
       case 'alphabeticalTitle':
         return (t: Tab) => t.title?.toUpperCase()
-        break
       default:
         return (t: Tab) => 1
     }
-    return (t: Tab) => 1
-  }
-}
-
-// function tabsForGroup(groupId: number): Tab[] {
-//   return _.orderBy(
-//     _.filter(
-//       useTabsetsStore().getTabset(tabsetId.value)?.tabs,
-//       // @ts-ignore
-//       (t: Tab) => t?.groupId === groupId),
-//     getOrder(), [orderDesc.value ? 'desc' : 'asc'])
-// }
-
-const toggleSorting = () => useCommandExecutor().executeFromUi(new ToggleSortingCommand(tabsetId.value))
-
-const toggleOrder = () => orderDesc.value = !orderDesc.value
-
-const sortingInfo = (): string => {
-  switch (props.tabset?.sorting) {
-    case 'custom':
-      return ", sorted by Index" + (orderDesc.value ? ', descending' : '')
-      break
-    case 'alphabeticalUrl':
-      return ", sorted by URL" + (orderDesc.value ? ', descending' : '')
-      break
-    case 'alphabeticalTitle':
-      return ", sorted by Title" + (orderDesc.value ? ', descending' : '')
-      break
-    default:
-      return "";
-      break
   }
 }
 

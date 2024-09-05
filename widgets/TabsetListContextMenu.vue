@@ -157,7 +157,7 @@
 
 import {Tabset, TabsetSharing, TabsetStatus, TabsetType} from "src/tabsets/models/Tabset";
 import {FeatureIdent} from "src/app/models/FeatureIdent";
-import {PropType, ref} from "vue";
+import {PropType} from "vue";
 import {useUtils} from "src/core/services/Utils";
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {MarkTabsetAsFavoriteCommand} from "src/tabsets/commands/MarkTabsetAsFavorite";
@@ -190,13 +190,6 @@ const props = defineProps({
 // const emit = defineEmits(['toggleExpand']);
 
 const $q = useQuasar()
-
-const expanded = ref<boolean[]>([])
-
-// const toggleExpand = (index: number): void => {
-//   expanded.value[index] = !expanded.value[index]
-//   emit('toggleExpand', index)
-// }
 
 const markAsFavorite = (tabsetId: string) => useCommandExecutor().executeFromUi(new MarkTabsetAsFavoriteCommand(tabsetId))
 const markAsDefault = (tabsetId: string) => useCommandExecutor().executeFromUi(new MarkTabsetAsDefaultCommand(tabsetId))

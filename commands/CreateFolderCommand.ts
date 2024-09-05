@@ -1,14 +1,11 @@
 import Command from "src/core/domain/Command";
 import {ExecutionResult} from "src/core/domain/ExecutionResult";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
-import {useUtils} from "src/core/services/Utils";
-import {Tabset, TabsetType} from "src/tabsets/models/Tabset";
+import {Tabset} from "src/tabsets/models/Tabset";
 import {uid} from "quasar";
 import _ from "lodash"
 import {Tab} from "src/tabsets/models/Tab";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
-
-const {sendMsg} = useUtils()
 
 export class CreateFolderCommand implements Command<string> {
 

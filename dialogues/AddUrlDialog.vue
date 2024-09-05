@@ -31,11 +31,9 @@
 
 <script lang="ts" setup>
 
-import {computed, ref, watchEffect} from "vue";
+import {ref, watchEffect} from "vue";
 import TabsetService from "src/tabsets/services/TabsetService";
-import {uid, useQuasar} from "quasar";
-
-import {useDialogPluginComponent} from 'quasar'
+import {uid, useDialogPluginComponent} from "quasar";
 import {Tab} from "src/tabsets/models/Tab";
 import ChromeApi from "src/app/BrowserApi";
 import {useUtils} from "src/core/services/Utils";
@@ -59,6 +57,7 @@ const url = ref<string>(props.providedUrl)
 
 const {normalize} = useUtils()
 
+// @ts-ignore
 const {dialogRef, onDialogHide, onDialogOK, onDialogCancel} = useDialogPluginComponent()
 
 const newTabsetName = ref('')

@@ -11,7 +11,7 @@
   <q-item
     clickable
     v-ripple
-    v-for="(tab,index) in props.tabs"
+    v-for="tab in props.tabs"
     class="q-ma-none q-pa-md"
     :style="itemStyle(tab)"
     @click.stop="showDetails(tab)"

@@ -37,10 +37,7 @@
 <script lang="ts" setup>
 
 import {ref, watchEffect} from "vue";
-import {useQuasar} from "quasar";
-import {useRouter} from "vue-router";
-
-import {useDialogPluginComponent} from 'quasar'
+import {useDialogPluginComponent, useQuasar} from "quasar";
 import TabsetService from "src/tabsets/services/TabsetService";
 import {useSpacesStore} from "src/spaces/stores/spacesStore";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
@@ -53,7 +50,6 @@ defineEmits([
 
 const {dialogRef, onDialogHide, onDialogCancel} = useDialogPluginComponent()
 
-const router = useRouter()
 const $q = useQuasar()
 
 const exportAs = ref('json')
@@ -61,6 +57,7 @@ const hideWarning = ref(false)
 const warning = ref('')
 
 
+// @ts-ignore
 const props = defineProps({
   inSidePanel: {type: Boolean, default: false}
 })

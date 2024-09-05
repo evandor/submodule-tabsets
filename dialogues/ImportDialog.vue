@@ -48,6 +48,7 @@ const {dialogRef, onDialogHide, onDialogCancel} = useDialogPluginComponent()
 
 const {sendMsg} = useUtils()
 
+// @ts-ignore
 const props = defineProps({
   inSidePanel: {type: Boolean, default: false}
 })

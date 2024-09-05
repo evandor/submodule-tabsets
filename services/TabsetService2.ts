@@ -11,15 +11,11 @@ import {v5 as uuidv5} from 'uuid';
 import {useSettingsStore} from "src/stores/settingsStore"
 import {SaveOrReplaceResult} from "src/tabsets/models/SaveOrReplaceResult";
 import JsUtils from "src/utils/JsUtils";
-import {FeatureIdent} from "src/app/models/FeatureIdent";
 import {useUiStore} from "src/ui/stores/uiStore";
-import {useSuggestionsStore} from "src/suggestions/stores/suggestionsStore";
-import {Suggestion, SuggestionState, SuggestionType} from "src/suggestions/models/Suggestion";
 import {TabInFolder} from "src/tabsets/models/TabInFolder";
 import {useContentService} from "src/content/services/ContentService";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {useTabsStore2} from "src/tabsets/stores/tabsStore2";
-import {useFeaturesStore} from "src/features/stores/featuresStore";
 import AppEventDispatcher from "src/app/AppEventDispatcher";
 
 // let db: TabsetsPersistence = null as unknown as TabsetsPersistence
@@ -279,7 +275,6 @@ export function useTabsetService() {
       if (!tabset.type) {
         tabset.type = TabsetType.DEFAULT
       }
-      const additionalInfo = _.map(tabset.tabs, (t: any) => t.monitor)
       const rootTabset = rootTabsetFor(tabset)
       console.debug(`saving (sub-)tabset '${tabset.name}' with ${tabset.tabs.length} tab(s) at id ${rootTabset?.id}`)
       if (rootTabset) {
@@ -381,7 +376,6 @@ export function useTabsetService() {
               t.image = image
             }
 
-            const oldContentHash = t.contentHash
             if (text && text.length > 0) {
               t.contentHash = uuidv5(text, 'da42d8e8-2afd-446f-b72e-8b437aa03e46')
             } else {

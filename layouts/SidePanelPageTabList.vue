@@ -47,7 +47,7 @@
 </template>
 
 <script setup lang="ts">
-import {ref, onMounted, PropType, watchEffect} from "vue";
+import {PropType, ref, watchEffect} from "vue";
 import {VueDraggableNext} from 'vue-draggable-next'
 import _ from "lodash"
 import {Tab, TabSorting} from "src/tabsets/models/Tab";
@@ -82,7 +82,7 @@ const handleDragAndDrop =  async (event: any, column: TabsetColumn) => {
     const movedElement: Tab = tabsInColumn[moved.oldIndex].tab
     const realNewIndex = tabsInColumn[moved.newIndex].index
     console.log(`             '${movedElement.id}' ${moved.oldIndex} -> ${realNewIndex}`)
-    await TabsetService.moveTo(movedElement.id, realNewIndex, column, props.activeFolder)
+    await TabsetService.moveTo(movedElement.id, realNewIndex, column)
     console.log("hier: ", props.tabset)
     if (props.tabset) {
       tabs.value = useTabsetService().tabsToShow(props.tabset)

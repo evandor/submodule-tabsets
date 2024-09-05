@@ -1,7 +1,7 @@
 <template>
 
   <q-list style="max-width:95%">
-    <q-item v-for="(tag,index) in tags.keys()"
+    <q-item v-for="tag in tags.keys()"
             dense-toggle dense hide-expand-icon
             class="darken-on-hover"
             header-class="q-ma-none q-pa-none q-ml-md q-mb-xs">
@@ -55,17 +55,14 @@
 <script lang="ts" setup>
 
 import {ref, watchEffect} from "vue";
-import {useQuasar} from "quasar";
 import _ from "lodash";
 import {Tabset, TabsetStatus, TabsetType} from "src/tabsets/models/Tabset";
 import {Tab} from "src/tabsets/models/Tab";
-import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 
 const emit = defineEmits(['tagSelected']);
 
 const tags = ref<Map<string, number>>(new Map())
-const $q = useQuasar();
 
 const hoveredTag = ref<string | undefined>(undefined)
 const hoveredOver = (tag: string) => hoveredTag.value === tag

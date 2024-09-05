@@ -1,4 +1,3 @@
-import {Space} from "src/spaces/models/Space";
 import {Tabset, TabsetSharing} from "src/tabsets/models/Tabset";
 
 interface TabsetsPersistence {

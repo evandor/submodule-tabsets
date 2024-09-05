@@ -190,10 +190,10 @@
   >
     <q-tab name="tabset" label="Tabs"/>
     <q-tab name="page" label="Page"
-           v-if="useAuthStore().isAuthenticated"
+           v-if="useAuthStore().isAuthenticated()"
            :disable="!useTabsetsStore().currentTabsetId"/>
     <q-tab name="canvas" label="Canvas"
-           v-if="useAuthStore().isAuthenticated"
+           v-if="useAuthStore().isAuthenticated()"
            :disable="!useTabsetsStore().currentTabsetId"/>
   </q-tabs>
 
@@ -265,9 +265,9 @@ a tab's url starts with one of the urls of this tabset, it will be ignored and n
 </template>
 
 <script setup lang="ts">
-import {onMounted, onUpdated, ref, unref, watchEffect} from 'vue'
+import {onMounted, onUpdated, ref, watchEffect} from 'vue'
 import {useRoute, useRouter} from "vue-router";
-import {date, openURL, uid, useQuasar} from "quasar";
+import {date, uid, useQuasar} from "quasar";
 import TabsetService from "src/tabsets/services/TabsetService";
 import InfoMessageWidget from "src/ui/widgets/InfoMessageWidget.vue";
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
@@ -341,8 +341,6 @@ const toggleSorting = () => useCommandExecutor().executeFromUi(new ToggleSorting
 const toggleOrder = () => orderDesc.value = !orderDesc.value
 
 const showSorting = () => useTabsetsStore().getCurrentTabs.length > 10 && $q.screen.gt.xs
-
-const GOOGLE_ORIGIN = 'https://www.skysail.io';
 
 </script>
 

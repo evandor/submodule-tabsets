@@ -71,24 +71,19 @@
 
 <script setup lang="ts">
 import {onMounted, ref, watchEffect} from 'vue'
-import {useRoute, useRouter} from "vue-router";
-import {uid, useQuasar} from "quasar";
+import {useRoute} from "vue-router";
+import {uid} from "quasar";
 import TabsetService from "src/tabsets/services/TabsetService";
-import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {Tabset} from "src/tabsets/models/Tabset";
-import {ToggleSortingCommand} from "src/domain/tabsets/ToggleSorting";
 import Analytics from "src/core/utils/google-analytics";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import TabsetPageCards from "src/tabsets/pages/pwa/TabsetPageCards.vue";
 import NavigationService from "src/services/NavigationService";
 
 const route = useRoute()
-const router = useRouter()
-const $q = useQuasar()
 
 const tabsetId = ref(null as unknown as string)
 const tabset = ref<Tabset>(new Tabset(uid(), "empty", []))
-const orderDesc = ref(false)
 
 const tab = ref('tabset')
 

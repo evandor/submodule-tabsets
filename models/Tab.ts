@@ -2,8 +2,6 @@ import {uid} from "quasar";
 import {STRIP_CHARS_IN_USER_INPUT} from "boot/constants";
 import _ from "lodash"
 import {Placeholders} from "src/tabsets/models/Placeholders";
-import {useFeaturesStore} from "src/features/stores/featuresStore";
-import {FeatureIdent} from "src/app/models/FeatureIdent";
 
 export enum TabSorting {
   URL = "URL",
@@ -33,14 +31,10 @@ export class HTMLSelectionComment {
 }
 
 export class HTMLSelection {
-  private created: number;
-  private id: string;
   constructor(
     public text: string = '',
     public range: string = '',
     public comments: HTMLSelectionComment[] = []) {
-    this.id = uid()
-    this.created = new Date().getTime()
   }
 }
 

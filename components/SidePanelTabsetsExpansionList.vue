@@ -256,7 +256,6 @@ import {useUiStore} from "src/ui/stores/uiStore";
 import _ from "lodash";
 import {FeatureIdent} from "src/app/models/FeatureIdent";
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
-import {useSpacesStore} from "src/spaces/stores/spacesStore";
 import {Tab} from "src/tabsets/models/Tab";
 import ShareTabsetPubliclyDialog from "src/tabsets/dialogues/ShareTabsetPubliclyDialog.vue";
 import {openURL, scroll, uid, useQuasar} from "quasar";
@@ -301,13 +300,11 @@ interface SelectionObject {
   [key: string]: boolean
 }
 
-const showSearchBox = ref(false)
 const showAddCurrentTabTooltip = ref(false)
 const currentTabsetId = ref<string | undefined>(undefined)
 const tabsetExpanded = ref<Map<string, boolean>>(new Map())
 const selected_model = ref<SelectionObject>({})
 const hoveredTabset = ref<string | undefined>(undefined)
-const selectedTab = ref<Tab | undefined>(undefined)
 const tsBadges = ref<object[]>([])
 const editHeaderDescription = ref<boolean>(false)
 const tabsetName = ref<object>(null as unknown as object)
@@ -425,17 +422,6 @@ const headerStyle = (tabset: Tabset) => {
   return style
 }
 
-const suggestTabsetImport = () => {
-  const currentTabUrl = useTabsStore2().currentChromeTab?.url
-  if (currentTabUrl?.startsWith("https://shared.tabsets.net/#/pwa/tabsets/")) {
-    const urlSplit = currentTabUrl.split("/")
-    const tabsetId = urlSplit[urlSplit.length - 1]
-    console.log("tabsetId", tabsetId, useTabsetsStore().getTabset(tabsetId))
-    return !useTabsetsStore().getTabset(tabsetId)
-  }
-  return false
-}
-
 const updateSelectedTabset = (tabsetId: string, open: boolean, index: number | undefined = undefined) => {
   //console.log(`updating: selectedTabset=${tabsetId} ${open ? 'open':'closed'}`)
   tabsetExpanded.value.set(tabsetId, open)
@@ -447,7 +433,7 @@ const updateSelectedTabset = (tabsetId: string, open: boolean, index: number | u
     useUiStore().tabsetsExpanded = true
 
     useCommandExecutor()
-      .execute(new SelectTabsetCommand(tabsetId, useSpacesStore().space?.id))
+      .execute(new SelectTabsetCommand(tabsetId))
       .then(() => handleHeadRequests(useTabsetsStore().getTabset(tabsetId)!))
 
   } else {
@@ -652,15 +638,6 @@ const saveInTabset = (tabsetId: string, activeFolder: string | undefined) => {
 
 const loadDynamicTabs = (tabset: Tabset) => {
   useCommandExecutor().execute(new LoadDynamicTabsCommand(tabset))
-}
-
-const addURL = (tabsetId: string, activeFolder: string | undefined) => {
-  const useTS: Tabset | undefined = useTabsetsStore().getTabset(tabsetId)
-  if (useTS && currentChromeTab.value) {
-    useCommandExecutor().execute(new AddTabToTabsetCommand(new Tab(uid(), currentChromeTab.value), useTS, activeFolder))
-  } else {
-    console.warn("expected to find tabsetId", tabsetId)
-  }
 }
 
 const tabsetForTabList = (tabset: Tabset) => {

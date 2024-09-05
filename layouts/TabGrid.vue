@@ -9,7 +9,7 @@
 
     <div
       clickable
-      v-for="(tab,index) in props.tabs"
+      v-for="tab in props.tabs"
       class="item"
       :style="itemStyle(tab)"
       @click.stop="showDetails(tab)"
@@ -36,6 +36,7 @@ import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {CreateTabFromOpenTabsCommand} from "src/tabsets/commands/CreateTabFromOpenTabs";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import TabGridWidget from "src/tabsets/widgets/TabGridWidget.vue";
+import {TabsetColumn} from "src/tabsets/models/TabsetColumn";
 
 const props = defineProps({
   tabs: {
@@ -62,10 +63,10 @@ function adjustIndex(element: any, tabs: Tab[]) {
   //console.log("filtered", tabs)
   if (element.newIndex === 0) { // first element
     //console.log(" 0 - searching for ", tabs[0].id)
-    return _.findIndex(useTabsetsStore().getCurrentTabs, t => t.id === tabs[0].id)
+    return _.findIndex(useTabsetsStore().getCurrentTabs, (t:Tab) => t.id === tabs[0].id)
   } else {
     //console.log(" 1 - searching for ", tabs[element.newIndex - 1].id)
-    return 1 + _.findIndex(useTabsetsStore().getCurrentTabs, t => t.id === tabs[element.newIndex - 1].id)
+    return 1 + _.findIndex(useTabsetsStore().getCurrentTabs, (t:Tab) => t.id === tabs[element.newIndex - 1].id)
   }
 }
 
@@ -101,7 +102,7 @@ const handleDragAndDrop = (event: any) => {
         }
         break
     }
-    TabsetService.moveTo(moved.element.id, useIndex)
+    TabsetService.moveTo(moved.element.id, useIndex, null as unknown as TabsetColumn)
   }
   if (added) {
     useCommandExecutor()
@@ -121,7 +122,7 @@ const startDrag = (evt: any, tab: Tab) => {
 }
 
 const showDetails = (tab: Tab) => {
-  useUiStore().setSelectedTab(tab)
+  //useUiStore().setSelectedTab(tab)
   useUiStore().rightDrawerSetActiveTab(DrawerTabs.TAB_DETAILS)
 }
 

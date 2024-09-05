@@ -1,5 +1,3 @@
-import {Space} from "src/spaces/models/Space";
-import {Tabset} from "src/tabsets/models/Tabset";
 
 interface TabsetsGroupsPersistence {
 

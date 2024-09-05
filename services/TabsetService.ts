@@ -1,4 +1,4 @@
-import {LocalStorage, uid} from "quasar";
+import {uid} from "quasar";
 import _ from "lodash";
 import {Tab, UrlExtension} from "src/tabsets/models/Tab";
 import {Tabset, TabsetSharing, TabsetStatus, TabsetType} from "src/tabsets/models/Tabset";
@@ -14,19 +14,14 @@ import {useTabsStore2} from "src/tabsets/stores/tabsStore2";
 import {Space} from "src/spaces/models/Space";
 import AppEventDispatcher from "src/app/AppEventDispatcher";
 import {ContentItem} from "src/content/models/ContentItem";
-import {useUtils} from "src/core/services/Utils";
 
 const {saveTabset, saveCurrentTabset, tabsetsFor, addToTabset} = useTabsetService()
 
 // const {db} = useDB()
-const {throwIdNotFound} = useUtils()
-
 class TabsetService {
 
-  private localStorage: LocalStorage = null as unknown as LocalStorage
-
   setLocalStorage(localStorage: any) {
-    this.localStorage = localStorage;
+//    this.localStorage = localStorage;
   }
 
   async saveToCurrentTabset(tab: Tab, useIndex: number | undefined = undefined): Promise<Tabset> {
@@ -230,12 +225,6 @@ class TabsetService {
     let data = JSON.parse(json)
     let tabsets = data.tabsets || data
     let spaces = data.spaces || []
-
-    // TODO
-    let importedSpaces = 0
-    let importedTabsets = 0
-    let failedSpaces = 0
-    let failedTabsets = 0
 
     _.forEach(spaces, (space: Space) => {
       useSpacesStore().addSpace(space)
