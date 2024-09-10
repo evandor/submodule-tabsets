@@ -147,6 +147,7 @@
           <!--            </span>-->
           <PanelTabListContextMenu
             :tabset="props.tabset"
+            :tabsetId="props.tabsetId"
             :tab="tab" v-if="!props.hideMenu"/>
 
         </div>
@@ -357,7 +358,8 @@ const props = defineProps({
   sorting: {type: String as PropType<TabSorting>, default: TabSorting.CUSTOM},
   showTabsets: {type: Boolean, default: false},
   preventDragAndDrop: {type: Boolean, default: false},
-  tabset: {type: Object as PropType<Tabset>, required: false}
+  tabset: {type: Object as PropType<Tabset>, required: false},
+  tabsetId: {type: String, required: false}
 })
 
 const $q = useQuasar()

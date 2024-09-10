@@ -17,6 +17,7 @@ import {useContentService} from "src/content/services/ContentService";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {useTabsStore2} from "src/tabsets/stores/tabsStore2";
 import AppEventDispatcher from "src/app/AppEventDispatcher";
+import throttledQueue from "throttled-queue";
 
 // let db: TabsetsPersistence = null as unknown as TabsetsPersistence
 
@@ -491,7 +492,7 @@ export function useTabsetService() {
   }
 
   const deleteTab = (tab: Tab, tabset: Tabset): Promise<Tabset> => {
-    console.log("deleting tab", tab.id, tab.chromeTabId, tabset.id)
+    console.log("deleting tab", tab)//.id, tab.chromeTabId, tabset.id)
     const tabUrl = tab.url || ''
     if (tabsetsFor(tabUrl).length <= 1) {
 
@@ -641,72 +642,80 @@ export function useTabsetService() {
 
   const populateSearch = async () => {
 
-    const urlSet: Set<string> = new Set()
+    //const urlSet: Set<string> = new Set()
     const minimalIndex: object[] = []
 
     for (const tabset of [...useTabsetsStore().tabsets.values()] as Tabset[]) {
       for (const tab of tabset.tabs) {
         if (!tab.url) {
-          return
+          continue
         }
-        if (urlSet.has(tab.url)) {
-          const existingDocIndex = _.findIndex(minimalIndex, (d: any) => {
-            return d.url === tab.title
-          })
-          if (existingDocIndex >= 0) {
-            const existingDoc = minimalIndex[existingDocIndex]
-            // console.log("existingDoc", existingDoc)
-            if ((existingDoc['tabsets' as keyof object] as string[]).indexOf(tabset.id) < 0) {
-              const newTabsetIds = (existingDoc['tabsets' as keyof object] as string[]).concat([tabset.id])
-              //@ts-ignore
-              existingDoc['tabsets'] = newTabsetIds
-              minimalIndex.splice(existingDocIndex, 1, existingDoc)
-            }
-          } else {
-            //const doc = new SearchDoc(uid(), tab.name || '', tab.title || '', tab.url, "", "", "", [tabset.id], '', "")
-            minimalIndex.push({
-              name: tab.name || '',
-              title: tab.title || '',
-              url: tab.url || '',
-              description: tab.description,
-              content: '',
-              tabsets: [tabset.id],
-              favIconUrl: tab.favIconUrl || '',
-              tags: tab.tags ? tab.tags.join(' ') : ''
-            })
-          }
-        } else {
-          const content = await useContentService().getContent(tab.id)
-          const addToIndex = {
-            name: tab.name || '',
-            title: tab.title || '',
-            url: tab.url || '',
-            description: tab.description,
-            content: content?.content || '',
-            tabsets: [tabset.id],
-            favIconUrl: tab.favIconUrl || '',
-            tags: tab.tags ? tab.tags.join(' ') : ''
-          }
-          //console.log("adding to index: ", addToIndex)
-          minimalIndex.push(addToIndex)
-          urlSet.add(tab.url)
+        if (typeof (tab.id) === 'number') {
+          console.log("tab.id", tab.id, typeof (tab.id))
+
         }
-
-
+        // if (urlSet.has(tab.url)) {
+        //   const existingDocIndex = _.findIndex(minimalIndex, (d: any) => {
+        //     return d.url === tab.title
+        //   })
+        //   if (existingDocIndex >= 0) {
+        //     const existingDoc = minimalIndex[existingDocIndex]
+        //     // console.log("existingDoc", existingDoc)
+        //     if ((existingDoc['tabsets' as keyof object] as string[]).indexOf(tabset.id) < 0) {
+        //       const newTabsetIds = (existingDoc['tabsets' as keyof object] as string[]).concat([tabset.id])
+        //       //@ts-ignore
+        //       existingDoc['tabsets'] = newTabsetIds
+        //       minimalIndex.splice(existingDocIndex, 1, existingDoc)
+        //     }
+        //   } else {
+        //     //const doc = new SearchDoc(uid(), tab.name || '', tab.title || '', tab.url, "", "", "", [tabset.id], '', "")
+        //     minimalIndex.push({
+        //       name: tab.name || '',
+        //       title: tab.title || '',
+        //       url: tab.url || '',
+        //       description: tab.description,
+        //       content: '',
+        //       tabsets: [tabset.id],
+        //       favIconUrl: tab.favIconUrl || '',
+        //       tags: tab.tags ? tab.tags.join(' ') : ''
+        //     })
+        //   }
+        // } else {
+        const content = await useContentService().getContent(tab.id)
+        const addToIndex = {
+          name: tab.name || '',
+          title: tab.title || '',
+          url: tab.url || '',
+          description: tab.description,
+          content: content?.content || '',
+          tabsets: [tabset.id],
+          favIconUrl: tab.favIconUrl || '',
+          tags: tab.tags ? tab.tags.join(' ') : ''
+        }
+        //console.log("adding to index: ", addToIndex)
+        minimalIndex.push(addToIndex)
+        // AppEventDispatcher.dispatchEvent('upsert-in-search', addToIndex)
+        // urlSet.add(tab.url)
+        // }
       }
     }
 
-    _.forEach([...useTabsetsStore().tabsets.values()] as Tabset[], (tabset: Tabset) => {
-        tabset.tabs.forEach((tab: Tab) => {
-        })
-      }
-    )
-
     console.debug(` ...populating search index from tabsets with ${minimalIndex.length} entries`)
+    const perInterval = 250
+    const throttleRequests = throttledQueue(perInterval, 1000, true)
 
+    const promises: Promise<any>[] = []
+    let index = 0
     minimalIndex.forEach((doc: object) => {
-      AppEventDispatcher.dispatchEvent('upsert-in-search', doc)
+      const p = throttleRequests(async () => {
+        const progress = Math.round(100 * (1.1 * (perInterval * index / minimalIndex.length) + index++) / minimalIndex.length) / 100
+        useUiStore().setProgress(progress, "indexing search...")
+        AppEventDispatcher.dispatchEvent('upsert-in-search', doc)
+        return Promise.resolve("")
+      })
+      promises.push(p)
     })
+    Promise.all(promises).finally(() => useUiStore().progress = undefined)
   }
 
   const addToSearchIndex = (tsId: string, tabs: Tab[]) => {

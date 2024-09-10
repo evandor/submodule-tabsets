@@ -100,41 +100,44 @@
             </q-btn>
             <!-- workaround for adding URLs in non-bex environments -->
 
-            <q-btn outline
-                   v-if="showAddTabButton(tabset as Tabset, currentChromeTab) && !tabset.dynamicUrl"
-                   @click.stop="saveInTabset(tabset.id, tabset.folderActive)"
-                   class="q-ma-none q-px-sm q-py-none"
-                   name="o_bookmark_add"
-                   :class="alreadyInTabset() ? '':'cursor-pointer'"
-                   :color="alreadyInTabset() ? 'grey-5': tsBadges.length > 0 ? 'positive':'warning'"
-                   size="xs"
-                   data-testid="saveInTabsetBtn">
-              <div>Add Tab</div>
-              <!--                  <q-icon right class="q-ma-none q-pa-none" size="2em" name="o_south" />-->
-            </q-btn>
-            <q-tooltip class="tooltip-small" v-if="alreadyInTabset()">
-              Tab is already contained in tabset '{{ tabset.name }}'
-            </q-tooltip>
-            <q-tooltip class="tooltip-small" v-else-if="tsBadges.length > 0">
-              {{ tooltipAlreadyInOtherTabsets(tabset.name) }}
-            </q-tooltip>
-            <q-tooltip class="tooltip-small">
-              Add current Tab to '{{ tabsetNameOrChain(tabset as Tabset) }}'...
-            </q-tooltip>
+            <template v-if="showAddTabButton(tabset as Tabset, currentChromeTab) && !tabset.dynamicUrl">
+              <q-btn outline
+                     @click.stop="saveInTabset(tabset.id, tabset.folderActive)"
+                     class="q-ma-none q-px-sm q-py-none"
+                     name="o_bookmark_add"
+                     :class="alreadyInTabset() ? '':'cursor-pointer'"
+                     :color="alreadyInTabset() ? 'grey-5': tsBadges.length > 0 ? 'positive':'warning'"
+                     size="xs"
+                     data-testid="saveInTabsetBtn">
+                <div>Add Tab</div>
+                <!--                  <q-icon right class="q-ma-none q-pa-none" size="2em" name="o_south" />-->
+              </q-btn>
+              <q-tooltip class="tooltip-small" v-if="alreadyInTabset()">
+                Tab is already contained in tabset '{{ tabset.name }}'
+              </q-tooltip>
+              <q-tooltip class="tooltip-small" v-else-if="tsBadges.length > 0">
+                {{ tooltipAlreadyInOtherTabsets(tabset.name) }}
+              </q-tooltip>
+              <q-tooltip class="tooltip-small" v-else>
+                Add current Tab to '{{ tabsetNameOrChain(tabset as Tabset) }}'...
+              </q-tooltip>
+            </template>
 
-            <q-btn outline
-                   v-if="showAddTabButton(tabset as Tabset, currentChromeTab) && tabset.dynamicUrl"
-                   @click.stop="loadDynamicTabs(tabset)"
-                   class="q-ma-none q-px-sm q-py-none cursor-pointer"
-                   name="o_bookmark_add"
-                   size="xs"
-                   data-testid="loadDynamicTabset">
-              Dynamic Load
-              <!--                  <q-icon right class="q-ma-none q-pa-none" size="2em" name="o_south" />-->
-            </q-btn>
-            <q-tooltip class="tooltip-small">
-              Load Dynamic Data
-            </q-tooltip>
+            <template v-if="showAddTabButton(tabset as Tabset, currentChromeTab) && tabset.dynamicUrl">
+              <q-btn outline
+
+                     @click.stop="loadDynamicTabs(tabset)"
+                     class="q-ma-none q-px-sm q-py-none cursor-pointer"
+                     name="o_bookmark_add"
+                     size="xs"
+                     data-testid="loadDynamicTabset">
+                Dynamic Load
+                <!--                  <q-icon right class="q-ma-none q-pa-none" size="2em" name="o_south" />-->
+              </q-btn>
+              <q-tooltip class="tooltip-small">
+                Load Dynamic Data
+              </q-tooltip>
+            </template>
             <!--            <span-->
             <!--              v-if="!alreadyInTabset() && showAddTabButton(tabset as Tabset, currentChromeTab) && tsBadges.length > 0"-->
             <!--              style="color: grey;font-size: 7px;position: relative;top:-2px;left:-11px;">{{-->
@@ -331,7 +334,9 @@ const scrollToElement = (el: any, delay: number) => {
     const target = getScrollTarget(el)
     const offset = el.offsetTop
     const duration = 200
+    console.log("setting scroll position")
     setVerticalScrollPosition(target, offset - 120, duration)
+    console.log("setting scroll position, done")
   }, delay);
 
 }
