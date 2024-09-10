@@ -129,8 +129,8 @@ class TabsetService {
     extension: UrlExtension = UrlExtension.HTML
   ): Promise<any> {
     tab.url = url
-    tab.extension = extension,
-      tab = PlaceholderUtils.apply(tab, placeholders, placeholderValues)
+    tab.extension = extension
+    tab = PlaceholderUtils.apply(tab, placeholders, placeholderValues)
     return saveCurrentTabset()
   }
 

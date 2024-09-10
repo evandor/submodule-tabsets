@@ -130,7 +130,8 @@ const {handleSuccess, handleError} = useNotificationHandler()
 
 const props = defineProps({
   tab: {type: Object as PropType<Tab>, required: true},
-  tabset: {type: Object as PropType<Tabset>, required: false}
+  tabset: {type: Object as PropType<Tabset>, required: false},
+  tabsetId: {type: String, required: false}
 })
 
 const emit = defineEmits(['toggleExpand']);
@@ -157,7 +158,13 @@ const openSimilar = async () => {
 
 const deleteTab = async () => {
   const useTab = await tabToUse(props.tab)
-  useCommandExecutor().executeFromUi(new DeleteTabCommand(useTab, props.tabset!))
+  let useTabset = props.tabset
+  if (!useTabset && props.tabsetId) {
+    useTabset = useTabsetsStore().getTabset(props.tabsetId)
+  }
+  if (useTabset) {
+    useCommandExecutor().executeFromUi(new DeleteTabCommand(useTab, useTabset))
+  }
   // if (useTab && useTab.url) {
   //   const res = await useBookmarksStore().findBookmarksForUrl(useTab.url)
   //   console.log("existing bookmarks", res)
