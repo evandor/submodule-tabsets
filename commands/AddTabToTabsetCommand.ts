@@ -90,7 +90,7 @@ export class AddTabToTabsetCommand implements Command<any> {
           content = [...tokens].join(" ")
           await useTabsetService().saveText(this.tab, content, contentResult.metas)
         } catch (err) {
-          console.warn("got error when saving content and metadata", err)
+          console.warn("got error when saving content and metadata:", err, this.tab?.url)
         }
         res = new ExecutionResult("result", "Link was added")
 

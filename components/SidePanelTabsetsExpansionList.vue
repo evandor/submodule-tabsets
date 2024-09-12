@@ -15,6 +15,7 @@
       <template v-slot:header>
         <q-item-section
           class="q-mt-xs"
+          :data-testid="'expansion_' + tabset.name"
           @mouseover="hoveredTabset = tabset.id"
           @mouseleave="hoveredTabset = undefined">
           <q-item-label :class="useTabsetsStore().getCurrentTabset?.id === tabset.id ? 'text-bold text-underline' : ''">

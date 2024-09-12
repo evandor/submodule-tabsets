@@ -137,6 +137,7 @@
              class="col text-right q-mx-sm cursor-pointer"
              @mouseover="hoveredTab = tab.id"
              @mouseleave="hoveredTab = undefined"
+             :data-testid="testIdent('menu_',tab.url)"
              style="max-width:25px;font-size: 12px;color:#bfbfbf">
           <!--            <span v-if="hoveredOver(tab.id)">-->
           <span>
@@ -666,6 +667,8 @@ const deleteSelectedComment = () => {
 
 const setCustomTitle = (tab: Tab, newValue: string) =>
   useCommandExecutor().executeFromUi(new UpdateTabNameCommand(tab, newValue))
+
+const testIdent = (ident: string, s: string) => ident + s.length//btoa(s)
 
 </script>
 
