@@ -14,6 +14,8 @@ import {useTabsStore2} from "src/tabsets/stores/tabsStore2";
 import {Space} from "src/spaces/models/Space";
 import AppEventDispatcher from "src/app/AppEventDispatcher";
 import {ContentItem} from "src/content/models/ContentItem";
+import {useUtils} from "src/core/services/Utils";
+import BrowserApi from "src/app/BrowserApi";
 
 const {saveTabset, saveCurrentTabset, tabsetsFor, addToTabset} = useTabsetService()
 
