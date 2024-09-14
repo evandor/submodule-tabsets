@@ -137,7 +137,7 @@
              class="col text-right q-mx-sm cursor-pointer"
              @mouseover="hoveredTab = tab.id"
              @mouseleave="hoveredTab = undefined"
-             :data-testid="testIdent('menu_',tab.url)"
+             :data-testid="testIdent('menu_',tab.url || 'unknown')"
              style="max-width:25px;font-size: 12px;color:#bfbfbf">
           <!--            <span v-if="hoveredOver(tab.id)">-->
           <span>
