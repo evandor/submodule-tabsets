@@ -14,7 +14,6 @@ import {useTabsStore2} from "src/tabsets/stores/tabsStore2";
 import {Space} from "src/spaces/models/Space";
 import AppEventDispatcher from "src/app/AppEventDispatcher";
 import {ContentItem} from "src/content/models/ContentItem";
-import {useUtils} from "src/core/services/Utils";
 import BrowserApi from "src/app/BrowserApi";
 
 const {saveTabset, saveCurrentTabset, tabsetsFor, addToTabset} = useTabsetService()
@@ -442,20 +441,21 @@ class TabsetService {
     return Promise.reject("did not find tab with id " + tabId)
   }
 
-  markAsDeleted(tabsetId: string): Promise<Tabset> {
-    const ts = useTabsetsStore().getTabset(tabsetId)
-    if (ts) {
-      ts.status = TabsetStatus.DELETED
-      return saveTabset(ts)
-        .then(() => {
-          if (useTabsetsStore().getCurrentTabset?.id === tabsetId) {
-            useTabsetsStore().unsetCurrentTabset()// = null as unknown as string
-          }
-          return ts
-        })
-    }
-    return Promise.reject("could not mark as deleted: " + tabsetId)
-  }
+  // markAsDeleted(tabsetId: string): Promise<Tabset> {
+  //   debugger
+  //   const ts = useTabsetsStore().getTabset(tabsetId)
+  //   if (ts) {
+  //     ts.status = TabsetStatus.DELETED
+  //     return saveTabset(ts)
+  //       .then(() => {
+  //         if (useTabsetsStore().getCurrentTabset?.id === tabsetId) {
+  //           useTabsetsStore().unsetCurrentTabset()
+  //         }
+  //         return ts
+  //       })
+  //   }
+  //   return Promise.reject("could not mark as deleted: " + tabsetId)
+  // }
 
   markAs(tabsetId: string, status: TabsetStatus, type: TabsetType = TabsetType.DEFAULT): Promise<TabsetStatus> {
     console.debug(`marking ${tabsetId} as ${status}`)

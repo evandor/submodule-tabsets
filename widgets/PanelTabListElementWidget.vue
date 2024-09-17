@@ -49,9 +49,10 @@
                   @mouseleave="hoveredTab = undefined">
 
     <!-- === name or title === -->
-    <q-item-label @click.stop="(evt:PointerEvent) => checkEvent(evt)">
-      <div>
-        <div class="q-pr-lg cursor-pointer ellipsis">
+    <q-item-label>
+      <div class="row">
+
+        <div class="col-11 q-pr-lg cursor-pointer ellipsis" @click.stop="gotoTab()">
           <span v-if="props.header" class="text-caption">{{ props.header }}<br></span>
           <!--          <span v-if="useTabsStore().getCurrentTabset?.sorting === 'alphabeticalTitle'">-->
           <span v-if="props.sorting === TabSorting.TITLE">
@@ -76,6 +77,15 @@
 
         </div>
 
+        <div class="col text-right q-mr-md">
+          <span>
+              <q-icon name="more_vert" class="cursor-pointer" color="black" size="16px"/>
+            </span>
+          <PanelTabListContextMenu
+            :tabset="props.tabset"
+            :tabsetId="props.tabsetId"
+            :tab="tab" v-if="!props.hideMenu"/>
+        </div>
       </div>
     </q-item-label>
 
@@ -103,7 +113,7 @@
       @mouseover="showButtonsProp = true"
       @mouseleave="showButtonsProp = false">
       <div class="row q-ma-none">
-        <div class="col-11 q-pr-lg cursor-pointer" @click="gotoTab()">
+        <div class="col-12 q-pr-lg cursor-pointer" @click="gotoTab()">
            <span v-if="props.sorting === TabSorting.URL">
               <q-icon name="arrow_right" size="16px"/>
            </span>
@@ -133,25 +143,21 @@
           </template>
 
         </div>
-        <div v-if="!props.hideMenu"
-             class="col text-right q-mx-sm cursor-pointer"
-             @mouseover="hoveredTab = tab.id"
-             @mouseleave="hoveredTab = undefined"
-             :data-testid="testIdent('menu_',tab.url || 'unknown')"
-             style="max-width:25px;font-size: 12px;color:#bfbfbf">
-          <!--            <span v-if="hoveredOver(tab.id)">-->
-          <span>
-              <q-icon name="more_vert" class="cursor-pointer" color="black" size="16px"/>
-            </span>
-          <!--          <span v-else>-->
-          <!--              <q-icon color="primary" size="16px"/>-->
-          <!--            </span>-->
-          <PanelTabListContextMenu
-            :tabset="props.tabset"
-            :tabsetId="props.tabsetId"
-            :tab="tab" v-if="!props.hideMenu"/>
+<!--        <div v-if="!props.hideMenu"-->
+<!--             class="col text-right q-mx-sm cursor-pointer"-->
+<!--             @mouseover="hoveredTab = tab.id"-->
+<!--             @mouseleave="hoveredTab = undefined"-->
+<!--             :data-testid="testIdent('menu_',tab.url || 'unknown')"-->
+<!--             style="max-width:25px;font-size: 12px;color:#bfbfbf">-->
+<!--          <span>-->
+<!--              <q-icon name="more_vert" class="cursor-pointer" color="black" size="16px"/>-->
+<!--            </span>-->
+<!--          <PanelTabListContextMenu-->
+<!--            :tabset="props.tabset"-->
+<!--            :tabsetId="props.tabsetId"-->
+<!--            :tab="tab" v-if="!props.hideMenu"/>-->
 
-        </div>
+<!--        </div>-->
       </div>
 
     </q-item-label>
@@ -173,7 +179,7 @@
 
             <q-icon v-if="suggestion"
                     @click.stop="showSuggestion()"
-                    name="o_notifications" class="q-mr-xs"
+                    name="o_notifications" class="q-mr-xs" size="xs"
                     :color="suggestion.state === SuggestionState.NOTIFICATION ? 'negative' : 'accent'">
               <q-tooltip class="tooltip-small" v-if="suggestion.state === SuggestionState.NOTIFICATION">There is a new
                 notification for this tab
@@ -182,17 +188,17 @@
             </q-icon>
 
             <q-icon v-if="pngs.length > 0"
-                    @click.stop="openImage()"
+                    @click.stop="openImage()" size="xs"
                     name="o_image" class="q-mr-xs" color="accent">
               <q-tooltip class="tooltip-small">There are snapshot images of this tab</q-tooltip>
             </q-icon>
 
-            <q-icon v-if="(props.tab as Tab).placeholders"
+            <q-icon v-if="(props.tab as Tab).placeholders" size="xs"
                     name="published_with_changes" class="q-mr-xs" color="accent">
               <q-tooltip class="tooltip-small">This tab is created by substituting parts of its URL</q-tooltip>
             </q-icon>
 
-            <q-icon v-if="(props.tab as Tab).comments && (props.tab as Tab).comments.length > 0"
+            <q-icon v-if="(props.tab as Tab).comments && (props.tab as Tab).comments.length > 0" size="xs"
                     name="o_chat" class="q-mr-xs" color="warning" @click.stop="toggleLists('comments')">
               <q-tooltip class="tooltip-small">This tab has comments</q-tooltip>
             </q-icon>
