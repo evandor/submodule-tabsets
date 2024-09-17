@@ -441,20 +441,21 @@ class TabsetService {
     return Promise.reject("did not find tab with id " + tabId)
   }
 
-  markAsDeleted(tabsetId: string): Promise<Tabset> {
-    const ts = useTabsetsStore().getTabset(tabsetId)
-    if (ts) {
-      ts.status = TabsetStatus.DELETED
-      return saveTabset(ts)
-        .then(() => {
-          if (useTabsetsStore().getCurrentTabset?.id === tabsetId) {
-            useTabsetsStore().unsetCurrentTabset()// = null as unknown as string
-          }
-          return ts
-        })
-    }
-    return Promise.reject("could not mark as deleted: " + tabsetId)
-  }
+  // markAsDeleted(tabsetId: string): Promise<Tabset> {
+  //   debugger
+  //   const ts = useTabsetsStore().getTabset(tabsetId)
+  //   if (ts) {
+  //     ts.status = TabsetStatus.DELETED
+  //     return saveTabset(ts)
+  //       .then(() => {
+  //         if (useTabsetsStore().getCurrentTabset?.id === tabsetId) {
+  //           useTabsetsStore().unsetCurrentTabset()
+  //         }
+  //         return ts
+  //       })
+  //   }
+  //   return Promise.reject("could not mark as deleted: " + tabsetId)
+  // }
 
   markAs(tabsetId: string, status: TabsetStatus, type: TabsetType = TabsetType.DEFAULT): Promise<TabsetStatus> {
     console.debug(`marking ${tabsetId} as ${status}`)
