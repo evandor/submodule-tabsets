@@ -44,7 +44,6 @@
 <script setup lang="ts">
 
 import {Tab} from "src/tabsets/models/Tab"
-import TabsetService from "src/tabsets/services/TabsetService"
 import {onMounted, PropType, ref, watchEffect} from "vue"
 import NavigationService from "src/services/NavigationService"
 import TabFaviconWidget from "src/tabsets/widgets/TabFaviconWidget.vue"

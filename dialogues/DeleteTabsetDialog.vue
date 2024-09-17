@@ -31,7 +31,7 @@
 
 <script lang="ts" setup>
 
-import {QForm, useDialogPluginComponent} from 'quasar'
+import {useDialogPluginComponent} from 'quasar'
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import DialogButton from "src/core/dialog/buttons/DialogButton.vue";
 import {ref} from "vue";
@@ -54,6 +54,14 @@ const {dialogRef, onDialogHide} = useDialogPluginComponent()
 
 const router = useRouter()
 const isValid = ref(true)
+
+// const deleteTabset = () => useCommandExecutor().executeFromUi(new MarkTabsetDeletedCommand(props.tabsetId))
+//     .then((res: any) => {
+//       if (props.sidePanelMode) {
+//         useUiStore().sidePanelSetActiveView(SidePanelViews.MAIN)
+//       }
+//       return res
+//     })
 
 const deleteTabset = () => useCommandExecutor().executeFromUi(new DeleteTabsetCommand(props.tabsetId))
     .then((res: any) => {

@@ -137,7 +137,7 @@
              class="col text-right q-mx-sm cursor-pointer"
              @mouseover="hoveredTab = tab.id"
              @mouseleave="hoveredTab = undefined"
-             :data-testid="testIdent('menu_',tab.url)"
+             :data-testid="testIdent('menu_',tab.url || 'unknown')"
              style="max-width:25px;font-size: 12px;color:#bfbfbf">
           <!--            <span v-if="hoveredOver(tab.id)">-->
           <span>
@@ -228,7 +228,7 @@
             </template>
 
             <span>
-              <TabListIconIndicatorsHook :tabId="props.tab.id"/>
+              <TabListIconIndicatorsHook :tabId="props.tab.id" :tabUrl="props.tab.url"/>
               <span v-if="useUiStore().listDetailLevelGreaterEqual(ListDetailLevel.MAXIMAL, props.tabset?.details)">last active: {{
                   formatDate(props.tab.lastActive)
                 }}</span>
@@ -370,7 +370,6 @@ const router = useRouter()
 const showButtonsProp = ref<boolean>(false)
 const thumbnail = ref<string | undefined>(undefined)
 const hoveredTab = ref<string | undefined>(undefined)
-const hoveredAnnotation = ref<string | undefined>(undefined)
 const tsBadges = ref<object[]>([])
 const newState = ref(false)
 const showAnnotationList = ref(false)
@@ -489,9 +488,6 @@ watchEffect(async () => {
 
 const nameOrTitle = (tab: Tab) => tab.name ? tab.name : tab.title
 
-const hoveredOver = (tabsetId: string) => hoveredTab.value === tabsetId
-const hoveredOverAnnotation = (annotationId: string) => hoveredAnnotation.value === annotationId
-
 const formatDate = (timestamp: number | undefined) =>
   timestamp ? formatDistance(timestamp, new Date(), {addSuffix: true}) : ""
 
@@ -602,23 +598,6 @@ const openImage = () => window.open(chrome.runtime.getURL('www/index.html#/mainp
 //   tab.annotations = _.filter(tab.annotations, (a:any) => a.id !== annotationToDelete.id)
 //   useTabsetService().saveCurrentTabset()
 // }
-
-const showAnnotation = async (tab: Tab, a: HTMLSelection) => {
-  selectedAnnotation.value = selectedAnnotation.value === a ? undefined : a;
-  if (!TabService.isCurrentTab(tab)) {
-    gotoTab()
-  }
-  console.log("showing annotation", a, tab.chromeTabId)
-  const range: string = a['range']
-  chrome.tabs.sendMessage(tab.chromeTabId || 0, {action: "highlight-annotation", range: range}, function (response) {
-    console.log("hier, response: ", response)
-  });
-}
-
-// const showAnnotations = () =>
-//   showAnnotationList.value &&
-//   useUiStore().listDetailLevelGreaterEqual(ListDetailLevel.SOME, props.tabset?.details) &&
-//   (props.tab as Tab).annotations && (props.tab as Tab).annotations.length > 0
 
 const showComments = () =>
   showCommentList.value &&

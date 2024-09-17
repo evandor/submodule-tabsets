@@ -165,31 +165,24 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, onUpdated, ref, unref, watchEffect} from 'vue'
+import {onMounted, onUpdated, ref, watchEffect} from 'vue'
 import Analytics from "src/core/utils/google-analytics";
 import {useRoute, useRouter} from "vue-router";
-import {date, openURL, uid, useQuasar} from "quasar";
+import {date, uid, useMeta, useQuasar} from "quasar";
 import AddUrlDialog from "components/dialogues/AddUrlDialog.vue";
 import InfoMessageWidget from "components/widgets/InfoMessageWidget.vue";
 import OpenRightDrawerWidget from "components/widgets/OpenRightDrawerWidget.vue";
 import JsUtils from "src/utils/JsUtils";
-import EditorJS, {OutputData} from "@editorjs/editorjs";
-import { useMeta } from 'quasar'
 import {Tabset, TabsetType} from "src/tabsets/models/Tabset";
-import {useTabsStore2} from "src/tabsets/stores/tabsStore2";
-import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {useUiStore} from "src/ui/stores/uiStore";
-import TabsetService from "src/tabsets/services/TabsetService";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import TabsetPageCards from "src/tabsets/pages/pwa/TabsetPageCards.vue";
-import {collection, doc, getDocs, query, where} from "firebase/firestore";
+import {collection, getDocs, query, where} from "firebase/firestore";
 import FirebaseServices from "src/services/firebase/FirebaseServices";
-import {useAuthStore} from "stores/authStore";
 import {Note} from "src/notes/models/Note";
 
 const route = useRoute()
 const router = useRouter()
-const tabsStore = useTabsStore2()
 const tabsetsStore = useTabsetsStore()
 
 const $q = useQuasar()
@@ -199,51 +192,9 @@ const tabset = ref<Tabset>(new Tabset(uid(), "empty", []))
 const orderDesc = ref(false)
 const showEditButton = ref(false)
 
-let editorJS2: EditorJS = undefined as unknown as EditorJS
-
-const metaData = {
-  // sets document title
-  title: 'Index Page!',
-  // optional; sets final title as "Index Page - My Website", useful for multiple level meta
-  //titleTemplate: (tabset:Tabset) => `${tabset.name} - My Website`,
-
-  // meta tags
-  meta: {
-    description: { name: 'description', content: 'Page 1' },
-    keywords: { name: 'keywords', content: 'Quasar website' },
-   // equiv: { 'http-equiv': 'Content-Type', content: 'text/html; charset=UTF-8' },
-    // note: for Open Graph type metadata you will need to use SSR, to ensure page is rendered by the server
-    ogTitle:  {
-      property: 'og:title',
-      content: 'sharing with tabsets'
-    },
-    ogImage: {
-      property: 'og:image',
-      template (tabset: Tabset) {
-        console.log("tabset!!!", tabset)
-        return `${tabset} - My Website`
-      }
-    }
-  }
-}
-
 onMounted(() => {
   Analytics.firePageViewEvent('PwaTabsetPage', document.location.href);
 
-  // if (!editorJS2 && tabset.value.page) {
-  //   // @ts-ignore
-  //   editorJS2 = new EditorJS({
-  //     holder: "editorjs",
-  //     readOnly: true,
-  //     minHeight: 1,
-  //     data: (tabset.value.page || {}) as OutputData,
-  //     tools: EditorJsConfig.toolsconfig
-  //   });
-  //   // if the editor is readonly from the start, I cannot update it when tabset.page changes
-  //   // setTimeout(() => {
-  //   //   editorJS2.readOnly.toggle(true)
-  //   // }, 1000)
-  // }
 })
 
 //useMeta(metaData)
@@ -302,8 +253,6 @@ const setFilter = (newValue: string) => {
 
 
 const addUrlDialog = () => $q.dialog({component: AddUrlDialog})
-
-const setView = (view: string) => TabsetService.setView(tabsetId.value, view)
 
 const toggleSorting = () => {
   //useCommandExecutor().executeFromUi(new ToggleSortingCommand(tabsetId.value))

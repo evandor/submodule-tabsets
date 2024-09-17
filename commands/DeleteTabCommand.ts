@@ -6,7 +6,7 @@ import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {useUtils} from "src/core/services/Utils";
 
 const {addToTabset, deleteTab} = useTabsetService()
-const {inBexMode, sendMsg} = useUtils()
+const {sendMsg} = useUtils()
 
 class UndoCommand implements Command<any> {
 

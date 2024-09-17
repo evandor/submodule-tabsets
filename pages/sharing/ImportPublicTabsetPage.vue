@@ -42,19 +42,25 @@
     </div>
   </div>
 
+  <div class="absolute-bottom text-right text-caption text-blue-10 q-mr-lg q-mb-lg cursor-pointer" @click="openURL('https://bibbly.me')">
+    Bibbly {{ version }}
+  </div>
+
 </template>
 
 
 <script setup lang="ts">
 import {onMounted, ref} from 'vue'
 import {useRoute, useRouter} from "vue-router";
-import {uid} from "quasar";
+import {openURL, uid} from "quasar";
 import _ from "lodash"
 import {Tabset} from "src/tabsets/models/Tabset";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {doc, getDoc} from "firebase/firestore";
 import FirebaseServices from "src/services/firebase/FirebaseServices";
+
+import {version} from '../../../../package.json'
 
 const route = useRoute();
 const router = useRouter();

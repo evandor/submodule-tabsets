@@ -83,10 +83,8 @@ import {computed, ref, watchEffect} from "vue";
 import {useDialogPluginComponent} from "quasar";
 import {STRIP_CHARS_IN_USER_INPUT} from "boot/constants";
 import {RenameTabsetCommand} from "src/tabsets/commands/RenameTabset";
-import {useNotificationHandler} from "src/core/services/ErrorHandler";
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import ColorSelector from "src/core/dialog/ColorSelector.vue";
-import {usePermissionsStore} from "stores/permissionsStore";
 import {FeatureIdent} from "src/app/models/FeatureIdent";
 import {useWindowsStore} from "src/windows/stores/windowsStore";
 import {ListDetailLevel, useUiStore} from "src/ui/stores/uiStore";
@@ -106,7 +104,6 @@ const props = defineProps({
   fromPanel: {type: Boolean, default: false}
 })
 
-const {handleError} = useNotificationHandler()
 const {dialogRef, onDialogHide, onDialogCancel} = useDialogPluginComponent()
 
 const newTabsetName = ref(props.tabsetName)

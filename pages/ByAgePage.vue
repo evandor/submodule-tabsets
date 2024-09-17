@@ -26,7 +26,7 @@
     default-opened
     data-testid="expansion_item_unpinnedNoGroup"
     expand-separator>
-    <template v-slot:header="{ expanded }">
+    <template v-slot:header>
       <q-item-section>
         <div>
           <span class="text-weight-bold">Tabs </span>
@@ -38,7 +38,7 @@
     <q-card>
       <q-card-section>
 
-        <TabList :tabs="groupedTabs"/>
+<!--        <TabList :tabs="groupedTabs"/>-->
 
       </q-card-section>
 
@@ -55,7 +55,6 @@ import {Tab} from "src/tabsets/models/Tab";
 import {Tabset, TabsetStatus} from "src/tabsets/models/Tabset";
 import Analytics from "src/core/utils/google-analytics";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
-import TabList from "src/tabsets/pages/pwa/TabList.vue";
 
 const route = useRoute();
 

@@ -1,5 +1,4 @@
-import {Space} from "src/spaces/models/Space";
-import {Tabset} from "src/tabsets/models/Tabset";
+import {Tabset, TabsetSharing} from "src/tabsets/models/Tabset";
 
 interface TabsetsPersistence {
 
@@ -19,6 +18,8 @@ interface TabsetsPersistence {
   compactDb(): Promise<any>
 
   clear(name: string): void
+
+  share(tabset: Tabset, sharing: TabsetSharing, sharedId: string | undefined, sharedBy: string | undefined): Promise<TabsetSharing | void>
 
   // optional migration code for 0.4.11 to 0.5.0
   migrate(): any;

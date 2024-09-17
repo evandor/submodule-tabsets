@@ -11,7 +11,7 @@
   <q-item
     clickable
     v-ripple
-    v-for="(tab,index) in props.tabs"
+    v-for="tab in props.tabs"
     class="q-ma-none q-pa-md"
     :style="itemStyle(tab)"
     @click.stop="showDetails(tab)"
@@ -31,11 +31,8 @@
 
 <script lang="ts" setup>
 
-import TabListElementWidget from "components/widgets/TabListElementWidget.vue";
 import {PropType, ref} from "vue";
 import {useUtils} from "src/core/services/Utils";
-import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
-import {useTabsStore2} from "src/tabsets/stores/tabsStore2";
 import {Tab} from "src/tabsets/models/Tab";
 import {DrawerTabs, useUiStore} from "src/ui/stores/uiStore";
 import PanelTabListElementWidget from "src/tabsets/widgets/PanelTabListElementWidget.vue";
@@ -51,9 +48,6 @@ const props = defineProps({
 })
 
 const {inBexMode} = useUtils()
-
-const tabsStore = useTabsStore2()
-const tabsetsStore = useTabsetsStore()
 
 const showDetails = (tab: Tab) => {
   // useUiStore().setSelectedTab(tab)

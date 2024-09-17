@@ -1,6 +1,6 @@
 import {defineStore} from 'pinia';
 import _ from 'lodash'
-import {computed, ref, watch, watchEffect} from "vue";
+import {computed, ref} from "vue";
 import {Tabset} from "src/tabsets/models/Tabset";
 import {Tab} from "src/tabsets/models/Tab";
 

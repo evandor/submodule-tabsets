@@ -1,4 +1,4 @@
-import {LocalStorage, uid} from "quasar";
+import {uid} from "quasar";
 import _ from "lodash";
 import {Tab, UrlExtension} from "src/tabsets/models/Tab";
 import {Tabset, TabsetSharing, TabsetStatus, TabsetType} from "src/tabsets/models/Tabset";
@@ -20,14 +20,10 @@ import BrowserApi from "src/app/BrowserApi";
 const {saveTabset, saveCurrentTabset, tabsetsFor, addToTabset} = useTabsetService()
 
 // const {db} = useDB()
-const {throwIdNotFound} = useUtils()
-
 class TabsetService {
 
-  private localStorage: LocalStorage = null as unknown as LocalStorage
-
   setLocalStorage(localStorage: any) {
-    this.localStorage = localStorage;
+//    this.localStorage = localStorage;
   }
 
   async saveToCurrentTabset(tab: Tab, useIndex: number | undefined = undefined): Promise<Tabset> {
@@ -231,12 +227,6 @@ class TabsetService {
     let data = JSON.parse(json)
     let tabsets = data.tabsets || data
     let spaces = data.spaces || []
-
-    // TODO
-    let importedSpaces = 0
-    let importedTabsets = 0
-    let failedSpaces = 0
-    let failedTabsets = 0
 
     _.forEach(spaces, (space: Space) => {
       useSpacesStore().addSpace(space)
@@ -452,21 +442,20 @@ class TabsetService {
     return Promise.reject("did not find tab with id " + tabId)
   }
 
-  // markAsDeleted(tabsetId: string): Promise<Tabset> {
-  //   debugger
-  //   const ts = useTabsetsStore().getTabset(tabsetId)
-  //   if (ts) {
-  //     ts.status = TabsetStatus.DELETED
-  //     return saveTabset(ts)
-  //       .then(() => {
-  //         if (useTabsetsStore().getCurrentTabset?.id === tabsetId) {
-  //           useTabsetsStore().unsetCurrentTabset()
-  //         }
-  //         return ts
-  //       })
-  //   }
-  //   return Promise.reject("could not mark as deleted: " + tabsetId)
-  // }
+  markAsDeleted(tabsetId: string): Promise<Tabset> {
+    const ts = useTabsetsStore().getTabset(tabsetId)
+    if (ts) {
+      ts.status = TabsetStatus.DELETED
+      return saveTabset(ts)
+        .then(() => {
+          if (useTabsetsStore().getCurrentTabset?.id === tabsetId) {
+            useTabsetsStore().unsetCurrentTabset()// = null as unknown as string
+          }
+          return ts
+        })
+    }
+    return Promise.reject("could not mark as deleted: " + tabsetId)
+  }
 
   markAs(tabsetId: string, status: TabsetStatus, type: TabsetType = TabsetType.DEFAULT): Promise<TabsetStatus> {
     console.debug(`marking ${tabsetId} as ${status}`)
@@ -481,6 +470,10 @@ class TabsetService {
     return Promise.reject("could not change status : " + tabsetId)
   }
 
+  share(tabsetId: string, sharing: TabsetSharing, sharedId: string | undefined, sharedBy: string) {
+    const tabset = useTabsetsStore().getTabset(tabsetId)!
+    return useTabsetsStore().share(tabset, sharing, sharedId, sharedBy)
+  }
 }
 
 export default new TabsetService();

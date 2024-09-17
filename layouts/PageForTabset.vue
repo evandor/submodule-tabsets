@@ -23,7 +23,7 @@ import EditorJsConfig from "src/notes/editorjs/EditorJsConfig";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 
-const {formatDate, sendMsg, sanitize} = useUtils()
+const {sendMsg} = useUtils()
 
 const route = useRoute()
 
@@ -50,6 +50,7 @@ watchEffect(() => {
         autofocus: true,
         readOnly: false,
         data: (tabset.value.page || {}) as OutputData,
+        // @ts-ignore
         tools: EditorJsConfig.toolsconfig
       });
     }

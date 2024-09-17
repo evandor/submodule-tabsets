@@ -34,8 +34,6 @@ import {computed, PropType, ref, watchEffect} from "vue";
 import {useDialogPluginComponent} from "quasar";
 import {STRIP_CHARS_IN_USER_INPUT} from "boot/constants";
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
-import {RenameWindowCommand} from "src/windows/commands/RenameWindow";
-import {ExecutionResult} from "src/core/domain/ExecutionResult";
 import {Tabset} from "src/tabsets/models/Tabset";
 import {RenameFolderCommand} from "src/tabsets/commands/RenameFolderCommand";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
@@ -50,11 +48,11 @@ const props = defineProps({
   name: {type: String, default: ''}
 })
 
+// @ts-ignore
 const {dialogRef, onDialogOK, onDialogHide, onDialogCancel} = useDialogPluginComponent()
 
 const newSubfolderName = ref(props.name)
 const newSubfolderNameExists = ref(false)
-const hideWarning = ref(false)
 
 watchEffect(() => {
   newSubfolderNameExists.value = !!useTabsetsStore().existingInTabset(newSubfolderName.value);

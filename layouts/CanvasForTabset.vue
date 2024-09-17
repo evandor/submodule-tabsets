@@ -106,7 +106,6 @@ onMounted(() => {
 
   idraw.on('changeData', (e: any) => {
     console.log('changeData: event = ', e);
-    let tabId = undefined
     if (selectedTab.value) {
       saveCanvasElements()
       for (const element of e.elements) {
@@ -161,7 +160,7 @@ watchEffect(() => {
 })
 
 function saveCanvasElements() {
-  const nonTabElements = _.filter(idraw.getData().elements, e => !e.name.startsWith('tab-'))
+  const nonTabElements = _.filter(idraw.getData().elements, (e:any) => !e.name.startsWith('tab-'))
   if (tabset.value) {
     tabset.value.canvas = nonTabElements
     console.log("saving non tab elements", nonTabElements)
@@ -192,7 +191,7 @@ const deleteFigure = (uuid: string) => {
 
 <style>
 #idraw {
-  margin-top: 0px;
+  margin-top: 0;
   text-align: center;
 }
 

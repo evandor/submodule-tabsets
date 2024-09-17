@@ -26,7 +26,7 @@
 <script setup lang="ts">
 import {Tab} from "src/tabsets/models/Tab";
 import TabsetService from "src/tabsets/services/TabsetService";
-import {PropType, ref} from "vue";
+import {PropType} from "vue";
 import {VueDraggableNext} from 'vue-draggable-next'
 import TabCardWidget from "src/components/widgets/TabCardWidget.vue"
 import _ from "lodash"
@@ -34,6 +34,7 @@ import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {CreateTabFromOpenTabsCommand} from "src/tabsets/commands/CreateTabFromOpenTabs";
 import {useUiStore} from "src/ui/stores/uiStore";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
+import {TabsetColumn} from "src/tabsets/models/TabsetColumn";
 
 const props = defineProps({
   tabs: {
@@ -56,10 +57,10 @@ function adjustIndex(element: any, tabs: Tab[]) {
   //console.log("filtered", tabs)
   if (element.newIndex === 0) { // first element
     //console.log(" 0 - searching for ", tabs[0].id)
-    return _.findIndex(useTabsetsStore().getCurrentTabs, t => t.id === tabs[0].id)
+    return _.findIndex(useTabsetsStore().getCurrentTabs, (t:Tab) => t.id === tabs[0].id)
   } else {
     //console.log(" 1 - searching for ", tabs[element.newIndex - 1].id)
-    return 1 + _.findIndex(useTabsetsStore().getCurrentTabs, t => t.id === tabs[element.newIndex - 1].id)
+    return 1 + _.findIndex(useTabsetsStore().getCurrentTabs, (t:Tab) => t.id === tabs[element.newIndex - 1].id)
   }
 }
 
@@ -94,15 +95,12 @@ const handleDragAndDrop = (event: any) => {
         }
         break
     }
-    TabsetService.moveTo(moved.element.id, useIndex)
+    TabsetService.moveTo(moved.element.id, useIndex, null as unknown as TabsetColumn)
   }
   if (added) {
     useCommandExecutor()
       .executeFromUi(new CreateTabFromOpenTabsCommand(added.element, added.newIndex))
   }
-}
-
-const openOrShowOpenTabs = () => {
 }
 
 const startDrag = (evt: any, tab: Tab) => {
@@ -111,7 +109,7 @@ const startDrag = (evt: any, tab: Tab) => {
     evt.dataTransfer.dropEffect = 'move'
     evt.dataTransfer.effectAllowed = 'move'
     evt.dataTransfer.setData('text/plain', tab.id)
-    useUiStore().draggingTab(tab.id)
+    useUiStore().draggingTab(tab.id,evt)
   }
   console.log("evt.dataTransfer.getData('text/plain')", evt.dataTransfer.getData('text/plain'))
 }

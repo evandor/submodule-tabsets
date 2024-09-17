@@ -136,16 +136,6 @@ watchEffect(() => {
   }
 })
 
-const tabsets = ref<Tabset[]>([])
-const selectedTab = ref<Tab | undefined>(undefined)
-
-// watchEffect(() => {
-//   selectedTab.value = useUiStore().getSelectedTab
-//   if (selectedTab.value) {
-//     currentChromeTab.value = null as unknown as chrome.tabs.Tab
-//   }
-// })
-
 watchEffect(() => {
   openTabs.value = useTabsStore2().browserTabs
   currentTabset.value = useTabsetsStore().getCurrentTabset

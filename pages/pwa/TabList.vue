@@ -35,7 +35,7 @@
 </template>
 
 <script setup lang="ts">
-import {PropType, ref} from "vue";
+import {PropType} from "vue";
 import {VueDraggableNext} from 'vue-draggable-next'
 import _ from "lodash"
 import {useQuasar} from "quasar";
@@ -106,6 +106,7 @@ const handleDragAndDrop = (event: any) => {
         }
         break
     }
+    console.debug("logindex", useIndex)
     // TabsetService.moveTo(moved.element.id, useIndex)
   }
   if (added) {

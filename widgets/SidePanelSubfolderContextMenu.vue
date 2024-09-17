@@ -37,6 +37,7 @@ import RenameSubfolderDialog from "src/tabsets/dialogues/RenameSubfolderDialog.v
 
 const $q = useQuasar()
 
+// @ts-ignore
 const props = defineProps({
   tabset: {type: Object as PropType<Tabset>, required: true},
   folder: {type: Object as PropType<Tabset>, required: true}

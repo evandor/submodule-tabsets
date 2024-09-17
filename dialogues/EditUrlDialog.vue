@@ -35,7 +35,7 @@
         You can use placeholder like this as well: https://dax.de/${wkn}
       </q-card-section>
 
-      <q-card-section class="q-pt-none" v-for="(placeholder,index) in placeholders">
+      <q-card-section class="q-pt-none" v-for="placeholder in placeholders">
         <div class="text-body">Placeholder <i>{{ placeholder }}</i></div>
         <q-input dense :model-value="modelFor(placeholder)"
                  @update:model-value="(val:any) => updatePlaceholder(placeholder, val)"/>
@@ -72,14 +72,13 @@
 import {computed, PropType, ref, watchEffect} from "vue";
 
 import {useDialogPluginComponent} from 'quasar'
-import {UpdateTabCommand} from "src/domain/tabs/UpdateTabCommand";
 import DialogButton from "src/core/dialog/buttons/DialogButton.vue";
-import {useNotificationHandler} from "src/core/services/ErrorHandler";
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {Tab, UrlExtension} from "src/tabsets/models/Tab";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {useFeaturesStore} from "src/features/stores/featuresStore";
 import {FeatureIdent} from "src/app/models/FeatureIdent";
+import {UpdateTabCommand} from "src/domain/tabs/UpdateTabCommand.ts";
 
 defineEmits([
   ...useDialogPluginComponent.emits
@@ -89,7 +88,7 @@ const props = defineProps({
   tab: {type: Object as PropType<Tab>, required: true}
 })
 
-const {handleError} = useNotificationHandler()
+// @ts-ignore
 const {dialogRef, onDialogHide, onDialogCancel} = useDialogPluginComponent()
 
 const newTabUrl = ref(props.tab.url || '')

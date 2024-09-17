@@ -1,7 +1,7 @@
 import Command from "src/core/domain/Command";
 import {ExecutionResult} from "src/core/domain/ExecutionResult";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
-import {Tabset, TabsetStatus} from "src/tabsets/models/Tabset";
+import {Tabset} from "src/tabsets/models/Tabset";
 
 export class DeleteTabsetFolderCommand implements Command<string> {
 

@@ -45,6 +45,7 @@
 
 <script setup lang="ts">
 
+// @ts-ignore
 import {GridItem, GridLayout} from 'vue-grid-layout-v3';
 
 import {onMounted, onUnmounted, PropType, ref, watchEffect} from "vue";
@@ -157,7 +158,7 @@ const resizedEvent = (i: any, newH: number, newW: number, newHPx: any, newWPx: a
 }
 
 const containerResizedEvent = (i: any, newH: any, newW: any, newHPx: any, newWPx: any) => {
-  const msg = "CONTAINER RESIZED i=" + i + ", H=" + newH + ", W=" + newW + ", H(px)=" + newHPx + ", W(px)=" + newWPx;
+  //const msg = "CONTAINER RESIZED i=" + i + ", H=" + newH + ", W=" + newW + ", H(px)=" + newHPx + ", W(px)=" + newWPx;
   //console.log(msg);
 }
 

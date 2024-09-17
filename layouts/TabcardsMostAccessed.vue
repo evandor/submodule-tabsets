@@ -14,7 +14,7 @@
 
 <script setup lang="ts">
 import {Tab} from "src/tabsets/models/Tab";
-import {PropType, ref} from "vue";
+import {PropType} from "vue";
 import TabCardWidget from "src/components/widgets/TabCardWidget.vue"
 import _ from "lodash"
 
