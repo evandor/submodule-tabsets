@@ -577,15 +577,6 @@ const switchGroup = (group: chrome.tabGroups.TabGroup): void => {
   }
 }
 
-const checkEvent = async (evt: PointerEvent) => {
-  console.log("got evt", evt, typeof evt)
-  if (evt.detail === 1) {
-    await gotoTab()
-  } else {
-    popModel.value = true
-  }
-}
-
 const gotoTab = () =>
   NavigationService.openOrCreateTab(
     [props.tab.url || ''],
@@ -652,8 +643,6 @@ const deleteSelectedComment = () => {
 
 const setCustomTitle = (tab: Tab, newValue: string) =>
   useCommandExecutor().executeFromUi(new UpdateTabNameCommand(tab, newValue))
-
-const testIdent = (ident: string, s: string) => ident + s.length//btoa(s)
 
 </script>
 
