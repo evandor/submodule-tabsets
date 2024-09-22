@@ -12,8 +12,10 @@ import {STRIP_CHARS_IN_USER_INPUT} from "boot/constants";
 import {TabsetType} from "src/tabsets/models/Tabset";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {useFeaturesStore} from "src/features/stores/featuresStore";
+import {useLogger} from "src/services/Logger";
 
 const {sendMsg} = useUtils()
+const {info} = useLogger()
 
 export class CreateTabsetCommand implements Command<SaveOrReplaceResult> {
 
@@ -54,6 +56,7 @@ export class CreateTabsetCommand implements Command<SaveOrReplaceResult> {
                         //     process.env.MODE === 'bex') {
                         //     useSuggestionsStore().addSuggestion(Suggestion.getStaticSuggestion(StaticSuggestionIdent.TRY_NEWEST_TABS_FEATURE))
                         }
+                        info("tabset created")
                         sendMsg('tabset-added', {tabsetId: res.tabset.id})
                         return res
                     }
