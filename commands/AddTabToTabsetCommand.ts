@@ -12,9 +12,11 @@ import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import ContentUtils from "src/core/utils/ContentUtils";
 import BrowserApi from "src/app/BrowserApi";
 import {useThumbnailsService} from "src/thumbnails/services/ThumbnailsService";
+import {useLogger} from "src/services/Logger";
 
 const {saveTabset} = useTabsetService()
 const {sendMsg} = useUtils()
+const {info} = useLogger()
 
 // No undo command, tab can be deleted manually easily
 
@@ -118,6 +120,7 @@ export class AddTabToTabsetCommand implements Command<any> {
         tabsets: [this.tabset!.id],
         favIconUrl: this.tab.favIconUrl || ''
       })
+      info("tab created")
       sendMsg('tab-added', {tabsetId: this.tabset!.id})
       return res
     } catch (err) {
