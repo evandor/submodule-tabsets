@@ -13,6 +13,10 @@ import ContentUtils from "src/core/utils/ContentUtils";
 import BrowserApi from "src/app/BrowserApi";
 import {useThumbnailsService} from "src/thumbnails/services/ThumbnailsService";
 import {useLogger} from "src/services/Logger";
+import {useAuthStore} from "stores/authStore.ts";
+import {doc, setDoc} from "firebase/firestore";
+import FirebaseServices from "src/services/firebase/FirebaseServices.ts";
+import {uid} from "quasar";
 
 const {saveTabset} = useTabsetService()
 const {sendMsg} = useUtils()
@@ -66,10 +70,10 @@ export class AddTabToTabsetCommand implements Command<any> {
       const tabset: Tabset = await useTabsetService().addToTabset(tabsetOrFolder, this.tab, 0)
 
       // Analysis
-      // if (useAuthStore().isAuthenticated && this.tab.url?.startsWith("https://")) {
-      //   const userId = useAuthStore().user.uid
-      //   setDoc(doc(FirebaseServices.getFirestore(), "users", userId, "queue", uid()),{"event": "new-tab", "url": this.tab.url})
-      // }
+      if (useAuthStore().user.uid && this.tab.url?.startsWith("https://")) {
+        const userId = useAuthStore().user.uid
+        setDoc(doc(FirebaseServices.getFirestore(), "users", userId, "queue", uid()),{"event": "new-tab", "url": this.tab.url})
+      }
 
       // Sharing
       if (tabset.sharedId && tabset.sharing === TabsetSharing.PUBLIC_LINK && !this.activeFolder) {
