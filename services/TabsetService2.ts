@@ -219,7 +219,7 @@ export function useTabsetService() {
       //await db.deleteTabset(tabsetId)
 
       //this.db.delete('tabsets', tabsetId)
-      const nextKey: string = useTabsetsStore().tabsets.keys().next().value
+      const nextKey: string | undefined = useTabsetsStore().tabsets.keys().next().value
       console.log("setting next key to", nextKey)
       selectTabset(nextKey)
       return Promise.resolve("ok")

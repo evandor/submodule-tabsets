@@ -90,26 +90,28 @@
     </q-item-label>
 
     <!-- === description === -->
-    <template v-if="props.tab?.extension !== UrlExtension.NOTE">
-      <q-item-label class="ellipsis-2-lines text-grey-8"
+    <template v-if="useUiStore().listDetailLevelGreaterEqual(ListDetailLevel.SOME, props.tabset?.details)">
+      <template v-if="props.tab?.extension !== UrlExtension.NOTE">
+        <q-item-label class="ellipsis-2-lines text-body2 darkColors lightColors"
 
-                    @click.stop="gotoTab()">
-        {{ props.tab.longDescription || props.tab.description }}
-      </q-item-label>
-    </template>
-    <template else>
-      <q-item-label class="ellipsis-2-lines text-grey-8"
+                      @click.stop="gotoTab()">
+          {{ props.tab.longDescription || props.tab.description }}
+        </q-item-label>
+      </template>
+      <template else>
+        <q-item-label class="ellipsis-2-lines text-grey-8"
 
-                    @click.stop="gotoTab()">
-        {{ props.tab.description }}
-      </q-item-label>
+                      @click.stop="gotoTab()">
+          {{ props.tab.description }}
+        </q-item-label>
+      </template>
     </template>
 
     <!-- === url(s) === -->
     <q-item-label
       style="width:100%"
       v-if="props.tab?.url"
-      caption class="ellipsis-2-lines text-blue-10"
+      caption class="ellipsis-2-lines text-blue-10 q-pt-xs"
       @mouseover="showButtonsProp = true"
       @mouseleave="showButtonsProp = false">
       <div class="row q-ma-none">
@@ -143,21 +145,6 @@
           </template>
 
         </div>
-<!--        <div v-if="!props.hideMenu"-->
-<!--             class="col text-right q-mx-sm cursor-pointer"-->
-<!--             @mouseover="hoveredTab = tab.id"-->
-<!--             @mouseleave="hoveredTab = undefined"-->
-<!--             :data-testid="testIdent('menu_',tab.url || 'unknown')"-->
-<!--             style="max-width:25px;font-size: 12px;color:#bfbfbf">-->
-<!--          <span>-->
-<!--              <q-icon name="more_vert" class="cursor-pointer" color="black" size="16px"/>-->
-<!--            </span>-->
-<!--          <PanelTabListContextMenu-->
-<!--            :tabset="props.tabset"-->
-<!--            :tabsetId="props.tabsetId"-->
-<!--            :tab="tab" v-if="!props.hideMenu"/>-->
-
-<!--        </div>-->
       </div>
 
     </q-item-label>
@@ -310,7 +297,6 @@
     </q-item-label>-->
 
   </q-item-section>
-
 </template>
 
 <script setup lang="ts">
@@ -577,15 +563,6 @@ const switchGroup = (group: chrome.tabGroups.TabGroup): void => {
   }
 }
 
-const checkEvent = async (evt: PointerEvent) => {
-  console.log("got evt", evt, typeof evt)
-  if (evt.detail === 1) {
-    await gotoTab()
-  } else {
-    popModel.value = true
-  }
-}
-
 const gotoTab = () =>
   NavigationService.openOrCreateTab(
     [props.tab.url || ''],
@@ -653,12 +630,18 @@ const deleteSelectedComment = () => {
 const setCustomTitle = (tab: Tab, newValue: string) =>
   useCommandExecutor().executeFromUi(new UpdateTabNameCommand(tab, newValue))
 
-const testIdent = (ident: string, s: string) => ident + s.length//btoa(s)
-
 </script>
 
 <!--https://stackoverflow.com/questions/41078478/css-animated-checkmark -->
-<style>
+<style lang="scss" scoped>
+
+.body--dark .darkColors {
+  color: $grey-2;
+}
+
+.body--light .lightColors {
+  color: $grey-9;
+}
 
 .checkmark__circle {
   stroke-dasharray: 66;
@@ -669,6 +652,7 @@ const testIdent = (ident: string, s: string) => ident + s.length//btoa(s)
   fill: none;
   animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
 }
+
 
 .checkmark {
   width: 22px;

@@ -2,7 +2,7 @@
   <q-item
       clickable
       v-ripple
-      class="q-ma-none q-px-sm q-pt-xs q-pb-none q-ml-sm"
+      class="q-mt-xs q-px-sm q-pt-xs q-pb-none q-mx-sm darkColors lightColors"
       :class="props.indent ? 'q-ml-md':''"
       :style="itemStyle()"
       @dragstart="startDrag($event, tab)"
@@ -54,7 +54,7 @@ const startDrag = (evt: any, tab: Tab) => {
 }
 
 const itemStyle = () => {
-  let style = ""
+  let style = "border-radius:3px;"
   if (props.tab.color && useFeaturesStore().hasFeature(FeatureIdent.COLOR_TAGS)) {
     style = style + 'border-left:3px solid ' + props.tab.color + ';border-radius:4px;'
   }
@@ -62,3 +62,17 @@ const itemStyle = () => {
 }
 
 </script>
+
+<style scoped lang="scss">
+
+.body--dark .darkColors {
+  background-color: $grey-9;
+  border:1px solid $grey-8;
+}
+
+.body--light .lightColors {
+  background-color: $grey-2;
+  border:1px solid $grey-3;
+}
+
+</style>
