@@ -106,7 +106,7 @@
         </q-item-label>
       </template>
     </template>
-    
+
     <!-- === url(s) === -->
     <q-item-label
       style="width:100%"
