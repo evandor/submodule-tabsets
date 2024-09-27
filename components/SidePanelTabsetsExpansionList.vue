@@ -1,4 +1,5 @@
 <template>
+  <!-- SidePanelTabsetsExpansionList -->
   <q-list dense
           class="rounded-borders q-ma-none q-pa-none" :key="tabset.id"
           v-for="(tabset,index) in props.tabsets">
