@@ -253,32 +253,6 @@
       </div>
     </q-item-label>
 
-    <!-- === annotations === -->
-    <!--    <q-item-label v-if="showAnnotations()"-->
-    <!--                  class="text-grey-10" text-subtitle1>-->
-    <!--      <div class="row" v-for="a in (props.tab as Tab).annotations"-->
-    <!--           @mouseover="hoveredAnnotation = a['id' as keyof object]"-->
-    <!--           @mouseleave="hoveredAnnotation = undefined">-->
-    <!--        <div class="col-10 ellipsis" @click="showAnnotation(props.tab as Tab, a)">{{ a.text }}</div>-->
-    <!--        <div class="col-2 text-right" v-if="hoveredOverAnnotation(a['id' as keyof object])">-->
-    <!--          <q-icon name="delete" color="negative" @click="deleteAnnotation(props.tab as Tab, a)"/>-->
-    <!--        </div>-->
-    <!--        <div class="col-12 q-ml-md" v-if="selectedAnnotation === a">-->
-    <!--          <div v-for="comment in selectedAnnotation.comments">-->
-    <!--            <div class="row">-->
-    <!--              <div class="col-10">-->
-    <!--                {{ comment.comment }}-->
-    <!--              </div>-->
-    <!--              <div class="col-2">-->
-    <!--                .-->
-    <!--              </div>-->
-    <!--            </div>-->
-    <!--          </div>-->
-    <!--         -->
-    <!--        </div>-->
-    <!--      </div>-->
-    <!--    </q-item-label>-->
-
     <!-- === badges === -->
     <q-item-label v-if="props.showTabsets">
       <template v-for="badge in tsBadges">
@@ -288,13 +262,6 @@
         </q-chip>
       </template>
     </q-item-label>
-
-    <!-- === debug ===
-    <q-item-label>
-      <div class="row q-mx-sm">
-        <TabDetailsSearchIndex :tabId="tab.id"/>
-      </div>
-    </q-item-label>-->
 
   </q-item-section>
 </template>
