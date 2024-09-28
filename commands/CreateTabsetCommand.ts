@@ -23,7 +23,8 @@ export class CreateTabsetCommand implements Command<SaveOrReplaceResult> {
 
     constructor(
         public tabsetName: string,
-        public tabsToUse: chrome.tabs.Tab[],
+        public tabsToUse: chrome.tabs.Tab[] = [],
+        public spaceId: string | undefined = undefined,
         public windowToOpen: string = 'current',
         public color: string | undefined = undefined,
         public dynamicSource: string | undefined = undefined) {
@@ -36,7 +37,7 @@ export class CreateTabsetCommand implements Command<SaveOrReplaceResult> {
                 this.windowToOpen.replace(STRIP_CHARS_IN_USER_INPUT, '') : 'current'
             useWindowsStore().addToWindowSet(windowId)
             const result: SaveOrReplaceResult = await useTabsetService()
-                .saveOrReplaceFromChromeTabs(this.tabsetName, this.tabsToUse, this.merge, windowId, TabsetType.DEFAULT, this.color, this.dynamicSource)
+                .saveOrReplaceFromChromeTabs(this.tabsetName, this.tabsToUse, this.merge, windowId, TabsetType.DEFAULT, this.color, this.dynamicSource, this.spaceId)
                 .then(res => {
                     //JsUtils.gaEvent('tabset-created', {"tabsCount": this.tabsToUse.length})
                     Analytics.fireEvent('tabset-created', {"tabsCount": this.tabsToUse.length})

@@ -67,7 +67,8 @@ export function useTabsetService() {
     windowId: string = 'current',
     tsType: TabsetType = TabsetType.DEFAULT,
     color: string | undefined = undefined,
-    dynamicSource: string | undefined = undefined
+    dynamicSource: string | undefined = undefined,
+    spaceId: string | undefined = undefined
   ): Promise<SaveOrReplaceResult> => {
     const trustedName = name.replace(STRIP_CHARS_IN_USER_INPUT, '')
       .substring(0, 31)
@@ -88,7 +89,7 @@ export function useTabsetService() {
       })
     try {
       const dynUrl = dynamicSource ? new URL(dynamicSource) : undefined
-      const tabset = await useTabsetsStore().createTabset(trustedName, tabs, trustedColor, dynUrl)
+      const tabset = await useTabsetsStore().createTabset(trustedName, tabs, trustedColor, dynUrl, spaceId)
 
 
       //await saveTabset(result.tabset)
