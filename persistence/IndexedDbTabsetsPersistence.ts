@@ -33,12 +33,11 @@ class IndexedDbTabsetsPersistence implements TabsetsPersistence {
   }
 
   async loadTabsets(): Promise<any> {
-    console.debug(" ...loading tabsets")
     const tabsets = await this.db.getAll('tabsets')
     tabsets.forEach((ts: Tabset) => {
       useTabsetsStore().setTabset(ts)
     })
-    console.log("loading tabsets, found ", useTabsetsStore().tabsets.size);
+    console.log(" ...loaded tabsets, found ", useTabsetsStore().tabsets.size);
     return Promise.resolve()
   }
 
