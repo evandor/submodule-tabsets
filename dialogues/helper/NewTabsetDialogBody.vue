@@ -97,7 +97,7 @@ import {STRIP_CHARS_IN_USER_INPUT} from "boot/constants";
 import {Tabset, TabsetStatus} from "src/tabsets/models/Tabset";
 import {ref, watchEffect} from "vue";
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
-import {CreateTabsetCommand} from "src/tabsets/commands/CreateTabset";
+import {CreateTabsetCommand} from "src/tabsets/commands/CreateTabsetCommand";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {useUiStore} from "src/ui/stores/uiStore";
 import {FeatureIdent} from "src/app/models/FeatureIdent";
@@ -186,13 +186,13 @@ const submit = () => {
       }
     }
     useCommandExecutor()
-      .executeFromUi(new CreateTabsetCommand(newTabsetName.value, tabsToUse, windowModel.value, theColor.value, dynamicSource.value))
+      .executeFromUi(new CreateTabsetCommand(newTabsetName.value, tabsToUse, props.spaceId, windowModel.value, theColor.value, dynamicSource.value))
       .then((res) => {
-        if (props.spaceId) {
-          const ts: Tabset = res.result?.tabset
-          ts.spaces.push(props.spaceId)
-          useTabsetService().saveTabset(ts)
-        }
+        // if (props.spaceId) {
+        //   const ts: Tabset = res.result?.tabset
+        //   ts.spaces.push(props.spaceId)
+        //   useTabsetService().saveTabset(ts)
+        // }
         if (!props.fromPanel) {
           router.push("/tabsets/" + res.result?.tabsetId)
         } else {
