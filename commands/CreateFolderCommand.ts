@@ -6,6 +6,9 @@ import {uid} from "quasar";
 import _ from "lodash"
 import {Tab} from "src/tabsets/models/Tab";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
+import {useLogger} from "src/services/Logger";
+
+const {info} = useLogger()
 
 export class CreateFolderCommand implements Command<string> {
 
@@ -30,7 +33,8 @@ export class CreateFolderCommand implements Command<string> {
         }
         tabset.folders.push(newFolder)
         await useTabsetService().saveTabset(tabset)
-        return Promise.resolve(new ExecutionResult<string>("result", 'Folder created'))
+        info("folder created")
+        return Promise.resolve(new ExecutionResult<string>(newFolder.id, 'Folder created'))
       }
       //const parentFolder = this.getFolder(tabset, tabset.folderActive)
       const parentFolder = useTabsetsStore().getActiveFolder(tabset)
@@ -44,7 +48,8 @@ export class CreateFolderCommand implements Command<string> {
         }
         parentFolder.folders.push(newFolder)
         await useTabsetService().saveTabset(tabset)
-        return Promise.resolve(new ExecutionResult<string>("result", 'Subfolder created'))
+        info("subfolder created")
+        return Promise.resolve(new ExecutionResult<string>(newFolder.id, 'Subfolder created'))
       }
       return Promise.reject("could not find subfolder")
     } catch (err) {

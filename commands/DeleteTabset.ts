@@ -1,6 +1,9 @@
 import Command from "src/core/domain/Command";
 import {ExecutionResult} from "src/core/domain/ExecutionResult";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
+import {useLogger} from "src/services/Logger";
+
+const {info} = useLogger()
 
 export class DeleteTabsetCommand implements Command<string> {
 
@@ -11,6 +14,7 @@ export class DeleteTabsetCommand implements Command<string> {
     return useTabsetService().deleteTabset(this.tabsetId)
       .then(res => {
         //sendMsg('tabset-deleted', {tabsetId: this.tabsetId})
+        info("tabset deleted")
         return res
       })
       .then(res => Promise.resolve(new ExecutionResult(res, "Tabset deleted")))

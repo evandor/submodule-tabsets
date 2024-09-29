@@ -91,10 +91,8 @@ const doesNotExistYet = (val: string) => {
 }
 
 const submit = () => {
-  console.log("submit", addAllOpenTabs.value, useTabsStore2().browserTabs)
-
+  //console.log("submit", addAllOpenTabs.value, useTabsStore2().browserTabs)
   let tabsToUse = addAllOpenTabs.value ? useTabsStore2().browserTabs : []
-
   useCommandExecutor()
     .executeFromUi(new CreateFolderCommand(newFolderName.value, tabsToUse, props.tabsetId, props.parentFolder))
 }

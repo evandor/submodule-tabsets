@@ -2,6 +2,9 @@ import Command from "src/core/domain/Command";
 import {ExecutionResult} from "src/core/domain/ExecutionResult";
 import TabsetService from "src/tabsets/services/TabsetService";
 import {TabsetSharing} from "src/tabsets/models/Tabset";
+import {useLogger} from "src/services/Logger";
+
+const {info} = useLogger()
 
 export class UnShareTabsetCommand implements Command<any> {
 
@@ -13,6 +16,10 @@ export class UnShareTabsetCommand implements Command<any> {
 
   async execute(): Promise<ExecutionResult<any>> {
     return TabsetService.share(this.tabsetId, TabsetSharing.UNSHARED, this.sharedId, "undefined")
+      .then((res: any) => {
+        info("unsharing tabset")
+        return res
+      })
       .then((oldSharing:any) => Promise.resolve(
         new ExecutionResult(
           oldSharing,

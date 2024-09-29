@@ -2,6 +2,9 @@ import Command from "src/core/domain/Command";
 import {ExecutionResult} from "src/core/domain/ExecutionResult";
 import {Tabset} from "src/tabsets/models/Tabset";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
+import {useLogger} from "src/services/Logger";
+
+const {info} = useLogger()
 
 export class RenameFolderCommand implements Command<string> {
 
@@ -19,6 +22,7 @@ export class RenameFolderCommand implements Command<string> {
     if (this.newName && this.newName.toString().trim().length > 0) {
       this.folder.name = this.newName.toString().trim()
       await useTabsetService().saveTabset(this.tabset)
+      info("renamed folder")
       return Promise.resolve(new ExecutionResult("done", "done"))
     }
     return Promise.reject("name was not valid")
