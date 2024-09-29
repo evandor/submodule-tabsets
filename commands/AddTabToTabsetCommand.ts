@@ -90,13 +90,15 @@ export class AddTabToTabsetCommand implements Command<any> {
         } catch (err) {
           console.warn("got error when saving content and metadata:", err, this.tab?.url)
         }
-        res = new ExecutionResult("result", "Link was added")
+        //res = new ExecutionResult("result", "Link was added")
+        const res2 = await saveTabset(this.tabset!)
+        res = new ExecutionResult(res2, "Link was added")
 
         // saving thumbnail
         useThumbnailsService().captureVisibleTab(this.tab.id)
 
       } else {
-        const res2 = saveTabset(this.tabset!)
+        const res2 = await saveTabset(this.tabset!)
         res = new ExecutionResult(res2, "Link was added")
 
       }

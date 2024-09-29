@@ -67,12 +67,6 @@ export class CreateTabFromOpenTabsCommand implements Command<any> {
           return res
         })
         .then((res) => {
-          // if (tabsStore.pendingTabset) {
-          //   tabsStore.pendingTabset.tabs = _.filter(tabsStore.pendingTabset.tabs, t => t.url !== this.tab.url)
-          // }
-        })
-        .then((res) => {
-
           if (currentTabset) {
             return TabsetService.getContentFor(this.tab)
               .then((content) => {

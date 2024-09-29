@@ -613,7 +613,7 @@ const activeFolderNameFor = (ts: Tabset, activeFolder: string) => {
 
 const selectFolder = (tabset: Tabset, folder: Tabset) => {
   console.log("selecting folder", tabset.id, folder.id)
-  tabset.folderActive = folder.id
+  tabset.folderActive = tabset.id === folder.id ? undefined : folder.id
   useTabsetService().saveTabset(tabset)
 }
 

@@ -4,9 +4,11 @@ import {Tab} from "src/tabsets/models/Tab";
 import {Tabset, TabsetSharing} from "src/tabsets/models/Tabset";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {useUtils} from "src/core/services/Utils";
+import {useLogger} from "src/services/Logger";
 
 const {addToTabset, deleteTab} = useTabsetService()
 const {sendMsg} = useUtils()
+const {info} = useLogger()
 
 class UndoCommand implements Command<any> {
 
@@ -41,6 +43,10 @@ export class DeleteTabCommand implements Command<Tabset> {
           tabset.sharing = TabsetSharing.PUBLIC_LINK_OUTDATED
           tabset.sharedAt = new Date().getTime()
         }
+        return tabset
+      })
+      .then((tabset: Tabset) => {
+        info("tab deleted")
         return tabset
       })
       .then(tabset => Promise.resolve(new ExecutionResult(
