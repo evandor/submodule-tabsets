@@ -9,7 +9,7 @@
             <div class="text-body">Would you like to delete the tabset: <em>{{ props.tabsetName }}</em>?</div>
           </q-card-section>
           <q-card-section>
-            <div class="text-body2">This tabset contains {{props.tabsCount}} tabs which will be deleted as well, including their comments and snapshots</div>
+            <div class="text-body2">This tabset contains {{props.tabsCount}} {{ props.tabsCount > 1 ? 'tabs' : 'tab'}} which will be deleted as well, including their comments and snapshots</div>
           </q-card-section>
           <q-card-actions align="right">
 
