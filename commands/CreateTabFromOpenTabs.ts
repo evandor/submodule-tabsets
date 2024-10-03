@@ -9,7 +9,6 @@ import {Tabset} from "src/tabsets/models/Tabset";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {DeleteTabCommand} from "src/tabsets/commands/DeleteTabCommand";
 import AppEventDispatcher from "src/app/AppEventDispatcher";
-import BrowserApi from "src/app/BrowserApi";
 import {uid} from "quasar";
 
 const {saveCurrentTabset} = useTabsetService()
@@ -110,5 +109,5 @@ export class CreateTabFromOpenTabsCommand implements Command<any> {
 }
 
 CreateTabFromOpenTabsCommand.prototype.toString = function cmdToString() {
-  return `CreateTabFromOpenTabs: {tab=${this.tab.toString()}}`;
+  return `CreateTabFromOpenTabs: {tab=${this.chromeTab.toString()}}`;
 };

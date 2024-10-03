@@ -25,7 +25,7 @@ import _ from "lodash";
 import {useRoute} from "vue-router";
 import {Tabset} from "src/tabsets/models/Tabset";
 import {useUiStore} from "src/ui/stores/uiStore";
-import {Tab, TabFavorite} from "src/tabsets/models/Tab";
+import {Tab} from "src/tabsets/models/Tab";
 import TabGrid2 from "src/tabsets/layouts/TabGrid2.vue";
 import {uid} from "quasar";
 import InfoMessageWidget from "src/ui/widgets/InfoMessageWidget.vue";
@@ -109,7 +109,5 @@ const updateGrids = () => {
   randomKey1.value = uid()
   randomKey2.value = uid()
 }
-
-const favoriteTabs = () => _.filter(currentTabs(), (t: Tab) => t.favorite !== TabFavorite.NONE)
 
 </script>

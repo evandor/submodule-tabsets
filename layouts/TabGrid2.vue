@@ -58,7 +58,7 @@
 // @ts-ignore
 import {GridItem, GridLayout} from 'vue-grid-layout-v3';
 
-import {onMounted, onUnmounted, PropType, ref, watchEffect, watch} from "vue";
+import {onMounted, onUnmounted, PropType, ref, watchEffect} from "vue";
 import {Tab, TabCoordinate, TabFavorite} from "src/tabsets/models/Tab";
 import TabGridWidget from "src/tabsets/widgets/TabGridWidget.vue";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
@@ -83,7 +83,6 @@ const emits = defineEmits(['wasClicked'])
 const layout = ref<any[]>([])
 
 const draggable = ref(true)
-const resizable = false
 const randomKey = ref<string>(uid())
 let windowWidth = ref(window.innerWidth)
 const rowHeight = ref(Math.round(window.innerWidth / 44))
