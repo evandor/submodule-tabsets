@@ -83,10 +83,10 @@ export class Tabset {
   constructor(id: string, name: string, tabs: Tab[], columns: TabsetColumn[] = [], spaces: string[] = []) {
 
     // some guards
-    if (!Tabset.newTabsetNameIsValid) {
+    if (!Tabset.newTabsetNameIsValid(name)) {
       throw new Error(`Tabset name '${name}' is not valid`)
     }
-    if (!Tabset.newTabsetNameIsShortEnough) {
+    if (!Tabset.newTabsetNameIsShortEnough(name)) {
       throw new Error(`Tabset name '${name}' is too long`)
     }
 

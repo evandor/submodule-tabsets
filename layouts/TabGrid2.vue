@@ -1,20 +1,30 @@
 <template>
+  <!-- TabGrid2 -->
+  <div class="row">
+    <div class="col-2 text-center cursor-pointer" v-for="index in 6">
+      {{ columns[index]?.title || '&nbsp;' }}
+      <q-popup-edit v-if="columns[index]"
+        v-model="columns[index].title" auto-save v-slot="scope">
+        <q-input v-model="scope.value" dense autofocus counter
+                 @update:model-value="val => setColumn( index, val)"
+                 @keyup.enter="scope.set"/>
+      </q-popup-edit>
+    </div>
+  </div>
 
   <GridLayout :layout.sync="layout"
               :key="randomKey"
-              :col-num="16"
+              :col-num="12"
               :row-height="rowHeight"
               :is-draggable="draggable"
-              :is-resizable="resizable"
+              :is-resizable="false"
               :vertical-compact="true"
               :use-css-transforms="true">
     <GridItem v-for="item in layout"
               @moved="movedEvent"
-              @resized="resizedEvent"
-              @container-resized="containerResizedEvent"
               :static="item.static"
-              :maxH="8"
-              :maxW="8"
+              :maxH="2"
+              :maxW="2"
               :minW="2"
               :minH="2"
               :x="item.x"
@@ -48,7 +58,7 @@
 // @ts-ignore
 import {GridItem, GridLayout} from 'vue-grid-layout-v3';
 
-import {onMounted, onUnmounted, PropType, ref, watchEffect} from "vue";
+import {onMounted, onUnmounted, PropType, ref, watchEffect, watch} from "vue";
 import {Tab, TabCoordinate, TabFavorite} from "src/tabsets/models/Tab";
 import TabGridWidget from "src/tabsets/widgets/TabGridWidget.vue";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
@@ -60,6 +70,7 @@ import {uid} from "quasar";
 import {useThumbnailsService} from "src/thumbnails/services/ThumbnailsService";
 import {useTabsStore2} from "src/tabsets/stores/tabsStore2";
 import AppEventDispatcher from "src/app/AppEventDispatcher";
+import {TabsetColumn} from "src/tabsets/models/TabsetColumn";
 
 const props = defineProps({
   tabs: {type: Array as PropType<Array<Tab>>, required: true},
@@ -72,13 +83,18 @@ const emits = defineEmits(['wasClicked'])
 const layout = ref<any[]>([])
 
 const draggable = ref(true)
-const resizable = true
+const resizable = false
 const randomKey = ref<string>(uid())
 let windowWidth = ref(window.innerWidth)
-const rowHeight = ref(Math.round(window.innerWidth / 50))
+const rowHeight = ref(Math.round(window.innerWidth / 44))
+const columns = ref<any[]>([{title:'click to add title'},{title:' '},{title:' '},{title:' '},{title:' '},{title:' '}])
 
 const onWidthChange = () => windowWidth.value = window.innerWidth
-onMounted(() => window.addEventListener('resize', onWidthChange))
+
+onMounted(() => {
+  window.addEventListener('resize', onWidthChange)
+})
+
 onUnmounted(() => window.removeEventListener('resize', onWidthChange))
 
 function getCoordinate(t: Tab, ident: string, def: number) {
@@ -88,6 +104,17 @@ function getCoordinate(t: Tab, ident: string, def: number) {
   const coordinates = _.find(t.coordinates, (c: TabCoordinate) => c.identifier === props.coordinatesIdentifier)
   return coordinates && coordinates.val && (coordinates.val[ident as keyof object] >= 0) ? coordinates.val[ident as keyof object] : def
 }
+
+watchEffect(() => {
+  _.forEach(props.tabset?.columns, (c: TabsetColumn) => {
+    if (c.id.startsWith("grid_")) {
+      var index = parseInt(c.id.split("_")[1])
+      if (index >= 0 && index <= 6) {
+        columns.value[index] = {title: c.title}
+      }
+    }
+  })
+})
 
 watchEffect(() => {
   //console.log("in:", _.map(props.tabs, (t:Tab) => JSON.stringify({id: t.id, data: t.griddata})))
@@ -111,11 +138,19 @@ watchEffect(() => {
 })
 
 watchEffect(() => {
-  // const screenWidth = document.documentElement.clientWidth
-  // console.log("screenWIdth", screenWidth)
-  rowHeight.value = Math.round(windowWidth.value / 50)
+  rowHeight.value = Math.round(windowWidth.value / 44)
   console.log("rowHeight:", windowWidth.value, rowHeight.value)
 })
+
+const setColumn = (i:number, v: any) => {
+  console.log("setting column", i,v)
+  const tsCol = new TabsetColumn("grid_" + i, v)
+  columns.value[i].title = tsCol.title
+  var newColumns = _.filter(props.tabset?.columns,(c: TabsetColumn) => c.id !== tsCol.id)
+  newColumns.push(tsCol)
+  props.tabset.columns = newColumns
+  useTabsetsStore().saveTabset(props.tabset)
+}
 
 const movedEvent = (i: any, newX: any, newY: any) => {
   const msg = "MOVED i=" + i + ", X=" + newX + ", Y=" + newY;
@@ -136,30 +171,6 @@ const movedEvent = (i: any, newX: any, newY: any) => {
     }
     useTabsetsStore().saveTabset(props.tabset)
   }
-}
-
-const resizedEvent = (i: any, newH: number, newW: number, newHPx: any, newWPx: any) => {
-  const tab: Tab | undefined = _.find(props.tabs, (t: Tab) => t.id === i)
-  if (tab) {
-    if (!tab.coordinates) {
-      tab.coordinates = []
-    }
-    const optionalGriddataIndex = _.findIndex(tab.coordinates, (c: TabCoordinate) => c.identifier === props.coordinatesIdentifier)
-    const gd: { [k: string]: any } = (optionalGriddataIndex >= 0)
-      ? tab.coordinates.at(optionalGriddataIndex) ? tab.coordinates.at(optionalGriddataIndex)!.val : {}
-      : {}
-    gd['h'] = newH
-    gd['w'] = newW
-    if (optionalGriddataIndex < 0) {
-      tab.coordinates.push(new TabCoordinate(props.coordinatesIdentifier, gd))
-    }
-    useTabsetsStore().saveTabset(props.tabset)
-  }
-}
-
-const containerResizedEvent = (i: any, newH: any, newW: any, newHPx: any, newWPx: any) => {
-  //const msg = "CONTAINER RESIZED i=" + i + ", H=" + newH + ", W=" + newW + ", H(px)=" + newHPx + ", W(px)=" + newWPx;
-  //console.log(msg);
 }
 
 const toggleFavorite = async (tab: Tab) => {
@@ -193,7 +204,7 @@ const createThumbnail = async (tab: Tab) => {
       }
     })
   } else {
-    const newTab:chrome.tabs.Tab = await chrome.tabs.create({url: tab.url})
+    const newTab: chrome.tabs.Tab = await chrome.tabs.create({url: tab.url})
     console.log("opened new tab...", newTab.id)
     setTimeout(() => {
       useThumbnailsService().captureVisibleTab(tab.id, (tabId: string, dataUrl: string) => {
@@ -202,10 +213,10 @@ const createThumbnail = async (tab: Tab) => {
           data: dataUrl
         })
       })
-        setTimeout(() => {
-          chrome.tabs.remove(newTab.id || 0)
-            .then(() => chrome.tabs.reload())
-        }, 1000)
+      setTimeout(() => {
+        chrome.tabs.remove(newTab.id || 0)
+          .then(() => chrome.tabs.reload())
+      }, 1000)
     }, 2000)
   }
 }

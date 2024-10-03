@@ -1,12 +1,13 @@
 <template>
+  <!-- SidePanelTabListHelper -->
   <q-item
-      clickable
-      v-ripple
-      class="q-mt-xs q-px-sm q-pt-xs q-pb-none q-mx-sm darkColors lightColors"
-      :class="props.indent ? 'q-ml-md':''"
-      :style="itemStyle()"
-      @dragstart="startDrag($event, tab)"
-      :key="'paneltablist_' + tab.id">
+    clickable
+    v-ripple
+    class="q-mt-xs q-px-sm q-pt-xs q-pb-none q-mx-sm darkColors lightColors"
+    :class="props.indent ? 'q-ml-md':''"
+    :style="itemStyle()"
+    @dragstart="startDrag($event, tab)"
+    :key="'paneltablist_' + tab.id">
 
     <PanelTabListElementWidget :key="'ptlew__' + tab.id"
                                :tab="tab"
@@ -67,12 +68,12 @@ const itemStyle = () => {
 
 .body--dark .darkColors {
   background-color: $grey-9;
-  border:1px solid $grey-8;
+  border: 1px solid $grey-8;
 }
 
 .body--light .lightColors {
   background-color: $grey-2;
-  border:1px solid $grey-3;
+  border: 1px solid $grey-3;
 }
 
 </style>

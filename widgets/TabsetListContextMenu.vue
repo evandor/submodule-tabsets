@@ -45,7 +45,7 @@
         Archive Tabset
       </q-item>
 
-      <q-separator v-if="props.tabset.type !== TabsetType.DYNAMIC" />
+      <q-separator v-if="props.tabset.type !== TabsetType.DYNAMIC"/>
       <q-item v-if="props.tabset.type !== TabsetType.DYNAMIC"
               clickable>
         <q-item-section>Sharing</q-item-section>
@@ -91,7 +91,7 @@
         <q-menu :offset="[10,10]">
           <q-list>
             <q-item>Add to Space...</q-item>
-            <q-separator />
+            <q-separator/>
             <q-item
               v-for="space in addToSpaces(tabset)"
               :key="space['spaceId' as keyof object]"
@@ -103,7 +103,7 @@
           </q-list>
           <q-separator/>
           <q-item>Remove from Space...</q-item>
-          <q-separator />
+          <q-separator/>
           <q-list>
             <q-item
               v-for="space in removeFromSpaces(tabset)"
@@ -177,6 +177,7 @@ import {useFeaturesStore} from "src/features/stores/featuresStore";
 import {CopyTabsetCommand} from "src/domain/tabsets/CopyTabset";
 import {useEntityRegistryStore} from "src/core/stores/entityRegistryStore";
 import {SpaceInfo} from "src/core/models/SpaceInfo";
+import {DeleteTabsetCommand} from "src/tabsets/commands/DeleteTabset";
 
 const {inBexMode} = useUtils()
 
@@ -228,7 +229,7 @@ const copyPublicShareToClipboard = (tabsetId: string) => {
 }
 
 const restoreInGroup = (tabsetId: string) =>
-    useCommandExecutor().execute(new RestoreTabsetCommand(tabsetId, undefined,false))
+  useCommandExecutor().execute(new RestoreTabsetCommand(tabsetId, undefined, false))
 
 const restoreDialog = (tabsetId: string) => $q.dialog({
   component: RestoreTabsetDialog,
@@ -282,15 +283,22 @@ const copyTabset = (tabset: Tabset) => {
   useCommandExecutor().executeFromUi(new CopyTabsetCommand(tabset))
 }
 
-const deleteDialog = (tabset: Tabset) =>
+const deleteDialog = (tabset: Tabset) => {
+  if (tabset.tabs.length === 0) {
+    useCommandExecutor().executeFromUi(new DeleteTabsetCommand(tabset.id))
+    return
+  }
   $q.dialog({
     component: DeleteTabsetDialog,
     componentProps: {
       tabsetId: tabset.id,
       tabsetName: tabset.name,
-      sidePanelMode: false
+      sidePanelMode: false,
+      tabsCount: tabset.tabs.length,
+      redirectTo: '/tabsets'
     }
   })
+}
 
 const getPublicTabsetLink = (ts: Tabset) => {
   let image = "https://tabsets.web.app/favicon.ico"

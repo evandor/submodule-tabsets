@@ -189,12 +189,12 @@
     narrow-indicator
   >
     <q-tab name="tabset" label="Tabs"/>
-    <q-tab name="page" label="Page"
-           v-if="useAuthStore().isAuthenticated()"
-           :disable="!useTabsetsStore().currentTabsetId"/>
-    <q-tab name="canvas" label="Canvas"
-           v-if="useAuthStore().isAuthenticated()"
-           :disable="!useTabsetsStore().currentTabsetId"/>
+<!--    <q-tab name="page" label="Page"-->
+<!--           v-if="useAuthStore().isAuthenticated()"-->
+<!--           :disable="!useTabsetsStore().currentTabsetId"/>-->
+<!--    <q-tab name="canvas" label="Canvas"-->
+<!--           v-if="useAuthStore().isAuthenticated()"-->
+<!--           :disable="!useTabsetsStore().currentTabsetId"/>-->
   </q-tabs>
 
   <!--  <q-separator class="q-mb-md" />-->
@@ -343,12 +343,3 @@ const toggleOrder = () => orderDesc.value = !orderDesc.value
 const showSorting = () => useTabsetsStore().getCurrentTabs.length > 10 && $q.screen.gt.xs
 
 </script>
-
-<style>
-.material-symbols-outlined {
-  font-variation-settings: 'FILL' 0,
-  'wght' 400,
-  'GRAD' 0,
-  'opsz' 48
-}
-</style>

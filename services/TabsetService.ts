@@ -59,16 +59,16 @@ class TabsetService {
     }
   }
 
-  async getRequestFor(selectedTab: Tab): Promise<any> {
-    if (selectedTab.url) {
-      return this.getRequestForUrl(selectedTab.url)
-    }
-    return Promise.reject("url not provided");
-  }
-
-  async getRequestForUrl(url: string): Promise<any> {
-    return Promise.reject("not implemented")//db.getRequest(url)
-  }
+  // async getRequestFor(selectedTab: Tab): Promise<any> {
+  //   if (selectedTab.url) {
+  //     return this.getRequestForUrl(selectedTab.url)
+  //   }
+  //   return Promise.reject("url not provided");
+  // }
+  //
+  // async getRequestForUrl(url: string): Promise<any> {
+  //   return Promise.reject("not implemented")//db.getRequest(url)
+  // }
 
   async getContentFor(selectedTab: Tab): Promise<ContentItem | undefined> {
     return this.getContentForUrl(selectedTab.id)

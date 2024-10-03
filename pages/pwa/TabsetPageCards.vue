@@ -1,70 +1,20 @@
 <template>
+  <!-- TabsetPageCards -->
 
-  <q-card flat>
-    <q-card-section class="q-pa-none">
-      <TabList v-if="props.tabset?.view === 'list'"
-               group="otherTabs"
-               :highlightUrl="highlightUrl"
-               :tabsetId="props.tabset?.id"
-               :tabsetSorting="props.tabset?.sorting"
-               :tabsetSharedId="props.tabset?.sharedId"
-               :simpleUi="props.simpleUi"
-               :tabs="currentTabs()"/>
+  <InfoMessageWidget
+    :probability="1"
+    ident="tabsetpagecards_taggridinfo">
+    Click the image to move your tabs to your liking; right-click to create or remove favorites and click on the
+    URL to open the page.
+  </InfoMessageWidget>
 
-      <!--      <TabGroups v-else-if="props.tabset?.view === 'group'"-->
-      <!--                 group="otherTabs"-->
-      <!--                 :highlightUrl="highlightUrl"-->
-      <!--                 :tabsetId="props.tabset?.id"-->
-      <!--                 :tabs="currentTabs()"/>-->
+  <TabGrid2
+    :key="randomKey2"
+    @was-clicked="updateGrids()"
+    coordinates-identifier="grid"
+    :tabset="props.tabset"
+    :tabs="currentTabs()"/>
 
-      <TabGrid v-else-if="props.tabset?.view === 'grid-disabled'"
-               group="otherTabs"
-               :highlightUrl="highlightUrl"
-               :tabs="currentTabs()"/>
-
-      <template v-else-if="props.tabset?.view === 'grid'">
-
-        <InfoMessageWidget
-          :probability="1"
-          ident="tabsetpagecards_taggridinfo">
-          Click the image to move your tabs to your liking; right-click to create or remove favorites and click on the
-          URL to open the page.
-        </InfoMessageWidget>
-
-        <template v-if="favoriteTabs().length > 0">
-          <div class="text-subtitle2 q-ma-md">Favorites</div>
-          <TabGrid2
-            :tabset="props.tabset"
-            :key="randomKey1"
-            @was-clicked="updateGrids()"
-            coordinates-identifier="grid-favorites"
-            :tabs="favoriteTabs()"/>
-        </template>
-
-        <div class="text-subtitle2 q-ma-md">{{ favoriteTabs().length > 0 ? 'Other Tabs' : '' }}</div>
-        <TabGrid2
-          :key="randomKey2"
-          @was-clicked="updateGrids()"
-          coordinates-identifier="grid"
-          :tabset="props.tabset"
-          :tabs="_.filter(currentTabs(), (t: Tab) => !t.favorite || t.favorite === TabFavorite.NONE)"/>
-
-      </template>
-
-      <!--      <TabsExporter v-else-if="props.tabset?.view === 'exporter'"-->
-      <!--                    group="otherTabs"-->
-      <!--                    :tabs="currentTabs()"/>-->
-
-      <!-- fallback -->
-      <TabList v-else
-               group="otherTabs"
-               :highlightUrl="highlightUrl"
-               :tabsetId="props.tabset?.id"
-               :tabs="currentTabs()"/>
-
-    </q-card-section>
-
-  </q-card>
 
 </template>
 
@@ -76,8 +26,6 @@ import {useRoute} from "vue-router";
 import {Tabset} from "src/tabsets/models/Tabset";
 import {useUiStore} from "src/ui/stores/uiStore";
 import {Tab, TabFavorite} from "src/tabsets/models/Tab";
-import TabList from "src/tabsets/pages/pwa/TabList.vue";
-import TabGrid from "src/tabsets/layouts/TabGrid.vue";
 import TabGrid2 from "src/tabsets/layouts/TabGrid2.vue";
 import {uid} from "quasar";
 import InfoMessageWidget from "src/ui/widgets/InfoMessageWidget.vue";

@@ -1,5 +1,5 @@
 <template>
-
+  <!-- SidePanelPageTabList -->
   <q-list separator class="q-ma-none">
 
     <!-- supporting drag & drop when not on mobile -->

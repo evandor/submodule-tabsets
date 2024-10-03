@@ -7,6 +7,7 @@ import {uid} from "quasar";
 import ChromeApi from "src/app/BrowserApi";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import Parser from 'rss-parser';
+import * as cheerio from "cheerio";
 
 export class LoadDynamicTabsCommand implements Command<any> {
 
@@ -60,10 +61,10 @@ export class LoadDynamicTabsCommand implements Command<any> {
       const CORS_PROXY = "https://cors-anywhere.herokuapp.com/"
 
       let parser = new Parser();
-      await parser.parseURL(CORS_PROXY + 'https://www.reddit.com/.rss', function(err, feed) {
+      await parser.parseURL(CORS_PROXY + 'https://www.reddit.com/.rss', function (err, feed) {
         if (err) throw err;
         console.log(feed.title);
-        feed.items.forEach(function(entry) {
+        feed.items.forEach(function (entry) {
           console.log(entry.title + ':' + entry.link);
         })
       })
@@ -81,8 +82,25 @@ export class LoadDynamicTabsCommand implements Command<any> {
       // });
 
       return Promise.resolve(new ExecutionResult("", "xxx"))
+    } else if (this.tabset.dynamicUrl.startsWith("https://www.youtube.com/watch")) {
+      const doc = await fetch(this.tabset.dynamicUrl)
+      const body = await doc.text()
+      console.log("body", body)
+      const $ = cheerio.load(body);
+     // #description-inline-expander
+     //  const segment = $('#description-inline-expander')
+     //  console.log("segment", segment)
+     //  for (const elem of segment._findBySelector('a',100)) {
+     //    console.log("elem", elem)
+     //  }
+      const links = $("#description-inline-expander a")
+      console.log("links", links)
+      // const t = new Tab(uid(), ChromeApi.createChromeTabObject(heading + ": " + title, n.url, ""))
+      // this.tabset.tabs.push(t)
+
+      return Promise.resolve(new ExecutionResult("", "xxx"))
     } else {
-      return Promise.resolve(new ExecutionFailureResult("", "must be a markdown or rss file"))
+      return Promise.resolve(new ExecutionFailureResult("", "must be a markdown, rss or a youtube 'watch' link"))
     }
 
   }
