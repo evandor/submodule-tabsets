@@ -1,5 +1,5 @@
 <template>
-
+  <!-- MainPanelTabsetOverviewPage -->
   <q-toolbar>
     <div class="row fit">
       <div class="col-8 q-mt-xs">
@@ -14,27 +14,6 @@
                class="q-mr-sm" size="8px"
                icon="stars">
           <q-tooltip class="tooltip">Show all favorites</q-tooltip>
-        </q-btn>
-
-        <q-btn v-if="tabset?.tabs.length > 0 "
-               @click="setView('grid')"
-               style="width:14px"
-               class="q-mr-sm" size="8px"
-               :flat="tabset?.view !== 'grid'"
-               :outline="tabset?.view === 'grid'"
-               icon="grid_on">
-          <q-tooltip class="tooltip">Use grid layout to visualize your tabs</q-tooltip>
-        </q-btn>
-
-        <!-- default view, no need to show if there is no alternative -->
-        <q-btn v-if="tabset?.tabs.length > 0 "
-               @click="setView('list')"
-               style="width:14px"
-               class="q-mr-sm" size="10px"
-               :flat="tabset?.view !== 'list'"
-               :outline="tabset?.view === 'list'"
-               icon="o_list">
-          <q-tooltip class="tooltip">Use the list layout to visualize your tabs</q-tooltip>
         </q-btn>
 
 
@@ -52,16 +31,29 @@
     indicator-color="primary"
     align="left"
     narrow-indicator>
-    <q-tab name="tabset" label="Tabs"/>
+    <q-tab name="grid" label="As Grid" @click="setView('grid')"/>
+    <q-tab name="list" label="As List" @click="setView('list')"/>
   </q-tabs>
 
 
   <q-tab-panels v-model="tab" animated>
-    <q-tab-panel class="q-ma-none q-pa-none" name="tabset">
+    <q-tab-panel class="q-ma-none q-pa-none" name="grid">
 
       <TabsetPageCards
         :tabset="tabset as unknown as Tabset"
         :simple-ui="false"/>
+
+
+    </q-tab-panel>
+
+    <q-tab-panel class="q-ma-none q-pa-none" name="list">
+
+      <TabList
+        group="otherTabs"
+        :tabsetId="tabset.id"
+        :tabsetSorting="tabset?.sorting"
+        :tabsetSharedId="tabset?.sharedId"
+        :tabs="tabset.tabs"/>
 
     </q-tab-panel>
 
@@ -79,18 +71,20 @@ import Analytics from "src/core/utils/google-analytics";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import TabsetPageCards from "src/tabsets/pages/pwa/TabsetPageCards.vue";
 import NavigationService from "src/services/NavigationService";
+import TabList from "src/tabsets/pages/pwa/TabList.vue";
 
 const route = useRoute()
 
 const tabsetId = ref(null as unknown as string)
 const tabset = ref<Tabset>(new Tabset(uid(), "empty", []))
 
-const tab = ref('tabset')
+const tab = ref('')
 
 onMounted(() => {
   Analytics.firePageViewEvent('MainPanelTabsetPage', document.location.href);
 })
 
+const setView = (view: string) => TabsetService.setView(tabsetId.value, view)
 
 watchEffect(() => {
   if (!route || !route.params) {
@@ -98,11 +92,10 @@ watchEffect(() => {
   }
   tabsetId.value = route?.params.tabsetId as string
   tabset.value = useTabsetsStore().getTabset(tabsetId.value) || new Tabset(uid(), "empty", [])
+  tab.value = tabset.value.view || 'grid'
   console.log("watch effect in tabsetpage", tabsetId.value)
-  tab.value = route.query['tab'] ? route.query['tab'] as string : 'tabset'
+  //tab.value = route.query['tab'] ? route.query['tab'] as string : 'tabset'
 })
-
-const setView = (view: string) => TabsetService.setView(tabsetId.value, view)
 
 const openAllTabsetsOverview = () =>
   NavigationService.openOrCreateTab([chrome.runtime.getURL(`www/index.html#/mainpanel/tabsets/overview`)])

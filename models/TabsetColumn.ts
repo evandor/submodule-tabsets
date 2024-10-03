@@ -8,19 +8,11 @@ export class TabsetColumn {
     public title: string,
     public open: boolean = false) {
 
-    if (!TabsetColumn.titleIsValid) {
-      throw new Error(`Column's name '${name}' is not valid`)
-    }
-
-    if (!TabsetColumn.titleIsShortEnough) {
-      throw new Error(`Column's name '${name}' is too long`)
+    this.title = this.title.replace(STRIP_CHARS_IN_USER_INPUT, '')
+    if (this.title.length >= 20) {
+      this.title = this.title.substring(0, 17) + "..."
     }
 
   }
-
-  static titleIsValid = (val: string) => !STRIP_CHARS_IN_USER_INPUT.test(val)
-
-  static titleIsShortEnough = (val: string) => val ? val.length <= TABSET_NAME_MAX_LENGTH : true
-
 
 }

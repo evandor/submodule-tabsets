@@ -1,4 +1,5 @@
 <template>
+  <!-- SidePanelTabListHelper -->
   <q-item
     clickable
     v-ripple
