@@ -69,12 +69,12 @@
           </div>
         </q-card-section>
 
-        <q-card-section v-if="useFeaturesStore().hasFeature(FeatureIdent.DYNAMIC_TABSET)">
-          Source for Dynamic Tabset (optinal)
-          <div class="row q-pa-xs q-mt-none q-pl-sm q-gutter-sm">
-            <q-input type="url" v-model="dynamicSource" />
-          </div>
-        </q-card-section>
+<!--        <q-card-section v-if="useFeaturesStore().hasFeature(FeatureIdent.DYNAMIC_TABSET)">-->
+<!--          Source for Dynamic Tabset (optinal)-->
+<!--          <div class="row q-pa-xs q-mt-none q-pl-sm q-gutter-sm">-->
+<!--            <q-input type="url" v-model="dynamicSource" />-->
+<!--          </div>-->
+<!--        </q-card-section>-->
 
         <q-card-actions align="right">
           <DialogButton label="Cancel" color="primary" v-close-popup/>

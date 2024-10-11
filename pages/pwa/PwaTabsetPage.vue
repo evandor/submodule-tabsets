@@ -179,7 +179,7 @@ import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import TabsetPageCards from "src/tabsets/pages/pwa/TabsetPageCards.vue";
 import {collection, getDocs, query, where} from "firebase/firestore";
 import FirebaseServices from "src/services/firebase/FirebaseServices";
-import {Note} from "src/notes/models/Note";
+import {NotesPage} from "src/notes/models/NotesPage";
 
 const route = useRoute()
 const router = useRouter()
@@ -230,12 +230,12 @@ watchEffect(async () => {
   console.log("watch effect in tabsetpage", tabsetId.value)
 
   // handle public notes
-  const res: Note[] = []
+  const res: NotesPage[] = []
   const cr = collection(FirebaseServices.getFirestore(), "public-notes")
   const r = query(cr, where("sourceId", "==", tabset.value.sharedId))
   const querySnapshot = await getDocs(r);
   querySnapshot.forEach((doc) => {
-    let newItem = doc.data() as Note
+    let newItem = doc.data() as NotesPage
     res.push(newItem)
   });
   console.log("found notes", res, tabsetId.value)

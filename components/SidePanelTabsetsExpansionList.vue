@@ -38,22 +38,23 @@
               tabsetCaption(useTabsetService().tabsToShow(tabset as Tabset), tabset.window, tabset.folders?.length)
             }}
           </q-item-label>
-          <q-item-label class="text-caption text-grey-5" v-if="tabsetExpanded.get(tabset.id)">
-            <template v-for="n in notes">
-              <div class="row">
-                <div
-                  class="col-2 cursor-pointer"
-                  @click.stop="openNote(n)">
-                  <q-icon name="description" class="q-ml-md" color="grey" size="12px"/>
-                </div>
-                <div
-                  class="col vertical-bottom q-ml-xs ellipsis text-caption cursor-pointer text-blue-10"
-                  @click.stop="openNote(n)">
-                  {{ n.title }}
-                </div>
-              </div>
-            </template>
-          </q-item-label>
+<!--          <q-item-label class="text-caption text-grey-5" v-if="tabsetExpanded.get(tabset.id)">-->
+
+<!--            <template v-for="n in notes">-->
+<!--              <div class="row">-->
+<!--                <div-->
+<!--                  class="col-2 cursor-pointer"-->
+<!--                  @click.stop="openNote(n)">-->
+<!--                  <q-icon name="description" class="q-ml-md" color="grey" size="12px"/>-->
+<!--                </div>-->
+<!--                <div-->
+<!--                  class="col vertical-bottom q-ml-xs ellipsis text-caption cursor-pointer text-blue-10"-->
+<!--                  @click.stop="openNote(n)">-->
+<!--                  {{ n.title }}-->
+<!--                </div>-->
+<!--              </div>-->
+<!--            </template>-->
+<!--          </q-item-label>-->
           <q-item-label v-if="tabset.sharedId" class="q-mb-xs"
                         @mouseover="hoveredPublicLink = true"
                         @mouseleave="hoveredPublicLink = false">
@@ -76,12 +77,6 @@
               name="content_copy" color="primary" @click="copyPublicShareToClipboard(tabset.id)">
               <q-tooltip class="tooltip-small">Copy the Link to your Clipboard</q-tooltip>
             </q-icon>
-            <!--                <q-icon-->
-            <!--                  v-show="hoveredPublicLink"-->
-            <!--                  class="q-ml-sm cursor-pointer"-->
-            <!--                  name="open_in_browser" color="primary" @click="openElectronLink(tabset.id)">-->
-            <!--                  <q-tooltip class="tooltip-small">Copy the Electron Link to your Clipboard</q-tooltip>-->
-            <!--                </q-icon>-->
           </q-item-label>
         </q-item-section>
 
@@ -140,11 +135,6 @@
                 Load Dynamic Data
               </q-tooltip>
             </template>
-            <!--            <span-->
-            <!--              v-if="!alreadyInTabset() && showAddTabButton(tabset as Tabset, currentChromeTab) && tsBadges.length > 0"-->
-            <!--              style="color: grey;font-size: 7px;position: relative;top:-2px;left:-11px;">{{-->
-            <!--                tsBadges.length-->
-            <!--              }}</span>-->
 
           </q-item-label>
         </q-item-section>
@@ -161,37 +151,6 @@
       </template>
 
       <div class="q-ma-none q-pa-none">
-
-        <template v-if="editHeaderDescription">
-          <div class="row q-ma-none q-pa-md">
-            <q-editor style="width:100%"
-                      flat
-                      v-model="headerDescription" min-height="5rem"
-                      :definitions="{
-                            save: {
-                              tip: 'Save your work',
-                              icon: 'save',
-                              label: 'Save',
-                              handler: saveTabsetDescription
-                            },
-                             pageNote: {
-                              tip: 'Open page Note',
-                              icon: 'open',
-                              label: 'Open Page Note',
-                              handler: openPageNote
-                            }
-                          }"
-                      :toolbar="[
-                            ['bold', 'italic', 'strike', 'underline'],
-                            ['save','pageNote']
-                          ]"
-                      placeholder="Create a header description for your current tabset"/>
-          </div>
-        </template>
-        <template v-else-if="tabset.headerDescription">
-          <div class="row q-ma-sm q-pa-sm text-body2 darkInDarkMode brightInBrightMode"
-               style="border:1px solid #efefef;border-radius:3px;" v-html="tabset.headerDescription"></div>
-        </template>
 
         <q-list>
           <q-item v-for="folder in calcFolders(tabset as Tabset)"
@@ -234,6 +193,9 @@
 
           </q-item>
         </q-list>
+
+        <!-- optional: notes -->
+        <SidePanelNotesView :tabset="tabset"/>
 
         <!-- the actual tabs -->
         <SidePanelPageTabList
@@ -280,11 +242,13 @@ import SidePanelSubfolderContextMenu from "src/tabsets/widgets/SidePanelSubfolde
 import SidePanelPageContextMenu from "pages/sidepanel/SidePanelPageContextMenu.vue";
 import AddUrlDialog from "src/tabsets/dialogues/AddUrlDialog.vue";
 import {useNotesStore} from "src/notes/stores/NotesStore";
-import {Note} from "src/notes/models/Note";
+import {NotesPage} from "src/notes/models/NotesPage";
 import NavigationService from "src/services/NavigationService";
 import SidePanelPageTabList from "src/tabsets/layouts/SidePanelPageTabList.vue";
 import {LoadDynamicTabsCommand} from "src/tabsets/commands/LoadDynamicTabsCommand";
 import getScrollTarget = scroll.getScrollTarget;
+import SidePanelPageNotesList from "src/tabsets/layouts/SidePanelPageNotesList.vue";
+import SidePanelNotesView from "src/notes/views/sidepanel/SidePanelNotesView.vue";
 
 const props = defineProps({
   tabsets: {type: Array as PropType<Array<Tabset>>, required: true}
@@ -311,13 +275,12 @@ const tabsetExpanded = ref<Map<string, boolean>>(new Map())
 const selected_model = ref<SelectionObject>({})
 const hoveredTabset = ref<string | undefined>(undefined)
 const tsBadges = ref<object[]>([])
-const editHeaderDescription = ref<boolean>(false)
 const tabsetName = ref<object>(null as unknown as object)
 const tabsetNameOptions = ref<object[]>([])
 const currentChromeTab = ref<chrome.tabs.Tab | undefined>(undefined)
 const hoveredPublicLink = ref(false)
 const headerDescription = ref<string>('')
-const notes = ref<Note[]>([])
+const notes = ref<NotesPage[]>([])
 
 onMounted(() => {
   if (useTabsetsStore().allTabsCount === 0) {
@@ -597,7 +560,6 @@ const saveTabsetDescription = () => {
   if (currentTs) {
     currentTs.headerDescription = sanitize(headerDescription.value)
     useTabsetService().saveCurrentTabset()
-    editHeaderDescription.value = false
     headerDescription.value = ''
     handleSuccess(new ExecutionResult<string>('saved', 'saved'))
   } else {
@@ -701,7 +663,7 @@ async function handleHeadRequests(selectedTabset: Tabset) {
   useTabsetService().saveTabset(selectedTabset)
 }
 
-const openNote = (note: Note) => {
+const openNote = (note: NotesPage) => {
   const url = chrome.runtime.getURL(`/www/index.html#/mainpanel/notes/${note.id}`)
   NavigationService.openOrCreateTab([url])
 }
@@ -713,7 +675,7 @@ if (inBexMode()) {
     //console.log(" <<< received message", message)
     if (message.name === "note-changed") {
       useNotesStore().getNotesFor(currentTabsetId.value!)
-        .then((ns: Note[]) => notes.value = ns)
+        .then((ns: NotesPage[]) => notes.value = ns)
     }
   })
 }
