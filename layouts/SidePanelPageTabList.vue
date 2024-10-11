@@ -113,22 +113,8 @@ watchEffect(() => {
   }
 })
 
-/**
- * props.tabset.columns can be []
- */
 const getColumns = () => {
-  //if (!props.tabset || !props.tabset.columns || props.tabset.columns.length === 0) {
   return [new TabsetColumn(SPECIAL_ID_FOR_NO_GROUP_ASSIGNED, '')]
-  //}
-  // const columnsFromTabs = _.uniq(_.map(props.tabset.tabs, t => t.columnId ? t.columnId : "undefined"))
-  // console.log("columnsFromTabs", columnsFromTabs)
-  // if (columnsFromTabs.length === 1 && columnsFromTabs[0] === "undefined") {
-  //   return [new TabsetColumn(SPECIAL_ID_FOR_NO_GROUP_ASSIGNED, props.tabset.columns[0].title ? props.tabset.columns[0].title : 'tabs w/o group')]
-  // }
-  // if (columnsFromTabs.length > props.tabset.columns.length) {
-  //   return props.tabset.columns.concat([new TabsetColumn(SPECIAL_ID_FOR_NO_GROUP_ASSIGNED, 'tabs w/o group')])
-  // }
-  // return props.tabset.columns
 }
 
 const tabsForColumn = (): IndexedTab[] =>
