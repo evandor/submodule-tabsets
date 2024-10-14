@@ -18,6 +18,7 @@ import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {useTabsStore2} from "src/tabsets/stores/tabsStore2";
 import AppEventDispatcher from "src/app/AppEventDispatcher";
 import throttledQueue from "throttled-queue";
+import {useSpacesStore} from "src/spaces/stores/spacesStore";
 
 // let db: TabsetsPersistence = null as unknown as TabsetsPersistence
 
@@ -177,8 +178,7 @@ export function useTabsetService() {
   }
 
   const reloadTabset = async (tabsetId: string) => {
-    //return db.reloadTabset(tabsetId)
-    throw new Error("not implemented")
+    useTabsetsStore().reloadTabset(tabsetId)
   }
 
   const resetSelectedTabs = () => {
@@ -421,15 +421,13 @@ export function useTabsetService() {
     return tabsets;
   }
 
-  // const tabsetFor = (id: string): Tabset | undefined => {
-  //   let tabset: Tabset | undefined = undefined
-  //   for (let ts of [...useTabsetsStore().tabsets.values()]) {
-  //     if (_.find(ts.tabs, t => t.id === id)) {
-  //       tabset = ts as Tabset
-  //     }
-  //   }
-  //   return tabset
-  // }
+  const exportDataAsJson = () => {
+    const tabsets = [...useTabsetsStore().tabsets.values()] as Tabset[]
+    return JSON.stringify({
+      tabsets: tabsets.filter((ts: Tabset) => ts.status !== TabsetStatus.DELETED),
+      spaces: [...useSpacesStore().spaces.values()]
+    }, null, 2)
+  }
 
   /**
    * adds the (new) Tab 'tab' to the tabset given in 'ts' (- but does not persist to db).
@@ -534,10 +532,10 @@ export function useTabsetService() {
     }
     return false;
   }
-  const urlExistsInCurrentTabset = (url: string): boolean => {
+  const urlExistsInCurrentTabset = (url: string | undefined): boolean => {
     const currentTabset = useTabsetsStore().getCurrentTabset
     // console.log("testing exists in current tabset", currentTabset.id, url)
-    if (currentTabset) {
+    if (currentTabset && url) {
       if (_.find(currentTabset.tabs, (t: any) => {
         return (t.matcher) ?
           JsUtils.match(t.matcher, url) :
@@ -716,7 +714,7 @@ export function useTabsetService() {
       })
       promises.push(p)
     })
-    Promise.all(promises).finally(() => useUiStore().progress = undefined)
+    Promise.all(promises).finally(() => useUiStore().stopProgress())
   }
 
   const addToSearchIndex = (tsId: string, tabs: Tab[]) => {
@@ -781,7 +779,8 @@ export function useTabsetService() {
     deleteTabsetFolder,
     urlWasActivated,
     populateSearch,
-    addToSearchIndex
+    addToSearchIndex,
+    exportDataAsJson
   }
 
 }

@@ -13,6 +13,7 @@ import ContentUtils from "src/core/utils/ContentUtils";
 import BrowserApi from "src/app/BrowserApi";
 import {useThumbnailsService} from "src/thumbnails/services/ThumbnailsService";
 import {useLogger} from "src/services/Logger";
+import {useUrlHandlers} from "src/tabsets/specialHandling/SpecialUrls";
 
 const {saveTabset} = useTabsetService()
 const {sendMsg} = useUtils()
@@ -28,7 +29,8 @@ export class AddTabToTabsetCommand implements Command<any> {
   constructor(
     public tab: Tab,
     public tabset: Tabset | undefined = undefined,
-    public activeFolder: string | undefined = undefined) {
+    public activeFolder: string | undefined = undefined
+  ) {
 
     if (!tabset) {
       this.tabset = useTabsetsStore().getCurrentTabset
@@ -40,6 +42,28 @@ export class AddTabToTabsetCommand implements Command<any> {
 
   async execute(): Promise<ExecutionResult<any>> {
     console.info(`adding tab '${this.tab.id}' to tabset '${this.tabset!.id}', active folder: ${this.activeFolder}`)
+
+    const urlHandler = useUrlHandlers().getHandler(this.tab.url)
+
+    // special urls
+    if (this.tab.url === "https://excalidraw.com/" && this.tab.chromeTabId) {
+      const returned = await chrome.scripting.executeScript({
+        target: {tabId: this.tab.chromeTabId},
+        func: () => {
+          return localStorage.getItem("excalidraw")
+        }
+      })
+      if (returned.length > 0) {
+        const firstFrameReturned = returned.at(0)
+        console.log("hier", firstFrameReturned)
+        if (firstFrameReturned && firstFrameReturned.result) {
+          this.tab.storage = {
+            'excalidraw': JSON.parse(firstFrameReturned.result)
+          }
+        }
+      }
+    }
+
     let tabsetOrFolder = this.tabset!
     if (this.activeFolder) {
       //const folder = useTabsetService().findFolder(this.tabset!.folders, this.activeFolder)
@@ -83,7 +107,6 @@ export class AddTabToTabsetCommand implements Command<any> {
         // saving content excerpt and meta data
         try {
           const contentResult = await chrome.tabs.sendMessage(this.tab.chromeTabId, 'getExcerpt')
-          console.log("=== contentResult", contentResult)
           const tokens = ContentUtils.html2tokens(contentResult.html)
           content = [...tokens].join(" ")
           await useTabsetService().saveText(this.tab, content, contentResult.metas)

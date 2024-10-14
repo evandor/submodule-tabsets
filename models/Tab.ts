@@ -140,13 +140,13 @@ export class Tab {
   canvasWidth: number | undefined
   canvasHeight: number | undefined
 
-  // annotations: HTMLSelection[] = []
-
   comments: TabComment[] = []
 
   preview: TabPreview = TabPreview.FAVICON
 
   coordinates: TabCoordinate[] = []
+
+  storage: { [k: string]: any } = {}
 
   constructor(public id: string, chromeTab: chrome.tabs.Tab) {
     this.created = new Date().getTime()
@@ -155,7 +155,7 @@ export class Tab {
     this.activatedCount = 1
     this.loadedCount = 0 //?
 
-    this.chromeTabId = chromeTab.id // needed?
+    this.chromeTabId = chromeTab.id
     this.favIconUrl = chromeTab.favIconUrl
     this.url = chromeTab.url
     this.title = chromeTab.title

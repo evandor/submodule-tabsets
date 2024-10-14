@@ -38,23 +38,23 @@
               tabsetCaption(useTabsetService().tabsToShow(tabset as Tabset), tabset.window, tabset.folders?.length)
             }}
           </q-item-label>
-<!--          <q-item-label class="text-caption text-grey-5" v-if="tabsetExpanded.get(tabset.id)">-->
+          <!--          <q-item-label class="text-caption text-grey-5" v-if="tabsetExpanded.get(tabset.id)">-->
 
-<!--            <template v-for="n in notes">-->
-<!--              <div class="row">-->
-<!--                <div-->
-<!--                  class="col-2 cursor-pointer"-->
-<!--                  @click.stop="openNote(n)">-->
-<!--                  <q-icon name="description" class="q-ml-md" color="grey" size="12px"/>-->
-<!--                </div>-->
-<!--                <div-->
-<!--                  class="col vertical-bottom q-ml-xs ellipsis text-caption cursor-pointer text-blue-10"-->
-<!--                  @click.stop="openNote(n)">-->
-<!--                  {{ n.title }}-->
-<!--                </div>-->
-<!--              </div>-->
-<!--            </template>-->
-<!--          </q-item-label>-->
+          <!--            <template v-for="n in notes">-->
+          <!--              <div class="row">-->
+          <!--                <div-->
+          <!--                  class="col-2 cursor-pointer"-->
+          <!--                  @click.stop="openNote(n)">-->
+          <!--                  <q-icon name="description" class="q-ml-md" color="grey" size="12px"/>-->
+          <!--                </div>-->
+          <!--                <div-->
+          <!--                  class="col vertical-bottom q-ml-xs ellipsis text-caption cursor-pointer text-blue-10"-->
+          <!--                  @click.stop="openNote(n)">-->
+          <!--                  {{ n.title }}-->
+          <!--                </div>-->
+          <!--              </div>-->
+          <!--            </template>-->
+          <!--          </q-item-label>-->
           <q-item-label v-if="tabset.sharedId" class="q-mb-xs"
                         @mouseover="hoveredPublicLink = true"
                         @mouseleave="hoveredPublicLink = false">
@@ -95,46 +95,38 @@
                    size="xs">
               <div>Add URL</div>
             </q-btn>
-            <!-- workaround for adding URLs in non-bex environments -->
+            <!-- workaround for adding URLs in non-bex environments: end -->
 
-            <template v-if="showAddTabButton(tabset as Tabset, currentChromeTab) && !tabset.dynamicUrl">
-              <q-btn outline
-                     @click.stop="saveInTabset(tabset.id, tabset.folderActive)"
-                     class="q-ma-none q-px-sm q-py-none"
-                     name="o_bookmark_add"
-                     :class="alreadyInTabset() ? '':'cursor-pointer'"
-                     :color="alreadyInTabset() ? 'grey-5': tsBadges.length > 0 ? 'positive':'warning'"
-                     size="xs"
-                     data-testid="saveInTabsetBtn">
-                <div>Add Tab</div>
-                <!--                  <q-icon right class="q-ma-none q-pa-none" size="2em" name="o_south" />-->
-              </q-btn>
-              <q-tooltip class="tooltip-small" v-if="alreadyInTabset()">
-                Tab is already contained in tabset '{{ tabset.name }}'
-              </q-tooltip>
-              <q-tooltip class="tooltip-small" v-else-if="tsBadges.length > 0">
-                {{ tooltipAlreadyInOtherTabsets(tabset.name) }}
-              </q-tooltip>
-              <q-tooltip class="tooltip-small" v-else>
-                Add current Tab to '{{ tabsetNameOrChain(tabset as Tabset) }}'...
-              </q-tooltip>
+            <template v-if="showAddTabButton(tabset as Tabset, currentChromeTab)">
+
+              <template v-if="!tabset.dynamicUrl">
+
+                <SpecialUrlAddToTabsetComponent
+                  v-if="currentChromeTab"
+                  @button-clicked.stop="(args:object) => handleButtonClicked(tabset, args)"
+                  :currentChromeTab="currentChromeTab"
+                  :tabset="tabset"
+                />
+
+              </template>
+
+              <template v-else>
+                <q-btn outline
+
+                       @click.stop="loadDynamicTabs(tabset)"
+                       class="q-ma-none q-px-sm q-py-none cursor-pointer"
+                       name="o_bookmark_add"
+                       size="xs"
+                       data-testid="loadDynamicTabset">
+                  Dynamic Load
+                  <!--                  <q-icon right class="q-ma-none q-pa-none" size="2em" name="o_south" />-->
+                </q-btn>
+                <q-tooltip class="tooltip-small">
+                  Load Dynamic Data
+                </q-tooltip>
+              </template>
             </template>
 
-            <template v-if="showAddTabButton(tabset as Tabset, currentChromeTab) && tabset.dynamicUrl">
-              <q-btn outline
-
-                     @click.stop="loadDynamicTabs(tabset)"
-                     class="q-ma-none q-px-sm q-py-none cursor-pointer"
-                     name="o_bookmark_add"
-                     size="xs"
-                     data-testid="loadDynamicTabset">
-                Dynamic Load
-                <!--                  <q-icon right class="q-ma-none q-pa-none" size="2em" name="o_south" />-->
-              </q-btn>
-              <q-tooltip class="tooltip-small">
-                Load Dynamic Data
-              </q-tooltip>
-            </template>
 
           </q-item-label>
         </q-item-section>
@@ -225,15 +217,13 @@ import {FeatureIdent} from "src/app/models/FeatureIdent";
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {Tab} from "src/tabsets/models/Tab";
 import ShareTabsetPubliclyDialog from "src/tabsets/dialogues/ShareTabsetPubliclyDialog.vue";
-import {openURL, scroll, uid, useQuasar} from "quasar";
+import {openURL, scroll, useQuasar} from "quasar";
 import {CopyToClipboardCommand} from "src/core/domain/commands/CopyToClipboard";
-import {AddTabToTabsetCommand} from "src/tabsets/commands/AddTabToTabsetCommand";
 import {useUtils} from "src/core/services/Utils";
 
 import {ExecutionResult} from "src/core/domain/ExecutionResult";
 import {useNotificationHandler} from "src/core/services/ErrorHandler";
 import {useWindowsStore} from "src/windows/stores/windowsStore";
-import TabsetService from "src/tabsets/services/TabsetService";
 import {useTabsStore2} from "src/tabsets/stores/tabsStore2";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {SelectTabsetCommand} from "src/tabsets/commands/SelectTabset";
@@ -243,12 +233,13 @@ import SidePanelPageContextMenu from "pages/sidepanel/SidePanelPageContextMenu.v
 import AddUrlDialog from "src/tabsets/dialogues/AddUrlDialog.vue";
 import {useNotesStore} from "src/notes/stores/NotesStore";
 import {NotesPage} from "src/notes/models/NotesPage";
-import NavigationService from "src/services/NavigationService";
 import SidePanelPageTabList from "src/tabsets/layouts/SidePanelPageTabList.vue";
 import {LoadDynamicTabsCommand} from "src/tabsets/commands/LoadDynamicTabsCommand";
-import getScrollTarget = scroll.getScrollTarget;
-import SidePanelPageNotesList from "src/tabsets/layouts/SidePanelPageNotesList.vue";
 import SidePanelNotesView from "src/notes/views/sidepanel/SidePanelNotesView.vue";
+import SpecialUrlAddToTabsetComponent from "src/tabsets/specialHandling/SpecialUrlAddToTabsetComponent.vue";
+import {ButtonActions} from "src/tabsets/specialHandling/AddUrlToTabsetHandler";
+import {useUrlHandlers} from "src/tabsets/specialHandling/SpecialUrls";
+import getScrollTarget = scroll.getScrollTarget;
 
 const props = defineProps({
   tabsets: {type: Array as PropType<Array<Tabset>>, required: true}
@@ -261,8 +252,6 @@ const {inBexMode, sanitize} = useUtils()
 const {handleSuccess, handleError} = useNotificationHandler()
 
 const $q = useQuasar()
-const tabsetsStore = useTabsetsStore()
-
 
 // https://stackoverflow.com/questions/12710905/how-do-i-dynamically-assign-properties-to-an-object-in-typescript
 interface SelectionObject {
@@ -274,7 +263,7 @@ const currentTabsetId = ref<string | undefined>(undefined)
 const tabsetExpanded = ref<Map<string, boolean>>(new Map())
 const selected_model = ref<SelectionObject>({})
 const hoveredTabset = ref<string | undefined>(undefined)
-const tsBadges = ref<object[]>([])
+
 const tabsetName = ref<object>(null as unknown as object)
 const tabsetNameOptions = ref<object[]>([])
 const currentChromeTab = ref<chrome.tabs.Tab | undefined>(undefined)
@@ -319,14 +308,6 @@ watchEffect(async () => {
 
 })
 
-// watchEffect(() => {
-//   //console.log(" >>> change in getSelectedTab", useUiStore().getSelectedTab)
-//   selectedTab.value = useUiStore().getSelectedTab
-//   if (selectedTab.value) {
-//     currentChromeTab.value = null as unknown as chrome.tabs.Tab
-//   }
-// })
-
 watchEffect(() => {
   if (useTabsetsStore().tabsets) {
     //console.log(" >>> change in tabsets...")
@@ -342,33 +323,9 @@ watchEffect(() => {
   }
 })
 
-// watchEffect(() => {
-//   //console.log(" >>> change in getSelectedTab", useUiStore().getSelectedTab)
-//   selectedTab.value = useUiStore().getSelectedTab
-//   if (selectedTab.value) {
-//     currentChromeTab.value = null as unknown as chrome.tabs.Tab
-//   }
-// })
-
 watchEffect(() => {
-  if (currentChromeTab.value?.url) {
-    const url = currentChromeTab.value.url
-    const tabsetIds = useTabsetService().tabsetsFor(url)
-    tsBadges.value = []
-    //created.value = undefined
-    _.forEach(tabsetIds, (tsId: string) => {
-      tsBadges.value.push({
-        label: TabsetService.nameForTabsetId(tsId),
-        tabsetId: tsId,
-        encodedUrl: btoa(url || '')
-      })
-    })
-  }
-
-  watchEffect(() => {
-    const windowId = useWindowsStore().currentChromeWindow?.id || 0
-    currentChromeTab.value = useTabsStore2().getCurrentChromeTab(windowId) || useTabsStore2().currentChromeTab
-  })
+  const windowId = useWindowsStore().currentChromeWindow?.id || 0
+  currentChromeTab.value = useTabsStore2().getCurrentChromeTab(windowId) || useTabsStore2().currentChromeTab
 })
 
 const showTabset = (tabset: Tabset) => !useUiStore().tabsFilter ?
@@ -420,12 +377,6 @@ const calcFolders = (tabset: Tabset): Tabset[] => {
     }
   }
   return tabset.folders
-}
-
-const openPageNote = () => {
-  if (inBexMode()) {
-    openURL(chrome.runtime.getURL("/www/index.html#/tabsets/" + useTabsetsStore().getCurrentTabset?.id || '' + "?tab=page"))
-  }
 }
 
 const startDrag = (evt: any, folder: Tabset) => {
@@ -510,13 +461,6 @@ const shareTabsetPubliclyDialog = (tabset: Tabset, republish: boolean = false) =
   })
 }
 
-const tooltipAlreadyInOtherTabsets = (tabsetName: string) => {
-  const tabsetList = _.join(_.map(tsBadges.value, (b: any) => b['label'] as keyof object), ", ")
-  return "The current Tab is already contained in " +
-    tsBadges.value.length + " other Tabsets: " + tabsetList + ". Click to add " +
-    "it to '" + tabsetName + "' as well."
-}
-
 const openPublicShare = (tabsetId: string) => {
   const ts = useTabsetsStore().getTabset(tabsetId)
   if (ts && ts.sharedId) {
@@ -567,43 +511,12 @@ const saveTabsetDescription = () => {
   }
 }
 
-const activeFolderNameFor = (ts: Tabset, activeFolder: string) => {
-  // const folder = useTabsetService().findFolder(ts.folders, activeFolder)
-  const folder = useTabsetsStore().getActiveFolder(ts, activeFolder)
-  return folder ? folder.name : ts.name
-}
-
 const selectFolder = (tabset: Tabset, folder: Tabset) => {
   console.log("selecting folder", tabset.id, folder.id)
   tabset.folderActive = tabset.id === folder.id ? undefined : folder.id
   useTabsetService().saveTabset(tabset)
 }
 
-const tabsetNameOrChain = (tabset: Tabset) => {
-  if (tabset.folderActive) {
-    return activeFolderNameFor(tabset, tabset.folderActive)
-  }
-  return tabset.name
-}
-
-const alreadyInTabset = () => {
-  if (currentChromeTab.value?.url && tabsetsStore.getCurrentTabset) {
-    return useTabsetService().urlExistsInCurrentTabset(currentChromeTab.value.url)
-  }
-  return false
-}
-
-const saveInTabset = (tabsetId: string, activeFolder: string | undefined) => {
-  const useTS: Tabset | undefined = useTabsetsStore().getTabset(tabsetId)
-  if (useTS && currentChromeTab.value) {
-    // if (alreadyInTabset()) {
-    //   return
-    // }
-    useCommandExecutor().execute(new AddTabToTabsetCommand(new Tab(uid(), currentChromeTab.value), useTS, activeFolder))
-  } else {
-    console.warn("expected to find tabsetId", tabsetId)
-  }
-}
 
 const loadDynamicTabs = (tabset: Tabset) => {
   useCommandExecutor().execute(new LoadDynamicTabsCommand(tabset))
@@ -663,11 +576,6 @@ async function handleHeadRequests(selectedTabset: Tabset) {
   useTabsetService().saveTabset(selectedTabset)
 }
 
-const openNote = (note: NotesPage) => {
-  const url = chrome.runtime.getURL(`/www/index.html#/mainpanel/notes/${note.id}`)
-  NavigationService.openOrCreateTab([url])
-}
-
 if (inBexMode()) {
   // seems we need to define these listeners here to get the matching messages reliably
   // these messages are created by triggering events in the mainpanel
@@ -680,5 +588,21 @@ if (inBexMode()) {
   })
 }
 
+const saveInTabset = async (tabset: Tabset) => {
+  const handler = useUrlHandlers().getHandler(currentChromeTab.value!.url)
+  await handler.saveInTabset(currentChromeTab.value!, tabset, tabset.folderActive)
+}
+
+const handleButtonClicked = (tabset: Tabset, args: object) => {
+  console.log("button clicked", args)
+  const actionIdentifier = args as unknown as ButtonActions
+  switch (actionIdentifier) {
+    case ButtonActions.AddTab:
+      saveInTabset(tabset)
+      break;
+    default:
+      console.log("no action defined for ", actionIdentifier)
+  }
+}
 
 </script>
