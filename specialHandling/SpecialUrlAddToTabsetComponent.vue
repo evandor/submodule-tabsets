@@ -2,7 +2,7 @@
   <!--  @click.stop="saveInTabset(props.tabset.id, props.tabset.folderActive)" -->
   <template v-if="handler.actions().length === 1">
     <q-btn outline
-           @click="emits('buttonClicked', handler.actions()[0].identifier)"
+           @click.stop="emits('buttonClicked', handler.actions()[0].identifier)"
            class="q-ma-none q-px-sm q-py-none"
            :class="alreadyInTabset() ? '':'cursor-pointer'"
            :color="alreadyInTabset() ? 'grey-5': tsBadges.length > 0 ? 'positive':'warning'"

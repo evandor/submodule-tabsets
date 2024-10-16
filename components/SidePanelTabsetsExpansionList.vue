@@ -103,7 +103,7 @@
 
                 <SpecialUrlAddToTabsetComponent
                   v-if="currentChromeTab"
-                  @button-clicked.stop="(args:object) => handleButtonClicked(tabset, args)"
+                  @button-clicked="(args:object) => handleButtonClicked(tabset, args)"
                   :currentChromeTab="currentChromeTab"
                   :tabset="tabset"
                 />

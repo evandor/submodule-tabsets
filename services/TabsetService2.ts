@@ -19,6 +19,8 @@ import {useTabsStore2} from "src/tabsets/stores/tabsStore2";
 import AppEventDispatcher from "src/app/AppEventDispatcher";
 import throttledQueue from "throttled-queue";
 import {useSpacesStore} from "src/spaces/stores/spacesStore";
+import {useCommandExecutor} from "src/core/services/CommandExecutor";
+import {GithubLogCommand} from "src/tabsets/commands/github/GithubLogCommand";
 
 // let db: TabsetsPersistence = null as unknown as TabsetsPersistence
 
@@ -457,8 +459,10 @@ export function useTabsetService() {
       } else {
         ts.tabs.push(tab)
       }
-      // return saveTabset(ts)
-      //   .then(() => Promise.resolve(0)) // TODO
+
+      useCommandExecutor().execute(new GithubLogCommand('newTab', tab as object))
+        .catch((err) => console.warn(err))
+
       return Promise.resolve(ts)
     }
     return Promise.reject("tab.url undefined")
