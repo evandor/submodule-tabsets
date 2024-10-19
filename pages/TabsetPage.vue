@@ -112,16 +112,16 @@
         <!--          <q-tooltip>Use the table layout to visualize your tabs</q-tooltip>-->
         <!--        </q-btn>-->
 
-        <!--        <q-btn-->
-        <!--            v-if="useFeaturesStore().hasFeature(FeatureIdent.EXPERIMENTAL_VIEWS) && tabset?.tabs.length > 0"-->
-        <!--            @click="setView('canvas')"-->
-        <!--            style="width:14px"-->
-        <!--            class="q-mr-sm" size="10px"-->
-        <!--            :flat="tabset?.view !== 'canvas'"-->
-        <!--            :outline="tabset?.view === 'canvas'"-->
-        <!--            icon="o_shape_line">-->
-        <!--          <q-tooltip>Use the canvas freestyle layout to visualize your tabs</q-tooltip>-->
-        <!--        </q-btn>-->
+                <q-btn
+                    v-if="useFeaturesStore().hasFeature(FeatureIdent.EXPERIMENTAL_VIEWS) && tabset?.tabs.length > 0"
+                    @click="setView('canvas')"
+                    style="width:14px"
+                    class="q-mr-sm" size="10px"
+                    :flat="tabset?.view !== 'canvas'"
+                    :outline="tabset?.view === 'canvas'"
+                    icon="o_shape_line">
+                  <q-tooltip>Use the canvas freestyle layout to visualize your tabs</q-tooltip>
+                </q-btn>
 
         <q-btn
           v-if="useFeaturesStore().hasFeature(FeatureIdent.EXPERIMENTAL_VIEWS) && tabset?.tabs.length > 0"
@@ -192,9 +192,9 @@
 <!--    <q-tab name="page" label="Page"-->
 <!--           v-if="useAuthStore().isAuthenticated()"-->
 <!--           :disable="!useTabsetsStore().currentTabsetId"/>-->
-<!--    <q-tab name="canvas" label="Canvas"-->
-<!--           v-if="useAuthStore().isAuthenticated()"-->
-<!--           :disable="!useTabsetsStore().currentTabsetId"/>-->
+    <q-tab name="canvas" label="Canvas"
+
+           :disable="!useTabsetsStore().currentTabsetId"/>
   </q-tabs>
 
   <!--  <q-separator class="q-mb-md" />-->

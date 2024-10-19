@@ -158,13 +158,6 @@ class TabsetService {
     return Promise.reject("could not find tab " + tabId)
   }
 
-  // ignoreTab(tab: Tab) {
-  //   const tabsStore = useTabsStore()
-  //   tabsStore.ignoredTabset.tabs.push(tab)
-  //   const ignoredTS: Tabset = tabsStore.ignoredTabset as Tabset
-  //   saveTabset(ignoredTS)
-  // }
-
   exportData(exportAs: string, appVersion: string = "0.0.0"): Promise<any> {
     console.log("exporting as ", exportAs)
 
@@ -173,6 +166,7 @@ class TabsetService {
     let data = ''
     let filename = 'tabsets.' + appVersion + '.json'
     if (exportAs === 'json') {
+      data = useTabsetService().exportDataAsJson()
       const tabsets = [...useTabsetsStore().tabsets.values()] as Tabset[]
       data = JSON.stringify({
         tabsets: tabsets.filter((ts: Tabset) => ts.status !== TabsetStatus.DELETED),

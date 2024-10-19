@@ -18,6 +18,9 @@ import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {useTabsStore2} from "src/tabsets/stores/tabsStore2";
 import AppEventDispatcher from "src/app/AppEventDispatcher";
 import throttledQueue from "throttled-queue";
+import {useSpacesStore} from "src/spaces/stores/spacesStore";
+import {useCommandExecutor} from "src/core/services/CommandExecutor";
+import {GithubLogCommand} from "src/tabsets/commands/github/GithubLogCommand";
 
 // let db: TabsetsPersistence = null as unknown as TabsetsPersistence
 
@@ -177,8 +180,7 @@ export function useTabsetService() {
   }
 
   const reloadTabset = async (tabsetId: string) => {
-    //return db.reloadTabset(tabsetId)
-    throw new Error("not implemented")
+    useTabsetsStore().reloadTabset(tabsetId)
   }
 
   const resetSelectedTabs = () => {
@@ -421,15 +423,13 @@ export function useTabsetService() {
     return tabsets;
   }
 
-  // const tabsetFor = (id: string): Tabset | undefined => {
-  //   let tabset: Tabset | undefined = undefined
-  //   for (let ts of [...useTabsetsStore().tabsets.values()]) {
-  //     if (_.find(ts.tabs, t => t.id === id)) {
-  //       tabset = ts as Tabset
-  //     }
-  //   }
-  //   return tabset
-  // }
+  const exportDataAsJson = () => {
+    const tabsets = [...useTabsetsStore().tabsets.values()] as Tabset[]
+    return JSON.stringify({
+      tabsets: tabsets.filter((ts: Tabset) => ts.status !== TabsetStatus.DELETED),
+      spaces: [...useSpacesStore().spaces.values()]
+    }, null, 2)
+  }
 
   /**
    * adds the (new) Tab 'tab' to the tabset given in 'ts' (- but does not persist to db).
@@ -440,11 +440,13 @@ export function useTabsetService() {
    * @param tab
    * @param useIndex
    */
-  const addToTabset = async (ts: Tabset, tab: Tab, useIndex: number | undefined = undefined): Promise<Tabset> => {
+  const addToTabset = async (ts: Tabset, tab: Tab, useIndex: number | undefined = undefined, allowDuplicates = false): Promise<Tabset> => {
     if (tab.url) {
-      const indexInTabset = _.findIndex(ts.tabs, (t: any) => t.url === tab.url)
-      if (indexInTabset >= 0 && !tab.image) {
-        return Promise.reject("tab exists already")
+      if (!allowDuplicates) {
+        const indexInTabset = _.findIndex(ts.tabs, (t: any) => t.url === tab.url)
+        if (indexInTabset >= 0 && !tab.image) {
+          return Promise.reject("tab exists already")
+        }
       }
 
       // add tabset's name to tab's tags
@@ -459,8 +461,10 @@ export function useTabsetService() {
       } else {
         ts.tabs.push(tab)
       }
-      // return saveTabset(ts)
-      //   .then(() => Promise.resolve(0)) // TODO
+
+      useCommandExecutor().execute(new GithubLogCommand('newTab', tab as object))
+        .catch((err) => console.warn(err))
+
       return Promise.resolve(ts)
     }
     return Promise.reject("tab.url undefined")
@@ -534,10 +538,10 @@ export function useTabsetService() {
     }
     return false;
   }
-  const urlExistsInCurrentTabset = (url: string): boolean => {
+  const urlExistsInCurrentTabset = (url: string | undefined): boolean => {
     const currentTabset = useTabsetsStore().getCurrentTabset
     // console.log("testing exists in current tabset", currentTabset.id, url)
-    if (currentTabset) {
+    if (currentTabset && url) {
       if (_.find(currentTabset.tabs, (t: any) => {
         return (t.matcher) ?
           JsUtils.match(t.matcher, url) :
@@ -716,7 +720,7 @@ export function useTabsetService() {
       })
       promises.push(p)
     })
-    Promise.all(promises).finally(() => useUiStore().progress = undefined)
+    Promise.all(promises).finally(() => useUiStore().stopProgress())
   }
 
   const addToSearchIndex = (tsId: string, tabs: Tab[]) => {
@@ -781,7 +785,8 @@ export function useTabsetService() {
     deleteTabsetFolder,
     urlWasActivated,
     populateSearch,
-    addToSearchIndex
+    addToSearchIndex,
+    exportDataAsJson
   }
 
 }

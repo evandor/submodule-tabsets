@@ -307,6 +307,8 @@ import {SavedBlob} from "src/snapshots/models/SavedBlob";
 import {useThumbnailsService} from "src/thumbnails/services/ThumbnailsService";
 import CommentDialog from "src/tabsets/dialogues/CommentDialog.vue";
 import TabListIconIndicatorsHook from "src/app/hooks/tabsets/TabListIconIndicatorsHook.vue";
+import {useNavigationService} from "src/navigation/services/NavigationService";
+import {OpenTabCommand} from "src/tabsets/commands/OpenTabCommand";
 
 const {inBexMode} = useUtils()
 
@@ -531,10 +533,8 @@ const switchGroup = (group: chrome.tabGroups.TabGroup): void => {
 }
 
 const gotoTab = () =>
-  NavigationService.openOrCreateTab(
-    [props.tab.url || ''],
-    props.tab.matcher,
-    props.tab.groupName ? [props.tab.groupName] : [])
+  useCommandExecutor().executeFromUi(new OpenTabCommand(props.tab))
+
 
 const showSuggestion = () => {
   const url = chrome.runtime.getURL('www/index.html') + "#/mainpanel/suggestions/" + suggestion.value?.id

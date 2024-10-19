@@ -9,6 +9,8 @@ interface TabsetsPersistence {
 
   loadTabsets(): Promise<any>
 
+  reloadTabset(tabsetId: string): Promise<Tabset>
+
   addTabset(ts: Tabset): Promise<any>
 
   saveTabset(ts: Tabset): Promise<any>

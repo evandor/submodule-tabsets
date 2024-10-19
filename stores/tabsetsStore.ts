@@ -58,6 +58,13 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       await storage.loadTabsets()
     }
 
+    async function reloadTabset(tabsetId: string) {
+      const updatedTabset = await storage.reloadTabset(tabsetId)
+      console.log("updatedTabset", updatedTabset)
+      tabsets.value.set(tabsetId, updatedTabset)
+      console.log("tabsets", tabsets)
+    }
+
     async function createTabset(
       tabsetName: string, tabs: Tab[],
       color: string | undefined = undefined,
@@ -340,7 +347,8 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       getAllUrls,
       loadTabsets,
       getActiveFolder,
-      share
+      share,
+      reloadTabset
     }
   }
 )

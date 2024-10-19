@@ -32,7 +32,9 @@ export class AddTabToTabsetCommand implements Command<any> {
   constructor(
     public tab: Tab,
     public tabset: Tabset | undefined = undefined,
-    public activeFolder: string | undefined = undefined) {
+    public activeFolder: string | undefined = undefined,
+    public allowDuplicates: boolean = false
+  ) {
 
     if (!tabset) {
       this.tabset = useTabsetsStore().getCurrentTabset
@@ -44,6 +46,7 @@ export class AddTabToTabsetCommand implements Command<any> {
 
   async execute(): Promise<ExecutionResult<any>> {
     console.info(`adding tab '${this.tab.id}' to tabset '${this.tabset!.id}', active folder: ${this.activeFolder}`)
+
     let tabsetOrFolder = this.tabset!
     if (this.activeFolder) {
       //const folder = useTabsetService().findFolder(this.tabset!.folders, this.activeFolder)
@@ -53,11 +56,14 @@ export class AddTabToTabsetCommand implements Command<any> {
       }
     }
 
-    const exists = _.findIndex(tabsetOrFolder.tabs, (t: any) => t.url === this.tab.url) >= 0
-    console.debug("checking 'tab exists' yields", exists)
-    if (exists) {
-      return Promise.reject("tab already exists in this tabset")
+    if (!this.allowDuplicates) {
+      const exists = _.findIndex(tabsetOrFolder.tabs, (t: any) => t.url === this.tab.url) >= 0
+      console.debug("checking 'tab exists' yields", exists)
+      if (exists) {
+        return Promise.reject("tab already exists in this tabset")
+      }
     }
+
     try {
       // manage (chrome) Group
       console.log("updating tab group for group id", this.tab.groupId)
@@ -67,7 +73,7 @@ export class AddTabToTabsetCommand implements Command<any> {
         await useGroupsStore().persistGroup(currentGroup)
       }
 
-      const tabset: Tabset = await useTabsetService().addToTabset(tabsetOrFolder, this.tab, 0)
+      const tabset: Tabset = await useTabsetService().addToTabset(tabsetOrFolder, this.tab, 0, this.allowDuplicates)
 
       // Analysis
       if (useAuthStore().user.uid && this.tab.url?.startsWith("https://")) {
@@ -91,7 +97,6 @@ export class AddTabToTabsetCommand implements Command<any> {
         // saving content excerpt and meta data
         try {
           const contentResult = await chrome.tabs.sendMessage(this.tab.chromeTabId, 'getExcerpt')
-          console.log("=== contentResult", contentResult)
           const tokens = ContentUtils.html2tokens(contentResult.html)
           content = [...tokens].join(" ")
           await useTabsetService().saveText(this.tab, content, contentResult.metas)
