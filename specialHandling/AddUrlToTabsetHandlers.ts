@@ -1,17 +1,18 @@
 import _ from "lodash";
-import {
-  AddUrlToTabsetHandler,
-  DefaultAddUrlToTabsetHandler
-} from "src/tabsets/specialHandling/AddUrlToTabsetHandler";
+import {AddUrlToTabsetHandler} from "src/tabsets/specialHandling/AddUrlToTabsetHandler";
+import {QVueGlobals} from "quasar";
 import {ExcalidrawAddUrlToTabsetHandler} from "src/tabsets/specialHandling/handler/ExcalidrawAddUrlToTabsetHandler";
+import {DefaultAddUrlToTabsetHandler} from "src/tabsets/specialHandling/handler/DefaultAddUrlToTabsetHandler";
 
 export class AddUrlToTabsetHandlers {
 
   defaultAddUrlToTabsetHandler = new DefaultAddUrlToTabsetHandler()
 
-  handlers: AddUrlToTabsetHandler[] = [
-    new ExcalidrawAddUrlToTabsetHandler()
-  ]
+  handlers: AddUrlToTabsetHandler[] = []
+
+  constructor(public quasar: QVueGlobals | undefined) {
+    this.handlers.push(new ExcalidrawAddUrlToTabsetHandler(this.quasar))
+  }
 
   handlerFor(url: string): AddUrlToTabsetHandler {
     const specialHandler = _.find(this.handlers, (h: AddUrlToTabsetHandler) => h.matches() === url);

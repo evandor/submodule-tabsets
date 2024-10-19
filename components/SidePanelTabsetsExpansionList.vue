@@ -588,20 +588,29 @@ if (inBexMode()) {
   })
 }
 
-const saveInTabset = async (tabset: Tabset) => {
-  const handler = useUrlHandlers().getHandler(currentChromeTab.value!.url)
-  await handler.saveInTabset(currentChromeTab.value!, tabset, tabset.folderActive)
-}
-
-const handleButtonClicked = (tabset: Tabset, args: object) => {
+const handleButtonClicked = async (tabset: Tabset, args: object) => {
   console.log("button clicked", args)
-  const actionIdentifier = args as unknown as ButtonActions
-  switch (actionIdentifier) {
+  const handler = useUrlHandlers($q).getHandler(currentChromeTab.value!.url)
+  const argsObject = args as unknown as {label: string, identifier: ButtonActions, filename: string | undefined}
+  switch (argsObject.identifier) {
     case ButtonActions.AddTab:
-      saveInTabset(tabset)
+      await handler.saveInTabset(currentChromeTab.value!, tabset, {})
+      break;
+    case ButtonActions.NewFile:
+      handler.withDialog(argsObject.identifier)?.onOk((filename: string) => {
+        handler.saveInTabset(currentChromeTab.value!, tabset, {filename})
+      })
+      break;
+    case ButtonActions.Save:
+      await handler.updateInTabset(currentChromeTab.value!, tabset, {filename: argsObject.filename})
+      break;
+    case ButtonActions.SaveAs:
+      handler.withDialog(argsObject.identifier)?.onOk((filename: string) => {
+        handler.saveInTabset(currentChromeTab.value!, tabset, {filename})
+      })
       break;
     default:
-      console.log("no action defined for ", actionIdentifier)
+      console.log("no action defined for ", argsObject.identifier)
   }
 }
 

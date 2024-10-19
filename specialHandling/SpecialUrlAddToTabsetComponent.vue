@@ -2,7 +2,7 @@
   <!--  @click.stop="saveInTabset(props.tabset.id, props.tabset.folderActive)" -->
   <template v-if="handler.actions().length === 1">
     <q-btn outline
-           @click.stop="emits('buttonClicked', handler.actions()[0].identifier)"
+           @click.stop="emits('buttonClicked', handler.actions()[0])"
            class="q-ma-none q-px-sm q-py-none"
            :class="alreadyInTabset() ? '':'cursor-pointer'"
            :color="alreadyInTabset() ? 'grey-5': tsBadges.length > 0 ? 'positive':'warning'"
@@ -23,26 +23,29 @@
   </template>
 
   <template v-else>
-    <q-btn-dropdown :label="'save as ' + handler.actions()[0]" split
+<!--    <q-select dense options-dense borderless v-model="saveAs" :options="handler.actions()" @click.stop="emitSaveAs()"/>-->
+    <q-btn-dropdown :label="'save as ' + handler.actions()[0].label"
+                    @click.stop="emits('buttonClicked', {identifier: ButtonActions.Save, filename: handler.actions()[0].label})"
                     class="q-ma-none q-px-sm q-py-none"
                     size="xs"
+                    split
                     outline>
       <q-list dense>
-<!--        <q-item v-for="l in handler.actions"-->
-<!--                clickable dense-->
-<!--                @click.stop="emits('asNewFile')">-->
-<!--          <q-item-section>-->
-<!--            <q-item-label>save as {{ l }}</q-item-label>-->
-<!--          </q-item-section>-->
-<!--        </q-item>-->
+        <q-item v-for="l in handler.actions"
+                clickable dense
+                @click.stop="emits('asNewFile')">
+          <q-item-section>
+            <q-item-label>save as {{ l }}</q-item-label>
+          </q-item-section>
+        </q-item>
 
-<!--        <q-item-->
-<!--          clickable dense v-close-popup-->
-<!--          @click.stop="emits('asNewFile')">-->
-<!--          <q-item-section>-->
-<!--            <q-item-label>as new file</q-item-label>-->
-<!--          </q-item-section>-->
-<!--        </q-item>-->
+        <q-item
+          clickable dense v-close-popup
+          @click.stop="emits('buttonClicked', {identifier: ButtonActions.SaveAs})">
+          <q-item-section>
+            <q-item-label>as new file</q-item-label>
+          </q-item-section>
+        </q-item>
 
       </q-list>
     </q-btn-dropdown>
@@ -60,20 +63,24 @@ import _ from "lodash";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import TabsetService from "src/tabsets/services/TabsetService";
 import {useUrlHandlers} from "src/tabsets/specialHandling/SpecialUrls";
-import {AddUrlToTabsetHandler} from "src/tabsets/specialHandling/AddUrlToTabsetHandler";
+import {AddUrlToTabsetHandler, ButtonActions} from "src/tabsets/specialHandling/AddUrlToTabsetHandler";
+import {useQuasar} from "quasar";
 
 const props = defineProps({
   currentChromeTab: {type: Object as PropType<chrome.tabs.Tab>, required: true},
   tabset: {type: Object as PropType<Tabset>, required: true}
 })
 
-const emits = defineEmits(['buttonClicked'])
+const emits = defineEmits(['buttonClicked','asNewFile'])
 
-const {getHandler} = useUrlHandlers()
+const $q = useQuasar()
+
+const {getHandler} = useUrlHandlers($q)
 
 const handler = ref<AddUrlToTabsetHandler>(getHandler(props.currentChromeTab.url))
 
 const tsBadges = ref<object[]>([])
+const saveAs = ref({label: 'save as...'})
 
 watchEffect(() => {
   handler.value = getHandler(props.currentChromeTab.url)
@@ -115,6 +122,10 @@ const tooltipAlreadyInOtherTabsets = (tabsetName: string) => {
     "it to '" + tabsetName + "' as well."
 }
 
+const emitSaveAs = () => {
+  console.log("saveAs", saveAs.value)
+//  emits('buttonClicked', saveAs)
+}
 
 
 </script>

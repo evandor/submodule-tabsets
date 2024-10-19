@@ -1,12 +1,14 @@
 import {AddUrlToTabsetHandlers} from "src/tabsets/specialHandling/AddUrlToTabsetHandlers";
+import {QVueGlobals} from "quasar";
 
-export function useUrlHandlers() {
+export function useUrlHandlers($q: QVueGlobals | undefined) {
 
-  const handlerRepo = new AddUrlToTabsetHandlers()
+  const handlerRepo = new AddUrlToTabsetHandlers($q)
 
   function getHandler(url: string | undefined) {
-    console.log("getting url handler for ", url)
-    return url ? handlerRepo.handlerFor(url) : handlerRepo.defaultAddUrlToTabsetHandler
+    const handler = url ? handlerRepo.handlerFor(url) : handlerRepo.defaultAddUrlToTabsetHandler
+    console.log("getting url handler for ", url, handler)
+    return handler
   }
 
   return {

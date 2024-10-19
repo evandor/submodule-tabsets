@@ -440,11 +440,13 @@ export function useTabsetService() {
    * @param tab
    * @param useIndex
    */
-  const addToTabset = async (ts: Tabset, tab: Tab, useIndex: number | undefined = undefined): Promise<Tabset> => {
+  const addToTabset = async (ts: Tabset, tab: Tab, useIndex: number | undefined = undefined, allowDuplicates = false): Promise<Tabset> => {
     if (tab.url) {
-      const indexInTabset = _.findIndex(ts.tabs, (t: any) => t.url === tab.url)
-      if (indexInTabset >= 0 && !tab.image) {
-        return Promise.reject("tab exists already")
+      if (!allowDuplicates) {
+        const indexInTabset = _.findIndex(ts.tabs, (t: any) => t.url === tab.url)
+        if (indexInTabset >= 0 && !tab.image) {
+          return Promise.reject("tab exists already")
+        }
       }
 
       // add tabset's name to tab's tags

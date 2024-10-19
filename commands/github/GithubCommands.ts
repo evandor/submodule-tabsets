@@ -19,7 +19,7 @@ export abstract class GithubCommands<T> implements Command<T> {
       method: 'PUT',
       headers: this.getHeaders(token),
       body: JSON.stringify({
-        message: 'upload from excalidraw extention',
+        message: 'upload from tabsets extension',
         committer: {name: "tabsets", email: "info@tabsets.net"},
         sha: sha,
         // https://stackoverflow.com/questions/23223718/failed-to-execute-btoa-on-window-the-string-to-be-encoded-contains-characte

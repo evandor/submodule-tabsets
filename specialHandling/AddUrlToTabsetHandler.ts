@@ -1,13 +1,13 @@
 import {Tabset} from "src/tabsets/models/Tabset";
-import {Tab} from "src/tabsets/models/Tab";
-import {uid} from "quasar";
-import {useCommandExecutor} from "src/core/services/CommandExecutor";
-import {AddTabToTabsetCommand} from "src/tabsets/commands/AddTabToTabsetCommand";
+import {DialogChainObject, uid} from "quasar";
 import {ExecutionResult} from "src/core/domain/ExecutionResult";
+import {Tab} from "src/tabsets/models/Tab";
 
 export enum ButtonActions {
   AddTab = "AddTab",
-  NewFile = "NewFile"
+  NewFile = "NewFile",
+  SaveAs = "SaveAs",
+  Save = "Save"
 }
 
 export interface AddUrlToTabsetHandler {
@@ -16,22 +16,14 @@ export interface AddUrlToTabsetHandler {
 
   actions: () => { label: string, identifier: ButtonActions }[]
 
-  saveInTabset: (chromeTab: chrome.tabs.Tab, ts: Tabset, activeFolder: string | undefined) => Promise<ExecutionResult<any>>
+  withDialog: (action: ButtonActions) => DialogChainObject | undefined
+
+  saveInTabset: (chromeTab: chrome.tabs.Tab, ts: Tabset, additionalData: object) => Promise<ExecutionResult<any>>
+
+  updateInTabset: (chromeTab: chrome.tabs.Tab, ts: Tabset, additionalData: object) => Promise<ExecutionResult<any>>
+
+  handleOpenedTab: (browserTab: chrome.tabs.Tab, tab: Tab) => void
 }
 
-export class DefaultAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
 
-  matches() {
-    return "**";
-  }
-
-  actions():{ label: string, identifier: ButtonActions }[] {
-    return [{label: "Add Tab", identifier: ButtonActions.AddTab}]
-  }
-
-  saveInTabset(chromeTab: chrome.tabs.Tab, ts: Tabset, activeFolder: string | undefined): Promise<ExecutionResult<any>> {
-    const newTab: Tab = new Tab(uid(), chromeTab)
-    return useCommandExecutor().execute(new AddTabToTabsetCommand(newTab, ts, activeFolder))
-  }
-}
 

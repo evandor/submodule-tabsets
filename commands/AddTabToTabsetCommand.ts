@@ -13,7 +13,6 @@ import ContentUtils from "src/core/utils/ContentUtils";
 import BrowserApi from "src/app/BrowserApi";
 import {useThumbnailsService} from "src/thumbnails/services/ThumbnailsService";
 import {useLogger} from "src/services/Logger";
-import {useUrlHandlers} from "src/tabsets/specialHandling/SpecialUrls";
 
 const {saveTabset} = useTabsetService()
 const {sendMsg} = useUtils()
@@ -29,7 +28,8 @@ export class AddTabToTabsetCommand implements Command<any> {
   constructor(
     public tab: Tab,
     public tabset: Tabset | undefined = undefined,
-    public activeFolder: string | undefined = undefined
+    public activeFolder: string | undefined = undefined,
+    public allowDuplicates: boolean = false
   ) {
 
     if (!tabset) {
@@ -43,27 +43,6 @@ export class AddTabToTabsetCommand implements Command<any> {
   async execute(): Promise<ExecutionResult<any>> {
     console.info(`adding tab '${this.tab.id}' to tabset '${this.tabset!.id}', active folder: ${this.activeFolder}`)
 
-    const urlHandler = useUrlHandlers().getHandler(this.tab.url)
-
-    // special urls
-    if (this.tab.url === "https://excalidraw.com/" && this.tab.chromeTabId) {
-      const returned = await chrome.scripting.executeScript({
-        target: {tabId: this.tab.chromeTabId},
-        func: () => {
-          return localStorage.getItem("excalidraw")
-        }
-      })
-      if (returned.length > 0) {
-        const firstFrameReturned = returned.at(0)
-        console.log("hier", firstFrameReturned)
-        if (firstFrameReturned && firstFrameReturned.result) {
-          this.tab.storage = {
-            'excalidraw': JSON.parse(firstFrameReturned.result)
-          }
-        }
-      }
-    }
-
     let tabsetOrFolder = this.tabset!
     if (this.activeFolder) {
       //const folder = useTabsetService().findFolder(this.tabset!.folders, this.activeFolder)
@@ -73,11 +52,14 @@ export class AddTabToTabsetCommand implements Command<any> {
       }
     }
 
-    const exists = _.findIndex(tabsetOrFolder.tabs, (t: any) => t.url === this.tab.url) >= 0
-    console.debug("checking 'tab exists' yields", exists)
-    if (exists) {
-      return Promise.reject("tab already exists in this tabset")
+    if (!this.allowDuplicates) {
+      const exists = _.findIndex(tabsetOrFolder.tabs, (t: any) => t.url === this.tab.url) >= 0
+      console.debug("checking 'tab exists' yields", exists)
+      if (exists) {
+        return Promise.reject("tab already exists in this tabset")
+      }
     }
+
     try {
       // manage (chrome) Group
       console.log("updating tab group for group id", this.tab.groupId)
@@ -87,7 +69,7 @@ export class AddTabToTabsetCommand implements Command<any> {
         await useGroupsStore().persistGroup(currentGroup)
       }
 
-      const tabset: Tabset = await useTabsetService().addToTabset(tabsetOrFolder, this.tab, 0)
+      const tabset: Tabset = await useTabsetService().addToTabset(tabsetOrFolder, this.tab, 0, this.allowDuplicates)
 
       // Analysis - expected diff to main branch
 
