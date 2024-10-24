@@ -120,7 +120,7 @@
               <q-icon name="arrow_right" size="16px"/>
            </span>
 
-          <template v-if="props.tab.extension !== UrlExtension.NOTE">
+          <template v-if="props.tab.extension !== UrlExtension.RSS">
             <short-url @click.stop="gotoTab()"
                        :url="props.tab.url" :hostname-only="!useUiStore().showFullUrls"/>
             <q-icon v-if="props.tab.matcher && useFeaturesStore().hasFeature(FeatureIdent.ADVANCED_TAB_MANAGEMENT)"
@@ -222,8 +222,11 @@
 
             <span>
               <TabListIconIndicatorsHook :tabId="props.tab.id" :tabUrl="props.tab.url"/>
-              <span v-if="useUiStore().listDetailLevelGreaterEqual(ListDetailLevel.MAXIMAL, props.tabset?.details)">last active: {{
+              <span v-if="props.tab.extension !== UrlExtension.RSS && useUiStore().listDetailLevelGreaterEqual(ListDetailLevel.MAXIMAL, props.tabset?.details)">last active: {{
                   formatDate(props.tab.lastActive)
+                }}</span>
+              <span v-else-if="props.tab.extension === UrlExtension.RSS">published: {{
+                  formatDate(props.tab.created)
                 }}</span>
             </span>
 
@@ -307,7 +310,6 @@ import {SavedBlob} from "src/snapshots/models/SavedBlob";
 import {useThumbnailsService} from "src/thumbnails/services/ThumbnailsService";
 import CommentDialog from "src/tabsets/dialogues/CommentDialog.vue";
 import TabListIconIndicatorsHook from "src/app/hooks/tabsets/TabListIconIndicatorsHook.vue";
-import {useNavigationService} from "src/navigation/services/NavigationService";
 import {OpenTabCommand} from "src/tabsets/commands/OpenTabCommand";
 
 const {inBexMode} = useUtils()

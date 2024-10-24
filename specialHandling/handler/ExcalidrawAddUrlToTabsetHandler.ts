@@ -15,15 +15,22 @@ export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   constructor(public $q: QVueGlobals | undefined) {
   }
 
-  matches() {
-    return "https://excalidraw.com/";
+  // Disabled
+  urlMatcher(): RegExp {
+    return /^https:\/\/excalidraw\.comXXX\/$/;
   }
+
+  contentMatcher(content: string) {
+    return false
+  }
+
 
   actions(): { label: string, identifier: ButtonActions }[] {
     const tabset: Tabset | undefined = useTabsetsStore().getCurrentTabset
     if (tabset) {
       return (tabset.tabs as Tab[])
-        .filter((t: Tab) => t.url === this.matches())
+        .filter((t: Tab) => t.url !== undefined)
+        .filter((t: Tab) => t.url!.match(this.urlMatcher()))
         .map((t: Tab) => {
           return {label: t.title || 'undefined', identifier: ButtonActions.Save}
         })
@@ -41,18 +48,17 @@ export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
       default:
         console.log("no dialog for action", action)
     }
-
   }
 
-  async saveInTabset(chromeTab: chrome.tabs.Tab, ts: Tabset, additionalData: object): Promise<ExecutionResult<any>> {
+  async clicked(chromeTab: chrome.tabs.Tab, ts: Tabset, folder?: Tabset, additionalData?: object): Promise<ExecutionResult<any>> {
 
     console.log("saving...", chromeTab.id, additionalData)
     try {
-      const filename = additionalData['filename' as keyof object]
+      const filename = additionalData ? additionalData['filename' as keyof object] : undefined
       if (!filename) {
         throw new Error("filename is missing")
       }
-      const returned = await this.queryBrowserTab(chromeTab, filename)
+      const returned = await this.queryBrowserTab(chromeTab, filename!)
       if (returned.length > 0) {
         const newTab = new Tab(uid(), chromeTab)
         newTab.title = filename
@@ -84,7 +90,7 @@ export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
       }
       const returned = await this.queryBrowserTab(chromeTab, filename)
       if (returned.length > 0) {
-        const tabCandidates = ts.tabs.filter((t: Tab) => t.url === this.matches() && t.title === filename)
+        const tabCandidates = ts.tabs.filter((t: Tab) => t.url!.match(this.urlMatcher()) && t.title === filename)
         const firstFrameReturned = returned.at(0)
         if (firstFrameReturned && firstFrameReturned.result && tabCandidates.length > 0) {
           tabCandidates[0].storage = {'excalidraw': JSON.parse(firstFrameReturned.result)}
@@ -98,7 +104,7 @@ export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
     return Promise.reject("error updating excalidraw")
   }
 
-  handleOpenedTab (browserTab: chrome.tabs.Tab, tab: Tab) {
+  handleOpenedTab(browserTab: chrome.tabs.Tab, tab: Tab) {
     console.log("handling opened tab", browserTab.id, tab.id)
     const excalidraw = JSON.stringify(tab.storage['excalidraw' as keyof object])
     console.log("setting to storage", excalidraw)

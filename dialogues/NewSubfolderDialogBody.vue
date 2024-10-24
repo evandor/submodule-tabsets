@@ -94,7 +94,7 @@ const submit = () => {
   //console.log("submit", addAllOpenTabs.value, useTabsStore2().browserTabs)
   let tabsToUse = addAllOpenTabs.value ? useTabsStore2().browserTabs : []
   useCommandExecutor()
-    .executeFromUi(new CreateFolderCommand(newFolderName.value, tabsToUse, props.tabsetId, props.parentFolder))
+    .executeFromUi(new CreateFolderCommand(uid(),newFolderName.value, tabsToUse, props.tabsetId, props.parentFolder))
 }
 
 </script>

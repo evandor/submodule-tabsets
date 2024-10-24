@@ -2,9 +2,9 @@
   <q-icon v-if="UrlExtension.IMAGE === tab?.extension"
           :size="props.width"
           name="image"/>
-  <q-icon v-else-if="UrlExtension.RSS === tab?.extension"
-          size="22px"
-          name="rss_feed"/>
+<!--  <q-icon v-else-if="UrlExtension.RSS === tab?.extension"-->
+<!--          size="22px"-->
+<!--          name="rss_feed"/>-->
   <q-icon v-else-if="UrlExtension.PDF === tab?.extension"
           size="22px"
           name="pdf"/>
@@ -14,11 +14,11 @@
   <q-img v-else
          class="rounded-borders"
          :style="props.preventDragAndDrop ? '' : 'cursor: move'"
-         :width="props.width"
-         :height="props.height"
+         :width="props.tab.image !== '' ? '38px' : props.width"
+         :height="props.tab.image !== '' ? '38px' : props.height"
          :src="getFaviconUrl(tab as Tab)">
     <q-tooltip v-if="!props.preventDragAndDrop" class="tooltip">
-      drag and drop to reorder in tabset {{ useSettingsStore().isEnabled("dev") ? 'Tab#: ' + tab.id : ''}}
+      drag and drop to reorder in tabset {{props.height}} {{ useSettingsStore().isEnabled("dev") ? 'Tab#: ' + tab.id : ''}}
     </q-tooltip>
     <q-tooltip v-else class="tooltip">This is a sorted list, you cannot drag and drop</q-tooltip>
   </q-img>
@@ -46,6 +46,9 @@ const getFaviconUrl = (tab: Tab) => {
   //const chromeTab = tab?.chromeTab
   if (tab && tab.url?.startsWith("chrome")) {
     return ''
+  }
+  if (tab && tab.image && tab.image.trim() !== '') {
+    return tab.image
   }
   if (tab && tab.favIconUrl) {
     return tab.favIconUrl

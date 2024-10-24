@@ -103,7 +103,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
         ts.spaces = [spaceId]
       }
       tabsets.value.set(ts.id, ts)
-      console.log("storage", storage)
+     // console.log("storage", storage)
       await storage.addTabset(ts)
 
       // TODO
@@ -288,7 +288,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       _.forEach([...tabsets.value.values()] as Tabset[], (ts: Tabset) => {
         if (ts.status === TabsetStatus.DEFAULT || ts.status === TabsetStatus.FAVORITE) {
           _.forEach(ts.tabs, (t: Tab) => {
-            if (t.extension === UrlExtension.RSS) {
+            if (t.url && t.url.endsWith(".rss")) {
               res.push(t)
             }
           })
@@ -310,7 +310,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
         return root
       }
       for(const f of root.folders) {
-        if (f.id === root.folderActive) {
+        if (f.id === folderActive) {
           return f
         } else {
           const subFolder = getActiveFolder(f, folderActive)

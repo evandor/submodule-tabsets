@@ -29,7 +29,8 @@ export class AddTabToTabsetCommand implements Command<any> {
     public tab: Tab,
     public tabset: Tabset | undefined = undefined,
     public activeFolder: string | undefined = undefined,
-    public allowDuplicates: boolean = false
+    public allowDuplicates: boolean = false,
+    public ignoreDuplicates: boolean = false
   ) {
 
     if (!tabset) {
@@ -55,8 +56,10 @@ export class AddTabToTabsetCommand implements Command<any> {
     if (!this.allowDuplicates) {
       const exists = _.findIndex(tabsetOrFolder.tabs, (t: any) => t.url === this.tab.url) >= 0
       console.debug("checking 'tab exists' yields", exists)
-      if (exists) {
+      if (exists && !this.ignoreDuplicates) {
         return Promise.reject("tab already exists in this tabset")
+      } else if (exists) {
+        return Promise.resolve("","")
       }
     }
 

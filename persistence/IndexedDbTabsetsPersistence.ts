@@ -51,7 +51,7 @@ class IndexedDbTabsetsPersistence implements TabsetsPersistence {
   }
 
   addTabset(ts: Tabset): Promise<any> {
-    console.log("adding tabset", ts)
+    //console.log("adding tabset", ts)
     return this.db.add(this.STORE_IDENT, ts, ts.id)
   }
 

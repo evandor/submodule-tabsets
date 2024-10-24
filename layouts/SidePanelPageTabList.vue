@@ -28,11 +28,11 @@
     <!-- no drag & drop on mobile -->
     <template v-else>
       <SidePanelTabListHelper
-        v-for="tab in tabs"
-        :tab="tab as Tab"
+        v-for="tab in tabsForColumn() as Array<IndexedTab>"
+        :tab="tab.tab as Tab"
         :index="0"
         :type="props.type"
-        :sorting="props.sorting"
+        :sorting="props.tabset?.type === TabsetType.RSS_FOLDER ? TabSorting.TITLE : props.sorting"
         :preventDragAndDrop="true"
         :tabset="props.tabset"
         :show-tabsets="props.showTabsets"
@@ -52,7 +52,7 @@ import {VueDraggableNext} from 'vue-draggable-next'
 import _ from "lodash"
 import {Tab, TabSorting} from "src/tabsets/models/Tab";
 import TabsetService from "src/tabsets/services/TabsetService";
-import {Tabset} from "src/tabsets/models/Tabset";
+import {Tabset, TabsetType} from "src/tabsets/models/Tabset";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {TabsetColumn} from "src/tabsets/models/TabsetColumn";
 import {SPECIAL_ID_FOR_NO_GROUP_ASSIGNED} from "boot/constants";
@@ -117,8 +117,15 @@ const getColumns = () => {
   return [new TabsetColumn(SPECIAL_ID_FOR_NO_GROUP_ASSIGNED, '')]
 }
 
-const tabsForColumn = (): IndexedTab[] =>
-  _.map(tabs.value as Tab[], (t: Tab, index: number) => new IndexedTab(index, t))
+const tabsForColumn = (): IndexedTab[] => {
+  return (tabs.value as Tab[])
+    .sort((a:Tab, b:Tab) => {
+      // console.log("comparing", props.)
+      return props.tabset && props.tabset.type === TabsetType.RSS_FOLDER ? b.created - a.created : 0}
+    )
+    .map((t: Tab, index: number) => new IndexedTab(index, t))
+  //return   _.map(tabs.value as Tab[], (t: Tab, index: number) => new IndexedTab(index, t))
+}
 
 
 </script>

@@ -1,24 +1,30 @@
 import {Tabset} from "src/tabsets/models/Tabset";
-import {DialogChainObject, uid} from "quasar";
+import {DialogChainObject} from "quasar";
 import {ExecutionResult} from "src/core/domain/ExecutionResult";
 import {Tab} from "src/tabsets/models/Tab";
 
 export enum ButtonActions {
   AddTab = "AddTab",
+  AddTabWithDynamicFolder = "AddTabWithDynamicFolder",
   NewFile = "NewFile",
   SaveAs = "SaveAs",
-  Save = "Save"
+  Save = "Save",
+  DynamicLoad = "DynamicLoad",
+  AddRssFeed = "AddRssFeed",
+  LoadRssFeed = "LoadRssFeed"
 }
 
 export interface AddUrlToTabsetHandler {
 
-  matches: () => string
+  urlMatcher: () => RegExp
 
-  actions: () => { label: string, identifier: ButtonActions }[]
+  contentMatcher: (content: string) => boolean
+
+  actions: () => { label: string, identifier: ButtonActions, folder?: Tabset }[]
 
   withDialog: (action: ButtonActions) => DialogChainObject | undefined
 
-  saveInTabset: (chromeTab: chrome.tabs.Tab, ts: Tabset, additionalData: object) => Promise<ExecutionResult<any>>
+  clicked: (chromeTab: chrome.tabs.Tab, ts: Tabset, folder?: Tabset, additionalData?: object) => Promise<ExecutionResult<any>>
 
   updateInTabset: (chromeTab: chrome.tabs.Tab, ts: Tabset, additionalData: object) => Promise<ExecutionResult<any>>
 

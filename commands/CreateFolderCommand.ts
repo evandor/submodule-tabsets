@@ -1,7 +1,7 @@
 import Command from "src/core/domain/Command";
 import {ExecutionResult} from "src/core/domain/ExecutionResult";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
-import {Tabset} from "src/tabsets/models/Tabset";
+import {Tabset, TabsetType} from "src/tabsets/models/Tabset";
 import {uid} from "quasar";
 import _ from "lodash"
 import {Tab} from "src/tabsets/models/Tab";
@@ -10,23 +10,33 @@ import {useLogger} from "src/services/Logger";
 
 const {info} = useLogger()
 
-export class CreateFolderCommand implements Command<string> {
+export class CreateFolderCommand implements Command<Tabset> {
 
   public merge: boolean = true
 
   constructor(
+    public folderId: string,
     public folderName: string,
     public tabsToUse: chrome.tabs.Tab[],
     public tabsetId: string,
-    public parentFolder: string | undefined = undefined) {
+    public parentFolder?: string,
+    public dynamicUrl?: string,
+    private type?: TabsetType
+  ) {
   }
 
-  async execute(): Promise<ExecutionResult<string>> {
+  async execute(): Promise<ExecutionResult<Tabset>> {
     try {
       const tabset = useTabsetsStore().getTabset(this.tabsetId)!
-      if (!tabset.folderActive) {
+      const oldFolderActive = tabset.folderActive
+      if (this.parentFolder) {
+        tabset.folderActive = this.parentFolder
+      }
+      if (!tabset.folderActive) { // assuming root
         const tabs = _.map(this.tabsToUse, (t: chrome.tabs.Tab) => new Tab(uid(), t))
-        const newFolder = new Tabset(uid(), this.folderName, tabs)
+        const newFolder = new Tabset(this.folderId, this.folderName, tabs)
+        newFolder.type = this.type || TabsetType.DEFAULT
+        newFolder.dynamicUrl = this.dynamicUrl
         newFolder.folderParent = tabset.id
         if (!tabset.folders) {
           tabset.folders = []
@@ -34,22 +44,23 @@ export class CreateFolderCommand implements Command<string> {
         tabset.folders.push(newFolder)
         await useTabsetService().saveTabset(tabset)
         info("folder created")
-        return Promise.resolve(new ExecutionResult<string>(newFolder.id, 'Folder created'))
+        return Promise.resolve(new ExecutionResult<Tabset>(newFolder, 'Folder created'))
       }
-      //const parentFolder = this.getFolder(tabset, tabset.folderActive)
       const parentFolder = useTabsetsStore().getActiveFolder(tabset)
-
-      //TODO use useTabsetService().findFolder(tabset.folders, tabset.folderActive)
       if (parentFolder) {
-        const newFolder = new Tabset(uid(), this.folderName, [])
+        const newFolder = new Tabset(this.folderId, this.folderName, [])
+        newFolder.type = this.type ||  TabsetType.DEFAULT
         newFolder.folderParent = parentFolder.id
         if (!tabset.folders) {
           tabset.folders = []
         }
         parentFolder.folders.push(newFolder)
+        if (this.parentFolder) {
+          tabset.folderActive = oldFolderActive
+        }
         await useTabsetService().saveTabset(tabset)
         info("subfolder created")
-        return Promise.resolve(new ExecutionResult<string>(newFolder.id, 'Subfolder created'))
+        return Promise.resolve(new ExecutionResult<Tabset>(newFolder, 'Subfolder created'))
       }
       return Promise.reject("could not find subfolder")
     } catch (err) {
@@ -60,5 +71,5 @@ export class CreateFolderCommand implements Command<string> {
 }
 
 CreateFolderCommand.prototype.toString = function cmdToString() {
-  return `CreateFolderCommand: {tabsetId=${this.tabsetId}, folderName=${this.folderName}, parentFolder=${this.parentFolder}}`;
+  return `CreateFolderCommand: {tabsetId=${this.tabsetId}, folderId: ${this.folderId}, folderName=${this.folderName}, parentFolder=${this.parentFolder}}`;
 };
