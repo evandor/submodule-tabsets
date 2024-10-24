@@ -249,6 +249,7 @@ import {ButtonActions} from "src/tabsets/specialHandling/AddUrlToTabsetHandler";
 import {useUrlHandlers} from "src/tabsets/specialHandling/SpecialUrls";
 import getScrollTarget = scroll.getScrollTarget;
 import {useContentStore} from "src/content/stores/contentStore";
+import * as cheerio from "cheerio";
 
 const props = defineProps({
   tabsets: {type: Array as PropType<Array<Tabset>>, required: true}
