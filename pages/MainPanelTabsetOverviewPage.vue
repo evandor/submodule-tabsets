@@ -33,6 +33,7 @@
     narrow-indicator>
     <q-tab name="grid" label="As Grid" @click="setView('grid')"/>
     <q-tab name="list" label="As List" @click="setView('list')"/>
+    <q-tab name="list" label="As Timeline" @click="setView('timeline')"/>
   </q-tabs>
 
 
@@ -57,6 +58,16 @@
 
     </q-tab-panel>
 
+    <q-tab-panel class="q-ma-none q-pa-none" name="timeline">
+      todo
+<!--      <Timeline-->
+<!--        :groups="groups"-->
+<!--        :items="items"-->
+<!--        :viewportMin="1703112200000"-->
+<!--        :viewportMax="1714566600000"-->
+<!--      />-->
+    </q-tab-panel>
+
   </q-tab-panels>
 
 </template>
@@ -72,6 +83,8 @@ import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import TabsetPageCards from "src/tabsets/pages/pwa/TabsetPageCards.vue";
 import NavigationService from "src/services/NavigationService";
 import TabList from "src/tabsets/pages/pwa/TabList.vue";
+import { Timeline } from 'vue-timeline-chart';
+import 'vue-timeline-chart/style.css';
 
 const route = useRoute()
 
@@ -96,6 +109,17 @@ watchEffect(() => {
   console.log("watch effect in tabsetpage", tabsetId.value)
   //tab.value = route.query['tab'] ? route.query['tab'] as string : 'tabset'
 })
+
+const groups = [
+  { id: 'group1', label: 'Group 1' },
+  { id: 'group2', label: 'Group 2' },
+];
+
+const items = [
+  { group: 'group1', type: 'point', start: 1705878000000, cssVariables: { '--item-background': 'var(--color-2)' } },
+  { group: 'group1', type: 'range', start: 1707135072000, end: 1708431072000, cssVariables: { '--item-background': 'var(--color-4)' } },
+  { group: 'group2', type: 'range', start: 1706790600000, end: 1706877000000 },
+];
 
 const openAllTabsetsOverview = () =>
   NavigationService.openOrCreateTab([chrome.runtime.getURL(`www/index.html#/mainpanel/tabsets/overview`)])

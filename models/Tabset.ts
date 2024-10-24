@@ -16,7 +16,8 @@ export enum TabsetType {
   SESSION = "SESSION",
 
   SPECIAL = "SPECIAL",
-  DYNAMIC = "DYNAMIC"
+  DYNAMIC = "DYNAMIC",
+  RSS_FOLDER = "RSS_FOLDER"
 }
 
 export enum TabsetSharing {
@@ -80,7 +81,7 @@ export class Tabset {
   // can be set (to the installtion.id) when saving the tabset in order to omit triggering an update
   origin: string = ''
 
-  constructor(id: string, name: string, tabs: Tab[], columns: TabsetColumn[] = [], spaces: string[] = []) {
+  constructor(id: string, name: string, tabs: Tab[] = [], columns: TabsetColumn[] = [], spaces: string[] = []) {
 
     // some guards
     if (!Tabset.newTabsetNameIsValid(name)) {

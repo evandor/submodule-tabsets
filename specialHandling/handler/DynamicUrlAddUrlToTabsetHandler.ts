@@ -6,19 +6,23 @@ import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {AddTabToTabsetCommand} from "src/tabsets/commands/AddTabToTabsetCommand";
 import {AddUrlToTabsetHandler, ButtonActions} from "src/tabsets/specialHandling/AddUrlToTabsetHandler";
 
-export class DefaultAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
+export class DynamicUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
 
+  constructor(
+    private tabset: Tabset,
+    private folder?: Tabset
+  ) {
+  }
   urlMatcher() {
     return /.*/;
   }
 
   contentMatcher(content: string) {
-    return true
+    return false
   }
 
-
-  actions():{ label: string, identifier: ButtonActions }[] {
-    return [{label: "Add Tab", identifier: ButtonActions.AddTab}]
+  actions():{ label: string, identifier: ButtonActions, folder?: Tabset }[] {
+    return [{label: "Dynamic Load", identifier: ButtonActions.DynamicLoad, folder: this.folder}]
   }
 
   withDialog(action: ButtonActions): DialogChainObject | undefined {

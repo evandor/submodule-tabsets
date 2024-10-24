@@ -1,10 +1,10 @@
 import Command from "src/core/domain/Command";
-import {useNavigationService} from "src/navigation/services/NavigationService";
 import {ExecutionResult} from "src/core/domain/ExecutionResult";
 import {ref} from "vue";
 import {AddUrlToTabsetHandler} from "src/tabsets/specialHandling/AddUrlToTabsetHandler";
 import {useUrlHandlers} from "src/tabsets/specialHandling/SpecialUrls";
 import {Tab} from "src/tabsets/models/Tab";
+import {useNavigationService} from "src/core/services/NavigationService";
 
 const {getHandler} = useUrlHandlers(undefined)
 
