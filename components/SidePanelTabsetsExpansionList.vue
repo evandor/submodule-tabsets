@@ -38,23 +38,7 @@
               tabsetCaption(useTabsetService().tabsToShow(tabset as Tabset), tabset.window, tabset.folders?.length)
             }}
           </q-item-label>
-          <!--          <q-item-label class="text-caption text-grey-5" v-if="tabsetExpanded.get(tabset.id)">-->
 
-          <!--            <template v-for="n in notes">-->
-          <!--              <div class="row">-->
-          <!--                <div-->
-          <!--                  class="col-2 cursor-pointer"-->
-          <!--                  @click.stop="openNote(n)">-->
-          <!--                  <q-icon name="description" class="q-ml-md" color="grey" size="12px"/>-->
-          <!--                </div>-->
-          <!--                <div-->
-          <!--                  class="col vertical-bottom q-ml-xs ellipsis text-caption cursor-pointer text-blue-10"-->
-          <!--                  @click.stop="openNote(n)">-->
-          <!--                  {{ n.title }}-->
-          <!--                </div>-->
-          <!--              </div>-->
-          <!--            </template>-->
-          <!--          </q-item-label>-->
           <q-item-label v-if="tabset.sharedId" class="q-mb-xs"
                         @mouseover="hoveredPublicLink = true"
                         @mouseleave="hoveredPublicLink = false">

@@ -93,7 +93,7 @@
     <template v-if="useUiStore().listDetailLevelGreaterEqual(ListDetailLevel.SOME, props.tabset?.details)">
       <template v-if="props.tab?.extension !== UrlExtension.NOTE">
         <q-item-label class="ellipsis-2-lines text-body2 darkColors lightColors"
-
+                      :class="props.tab?.extension === UrlExtension.RSS ? 'ellipsis-3-lines':'ellipsis-2-lines'"
                       @click.stop="gotoTab()">
           {{ props.tab.longDescription || props.tab.description }}
         </q-item-label>
