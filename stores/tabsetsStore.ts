@@ -4,7 +4,7 @@ import {computed, ref} from "vue";
 import {uid} from "quasar";
 import {Tabset, TabsetSharing, TabsetStatus} from "src/tabsets/models/Tabset";
 import TabsetsPersistence from "src/tabsets/persistence/TabsetsPersistence";
-import {Tab, TabComment, UrlExtension} from "src/tabsets/models/Tab";
+import {Tab, TabComment} from "src/tabsets/models/Tab";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {useWindowsStore} from "src/windows/stores/windowsStore";
 import {STRIP_CHARS_IN_COLOR_INPUT, STRIP_CHARS_IN_USER_INPUT} from "boot/constants";

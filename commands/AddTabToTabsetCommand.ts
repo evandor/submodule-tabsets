@@ -63,7 +63,7 @@ export class AddTabToTabsetCommand implements Command<any> {
       if (exists && !this.ignoreDuplicates) {
         return Promise.reject("tab already exists in this tabset")
       } else if (exists) {
-        return Promise.resolve("","")
+        return Promise.resolve(new ExecutionResult("",""))
       }
     }
 

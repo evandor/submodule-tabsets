@@ -6,8 +6,6 @@ import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {AddTabToTabsetCommand} from "src/tabsets/commands/AddTabToTabsetCommand";
 import {AddUrlToTabsetHandler, ButtonActions} from "src/tabsets/specialHandling/AddUrlToTabsetHandler";
 import {CreateFolderCommand} from "src/tabsets/commands/CreateFolderCommand";
-import * as cheerio from "cheerio";
-import {useContentStore} from "src/content/stores/contentStore";
 import {STRIP_CHARS_IN_USER_INPUT} from "boot/constants";
 
 export class RssUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
@@ -42,7 +40,7 @@ export class RssUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
       const displayFeed = additionalData['displayFeed' as keyof object] as boolean
       const newTab = new Tab(uid(), chromeTab)
       if (displayFeed) {
-        let title = chromeTab.url.replace("https://","").replace("http://", "").replace(STRIP_CHARS_IN_USER_INPUT, '')
+        let title = chromeTab.url?.replace("https://","").replace("http://", "").replace(STRIP_CHARS_IN_USER_INPUT, '') || 'no title'
         if (title.length > 32) {
           title = title.substring(0,28) + "..."
         }

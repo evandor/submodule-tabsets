@@ -212,9 +212,6 @@ import ShareTabsetPubliclyDialog from "src/tabsets/dialogues/ShareTabsetPublicly
 import {openURL, scroll, useQuasar} from "quasar";
 import {CopyToClipboardCommand} from "src/core/domain/commands/CopyToClipboard";
 import {useUtils} from "src/core/services/Utils";
-
-import {ExecutionResult} from "src/core/domain/ExecutionResult";
-import {useNotificationHandler} from "src/core/services/ErrorHandler";
 import {useWindowsStore} from "src/windows/stores/windowsStore";
 import {useTabsStore2} from "src/tabsets/stores/tabsStore2";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
@@ -231,9 +228,8 @@ import SidePanelNotesView from "src/notes/views/sidepanel/SidePanelNotesView.vue
 import SpecialUrlAddToTabsetComponent from "src/tabsets/specialHandling/SpecialUrlAddToTabsetComponent.vue";
 import {ButtonActions} from "src/tabsets/specialHandling/AddUrlToTabsetHandler";
 import {useUrlHandlers} from "src/tabsets/specialHandling/SpecialUrls";
-import getScrollTarget = scroll.getScrollTarget;
 import {useContentStore} from "src/content/stores/contentStore";
-import * as cheerio from "cheerio";
+import getScrollTarget = scroll.getScrollTarget;
 
 const props = defineProps({
   tabsets: {type: Array as PropType<Array<Tabset>>, required: true}
@@ -242,8 +238,7 @@ const props = defineProps({
 const emits = defineEmits(['re-render'])
 
 const {setVerticalScrollPosition} = scroll
-const {inBexMode, sanitize} = useUtils()
-const {handleSuccess, handleError} = useNotificationHandler()
+const {inBexMode} = useUtils()
 
 const $q = useQuasar()
 
@@ -262,7 +257,6 @@ const tabsetName = ref<object>(null as unknown as object)
 const tabsetNameOptions = ref<object[]>([])
 const currentChromeTab = ref<chrome.tabs.Tab | undefined>(undefined)
 const hoveredPublicLink = ref(false)
-const headerDescription = ref<string>('')
 const notes = ref<NotesPage[]>([])
 
 onMounted(() => {
@@ -492,18 +486,18 @@ const showAddTabButton = (tabset: Tabset, currentChromeTab: chrome.tabs.Tab | un
     useTabsetsStore().getCurrentTabset?.id === tabset.id
 }
 
-const saveTabsetDescription = () => {
-  console.log("saving tabset", headerDescription.value, useTabsetsStore().getCurrentTabset)
-  const currentTs = useTabsetsStore().getCurrentTabset
-  if (currentTs) {
-    currentTs.headerDescription = sanitize(headerDescription.value)
-    useTabsetService().saveCurrentTabset()
-    headerDescription.value = ''
-    handleSuccess(new ExecutionResult<string>('saved', 'saved'))
-  } else {
-    handleError("could not save description")
-  }
-}
+// const saveTabsetDescription = () => {
+//   console.log("saving tabset", headerDescription.value, useTabsetsStore().getCurrentTabset)
+//   const currentTs = useTabsetsStore().getCurrentTabset
+//   if (currentTs) {
+//     currentTs.headerDescription = sanitize(headerDescription.value)
+//     useTabsetService().saveCurrentTabset()
+//     headerDescription.value = ''
+//     handleSuccess(new ExecutionResult<string>('saved', 'saved'))
+//   } else {
+//     handleError("could not save description")
+//   }
+// }
 
 const selectFolder = (tabset: Tabset, folder: Tabset) => {
   console.log("selecting folder", tabset.id, folder.id)

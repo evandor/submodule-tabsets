@@ -171,6 +171,10 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
 
   }
 
+  reloadTabset(tabsetId: string): Promise<Tabset> {
+    throw new Error("reload tabset not yet implemented")
+  }
+
 
 }
 
