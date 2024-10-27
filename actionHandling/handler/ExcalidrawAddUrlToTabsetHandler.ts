@@ -4,8 +4,9 @@ import {ExecutionResult} from "src/core/domain/ExecutionResult";
 import {DialogChainObject, QVueGlobals, uid} from "quasar";
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {AddTabToTabsetCommand} from "src/tabsets/commands/AddTabToTabsetCommand";
-import {AddUrlToTabsetHandler, ButtonActions} from "src/tabsets/specialHandling/AddUrlToTabsetHandler";
+import {AddUrlToTabsetHandler, ButtonActions} from "src/tabsets/actionHandling/AddUrlToTabsetHandler";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
+import {ActionContext} from "src/tabsets/actionHandling/model/ActionContext";
 
 /**
  * does not work as intended; cannot overwrite local storage of excalidraw.com
@@ -25,16 +26,16 @@ export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   }
 
 
-  actions(): { label: string, identifier: ButtonActions }[] {
+  actions(): ActionContext[] {
     const tabset: Tabset | undefined = useTabsetsStore().getCurrentTabset
     if (tabset) {
       return (tabset.tabs as Tab[])
         .filter((t: Tab) => t.url !== undefined)
         .filter((t: Tab) => t.url!.match(this.urlMatcher()))
         .map((t: Tab) => {
-          return {label: t.title || 'undefined', identifier: ButtonActions.Save}
+          return new ActionContext(t.title || 'undefined', ButtonActions.Save)
         })
-        .concat([{label: 'as new file', identifier: ButtonActions.SaveAs}])
+        .concat([new ActionContext('as new file',ButtonActions.SaveAs)])
     }
     return []
   }

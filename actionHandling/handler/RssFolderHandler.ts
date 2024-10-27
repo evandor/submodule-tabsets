@@ -2,12 +2,13 @@ import {DialogChainObject, QVueGlobals, uid} from "quasar";
 import {Tabset} from "src/tabsets/models/Tabset";
 import {ExecutionResult} from "src/core/domain/ExecutionResult";
 import {Tab, UrlExtension} from "src/tabsets/models/Tab";
-import {AddUrlToTabsetHandler, ButtonActions} from "src/tabsets/specialHandling/AddUrlToTabsetHandler";
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {AddTabToTabsetCommand} from "src/tabsets/commands/AddTabToTabsetCommand";
 import BrowserApi from "src/app/BrowserApi";
 import {useUtils} from "src/core/services/Utils";
 import * as cheerio from 'cheerio';
+import {AddUrlToTabsetHandler, ButtonActions} from "src/tabsets/actionHandling/AddUrlToTabsetHandler";
+import {ActionContext} from "src/tabsets/actionHandling/model/ActionContext";
 
 const {sanitizeAsPlainText} = useUtils()
 
@@ -25,8 +26,8 @@ export class RssFolderHandler implements AddUrlToTabsetHandler {
     return true
   }
 
-  actions(): { label: string, identifier: ButtonActions }[] {
-    return [{label: "(Re-)Load", identifier: ButtonActions.LoadRssFeed}]
+  actions(): ActionContext[] {
+    return [new ActionContext("(Re-)Load", ButtonActions.LoadRssFeed)]
   }
 
   withDialog(action: ButtonActions): DialogChainObject | undefined {

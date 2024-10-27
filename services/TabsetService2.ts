@@ -590,20 +590,20 @@ export function useTabsetService() {
     })
   }
 
-  // const findFolder = (folders: Tabset[], folderId: string): Tabset | undefined => {
-  //   for (const f of folders) {
-  //     if (f.id === folderId) {
-  //       //console.log("found active folder", f)
-  //       return f
-  //     }
-  //     const optionalFound = findFolder(f.folders, folderId)
-  //
-  //     if (optionalFound) {
-  //       return optionalFound
-  //     }
-  //   }
-  //   return undefined
-  // }
+  const findFolder = (folders: Tabset[], folderId: string): Tabset | undefined => {
+    for (const f of folders) {
+      if (f.id === folderId) {
+        //console.log("found active folder", f)
+        return f
+      }
+      const optionalFound = findFolder(f.folders, folderId)
+
+      if (optionalFound) {
+        return optionalFound
+      }
+    }
+    return undefined
+  }
 
   const removeFolder = (root: Tabset, folderId: string): void => {
     root.folders = _.filter(root.folders, (f: any) => f.id !== folderId)
@@ -786,7 +786,8 @@ export function useTabsetService() {
     urlWasActivated,
     populateSearch,
     addToSearchIndex,
-    exportDataAsJson
+    exportDataAsJson,
+    findFolder
   }
 
 }

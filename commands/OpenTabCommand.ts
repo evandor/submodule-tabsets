@@ -1,12 +1,12 @@
 import Command from "src/core/domain/Command";
 import {ExecutionResult} from "src/core/domain/ExecutionResult";
 import {ref} from "vue";
-import {AddUrlToTabsetHandler} from "src/tabsets/specialHandling/AddUrlToTabsetHandler";
-import {useUrlHandlers} from "src/tabsets/specialHandling/SpecialUrls";
 import {Tab} from "src/tabsets/models/Tab";
 import {useNavigationService} from "src/core/services/NavigationService";
+import {AddUrlToTabsetHandler} from "src/tabsets/actionHandling/AddUrlToTabsetHandler";
+import {useActionHandlers} from "src/tabsets/actionHandling/ActionHandlers";
 
-const {getHandler} = useUrlHandlers(undefined)
+const {getHandler} = useActionHandlers(undefined)
 
 export class OpenTabCommand implements Command<string> {
 

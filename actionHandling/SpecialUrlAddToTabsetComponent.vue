@@ -5,7 +5,7 @@
   </template>
   <template v-else-if="handler.actions().length === 1">
     <q-btn outline
-           @click.stop="emits('buttonClicked', handler.actions()[0])"
+           @click.stop="emits('buttonClicked', new ActionHandlerButtonClickedHolder(handler,'', handler.actions()[0]))"
            class="q-ma-none q-px-sm q-py-none"
            :class="alreadyInTabset() ? '':'cursor-pointer'"
            :color="alreadyInTabset() ? 'grey-5': tsBadges.length > 0 ? 'positive':'warning'"
@@ -27,7 +27,7 @@
 
   <template v-else-if="handler.actions().length > 1">
     <q-btn-dropdown :label="'save as ' + handler.actions()[0].label"
-                    @click.stop="emits('buttonClicked', {identifier: ButtonActions.Save, filename: handler.actions()[0].label})"
+                    @click.stop="emits('buttonClicked', new ActionHandlerButtonClickedHolder(handler, ButtonActions.Save, handler.actions()[0], {filename: handler.actions()[0].label}))"
                     class="q-ma-none q-px-sm q-py-none"
                     size="xs"
                     split
@@ -43,7 +43,7 @@
 
         <q-item
           clickable dense v-close-popup
-          @click.stop="emits('buttonClicked', {identifier: ButtonActions.SaveAs})">
+          @click.stop="emits('buttonClicked', new ActionHandlerButtonClickedHolder(handler, ButtonActions.SaveAs))">
           <q-item-section>
             <q-item-label>as new file</q-item-label>
           </q-item-section>
@@ -64,11 +64,12 @@ import {Tabset} from "../models/Tabset";
 import _ from "lodash";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import TabsetService from "src/tabsets/services/TabsetService";
-import {useUrlHandlers} from "src/tabsets/specialHandling/SpecialUrls";
-import {AddUrlToTabsetHandler, ButtonActions} from "src/tabsets/specialHandling/AddUrlToTabsetHandler";
+import {useActionHandlers} from "src/tabsets/actionHandling/ActionHandlers";
+import {AddUrlToTabsetHandler, ButtonActions} from "src/tabsets/actionHandling/AddUrlToTabsetHandler";
 import {useQuasar} from "quasar";
-import {NoopAddUrlToTabsetHandler} from "src/tabsets/specialHandling/handler/NoopAddUrlToTabsetHandler";
+import {NoopAddUrlToTabsetHandler} from "src/tabsets/actionHandling/handler/NoopAddUrlToTabsetHandler";
 import {useContentStore} from "src/content/stores/contentStore";
+import {ActionHandlerButtonClickedHolder} from "src/tabsets/actionHandling/model/ActionHandlerButtonClickedHolder";
 
 const props = defineProps({
   currentChromeTab: {type: Object as PropType<chrome.tabs.Tab>, required: true},
@@ -80,7 +81,7 @@ const emits = defineEmits(['buttonClicked', 'asNewFile'])
 
 const $q = useQuasar()
 
-const {getHandler} = useUrlHandlers($q)
+const {getHandler} = useActionHandlers($q)
 
 const handler = ref<AddUrlToTabsetHandler>(new NoopAddUrlToTabsetHandler())
 
@@ -91,8 +92,8 @@ watchEffect(() => {
   // if (props.tabset.dynamicUrl || props.folder?.dynamicUrl) {
   //   handler.value = new DynamicUrlAddUrlToTabsetHandler(props.tabset, props.folder)
   // } else {
-    const content = useContentStore().currentTabContent
-    handler.value = getHandler(props.currentChromeTab.url, content, props.folder)
+  const content = useContentStore().currentTabContent
+  handler.value = getHandler(props.currentChromeTab.url, content, props.folder)
   // }
 })
 

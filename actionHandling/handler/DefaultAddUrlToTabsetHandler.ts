@@ -4,25 +4,22 @@ import {ExecutionResult} from "src/core/domain/ExecutionResult";
 import {Tab} from "src/tabsets/models/Tab";
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {AddTabToTabsetCommand} from "src/tabsets/commands/AddTabToTabsetCommand";
-import {AddUrlToTabsetHandler, ButtonActions} from "src/tabsets/specialHandling/AddUrlToTabsetHandler";
+import {AddUrlToTabsetHandler, ButtonActions} from "src/tabsets/actionHandling/AddUrlToTabsetHandler";
+import {ActionContext} from "src/tabsets/actionHandling/model/ActionContext";
 
-export class DynamicUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
+export class DefaultAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
 
-  constructor(
-    private tabset: Tabset,
-    private folder?: Tabset
-  ) {
-  }
   urlMatcher() {
     return /.*/;
   }
 
   contentMatcher(content: string) {
-    return false
+    return true
   }
 
-  actions():{ label: string, identifier: ButtonActions, folder?: Tabset }[] {
-    return [{label: "Dynamic Load", identifier: ButtonActions.DynamicLoad, folder: this.folder}]
+
+  actions():ActionContext[] {
+    return [new ActionContext("Add Tab", ButtonActions.AddTab)]
   }
 
   withDialog(action: ButtonActions): DialogChainObject | undefined {
