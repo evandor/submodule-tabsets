@@ -1,7 +1,7 @@
 <template>
   <!-- SidePanelPageTabList -->
-  <div style="max-width:100%">
-    <q-list separator class="q-ma-none">
+  <div style="width:100%;max-width:100%;">
+    <q-list class="q-ma-none">
 
       <!-- supporting drag & drop when not on mobile -->
       <template v-if="!props.preventDragAndDrop"
@@ -15,7 +15,6 @@
 
           <SidePanelTabListHelper v-for="tab in tabsForColumn() as Array<IndexedTab>"
                                   :tab="tab.tab as Tab"
-                                  :indent="props.indent"
                                   :index="tab.index"
                                   :type="props.type"
                                   :sorting="props.sorting"
@@ -26,11 +25,6 @@
 
 
         </vue-draggable-next>
-
-        <div v-if="tabsForColumn().length === 0"
-          class="q-ma-md q-pa-sm text-grey-8 text-caption text-center" style="border:1px dotted grey;border-radius: 3px">
-          Click 'Add Tab' to add the current tab to your collection
-        </div>
 
       </template>
 
@@ -75,7 +69,6 @@ const props = defineProps({
   sorting: {type: String as PropType<TabSorting>, default: TabSorting.CUSTOM},
   type: {type: String, default: 'sidepanel'},
   showTabsets: {type: Boolean, default: false},
-  indent: {type: Boolean, default: false},
   preventDragAndDrop: {type: Boolean, default: false},
   tabset: {type: Object as PropType<Tabset>, required: false},
   tabsCount: {type: Number, default: -1},

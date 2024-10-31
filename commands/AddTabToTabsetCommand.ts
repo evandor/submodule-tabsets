@@ -13,6 +13,11 @@ import ContentUtils from "src/core/utils/ContentUtils";
 import BrowserApi from "src/app/BrowserApi";
 import {useThumbnailsService} from "src/thumbnails/services/ThumbnailsService";
 import {useLogger} from "src/services/Logger";
+import {useContentStore} from "src/content/stores/contentStore";
+import {TabReference, TabReferenceType} from "src/content/models/TabReference";
+import {uid} from "quasar";
+import {useFeaturesStore} from "src/features/stores/featuresStore";
+import {FeatureIdent} from "src/app/models/FeatureIdent";
 
 const {saveTabset} = useTabsetService()
 const {sendMsg} = useUtils()
@@ -59,7 +64,7 @@ export class AddTabToTabsetCommand implements Command<any> {
       if (exists && !this.ignoreDuplicates) {
         return Promise.reject("tab already exists in this tabset")
       } else if (exists) {
-        return Promise.resolve("","")
+        return Promise.resolve(new ExecutionResult("", ""))
       }
     }
 
@@ -70,6 +75,18 @@ export class AddTabToTabsetCommand implements Command<any> {
       this.tab.groupName = currentGroup?.title || undefined
       if (currentGroup) {
         await useGroupsStore().persistGroup(currentGroup)
+      }
+
+      // TabReferences
+      this.tab.tabReferences = useContentStore().currentTabReferences
+
+      // Article (ReaderMode)
+      if (useFeaturesStore().hasFeature(FeatureIdent.READING_MODE)) {
+        this.tab.article = useContentStore().currentTabArticle
+        if (this.tab.article) {
+          this.tab.tabReferences.push(new TabReference(uid(), TabReferenceType.ORIGINAL_URL, "original url", [], this.tab.url))
+          this.tab.url = chrome.runtime.getURL(`/www/index.html#/mainpanel/readingmode/${this.tab.id}`)
+        }
       }
 
       const tabset: Tabset = await useTabsetService().addToTabset(tabsetOrFolder, this.tab, 0, this.allowDuplicates)

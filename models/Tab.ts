@@ -2,6 +2,7 @@ import {uid} from "quasar";
 import {STRIP_CHARS_IN_USER_INPUT} from "boot/constants";
 import _ from "lodash"
 import {Placeholders} from "src/tabsets/models/Placeholders";
+import {TabReference} from "src/content/models/TabReference";
 
 export enum TabSorting {
   URL = "URL",
@@ -147,6 +148,10 @@ export class Tab {
   coordinates: TabCoordinate[] = []
 
   storage: { [k: string]: any } = {}
+
+  tabReferences: TabReference[] = []
+
+  article: object | undefined = undefined
 
   constructor(public id: string, chromeTab: chrome.tabs.Tab) {
     this.created = new Date().getTime()

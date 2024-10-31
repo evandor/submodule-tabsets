@@ -9,12 +9,12 @@
       </div>
       <div class="col-4 text-right">
 
-        <q-btn @click="openAllTabsetsOverview()"
-               style="width:14px"
-               class="q-mr-sm" size="8px"
-               icon="stars">
-          <q-tooltip class="tooltip">Show all favorites</q-tooltip>
-        </q-btn>
+<!--        <q-btn @click="openAllTabsetsOverview()"-->
+<!--               style="width:14px"-->
+<!--               class="q-mr-sm" size="8px"-->
+<!--               icon="stars">-->
+<!--          <q-tooltip class="tooltip">Show all favorites</q-tooltip>-->
+<!--        </q-btn>-->
 
 
       </div>

@@ -73,7 +73,7 @@
             style="max-width:20px"
             size="10px">
             <q-tooltip class="tooltip-small">
-              Add current Tab to '{{ tabset?.name }}'
+              *Add current Tab to '{{ tabset?.name }}'
             </q-tooltip>
           </q-btn>
 

@@ -61,6 +61,7 @@ export class RssFolderHandler implements AddUrlToTabsetHandler {
     console.log("items", items)
     Array.from(items).forEach((item: any) => {
       console.log("item", item)
+      //const title = additionalData['feedname'] || 'no title' //this.getFromItem(item, "title", "no title")
       const title = this.getFromItem(item, "title", "no title")
       const url = item.querySelector("link")?.innerHTML || chromeTab.url
 
@@ -68,6 +69,7 @@ export class RssFolderHandler implements AddUrlToTabsetHandler {
       const published = item.querySelector("pubDate")?.innerHTML || undefined
       const enclosure: Element | null = item.querySelector("enclosure")
       let img = enclosure ? enclosure.getAttribute("url") : undefined
+      console.log("img", img)
       if (!img) {
         const snippet = "<p>" + this.getFromItem(item, "description") + "</p>"
         console.log("snippet", snippet)
@@ -97,23 +99,5 @@ export class RssFolderHandler implements AddUrlToTabsetHandler {
 
   }
 
-  storeAsFeed() {
-    if (this.$q) {
-      return this.$q!.dialog({
-        title: 'Display RSS Feed?',
-        message: 'This file seems to contain an RSS Feed',
-        options: {
-          type: 'checkbox',
-          model: [],
-          items: [
-            {label: 'Display Feed', value: 'displayFeed', color: 'secondary'}
-          ]
-        },
-        cancel: true,
-        persistent: true
-      })
-    } else {
-      console.warn("could not display storeAsFeed, quasar not set")
-    }
-  }
+
 }

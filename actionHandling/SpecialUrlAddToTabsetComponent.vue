@@ -7,8 +7,8 @@
     <q-btn outline
            @click.stop="emits('buttonClicked', new ActionHandlerButtonClickedHolder(handler,'', handler.actions()[0]))"
            class="q-ma-none q-px-sm q-py-none"
-           :class="alreadyInTabset() ? '':'cursor-pointer'"
-           :color="alreadyInTabset() ? 'grey-5': tsBadges.length > 0 ? 'positive':'warning'"
+           :class=" { shake: animateAddtabButton, 'cursor-pointer': !alreadyInTabset() }"
+           :color="alreadyInTabset() ? 'grey-5': tsBadges.length > 0 ? 'positive':'primary'"
            size="xs"
            data-testid="saveInTabsetBtn">
       <div>{{ handler.actions()[0].label }}</div>
@@ -70,6 +70,7 @@ import {useQuasar} from "quasar";
 import {NoopAddUrlToTabsetHandler} from "src/tabsets/actionHandling/handler/NoopAddUrlToTabsetHandler";
 import {useContentStore} from "src/content/stores/contentStore";
 import {ActionHandlerButtonClickedHolder} from "src/tabsets/actionHandling/model/ActionHandlerButtonClickedHolder";
+import {useUiStore} from "src/ui/stores/uiStore";
 
 const props = defineProps({
   currentChromeTab: {type: Object as PropType<chrome.tabs.Tab>, required: true},
@@ -84,17 +85,13 @@ const $q = useQuasar()
 const {getHandler} = useActionHandlers($q)
 
 const handler = ref<AddUrlToTabsetHandler>(new NoopAddUrlToTabsetHandler())
-
 const tsBadges = ref<object[]>([])
+const animateAddtabButton = ref(false)
+
 
 watchEffect(() => {
-  // console.log(`dealing with ${props.tabset.id} (${props.tabset?.dynamicUrl}) /${props.folder?.id} (${props.folder?.dynamicUrl})`)
-  // if (props.tabset.dynamicUrl || props.folder?.dynamicUrl) {
-  //   handler.value = new DynamicUrlAddUrlToTabsetHandler(props.tabset, props.folder)
-  // } else {
   const content = useContentStore().currentTabContent
   handler.value = getHandler(props.currentChromeTab.url, content, props.folder)
-  // }
 })
 
 watchEffect(() => {
@@ -108,6 +105,12 @@ watchEffect(() => {
     })
   })
 })
+
+watchEffect(() => {
+  animateAddtabButton.value = useUiStore().animateAddtabButton
+})
+
+
 
 const alreadyInTabset = () => {
   return useTabsetService().urlExistsInCurrentTabset(props.currentChromeTab.url)

@@ -583,7 +583,7 @@ if (inBexMode()) {
 
 const handleButtonClicked = async (tabset: Tabset, args: ActionHandlerButtonClickedHolder, folder?: Tabset) => {
   console.log(`button clicked: tsId=${tabset.id}, folderId=${folder?.id}, args=...`)
-  useActionHandlers(undefined).handleClick(tabset, currentChromeTab.value!, args, folder)
+  await useActionHandlers(undefined).handleClick(tabset, currentChromeTab.value!, args, folder)
 }
 
 </script>

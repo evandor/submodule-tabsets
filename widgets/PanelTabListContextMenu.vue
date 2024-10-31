@@ -1,5 +1,5 @@
 <template>
-  <q-menu :offset="[0, 0]">
+  <q-menu :offset="[0, 0]" @click.stop="">
     <q-list dense style="min-width: 200px">
 
       <PanelTabListContextMenuHook :tab="props.tab" :tabset="props.tabset"/>
@@ -25,19 +25,19 @@
         </q-item-section>
       </q-item>
 
-      <q-item clickable v-close-popup @click.stop="toggleFav(props['tab' as keyof object])">
-        <q-item-section style="padding-right:0;min-width:25px;max-width: 25px;">
-          <q-icon v-if="!props['tab']?.favorite" size="xs" name="sym_o_star" color="warning"/>
-          <q-icon v-if="props['tab']?.favorite === TabFavorite.NONE" size="xs" name="sym_o_star" color="warning"/>
-          <q-icon v-if="props['tab']?.favorite === TabFavorite.TABSET" size="xs" name="star" color="warning"/>
-          <q-icon v-if="props['tab']?.favorite === TabFavorite.SPACE" size="xs" name="star" color="positive"/>
-        </q-item-section>
-        <q-item-section v-if="!props['tab']?.favorite">Make Favorite</q-item-section>
-        <q-item-section v-if="props['tab']?.favorite === TabFavorite.NONE">Make Favorite</q-item-section>
-        <q-item-section v-if="props['tab']?.favorite === TabFavorite.TABSET && useFeaturesStore().hasFeature(FeatureIdent.SPACES)">Make Spaces Favorite</q-item-section>
-        <q-item-section v-if="props['tab']?.favorite === TabFavorite.TABSET && !useFeaturesStore().hasFeature(FeatureIdent.SPACES)">Remove as Favorite</q-item-section>
-        <q-item-section v-if="props['tab']?.favorite === TabFavorite.SPACE">Remove as Favorite</q-item-section>
-      </q-item>
+<!--      <q-item clickable v-close-popup @click.stop="toggleFav(props['tab' as keyof object])">-->
+<!--        <q-item-section style="padding-right:0;min-width:25px;max-width: 25px;">-->
+<!--          <q-icon v-if="!props['tab']?.favorite" size="xs" name="sym_o_star" color="warning"/>-->
+<!--          <q-icon v-if="props['tab']?.favorite === TabFavorite.NONE" size="xs" name="sym_o_star" color="warning"/>-->
+<!--          <q-icon v-if="props['tab']?.favorite === TabFavorite.TABSET" size="xs" name="star" color="warning"/>-->
+<!--          <q-icon v-if="props['tab']?.favorite === TabFavorite.SPACE" size="xs" name="star" color="positive"/>-->
+<!--        </q-item-section>-->
+<!--        <q-item-section v-if="!props['tab']?.favorite">Make Favorite</q-item-section>-->
+<!--        <q-item-section v-if="props['tab']?.favorite === TabFavorite.NONE">Make Favorite</q-item-section>-->
+<!--        <q-item-section v-if="props['tab']?.favorite === TabFavorite.TABSET && useFeaturesStore().hasFeature(FeatureIdent.SPACES)">Make Spaces Favorite</q-item-section>-->
+<!--        <q-item-section v-if="props['tab']?.favorite === TabFavorite.TABSET && !useFeaturesStore().hasFeature(FeatureIdent.SPACES)">Remove as Favorite</q-item-section>-->
+<!--        <q-item-section v-if="props['tab']?.favorite === TabFavorite.SPACE">Remove as Favorite</q-item-section>-->
+<!--      </q-item>-->
 
       <template v-if="props.tabset?.type.toString() !== TabsetType.DYNAMIC.toString()">
         <q-item clickable

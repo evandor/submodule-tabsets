@@ -43,11 +43,10 @@ const props = defineProps({
 })
 
 const getFaviconUrl = (tab: Tab) => {
-  //const chromeTab = tab?.chromeTab
   if (tab && tab.url?.startsWith("chrome")) {
     return ''
   }
-  if (tab && tab.image && tab.image.trim() !== '') {
+  if (tab && tab.extension === UrlExtension.RSS && tab.image && tab.image.trim() !== '') {
     return tab.image
   }
   if (tab && tab.favIconUrl) {

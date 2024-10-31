@@ -10,7 +10,7 @@ export function useActionHandlers($q: QVueGlobals | undefined) {
   const actionHandlerRepo = new AddUrlToTabsetHandlers($q)
 
   function getHandler(url?: string, content?: string, folder?: Tabset) {
-    console.log(`getHandler for '${url}', content#=${content?.length}, folderId=${folder?.id}`)
+    //console.log(`getHandler for '${url}', content#=${content?.length}, folderId=${folder?.id}`)
     if (folder && folder.type === TabsetType.RSS_FOLDER) {
       return new RssFolderHandler($q)
     }
@@ -49,8 +49,10 @@ export function useActionHandlers($q: QVueGlobals | undefined) {
       //   await useCommandExecutor().execute(new LoadDynamicTabsCommand(tabset, args.folder))
       //   break;
       case ButtonActions.AddRssFeed:
-        handler.withDialog(args.actionContext?.identifier)?.onOk((displayFeed: boolean) => {
-          handler.clicked(chromeTab, tabset, undefined, {displayFeed})
+        console.log("===>", args.actionContext)
+        handler.withDialog(args.actionContext?.identifier)?.onOk((data: {boolean, string}) => {
+          //console.log("in", in2)
+          handler.clicked(chromeTab, tabset, undefined, data)
         })
         break;
       case ButtonActions.LoadRssFeed:

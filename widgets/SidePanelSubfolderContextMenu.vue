@@ -10,7 +10,7 @@
       <ContextMenuItem v-close-popup
                        @was-clicked="renameSubfolder(tabset, folder)"
                        icon="o_edit"
-                       label="Rename Subfolder"/>
+                       label="Rename"/>
 
       <q-separator inset/>
 

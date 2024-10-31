@@ -51,7 +51,7 @@
 
 <script lang="ts" setup>
 
-import {QForm, useDialogPluginComponent} from "quasar";
+import {QForm, uid, useDialogPluginComponent} from "quasar";
 import {Tabset, TabsetStatus} from "src/tabsets/models/Tabset";
 import {ref} from "vue";
 import {useCommandExecutor} from "src/core/services/CommandExecutor";

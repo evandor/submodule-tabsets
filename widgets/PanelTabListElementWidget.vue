@@ -4,7 +4,8 @@
   <q-item-section v-if="useUiStore().listDetailLevelGreaterEqual(ListDetailLevel.SOME, props.tabset?.details)"
                   @mouseover="hoveredTab = tab.id"
                   @mouseleave="hoveredTab = undefined"
-                  class="q-mr-sm text-right" style="justify-content:start;width:30px;max-width:30px">
+                  class="q-mr-sm q-mt-sm text-right"
+                  style="justify-content:start;width:30px;max-width:30px;">
     <div class="bg-grey-3 q-pa-none" :style="iconStyle()">
 
       <transition name="fade" mode="out-in">
@@ -42,17 +43,16 @@
 
   </q-item-section>
 
-  <!-- right part: name, title, description, url && note -->
-  <q-item-section class="q-mb-sm"
-                  :style="TabService.isCurrentTab(props.tab) ? 'border-right:2px solid #1565C0' : ''"
+  <!-- middle part: name, title, description, url && note -->
+  <q-item-section class="q-mb-sm q-mt-sm q-mx-none q-pa-none"
                   @mouseover="hoveredTab = tab.id"
                   @mouseleave="hoveredTab = undefined">
 
     <!-- === name or title === -->
-    <q-item-label>
+    <q-item-label @click.stop="gotoTab()">
       <div class="row">
 
-        <div class="col-11 q-pr-lg cursor-pointer ellipsis" @click.stop="gotoTab()">
+        <div class="col-11 q-pr-lg cursor-pointer ellipsis">
           <span v-if="props.header" class="text-caption">{{ props.header }}<br></span>
           <!--          <span v-if="useTabsStore().getCurrentTabset?.sorting === 'alphabeticalTitle'">-->
           <span v-if="props.sorting === TabSorting.TITLE">
@@ -61,31 +61,25 @@
 
           <span v-if="props.tab?.extension === UrlExtension.NOTE"
                 v-html="nameOrTitle(props.tab as Tab)"/>
-          <span v-else :class="TabService.isCurrentTab(props.tab) ? 'text-bold text-blue-9':''">
+          <span v-else
+                :class="TabService.isCurrentTab(props.tab) ? 'text-bold':''">
             <q-icon v-if="props.tab?.favorite && props.tab?.favorite !== TabFavorite.NONE"
                     :color="props.tab.favorite === TabFavorite.TABSET ? 'warning':'positive'"
                     name="star" class="q-ma-mone">
               <q-tooltip class="tooltip_small">This tab is marked as favorite</q-tooltip>
             </q-icon>
-            {{ nameOrTitle(props.tab as Tab) }}</span>
-          <q-popup-edit
-            v-if="popModel && props.tab?.extension !== UrlExtension.NOTE && !props.tab.placeholders"
-            :model-value="nameOrTitle(props.tab as Tab)" v-slot="scope"
-            @update:model-value="(val:string) => setCustomTitle( tab, val)">
-            <q-input v-model="scope.value" dense autofocus counter @keyup.enter="scope.set"/>
-          </q-popup-edit>
+            <q-icon v-if="props.tab?.tabReferences && props.tab?.tabReferences.length > 0"
+                    @click.stop="showTabReferencesDialog()"
+                    color="positive"
+                    name="o_auto_awesome" class="q-ma-mone">
+              <q-tooltip class="tooltip_small">This tab references other interesting URLs - click here.</q-tooltip>
+            </q-icon>
+             {{ nameOrTitle(props.tab as Tab) }}
+          </span>
 
         </div>
 
-        <div class="col text-right q-mr-md">
-          <span>
-              <q-icon name="more_vert" class="cursor-pointer" color="black" size="16px"/>
-            </span>
-          <PanelTabListContextMenu
-            :tabset="props.tabset"
-            :tabsetId="props.tabsetId"
-            :tab="tab" v-if="!props.hideMenu"/>
-        </div>
+
       </div>
     </q-item-label>
 
@@ -222,7 +216,8 @@
 
             <span>
               <TabListIconIndicatorsHook :tabId="props.tab.id" :tabUrl="props.tab.url"/>
-              <span v-if="props.tab.extension !== UrlExtension.RSS && useUiStore().listDetailLevelGreaterEqual(ListDetailLevel.MAXIMAL, props.tabset?.details)">last active: {{
+              <span
+                v-if="props.tab.extension !== UrlExtension.RSS && useUiStore().listDetailLevelGreaterEqual(ListDetailLevel.MAXIMAL, props.tabset?.details)">last active: {{
                   formatDate(props.tab.lastActive)
                 }}</span>
               <span v-else-if="props.tab.extension === UrlExtension.RSS">published: {{
@@ -267,6 +262,23 @@
     </q-item-label>
 
   </q-item-section>
+
+  <!-- right part -->
+  <q-item-section
+    class="q-ma-none q-pa-none"
+    @mouseover="hoveredTab = tab.id"
+    @mouseleave="hoveredTab = undefined"
+    :style="TabService.isCurrentTab(props.tab) ? 'border-right:3px solid #1565C0;border-radius:3px' : ''"
+    style="justify-content:start;width:30px;max-width:30px">
+    <span>
+      <q-icon name="more_vert" class="cursor-pointer q-mt-sm" color="black" size="20px"/>
+      <PanelTabListContextMenu
+        :tabset="props.tabset"
+        :tabsetId="props.tabsetId"
+        :tab="tab" v-if="!props.hideMenu"/>
+    </span>
+  </q-item-section>
+
 </template>
 
 <script setup lang="ts">
@@ -311,6 +323,7 @@ import {useThumbnailsService} from "src/thumbnails/services/ThumbnailsService";
 import CommentDialog from "src/tabsets/dialogues/CommentDialog.vue";
 import TabListIconIndicatorsHook from "src/app/hooks/tabsets/TabListIconIndicatorsHook.vue";
 import {OpenTabCommand} from "src/tabsets/commands/OpenTabCommand";
+import TabReferencesDialog from "src/tabsets/dialogues/TabReferencesDialog.vue";
 
 const {inBexMode} = useUtils()
 
@@ -577,6 +590,11 @@ const isSender = (m: TabComment) => m.author === useUiStore().sharingAuthor
 const addCommentDialog = () => $q.dialog({
   component: CommentDialog,
   componentProps: {tabId: props.tab.id, sharedId: props.tabset?.sharedId}
+})
+
+const showTabReferencesDialog = () => $q.dialog({
+  component: TabReferencesDialog,
+  componentProps: {tab: props.tab, tabset: props.tabset}
 })
 
 const togglePreview = () => {

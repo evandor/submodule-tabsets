@@ -19,57 +19,57 @@ const {info} = useLogger()
 
 export class CreateTabsetCommand implements Command<SaveOrReplaceResult> {
 
-    public merge: boolean = true
+  public merge: boolean = true
 
-    constructor(
-        public tabsetName: string,
-        public tabsToUse: chrome.tabs.Tab[] = [],
-        public spaceId: string | undefined = undefined,
-        public windowToOpen: string = 'current',
-        public color: string | undefined = undefined,
-        public dynamicSource: string | undefined = undefined) {
-    }
+  constructor(
+    public tabsetName: string,
+    public tabsToUse: chrome.tabs.Tab[] = [],
+    public spaceId: string | undefined = undefined,
+    public windowToOpen: string = 'current',
+    public color: string | undefined = undefined,
+    public dynamicSource: string | undefined = undefined) {
+  }
 
-    async execute(): Promise<ExecutionResult<SaveOrReplaceResult>> {
-        try {
-            //const trustedWindowName = this.windowToOpen.replace(STRIP_CHARS_IN_USER_INPUT, '')
-            const windowId = this.windowToOpen ?
-                this.windowToOpen.replace(STRIP_CHARS_IN_USER_INPUT, '') : 'current'
-            useWindowsStore().addToWindowSet(windowId)
-            const result: SaveOrReplaceResult = await useTabsetService()
-                .saveOrReplaceFromChromeTabs(this.tabsetName, this.tabsToUse, this.merge, windowId, TabsetType.DEFAULT, this.color, this.dynamicSource, this.spaceId)
-                .then(res => {
-                    //JsUtils.gaEvent('tabset-created', {"tabsCount": this.tabsToUse.length})
-                    Analytics.fireEvent('tabset-created', {"tabsCount": this.tabsToUse.length})
-                    return res
-                })
-                .then(res => {
-                        //   if (useTabsetsStore().tabsets.size === 5 && !useFeaturesStore().hasFeature(FeatureIdent.BOOKMARKS) && process.env.MODE === 'bex') {
-                        //     useSuggestionsStore().addSuggestion(Suggestion.getStaticSuggestion(StaticSuggestionIdent.TRY_BOOKMARKS_FEATURE))
-                        //         }
-                        if (useTabsetsStore().tabsets.size >= 15 &&
-                            !useFeaturesStore().hasFeature(FeatureIdent.SPACES) &&
-                            process.env.MODE === 'bex') {
-                            useSuggestionsStore().addSuggestion(Suggestion.getStaticSuggestion(StaticSuggestionIdent.TRY_SPACES_FEATURE))
-                        // } else if (useTabsetsStore().tabsets.size >= 3 &&
-                        //     useTabsetsStore().allTabsCount > 10 &&
-                        //     !useFeaturesStore().hasFeature(FeatureIdent.NEWEST_TABS) &&
-                        //     process.env.MODE === 'bex') {
-                        //     useSuggestionsStore().addSuggestion(Suggestion.getStaticSuggestion(StaticSuggestionIdent.TRY_NEWEST_TABS_FEATURE))
-                        }
-                        info("tabset created")
-                        sendMsg('tabset-added', {tabsetId: res.tabset.id})
-                        return res
-                    }
-                )
-            let doneMsg = 'Tabset created'
-            return Promise.resolve(new ExecutionResult<SaveOrReplaceResult>(result, doneMsg))
-        } catch (err) {
-            return Promise.reject(err)
-        }
+  async execute(): Promise<ExecutionResult<SaveOrReplaceResult>> {
+    try {
+      //const trustedWindowName = this.windowToOpen.replace(STRIP_CHARS_IN_USER_INPUT, '')
+      const windowId = this.windowToOpen ?
+        this.windowToOpen.replace(STRIP_CHARS_IN_USER_INPUT, '') : 'current'
+      useWindowsStore().addToWindowSet(windowId)
+      const result: SaveOrReplaceResult = await useTabsetService()
+        .saveOrReplaceFromChromeTabs(this.tabsetName, this.tabsToUse, this.merge, windowId, TabsetType.DEFAULT, this.color, this.dynamicSource, this.spaceId)
+        .then(res => {
+          //JsUtils.gaEvent('tabset-created', {"tabsCount": this.tabsToUse.length})
+          Analytics.fireEvent('tabset-created', {"tabsCount": this.tabsToUse.length})
+          return res
+        })
+        .then(res => {
+            if (useTabsetsStore().tabsets.size > 1 && !useFeaturesStore().hasFeature(FeatureIdent.BOOKMARKS) && process.env.MODE === 'bex') {
+              useSuggestionsStore().addSuggestion(Suggestion.getStaticSuggestion(StaticSuggestionIdent.TRY_BOOKMARKS_FEATURE))
+            }
+            if (useTabsetsStore().tabsets.size >= 15 &&
+              !useFeaturesStore().hasFeature(FeatureIdent.SPACES) &&
+              process.env.MODE === 'bex') {
+              useSuggestionsStore().addSuggestion(Suggestion.getStaticSuggestion(StaticSuggestionIdent.TRY_SPACES_FEATURE))
+              // } else if (useTabsetsStore().tabsets.size >= 3 &&
+              //     useTabsetsStore().allTabsCount > 10 &&
+              //     !useFeaturesStore().hasFeature(FeatureIdent.NEWEST_TABS) &&
+              //     process.env.MODE === 'bex') {
+              //     useSuggestionsStore().addSuggestion(Suggestion.getStaticSuggestion(StaticSuggestionIdent.TRY_NEWEST_TABS_FEATURE))
+            }
+            info("tabset created")
+            sendMsg('tabset-added', {tabsetId: res.tabset.id})
+            return res
+          }
+        )
+      let doneMsg = 'Tabset created'
+      return Promise.resolve(new ExecutionResult<SaveOrReplaceResult>(result, doneMsg))
+    } catch (err) {
+      return Promise.reject(err)
     }
+  }
 }
 
 CreateTabsetCommand.prototype.toString = function cmdToString() {
-    return `CreateTabsetCommand: {merge=${this.merge}, tabsetName=${this.tabsetName}, tabs#=${this.tabsToUse.length}, windowToOpen#=${this.windowToOpen}}`;
+  return `CreateTabsetCommand: {merge=${this.merge}, tabsetName=${this.tabsetName}, tabs#=${this.tabsToUse.length}, windowToOpen#=${this.windowToOpen}}`;
 };
