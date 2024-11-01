@@ -192,7 +192,7 @@ export function useTabsetService() {
   }
 
   const selectTabset = (tabsetId: string | undefined): void => {
-    console.debug("selecting tabset", tabsetId)
+    //console.debug("selecting tabset", tabsetId)
     resetSelectedTabs()
     if (tabsetId) {
       useTabsetsStore().selectCurrentTabset(tabsetId)

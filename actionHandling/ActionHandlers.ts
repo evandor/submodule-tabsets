@@ -15,7 +15,7 @@ export function useActionHandlers($q: QVueGlobals | undefined) {
       return new RssFolderHandler($q)
     }
     const handler = url ? actionHandlerRepo.handlerFor(url, content || '') : actionHandlerRepo.defaultAddUrlToTabsetHandler
-    console.log("getting url handler for ", url, handler)
+    //console.log("getting url handler for ", url, handler)
     return handler
   }
 
@@ -50,8 +50,8 @@ export function useActionHandlers($q: QVueGlobals | undefined) {
       //   break;
       case ButtonActions.AddRssFeed:
         console.log("===>", args.actionContext)
-        handler.withDialog(args.actionContext?.identifier)?.onOk((data: {boolean, string}) => {
-          //console.log("in", in2)
+        handler.withDialog(args.actionContext?.identifier)?.onOk((data: {b: boolean, s: string}) => {
+          console.log("in", data)
           handler.clicked(chromeTab, tabset, undefined, data)
         })
         break;

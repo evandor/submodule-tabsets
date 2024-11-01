@@ -39,7 +39,8 @@
 <!--        <q-item-section v-if="props['tab']?.favorite === TabFavorite.SPACE">Remove as Favorite</q-item-section>-->
 <!--      </q-item>-->
 
-      <template v-if="props.tabset?.type.toString() !== TabsetType.DYNAMIC.toString()">
+      <!-- for now, revisit comments -->
+      <!--<template v-if="props.tabset?.type.toString() !== TabsetType.DYNAMIC.toString()">
         <q-item clickable
                 v-close-popup @click.stop="addCommentDialog()">
           <q-item-section style="padding-right:0;min-width:25px;max-width: 25px;">
@@ -49,7 +50,7 @@
             Add Comment
           </q-item-section>
         </q-item>
-      </template>
+      </template>-->
 
       <template v-if="useFeaturesStore().hasFeature(FeatureIdent.ADVANCED_TAB_MANAGEMENT)">
         <q-separator inset/>
