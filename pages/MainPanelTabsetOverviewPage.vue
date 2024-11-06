@@ -33,7 +33,7 @@
     narrow-indicator>
     <q-tab name="grid" label="As Grid" @click="setView('grid')"/>
     <q-tab name="list" label="As List" @click="setView('list')"/>
-    <q-tab name="list" label="As Timeline" @click="setView('timeline')"/>
+<!--    <q-tab name="list" label="As Timeline" @click="setView('timeline')"/>-->
   </q-tabs>
 
 
@@ -60,12 +60,7 @@
 
     <q-tab-panel class="q-ma-none q-pa-none" name="timeline">
       todo
-<!--      <Timeline-->
-<!--        :groups="groups"-->
-<!--        :items="items"-->
-<!--        :viewportMin="1703112200000"-->
-<!--        :viewportMax="1714566600000"-->
-<!--      />-->
+
     </q-tab-panel>
 
   </q-tab-panels>
@@ -83,8 +78,6 @@ import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import TabsetPageCards from "src/tabsets/pages/pwa/TabsetPageCards.vue";
 import NavigationService from "src/services/NavigationService";
 import TabList from "src/tabsets/pages/pwa/TabList.vue";
-import { Timeline } from 'vue-timeline-chart';
-import 'vue-timeline-chart/style.css';
 
 const route = useRoute()
 

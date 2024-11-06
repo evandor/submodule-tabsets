@@ -2,7 +2,8 @@ import {uid} from "quasar";
 import {STRIP_CHARS_IN_USER_INPUT} from "boot/constants";
 import _ from "lodash"
 import {Placeholders} from "src/tabsets/models/Placeholders";
-import {TabReference} from "src/content/models/TabReference";
+import {TabReference, TabReferenceType} from "src/content/models/TabReference";
+import {ExcalidrawStorage} from "src/tabsets/actionHandling/model/ExcalidrawStorage";
 
 export enum TabSorting {
   URL = "URL",
@@ -147,11 +148,11 @@ export class Tab {
 
   coordinates: TabCoordinate[] = []
 
-  storage: { [k: string]: any } = {}
+  storage: ExcalidrawStorage | undefined = undefined
 
   tabReferences: TabReference[] = []
 
-  article: object | undefined = undefined
+  // article: object | undefined = undefined
 
   constructor(public id: string, chromeTab: chrome.tabs.Tab) {
     this.created = new Date().getTime()
@@ -254,7 +255,13 @@ export class Tab {
     }
     return ext
   }
+
+  hasTabReference(type: TabReferenceType): boolean {
+    return this.tabReferences.findIndex((ref:TabReference) => ref.type === type) >= 0
+  }
+
 }
+
 
 Tab.prototype.toString = function tabToString() {
   return `Tab: {id=${this.id}, url=${this.url}, #history=${this.history.length}}`;

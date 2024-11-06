@@ -17,7 +17,7 @@ export class AddUrlToTabsetHandlers {
     this.handlers.push(new RssUrlAddUrlToTabsetHandler(this.quasar))
   }
 
-  handlerFor(url: string, content: string): AddUrlToTabsetHandler {
+  handlerFor(url: string, content: string, article?: object): AddUrlToTabsetHandler {
     const handler = this.handlers.filter((h: AddUrlToTabsetHandler) => url.match(h.urlMatcher()) || h.contentMatcher(content))
     return handler && handler.length > 0 ? handler[0] : this.defaultAddUrlToTabsetHandler
   }

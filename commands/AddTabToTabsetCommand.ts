@@ -82,10 +82,11 @@ export class AddTabToTabsetCommand implements Command<any> {
 
       // Article (ReaderMode)
       if (useFeaturesStore().hasFeature(FeatureIdent.READING_MODE)) {
-        this.tab.article = useContentStore().currentTabArticle
-        if (this.tab.article) {
-          this.tab.tabReferences.push(new TabReference(uid(), TabReferenceType.ORIGINAL_URL, "original url", [], this.tab.url))
-          this.tab.url = chrome.runtime.getURL(`/www/index.html#/mainpanel/readingmode/${this.tab.id}`)
+        const article = useContentStore().currentTabArticle
+        if (article && article['title' as keyof object] && article['textContent'] && article['textContent'].length > 500) {
+          this.tab.tabReferences.push(new TabReference(uid(), TabReferenceType.READING_MODE, article['title' as keyof object], [article], this.tab.url))
+          //this.tab.url = chrome.runtime.getURL(`/www/index.html#/mainpanel/readingmode/${this.tab.id}`)
+          useContentStore().resetCurrentTabArticle()
         }
       }
 

@@ -26,28 +26,28 @@
   </template>
 
   <template v-else-if="handler.actions().length > 1">
-    <q-btn-dropdown :label="'save as ' + handler.actions()[0].label"
+    <q-btn-dropdown :label="handler.actions()[0].label"
                     @click.stop="emits('buttonClicked', new ActionHandlerButtonClickedHolder(handler, ButtonActions.Save, handler.actions()[0], {filename: handler.actions()[0].label}))"
                     class="q-ma-none q-px-sm q-py-none"
                     size="xs"
                     split
                     outline>
       <q-list dense>
-        <q-item v-for="l in handler.actions"
+        <q-item v-for="l in handler.actions().slice(1)"
                 clickable dense
-                @click.stop="emits('asNewFile')">
+                @click.stop="emits('buttonClicked', new ActionHandlerButtonClickedHolder(handler, ButtonActions.Save, l, {}))">
           <q-item-section>
-            <q-item-label>save as {{ l }}</q-item-label>
+            <q-item-label>{{ l.label }}</q-item-label>
           </q-item-section>
         </q-item>
 
-        <q-item
-          clickable dense v-close-popup
-          @click.stop="emits('buttonClicked', new ActionHandlerButtonClickedHolder(handler, ButtonActions.SaveAs))">
-          <q-item-section>
-            <q-item-label>as new file</q-item-label>
-          </q-item-section>
-        </q-item>
+<!--        <q-item-->
+<!--          clickable dense v-close-popup-->
+<!--          @click.stop="emits('buttonClicked', new ActionHandlerButtonClickedHolder(handler, ButtonActions.SaveAs))">-->
+<!--          <q-item-section>-->
+<!--            <q-item-label>as new file</q-item-label>-->
+<!--          </q-item-section>-->
+<!--        </q-item>-->
 
       </q-list>
     </q-btn-dropdown>
@@ -90,8 +90,7 @@ const animateAddtabButton = ref(false)
 
 
 watchEffect(() => {
-  const content = useContentStore().currentTabContent
-  handler.value = getHandler(props.currentChromeTab.url, content, props.folder)
+  handler.value = getHandler(props.currentChromeTab.url, props.folder)
 })
 
 watchEffect(() => {

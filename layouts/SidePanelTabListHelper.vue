@@ -1,5 +1,6 @@
 <template>
   <!-- SidePanelTabListHelper -->
+  <!--  @dragstart="startDrag($event, tab)" -->
   <q-item
     clickable
     v-ripple

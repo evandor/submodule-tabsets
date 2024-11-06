@@ -4,16 +4,18 @@ import {AddUrlToTabsetHandlers} from "src/tabsets/actionHandling/AddUrlToTabsetH
 import {RssFolderHandler} from "src/tabsets/actionHandling/handler/RssFolderHandler";
 import {ActionHandlerButtonClickedHolder} from "src/tabsets/actionHandling/model/ActionHandlerButtonClickedHolder";
 import {ButtonActions} from "src/tabsets/actionHandling/AddUrlToTabsetHandler";
+import {useContentStore} from "src/content/stores/contentStore";
 
 export function useActionHandlers($q: QVueGlobals | undefined) {
 
   const actionHandlerRepo = new AddUrlToTabsetHandlers($q)
 
-  function getHandler(url?: string, content?: string, folder?: Tabset) {
-    //console.log(`getHandler for '${url}', content#=${content?.length}, folderId=${folder?.id}`)
+  function getHandler(url?: string,  folder?: Tabset) {
+    //console.log(`getHandler for '${url}', folderId=${folder?.id}`)
     if (folder && folder.type === TabsetType.RSS_FOLDER) {
       return new RssFolderHandler($q)
     }
+    const content = useContentStore().currentTabContent
     const handler = url ? actionHandlerRepo.handlerFor(url, content || '') : actionHandlerRepo.defaultAddUrlToTabsetHandler
     //console.log("getting url handler for ", url, handler)
     return handler
@@ -58,6 +60,9 @@ export function useActionHandlers($q: QVueGlobals | undefined) {
       case ButtonActions.LoadRssFeed:
         await handler.clicked(chromeTab, tabset, folder, {})
         break;
+      // case ButtonActions.ClearCanvas:
+      //   await handler.clicked(chromeTab, tabset, folder, {})
+      //   break;
       default:
         console.log("no action defined for ", args.actionContext?.identifier)
 

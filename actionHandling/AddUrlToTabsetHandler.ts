@@ -6,13 +6,15 @@ import {ActionContext} from "src/tabsets/actionHandling/model/ActionContext";
 
 export enum ButtonActions {
   AddTab = "AddTab",
+  AddReadingModeTab = "AddReadingModeTab",
   AddTabWithDynamicFolder = "AddTabWithDynamicFolder",
   NewFile = "NewFile",
   SaveAs = "SaveAs",
   Save = "Save",
   DynamicLoad = "DynamicLoad",
   AddRssFeed = "AddRssFeed",
-  LoadRssFeed = "LoadRssFeed"
+  LoadRssFeed = "LoadRssFeed",
+  ClearCanvas = "ClearCanvas"
 }
 
 export interface AddUrlToTabsetHandler {

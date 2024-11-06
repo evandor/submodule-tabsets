@@ -4,7 +4,7 @@ import {computed, ref} from "vue";
 import {uid} from "quasar";
 import {Tabset, TabsetSharing, TabsetStatus} from "src/tabsets/models/Tabset";
 import TabsetsPersistence from "src/tabsets/persistence/TabsetsPersistence";
-import {Tab, TabComment, UrlExtension} from "src/tabsets/models/Tab";
+import {Tab, TabComment} from "src/tabsets/models/Tab";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {useWindowsStore} from "src/windows/stores/windowsStore";
 import {STRIP_CHARS_IN_COLOR_INPUT, STRIP_CHARS_IN_USER_INPUT} from "boot/constants";
@@ -46,7 +46,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       // TODO remove after version 0.5.0
       await storage.migrate()
 
-      console.debug(" ...initialized tabsets: Store",'✅')
+      console.debug(" ...initialized tabsets: Store", '✅')
       await storage.loadTabsets()
     }
 
@@ -70,7 +70,6 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       color: string | undefined = undefined,
       dynamicUrl: URL | undefined = undefined,
       spaceId: string | undefined = undefined
-
     ): Promise<Tabset> {
       const currentTabsetsCount = tabsets.value.size
       if (useAuthStore().limitExceeded(AccessItem.TABSETS, currentTabsetsCount)) {
@@ -103,7 +102,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
         ts.spaces = [spaceId]
       }
       tabsets.value.set(ts.id, ts)
-     // console.log("storage", storage)
+      // console.log("storage", storage)
       await storage.addTabset(ts)
 
       // TODO
@@ -276,9 +275,15 @@ export const useTabsetsStore = defineStore('tabsets', () => {
 
     const allTabsCount = computed(() => {
       var count = 0
-      for (const value of tabsets.value.values()) {
-        const nr = value.tabs?.length
-        count = count + nr
+
+      function countAllTabs(ts: Tabset): number {
+        const directCount: number = ts.tabs?.length || 0
+        const childrenCount: number = ts.folders.map((f: Tabset) => countAllTabs(f)).reduce((a, b) => a + b, 0)
+        return directCount + childrenCount;
+      }
+
+      for (const ts of tabsets.value.values()) {
+        count = count + countAllTabs(ts)
       }
       return count;
     })
@@ -301,15 +306,15 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       return _.map(
         _.flatMap(
           [...useTabsetsStore().tabsets.values()] as Tabset[],
-          ((ts:Tabset) => ts.tabs)),
+          ((ts: Tabset) => ts.tabs)),
         (t: Tab) => t.url || '')
     }
 
-    const  getActiveFolder = (root: Tabset, folderActive: string | undefined = root.folderActive):Tabset | undefined => {
+    const getActiveFolder = (root: Tabset, folderActive: string | undefined = root.folderActive): Tabset | undefined => {
       if (!folderActive) {
         return root
       }
-      for(const f of root.folders) {
+      for (const f of root.folders) {
         if (f.id === folderActive) {
           return f
         } else {

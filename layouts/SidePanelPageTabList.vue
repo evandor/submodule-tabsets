@@ -78,8 +78,8 @@ const props = defineProps({
 const tabs = ref<Tab[]>([])
 
 const handleDragAndDrop = async (event: any, column: TabsetColumn) => {
-  const {moved, added} = event
   console.log("SidePanelPageTabList d&d event:", event)
+  const {moved, added} = event
   if (moved) {
     console.log(`moved event: '${moved.element.tab.id}' ${moved.oldIndex} -> ${moved.newIndex} (${props.activeFolder})`)
     const tabsInColumn = tabsForColumn()

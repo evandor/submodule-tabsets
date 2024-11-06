@@ -6,6 +6,7 @@ import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {AddTabToTabsetCommand} from "src/tabsets/commands/AddTabToTabsetCommand";
 import {AddUrlToTabsetHandler, ButtonActions} from "src/tabsets/actionHandling/AddUrlToTabsetHandler";
 import {ActionContext} from "src/tabsets/actionHandling/model/ActionContext";
+import {useContentStore} from "src/content/stores/contentStore";
 
 export class DefaultAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
 
@@ -19,6 +20,11 @@ export class DefaultAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
 
 
   actions():ActionContext[] {
+    // const article = useContentStore().currentTabArticle
+    // console.log("aritcle2:", article)
+    // if (article && article['title' as keyof object]) {
+    //   return [new ActionContext("Add Tab", ButtonActions.AddTab),new ActionContext("Reading Mode", ButtonActions.AddReadingModeTab)]
+    // }
     return [new ActionContext("Add Tab", ButtonActions.AddTab)]
   }
 

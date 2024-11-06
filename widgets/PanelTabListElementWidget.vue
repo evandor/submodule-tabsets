@@ -68,12 +68,18 @@
                     name="star" class="q-ma-mone">
               <q-tooltip class="tooltip_small">This tab is marked as favorite</q-tooltip>
             </q-icon>
-            <q-icon v-if="props.tab?.tabReferences && props.tab?.tabReferences.length > 0"
-                    @click.stop="showTabReferencesDialog()"
-                    color="positive"
-                    name="o_auto_awesome" class="q-ma-mone">
-              <q-tooltip class="tooltip_small">This tab references other interesting URLs - click here.</q-tooltip>
-            </q-icon>
+            <!--            <q-icon v-if="props.tab?.tabReferences && props.tab?.tabReferences.length > 0"-->
+            <!--                    @click.stop="showTabReferencesDialog()"-->
+            <!--                    color="positive"-->
+            <!--                    name="o_auto_awesome" class="q-ma-mone">-->
+            <!--              <q-tooltip class="tooltip_small">This tab references other interesting URLs - click here.</q-tooltip>-->
+            <!--            </q-icon>-->
+            <!--             <q-icon v-if="useFeaturesStore().hasFeature(FeatureIdent.READING_MODE) && props.tab.article && props.tab.article['title' as keyof object]"-->
+            <!--                     @click.stop="showInReadingMode()"-->
+            <!--                     color="primary"-->
+            <!--                     name="o_library_books" class="q-ma-mone">-->
+            <!--              <q-tooltip class="tooltip_small">This tab references other interesting URLs - click here.</q-tooltip>-->
+            <!--            </q-icon>-->
              {{ nameOrTitle(props.tab as Tab) }}
           </span>
 
@@ -122,6 +128,9 @@
                     name="o_settings">
               <q-tooltip class="tooltip">{{ matcherTooltip() }}</q-tooltip>
             </q-icon>
+            <span v-if="showReadingMode()" class="cursor-pointer" @click.stop="showInReadingMode()">
+              [Reading Mode]
+            </span>
             <!-- <q-icon class="q-ml-xs" name="open_in_new"/>-->
             <ul v-if="placeholders.length > 0">
               <div v-for="placeholder in placeholders">
@@ -317,13 +326,14 @@ import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {useFeaturesStore} from "src/features/stores/featuresStore";
 import TabService from "src/services/TabService";
 import {DeleteCommentCommand} from "src/domain/tabs/DeleteCommentCommand";
-import {UpdateTabNameCommand} from "src/domain/tabs/UpdateTabName";
 import {SavedBlob} from "src/snapshots/models/SavedBlob";
 import {useThumbnailsService} from "src/thumbnails/services/ThumbnailsService";
 import CommentDialog from "src/tabsets/dialogues/CommentDialog.vue";
 import TabListIconIndicatorsHook from "src/app/hooks/tabsets/TabListIconIndicatorsHook.vue";
 import {OpenTabCommand} from "src/tabsets/commands/OpenTabCommand";
-import TabReferencesDialog from "src/tabsets/dialogues/TabReferencesDialog.vue";
+import {useNavigationService} from "src/core/services/NavigationService";
+import {TabReferenceType} from "src/content/models/TabReference";
+import BrowserApi from "src/app/BrowserApi";
 
 const {inBexMode} = useUtils()
 
@@ -558,12 +568,6 @@ const showSuggestion = () => {
 
 const openImage = () => window.open(chrome.runtime.getURL('www/index.html#/mainpanel/png/' + props.tab.id + "/" + pngs.value[0].id))
 
-// const deleteAnnotation = async (tab: Tab, annotationToDelete: any) => {
-//   //console.log("deleting annotatin", tab, annotationToDelete)
-//   tab.annotations = _.filter(tab.annotations, (a:any) => a.id !== annotationToDelete.id)
-//   useTabsetService().saveCurrentTabset()
-// }
-
 const showComments = () =>
   showCommentList.value &&
   useUiStore().listDetailLevelGreaterEqual(ListDetailLevel.SOME, props.tabset?.details) &&
@@ -592,10 +596,8 @@ const addCommentDialog = () => $q.dialog({
   componentProps: {tabId: props.tab.id, sharedId: props.tabset?.sharedId}
 })
 
-const showTabReferencesDialog = () => $q.dialog({
-  component: TabReferencesDialog,
-  componentProps: {tab: props.tab, tabset: props.tabset}
-})
+const showInReadingMode = () => useNavigationService()
+  .browserTabFor(chrome.runtime.getURL(`/www/index.html#/mainpanel/readingmode/${props.tab.id}`))
 
 const togglePreview = () => {
   if (props.tab) {
@@ -614,9 +616,14 @@ const deleteSelectedComment = () => {
   }
 }
 
-const setCustomTitle = (tab: Tab, newValue: string) =>
-  useCommandExecutor().executeFromUi(new UpdateTabNameCommand(tab, newValue))
-
+const showReadingMode = () => {
+  if (props.tab) {
+    //console.log("xxx", props.tab.id)
+    const t: Tab = Object.assign(new Tab(props.tab.id, BrowserApi.createChromeTabObject("","")), props.tab)
+    return useFeaturesStore().hasFeature(FeatureIdent.READING_MODE) && t.hasTabReference(TabReferenceType.READING_MODE)
+  }
+  return false
+}
 </script>
 
 <!--https://stackoverflow.com/questions/41078478/css-animated-checkmark -->

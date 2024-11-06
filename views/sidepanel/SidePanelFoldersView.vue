@@ -2,11 +2,22 @@
   <!-- SidePanelFoldersView -->
   <div class="q-ma-none q-pa-sm q-pl-md greyBorderBottom" v-if="props.tabset?.folders.length > 0">
     <q-breadcrumbs>
-      <q-breadcrumbs-el class="cursor-pointer" @click="selectFolder(props.tabset)" icon="home" label="Home"/>
-      <q-breadcrumbs-el class="cursor-pointer" @click="selectFolder(props.tabset, f)" v-for="f in currentFolderPath()" :label="f.name"
+
+      <q-breadcrumbs-el class="cursor-pointer" icon="home" label="Home"
+                        @click="selectFolder(props.tabset)"
+                        @dragover="overDrag2($event)"
+                        @drop="dropAtBreadcrumb($event)"
+      />
+      <q-breadcrumbs-el v-for="f in currentFolderPath()"
+                        class="cursor-pointer"
+                        @dragover="overDrag2($event)"
+                        @drop="dropAtBreadcrumb($event,f)"
+                        @click="selectFolder(props.tabset, f)" :label="f['name' as keyof object]"
       />
     </q-breadcrumbs>
+
   </div>
+
   <q-list>
     <q-item v-if="props.tabset"
             v-for="folder in calcFolders(props.tabset)"
@@ -42,13 +53,13 @@
                       @mouseleave="hoveredTabset = undefined">
         <q-item-label>
 
-                    <SpecialUrlAddToTabsetComponent
-                      v-if="currentChromeTab"
-                      @button-clicked="(args:ActionHandlerButtonClickedHolder) => handleButtonClicked(tabset, args, folder)"
-                      :currentChromeTab="currentChromeTab"
-                      :tabset="tabset"
-                      :folder="folder"
-                    />
+          <SpecialUrlAddToTabsetComponent
+            v-if="currentChromeTab"
+            @button-clicked="(args:ActionHandlerButtonClickedHolder) => handleButtonClicked(tabset, args, folder)"
+            :currentChromeTab="currentChromeTab"
+            :tabset="tabset"
+            :folder="folder"
+          />
 
           <q-icon class="cursor-pointer" name="more_vert" size="16px"/>
           <SidePanelSubfolderContextMenu :tabset="tabset" :folder="folder"/>
@@ -109,12 +120,18 @@ const startDrag = (evt: any, folder: Tabset) => {
   console.log("evt.dataTransfer.getData('text/plain')", evt.dataTransfer.getData('text/plain'))
 }
 const enterDrag = (evt: any, folder: Tabset) => {
-  console.log("enter drag", evt, folder)
+  //console.log("enter drag", evt, folder)
 }
 const overDrag = (event: any, folder: Tabset) => {
-  console.log("enter drag", event, folder)
+  //console.log("enter drag", event, folder)
   event.preventDefault();
 }
+
+const overDrag2 = (event: any) => {
+  //console.log("enter drag2")
+  event.preventDefault();
+}
+
 const endDrag = (evt: any, folder: Tabset) => {
   console.log("end drag", evt, folder)
 }
@@ -125,6 +142,18 @@ const drop = (evt: any, folder: Tabset) => {
   if (tabToDrag && tabset) {
     console.log("tabToDrag", tabToDrag)
     const moveToFolderId = folder.id
+    console.log("moveToFolderId", moveToFolderId)
+    useTabsetService().moveTabToFolder(tabset, tabToDrag, moveToFolderId)
+  }
+}
+
+const dropAtBreadcrumb = (evt: any, f?: any) => {
+  console.log("dropAtBreadcrumb", evt, f)
+  const tabToDrag = useUiStore().tabBeingDragged
+  const tabset = useTabsetsStore().getCurrentTabset as Tabset | undefined
+  console.log("tabToDrag", tabToDrag, tabset?.id)
+  if (tabToDrag && tabset) {
+    const moveToFolderId = f?.id || undefined
     console.log("moveToFolderId", moveToFolderId)
     useTabsetService().moveTabToFolder(tabset, tabToDrag, moveToFolderId)
   }
@@ -151,7 +180,7 @@ const handleButtonClicked = async (tabset: Tabset, args: ActionHandlerButtonClic
   await useActionHandlers(undefined).handleClick(tabset, currentChromeTab.value!, args, folder)
 }
 
-const parentChain = (tabset: Tabset, folder?: Tabset, chain: Tabset[] = [], depth:number = 0):object[] => {
+const parentChain = (tabset: Tabset, folder?: Tabset, chain: Tabset[] = [], depth: number = 0): Tabset[] => {
   if (depth > 10) { // safety net
     return chain
   }
@@ -159,24 +188,29 @@ const parentChain = (tabset: Tabset, folder?: Tabset, chain: Tabset[] = [], dept
     return chain
   }
   if (!folder) {
-    const f:Tabset | undefined = useTabsetsStore().getActiveFolder(tabset, tabset.folderActive)
+    const f: Tabset | undefined = useTabsetsStore().getActiveFolder(tabset, tabset.folderActive)
     if (f) {
       chain.push(f)
       return parentChain(tabset, f, chain, depth++)
     }
   } else {
-    const f:Tabset | undefined = useTabsetsStore().getActiveFolder(tabset, folder.folderParent)
+    const f: Tabset | undefined = useTabsetsStore().getActiveFolder(tabset, folder.folderParent)
     if (f) {
       chain.push(f)
       return parentChain(tabset, f, chain, depth++)
     }
   }
+  return chain
 }
 
-const currentFolderPath = (): object[] => {
-  const res = parentChain(props.tabset)
+const currentFolderPath = (): Tabset[] => {
+  const res:Tabset[] = parentChain(props.tabset)
   console.log("res", res)
-  return res
+  return res.reverse()
+}
+
+const onDrop = (evt: any) => {
+  console.log("evt!!", evt)
 }
 
 </script>
