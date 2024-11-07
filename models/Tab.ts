@@ -4,6 +4,9 @@ import _ from "lodash"
 import {Placeholders} from "src/tabsets/models/Placeholders";
 import {TabReference, TabReferenceType} from "src/content/models/TabReference";
 import {ExcalidrawStorage} from "src/tabsets/actionHandling/model/ExcalidrawStorage";
+import {useUtils} from "src/core/services/Utils";
+
+const {sanitizeAsText, sanitizeAsHtml} = useUtils()
 
 export enum TabSorting {
   URL = "URL",
@@ -42,12 +45,12 @@ export class HTMLSelection {
 
 export class TabCoordinate {
 
- // public id: string;
+  // public id: string;
 
   constructor(
     public identifier: string,
     public val: object
-    ) {
+  ) {
     //this.id = uid()
   }
 }
@@ -72,13 +75,28 @@ export class TabComment {
   static commentIsShortEnough = (val: string) => val ? val.length <= 1024 : true
 }
 
+export class TabSnippet {
+  date: number = 0
+  public id: string;
+
+  constructor(
+    public text: string = '',
+    public html: string = ''
+  ) {
+    this.date = new Date().getTime()
+    this.id = uid()
+    this.text = sanitizeAsText(text)
+    this.html = sanitizeAsHtml(html)
+  }
+}
+
 export enum TabPreview {
-  FAVICON= "FAVICON",
+  FAVICON = "FAVICON",
   THUMBNAIL = "THUMBNAIL"
 }
 
 export enum TabFavorite {
-  NONE= "NONE",
+  NONE = "NONE",
   TABSET = "TABSET",
   SPACE = "SPACE"
 }
@@ -102,7 +120,7 @@ export class Tab {
   columnId: string | undefined
 
   history: string[] = []
-  // selected: boolean = false -- selections should be handled 'outside' of this entity
+
   name: string | undefined
   bookmarkUrl: string | undefined
   bookmarkId: string | undefined
@@ -143,6 +161,8 @@ export class Tab {
   canvasHeight: number | undefined
 
   comments: TabComment[] = []
+
+  snippets: TabSnippet[] = []
 
   preview: TabPreview = TabPreview.FAVICON
 
@@ -190,8 +210,8 @@ export class Tab {
     this.preview = TabPreview.FAVICON
 
     this.tags = _.uniq(_.filter(
-      _.map(this.tags, (t:string) => t.replace(STRIP_CHARS_IN_USER_INPUT, '')),
-      (e:string) => e.trim() !== ''))
+      _.map(this.tags, (t: string) => t.replace(STRIP_CHARS_IN_USER_INPUT, '')),
+      (e: string) => e.trim() !== ''))
 
     if (!Tab.titleIsValid) {
       throw new Error(`Tab's title '${this.title}' is not valid`)
@@ -257,7 +277,7 @@ export class Tab {
   }
 
   hasTabReference(type: TabReferenceType): boolean {
-    return this.tabReferences.findIndex((ref:TabReference) => ref.type === type) >= 0
+    return this.tabReferences.findIndex((ref: TabReference) => ref.type === type) >= 0
   }
 
 }

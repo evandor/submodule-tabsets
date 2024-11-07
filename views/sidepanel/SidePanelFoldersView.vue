@@ -1,6 +1,6 @@
 <template>
   <!-- SidePanelFoldersView -->
-  <div class="q-ma-none q-pa-sm q-pl-md greyBorderBottom" v-if="props.tabset?.folders.length > 0">
+  <div class="q-ma-none q-pa-sm q-pl-md greyBorderBottom" v-if="props.tabset?.folders?.length > 0">
     <q-breadcrumbs>
 
       <q-breadcrumbs-el class="cursor-pointer" icon="home" label="Home"
@@ -206,11 +206,8 @@ const parentChain = (tabset: Tabset, folder?: Tabset, chain: Tabset[] = [], dept
 const currentFolderPath = (): Tabset[] => {
   const res:Tabset[] = parentChain(props.tabset)
   console.log("res", res)
-  return res.reverse()
+  return res ? res.reverse() : []
 }
 
-const onDrop = (evt: any) => {
-  console.log("evt!!", evt)
-}
 
 </script>

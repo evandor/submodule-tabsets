@@ -278,10 +278,9 @@ export const useTabsetsStore = defineStore('tabsets', () => {
 
       function countAllTabs(ts: Tabset): number {
         const directCount: number = ts.tabs?.length || 0
-        const childrenCount: number = ts.folders.map((f: Tabset) => countAllTabs(f)).reduce((a, b) => a + b, 0)
+        const childrenCount: number = ts.folders?.map((f: Tabset) => countAllTabs(f)).reduce((a, b) => a + b, 0)
         return directCount + childrenCount;
       }
-
       for (const ts of tabsets.value.values()) {
         count = count + countAllTabs(ts)
       }

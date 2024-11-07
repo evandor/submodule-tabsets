@@ -260,6 +260,13 @@
       </div>
     </q-item-label>
 
+    <!-- === snippets === -->
+    <q-item-label v-if="TabService.isCurrentTab(props.tab)" class="text-grey-10" text-subtitle1>
+      <div v-for="s in props.tab.snippets" class="ellipsis-2-lines q-my-xs text-body2">
+        {{ s.text }}
+      </div>
+    </q-item-label>
+
     <!-- === badges === -->
     <q-item-label v-if="props.showTabsets">
       <template v-for="badge in tsBadges">
