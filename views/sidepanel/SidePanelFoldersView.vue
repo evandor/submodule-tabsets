@@ -1,6 +1,6 @@
 <template>
   <!-- SidePanelFoldersView -->
-  <div class="q-ma-none q-pa-sm q-pl-md greyBorderBottom" v-if="props.tabset?.folders?.length > 0">
+  <div class="q-ma-none q-pa-sm q-pl-md greyBorderBottom" v-if="props.tabset?.folders?.length > 0 && currentFolderPath().length > 0">
     <q-breadcrumbs>
 
       <q-breadcrumbs-el class="cursor-pointer" icon="home" label="Home"
@@ -160,7 +160,7 @@ const dropAtBreadcrumb = (evt: any, f?: any) => {
 }
 
 const selectFolder = (tabset: Tabset, folder?: Tabset) => {
-  console.log("selecting folder", tabset.id, folder?.id)
+  console.log(`selecting folder '${folder?.id}' (${folder?.name}) in tabset ${tabset.id} (${tabset.name})`)
   tabset.folderActive = folder
     ? tabset.id === folder.id
       ? undefined
@@ -180,24 +180,30 @@ const handleButtonClicked = async (tabset: Tabset, args: ActionHandlerButtonClic
   await useActionHandlers(undefined).handleClick(tabset, currentChromeTab.value!, args, folder)
 }
 
-const parentChain = (tabset: Tabset, folder?: Tabset, chain: Tabset[] = [], depth: number = 0): Tabset[] => {
-  if (depth > 10) { // safety net
+const parentChain = (tabset: Tabset, folder?: Tabset, chain: Tabset[] = []): Tabset[] => {
+  console.log(`parentChain tabset: ${tabset.id} (active: ${tabset.folderActive}), folder:${folder?.id}, chain.length: ${chain.length}`)
+  if (chain.length >5) { // safety net
     return chain
   }
-  if (!tabset.folderActive || tabset.id === folder?.folderParent) {
+  // if (!tabset.folderActive || tabset.id === folder?.folderParent) {
+  if (!tabset.folderActive || tabset.id === folder?.folderParent || tabset.id === tabset.folderActive) { //|| tabset.folderActive === folder?.id) {
+    console.log("returning chain...")
     return chain
   }
   if (!folder) {
+    console.log("!folder", tabset.folderActive)
     const f: Tabset | undefined = useTabsetsStore().getActiveFolder(tabset, tabset.folderActive)
     if (f) {
+      console.log("pushing", f.id)
       chain.push(f)
-      return parentChain(tabset, f, chain, depth++)
+      return parentChain(tabset, f, chain)
     }
   } else {
+    console.log("folder", folder.folderParent)
     const f: Tabset | undefined = useTabsetsStore().getActiveFolder(tabset, folder.folderParent)
     if (f) {
       chain.push(f)
-      return parentChain(tabset, f, chain, depth++)
+      return parentChain(tabset, f, chain)
     }
   }
   return chain
@@ -205,7 +211,7 @@ const parentChain = (tabset: Tabset, folder?: Tabset, chain: Tabset[] = [], dept
 
 const currentFolderPath = (): Tabset[] => {
   const res:Tabset[] = parentChain(props.tabset)
-  console.log("res", res)
+  console.log("=================== res", res)
   return res ? res.reverse() : []
 }
 

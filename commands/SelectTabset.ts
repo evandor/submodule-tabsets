@@ -11,23 +11,23 @@ export class SelectTabsetCommand implements Command<Tabset | undefined> {
 
   public merge: boolean = true
 
-  constructor(public tabsetId: string) {
+  constructor(public tabsetId: string,
+    public folderId?: string
+  ) {
   }
 
-  // TODO this return the old currentTabset - why? needed?
+  // TODO this returns the old currentTabset - why? needed?
   async execute(): Promise<ExecutionResult<Tabset | undefined>> {
     console.debug(this.toString())
 
     const currentTabset = useTabsetsStore().getCurrentTabset
-    // if (currentTabset) {
-    //   _.forEach(currentTabset.tabs as Tab[], (t: Tab) => t.selected = false)
-    // }
-    //useNotificationsStore().setSelectedTab(null as unknown as Tab)
-
-    // useUiStore().clearHighlights()
 
     useTabsetService().selectTabset(this.tabsetId)
-    // useSpacesStore().setSpace(this.spaceId)
+    const tabset = useTabsetsStore().getCurrentTabset
+    if (tabset && this.folderId) {
+      tabset.folderActive = this.folderId
+      await useTabsetsStore().saveTabset(tabset)
+    }
 
     if (inBexMode()) {
       const data = {

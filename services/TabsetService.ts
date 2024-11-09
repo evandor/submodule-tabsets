@@ -436,7 +436,6 @@ class TabsetService {
   }
 
   // markAsDeleted(tabsetId: string): Promise<Tabset> {
-  //   debugger
   //   const ts = useTabsetsStore().getTabset(tabsetId)
   //   if (ts) {
   //     ts.status = TabsetStatus.DELETED

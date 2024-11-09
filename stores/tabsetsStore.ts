@@ -137,13 +137,6 @@ export const useTabsetsStore = defineStore('tabsets', () => {
 
       useWindowsStore().addToWindowSet(ts.window)
 
-      if (ts.sharing === TabsetSharing.PUBLIC_LINK || ts.sharing === TabsetSharing.PUBLIC_LINK_OUTDATED) {
-        // MqttService.init()
-        // if (ts.sharedId) {
-        //   MqttService.subscribe(ts.sharedId)
-        // }
-      }
-
       tabsets.value.set(ts.id, ts)
       // TODO markDuplicates(ts)
     }
@@ -216,6 +209,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
 
     const getTabset = computed(() => {
       return (tabsetId: string): Tabset | undefined => {
+        console.log("searching for tabset", tabsetId)
         return tabsets.value.get(tabsetId) as Tabset | undefined
       }
     })
@@ -309,15 +303,22 @@ export const useTabsetsStore = defineStore('tabsets', () => {
         (t: Tab) => t.url || '')
     }
 
-    const getActiveFolder = (root: Tabset, folderActive: string | undefined = root.folderActive): Tabset | undefined => {
-      if (!folderActive) {
+    const getActiveFolder = (root: Tabset, folderActive: string | undefined = root.folderActive, level = 0): Tabset | undefined => {
+      console.log(`get active folder: root# ${root.id}, folderActive: ${folderActive}, level: ${level}`)
+      if (level > 5) {
+        //return undefined
+      }
+      if (!folderActive || root.id === folderActive) {
         return root
       }
       for (const f of root.folders) {
+        console.log("checking", f.id, folderActive)
         if (f.id === folderActive) {
+          console.log("returning", f)
           return f
         } else {
-          const subFolder = getActiveFolder(f, folderActive)
+          console.log("???")
+          const subFolder = getActiveFolder(f, folderActive, level+1)
           if (subFolder) {
             return subFolder
           }
