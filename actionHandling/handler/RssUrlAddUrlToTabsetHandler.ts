@@ -4,9 +4,10 @@ import {ExecutionResult} from "src/core/domain/ExecutionResult";
 import {Tab} from "src/tabsets/models/Tab";
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {AddTabToTabsetCommand} from "src/tabsets/commands/AddTabToTabsetCommand";
-import {AddUrlToTabsetHandler, ButtonActions} from "src/tabsets/specialHandling/AddUrlToTabsetHandler";
+import {AddUrlToTabsetHandler, ButtonActions} from "src/tabsets/actionHandling/AddUrlToTabsetHandler";
 import {CreateFolderCommand} from "src/tabsets/commands/CreateFolderCommand";
-import {STRIP_CHARS_IN_USER_INPUT} from "boot/constants";
+import {ActionContext} from "src/tabsets/actionHandling/model/ActionContext";
+import AddRssFeedDialog from "src/tabsets/dialogues/actions/AddRssFeedDialog.vue";
 
 export class RssUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
 
@@ -21,8 +22,8 @@ export class RssUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
     return content.indexOf("<rss ") >= 0
   }
 
-  actions(): { label: string, identifier: ButtonActions }[] {
-    return [{label: "Add RSS Feed", identifier: ButtonActions.AddRssFeed}]
+  actions():  ActionContext[] {
+    return [new ActionContext("Add RSS Feed", ButtonActions.AddRssFeed)]
   }
 
   withDialog(action: ButtonActions): DialogChainObject | undefined {
@@ -40,7 +41,8 @@ export class RssUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
       const displayFeed = additionalData['displayFeed' as keyof object] as boolean
       const newTab = new Tab(uid(), chromeTab)
       if (displayFeed) {
-        let title = chromeTab.url?.replace("https://","").replace("http://", "").replace(STRIP_CHARS_IN_USER_INPUT, '') || 'no title'
+        // let title = chromeTab.url?.replace("https://","").replace("http://", "").replace(STRIP_CHARS_IN_USER_INPUT, '') || 'no title'
+        let title = additionalData['feedName'] || 'no title'
         if (title.length > 32) {
           title = title.substring(0,28) + "..."
         }
@@ -64,21 +66,27 @@ export class RssUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
 
   }
 
-  storeAsFeed() {
+  storeAsFeed(): DialogChainObject | undefined {
     if (this.$q) {
-      return this.$q!.dialog({
-        title: 'Display RSS Feed?',
-        message: 'This file seems to contain an RSS Feed',
-        options: {
-          type: 'checkbox',
-          model: [],
-          items: [
-            {label: 'Display Feed', value: 'displayFeed', color: 'secondary'}
-          ]
-        },
-        cancel: true,
-        persistent: true
+
+      return this.$q.dialog({
+        component: AddRssFeedDialog,
+        componentProps: {parentFolderId: "bookmarkId.value"}
       })
+
+      // return this.$q!.dialog({
+      //   title: 'Display RSS Feed?',
+      //   message: 'This file seems to contain an RSS Feed',
+      //   options: {
+      //     type: 'checkbox',
+      //     model: [],
+      //     items: [
+      //       {label: 'Display Feed', value: 'displayFeed', color: 'secondary'},
+      //     ]
+      //   },
+      //   cancel: true,
+      //   persistent: true
+      // })
     } else {
       console.warn("could not display storeAsFeed, quasar not set")
     }

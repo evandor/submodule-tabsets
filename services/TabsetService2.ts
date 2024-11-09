@@ -192,7 +192,7 @@ export function useTabsetService() {
   }
 
   const selectTabset = (tabsetId: string | undefined): void => {
-    console.debug("selecting tabset", tabsetId)
+    //console.debug("selecting tabset", tabsetId)
     resetSelectedTabs()
     if (tabsetId) {
       useTabsetsStore().selectCurrentTabset(tabsetId)
@@ -590,20 +590,20 @@ export function useTabsetService() {
     })
   }
 
-  // const findFolder = (folders: Tabset[], folderId: string): Tabset | undefined => {
-  //   for (const f of folders) {
-  //     if (f.id === folderId) {
-  //       //console.log("found active folder", f)
-  //       return f
-  //     }
-  //     const optionalFound = findFolder(f.folders, folderId)
-  //
-  //     if (optionalFound) {
-  //       return optionalFound
-  //     }
-  //   }
-  //   return undefined
-  // }
+  const findFolder = (folders: Tabset[], folderId: string): Tabset | undefined => {
+    for (const f of folders || []) {
+      if (f.id === folderId) {
+        //console.log("found active folder", f)
+        return f
+      }
+      const optionalFound = findFolder(f.folders, folderId)
+
+      if (optionalFound) {
+        return optionalFound
+      }
+    }
+    return undefined
+  }
 
   const removeFolder = (root: Tabset, folderId: string): void => {
     root.folders = _.filter(root.folders, (f: any) => f.id !== folderId)
@@ -629,12 +629,14 @@ export function useTabsetService() {
   }
 
   // TODO make command
-  const moveTabToFolder = (tabset: Tabset, tabIdToDrag: string, moveToFolderId: string) => {
+  const moveTabToFolder = (tabset: Tabset, tabIdToDrag: string, moveToFolderId?: string) => {
     console.log(`moving tab ${tabIdToDrag} to folder ${moveToFolderId} in tabset ${tabset.id}`)
     const tabWithFolder = findTabInFolder([tabset], tabIdToDrag)
     console.log("found tabWithFolder", tabWithFolder)
     //const newParentFolder = findFolder([tabset], moveToFolderId)
-    const newParentFolder = useTabsetsStore().getActiveFolder(tabset, moveToFolderId)
+    const newParentFolder = moveToFolderId
+      ? useTabsetsStore().getActiveFolder(tabset, moveToFolderId)
+      : tabset
     if (newParentFolder && tabWithFolder) {
       console.log("newParentFolder", newParentFolder)
       newParentFolder.tabs.push(tabWithFolder.tab)
@@ -786,7 +788,8 @@ export function useTabsetService() {
     urlWasActivated,
     populateSearch,
     addToSearchIndex,
-    exportDataAsJson
+    exportDataAsJson,
+    findFolder
   }
 
 }

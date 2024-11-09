@@ -87,7 +87,7 @@
 
                 <SpecialUrlAddToTabsetComponent
                   v-if="currentChromeTab"
-                  @button-clicked="(args:object) => handleButtonClicked(tabset, undefined, args)"
+                  @button-clicked="(args:ActionHandlerButtonClickedHolder) => handleButtonClicked(tabset, args)"
                   :currentChromeTab="currentChromeTab"
                   :tabset="tabset"
                 />
@@ -168,7 +168,7 @@
 
                 <SpecialUrlAddToTabsetComponent
                   v-if="currentChromeTab"
-                  @button-clicked="(args:object) => handleButtonClicked(tabset, folder, args)"
+                  @button-clicked="(args:ActionHandlerButtonClickedHolder) => handleButtonClicked(tabset, args, folder)"
                   :currentChromeTab="currentChromeTab"
                   :tabset="tabset"
                   :folder="folder"
@@ -225,11 +225,11 @@ import {NotesPage} from "src/notes/models/NotesPage";
 import SidePanelPageTabList from "src/tabsets/layouts/SidePanelPageTabList.vue";
 import {LoadDynamicTabsCommand} from "src/tabsets/commands/LoadDynamicTabsCommand";
 import SidePanelNotesView from "src/notes/views/sidepanel/SidePanelNotesView.vue";
-import SpecialUrlAddToTabsetComponent from "src/tabsets/specialHandling/SpecialUrlAddToTabsetComponent.vue";
-import {ButtonActions} from "src/tabsets/specialHandling/AddUrlToTabsetHandler";
-import {useUrlHandlers} from "src/tabsets/specialHandling/SpecialUrls";
-import {useContentStore} from "src/content/stores/contentStore";
+import SpecialUrlAddToTabsetComponent from "src/tabsets/actionHandling/SpecialUrlAddToTabsetComponent.vue";
+import {ButtonActions} from "src/tabsets/actionHandling/AddUrlToTabsetHandler";
+import {ActionHandlerButtonClickedHolder} from "src/tabsets/actionHandling/model/ActionHandlerButtonClickedHolder";
 import getScrollTarget = scroll.getScrollTarget;
+import {useActionHandlers} from "src/tabsets/actionHandling/ActionHandlers";
 
 const props = defineProps({
   tabsets: {type: Array as PropType<Array<Tabset>>, required: true}
@@ -378,10 +378,10 @@ const startDrag = (evt: any, folder: Tabset) => {
   console.log("evt.dataTransfer.getData('text/plain')", evt.dataTransfer.getData('text/plain'))
 }
 const enterDrag = (evt: any, folder: Tabset) => {
-  console.log("enter drag", evt, folder)
+  //console.log("enter drag", evt, folder)
 }
 const overDrag = (event: any, folder: Tabset) => {
-  console.log("enter drag", event, folder)
+  //console.log("enter drag", event, folder)
   event.preventDefault();
 }
 const endDrag = (evt: any, folder: Tabset) => {
@@ -576,48 +576,9 @@ if (inBexMode()) {
   })
 }
 
-const handleButtonClicked = async (tabset: Tabset, folder?:Tabset, args?: object) => {
-  console.log(`button clicked: tsId=${tabset.id}, folderId=${folder?.id}, args=${JSON.stringify(args)}`)
-  const handler = useUrlHandlers($q).getHandler(currentChromeTab.value!.url, useContentStore().currentTabContent, folder)
-  const argsObject: { label: string, identifier: ButtonActions, filename?: string, folder?: Tabset } = args as unknown as { label: string, identifier: ButtonActions, filename?: string, folder?: Tabset }
-  switch (argsObject.identifier) {
-    case ButtonActions.AddTab:
-      await handler.clicked(currentChromeTab.value!, tabset, undefined,{})
-      break;
-    case ButtonActions.AddTabWithDynamicFolder:
-      handler.withDialog(argsObject.identifier)?.onOk((data: string[]) => {
-        console.log("data", data)
-        handler.clicked(currentChromeTab.value!, tabset, undefined,{useForLinks : (data.indexOf('useForLinks') >= 0)})
-      })
-      break;
-    case ButtonActions.NewFile:
-      handler.withDialog(argsObject.identifier)?.onOk((filename: string) => {
-        handler.clicked(currentChromeTab.value!, tabset, undefined,{filename})
-      })
-      break;
-    case ButtonActions.Save:
-      await handler.updateInTabset(currentChromeTab.value!, tabset, {filename: argsObject.filename})
-      break;
-    case ButtonActions.SaveAs:
-      handler.withDialog(argsObject.identifier)?.onOk((filename: string) => {
-        handler.clicked(currentChromeTab.value!, tabset, undefined,{filename})
-      })
-      break;
-    case ButtonActions.DynamicLoad:
-      console.log(`loading dynamic data for tabset/folder ${tabset.id}/${argsObject.folder?.id} `)
-      await useCommandExecutor().execute(new LoadDynamicTabsCommand(tabset, argsObject.folder))
-      break;
-    case ButtonActions.AddRssFeed:
-      handler.withDialog(argsObject.identifier)?.onOk((displayFeed: boolean) => {
-        handler.clicked(currentChromeTab.value!, tabset, undefined,{displayFeed})
-      })
-      break;
-    case ButtonActions.LoadRssFeed:
-      await handler.clicked(currentChromeTab.value!, tabset, folder,{})
-      break;
-    default:
-      console.log("no action defined for ", argsObject.identifier)
-  }
+const handleButtonClicked = async (tabset: Tabset, args: ActionHandlerButtonClickedHolder, folder?: Tabset) => {
+  console.log(`button clicked: tsId=${tabset.id}, folderId=${folder?.id}, args=...`)
+  await useActionHandlers(undefined).handleClick(tabset, currentChromeTab.value!, args, folder)
 }
 
 </script>

@@ -13,12 +13,12 @@ import ContentUtils from "src/core/utils/ContentUtils";
 import BrowserApi from "src/app/BrowserApi";
 import {useThumbnailsService} from "src/thumbnails/services/ThumbnailsService";
 import {useLogger} from "src/services/Logger";
-import {useAuthStore} from "stores/authStore.ts";
-import {doc, setDoc} from "firebase/firestore";
-import FirebaseServices from "src/services/firebase/FirebaseServices.ts";
+import {useContentStore} from "src/content/stores/contentStore";
+import {TabReference, TabReferenceType} from "src/content/models/TabReference";
 import {uid} from "quasar";
+import {useFeaturesStore} from "src/features/stores/featuresStore";
+import {FeatureIdent} from "src/app/models/FeatureIdent";
 
-const {saveTabset} = useTabsetService()
 const {sendMsg} = useUtils()
 const {info} = useLogger()
 
@@ -76,6 +76,23 @@ export class AddTabToTabsetCommand implements Command<any> {
         await useGroupsStore().persistGroup(currentGroup)
       }
 
+      // TabReferences
+      this.tab.tabReferences = useContentStore().currentTabReferences
+
+      // Article (ReaderMode)
+      if (useFeaturesStore().hasFeature(FeatureIdent.READING_MODE)) {
+        const article = useContentStore().currentTabArticle
+        if (article && article['title' as keyof object] &&
+          article['textContent' as keyof object]) {
+          const content:string = article['textContent' as keyof object]
+          if (content.length > 500) {
+            this.tab.tabReferences.push(new TabReference(uid(), TabReferenceType.READING_MODE, article['title' as keyof object], [article], this.tab.url))
+            //this.tab.url = chrome.runtime.getURL(`/www/index.html#/mainpanel/readingmode/${this.tab.id}`)
+            useContentStore().resetCurrentTabArticle()
+          }
+        }
+      }
+
       const tabset: Tabset = await useTabsetService().addToTabset(tabsetOrFolder, this.tab, 0, this.allowDuplicates)
 
       // Analysis
@@ -107,14 +124,14 @@ export class AddTabToTabsetCommand implements Command<any> {
           console.warn("got error when saving content and metadata:", err, this.tab?.url)
         }
         //res = new ExecutionResult("result", "Link was added")
-        const res2 = await saveTabset(this.tabset!)
+        const res2 = await useTabsetService().saveTabset(this.tabset!)
         res = new ExecutionResult(res2, "Link was added")
 
         // saving thumbnail
         useThumbnailsService().captureVisibleTab(this.tab.id)
 
       } else {
-        const res2 = await saveTabset(this.tabset!)
+        const res2 = await useTabsetService().saveTabset(this.tabset!)
         res = new ExecutionResult(res2, "Link was added")
 
       }

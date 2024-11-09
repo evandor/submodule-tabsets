@@ -1,9 +1,9 @@
-import {AddUrlToTabsetHandler} from "src/tabsets/specialHandling/AddUrlToTabsetHandler";
 import {QVueGlobals} from "quasar";
-import {ExcalidrawAddUrlToTabsetHandler} from "src/tabsets/specialHandling/handler/ExcalidrawAddUrlToTabsetHandler";
-import {DefaultAddUrlToTabsetHandler} from "src/tabsets/specialHandling/handler/DefaultAddUrlToTabsetHandler";
-import {MarkdownFileAddUrlToTabsetHandler} from "src/tabsets/specialHandling/handler/MarkdownFileAddUrlToTabsetHandler";
-import {RssUrlAddUrlToTabsetHandler} from "src/tabsets/specialHandling/handler/RssUrlAddUrlToTabsetHandler";
+import {DefaultAddUrlToTabsetHandler} from "src/tabsets/actionHandling/handler/DefaultAddUrlToTabsetHandler";
+import {ExcalidrawAddUrlToTabsetHandler} from "src/tabsets/actionHandling/handler/ExcalidrawAddUrlToTabsetHandler";
+import {MarkdownFileAddUrlToTabsetHandler} from "src/tabsets/actionHandling/handler/MarkdownFileAddUrlToTabsetHandler";
+import {AddUrlToTabsetHandler} from "src/tabsets/actionHandling/AddUrlToTabsetHandler";
+import {RssUrlAddUrlToTabsetHandler} from "src/tabsets/actionHandling/handler/RssUrlAddUrlToTabsetHandler";
 
 export class AddUrlToTabsetHandlers {
 
@@ -17,7 +17,7 @@ export class AddUrlToTabsetHandlers {
     this.handlers.push(new RssUrlAddUrlToTabsetHandler(this.quasar))
   }
 
-  handlerFor(url: string, content: string): AddUrlToTabsetHandler {
+  handlerFor(url: string, content: string, article?: object): AddUrlToTabsetHandler {
     const handler = this.handlers.filter((h: AddUrlToTabsetHandler) => url.match(h.urlMatcher()) || h.contentMatcher(content))
     return handler && handler.length > 0 ? handler[0] : this.defaultAddUrlToTabsetHandler
   }

@@ -4,7 +4,8 @@
   <q-item-section v-if="useUiStore().listDetailLevelGreaterEqual(ListDetailLevel.SOME, props.tabset?.details)"
                   @mouseover="hoveredTab = tab.id"
                   @mouseleave="hoveredTab = undefined"
-                  class="q-mr-sm text-right" style="justify-content:start;width:30px;max-width:30px">
+                  class="q-mr-sm q-mt-sm text-right"
+                  style="justify-content:start;width:30px;max-width:30px;">
     <div class="bg-grey-3 q-pa-none" :style="iconStyle()">
 
       <transition name="fade" mode="out-in">
@@ -42,17 +43,16 @@
 
   </q-item-section>
 
-  <!-- right part: name, title, description, url && note -->
-  <q-item-section class="q-mb-sm"
-                  :style="TabService.isCurrentTab(props.tab) ? 'border-right:2px solid #1565C0' : ''"
+  <!-- middle part: name, title, description, url && note -->
+  <q-item-section class="q-mb-sm q-mt-sm q-mx-none q-pa-none"
                   @mouseover="hoveredTab = tab.id"
                   @mouseleave="hoveredTab = undefined">
 
     <!-- === name or title === -->
-    <q-item-label>
+    <q-item-label @click.stop="gotoTab()">
       <div class="row">
 
-        <div class="col-11 q-pr-lg cursor-pointer ellipsis" @click.stop="gotoTab()">
+        <div class="col-11 q-pr-lg cursor-pointer ellipsis">
           <span v-if="props.header" class="text-caption">{{ props.header }}<br></span>
           <!--          <span v-if="useTabsStore().getCurrentTabset?.sorting === 'alphabeticalTitle'">-->
           <span v-if="props.sorting === TabSorting.TITLE">
@@ -61,31 +61,31 @@
 
           <span v-if="props.tab?.extension === UrlExtension.NOTE"
                 v-html="nameOrTitle(props.tab as Tab)"/>
-          <span v-else :class="TabService.isCurrentTab(props.tab) ? 'text-bold text-blue-9':''">
+          <span v-else
+                :class="TabService.isCurrentTab(props.tab) ? 'text-bold':''">
             <q-icon v-if="props.tab?.favorite && props.tab?.favorite !== TabFavorite.NONE"
                     :color="props.tab.favorite === TabFavorite.TABSET ? 'warning':'positive'"
                     name="star" class="q-ma-mone">
               <q-tooltip class="tooltip_small">This tab is marked as favorite</q-tooltip>
             </q-icon>
-            {{ nameOrTitle(props.tab as Tab) }}</span>
-          <q-popup-edit
-            v-if="popModel && props.tab?.extension !== UrlExtension.NOTE && !props.tab.placeholders"
-            :model-value="nameOrTitle(props.tab as Tab)" v-slot="scope"
-            @update:model-value="(val:string) => setCustomTitle( tab, val)">
-            <q-input v-model="scope.value" dense autofocus counter @keyup.enter="scope.set"/>
-          </q-popup-edit>
+            <!--            <q-icon v-if="props.tab?.tabReferences && props.tab?.tabReferences.length > 0"-->
+            <!--                    @click.stop="showTabReferencesDialog()"-->
+            <!--                    color="positive"-->
+            <!--                    name="o_auto_awesome" class="q-ma-mone">-->
+            <!--              <q-tooltip class="tooltip_small">This tab references other interesting URLs - click here.</q-tooltip>-->
+            <!--            </q-icon>-->
+            <!--             <q-icon v-if="useFeaturesStore().hasFeature(FeatureIdent.READING_MODE) && props.tab.article && props.tab.article['title' as keyof object]"-->
+            <!--                     @click.stop="showInReadingMode()"-->
+            <!--                     color="primary"-->
+            <!--                     name="o_library_books" class="q-ma-mone">-->
+            <!--              <q-tooltip class="tooltip_small">This tab references other interesting URLs - click here.</q-tooltip>-->
+            <!--            </q-icon>-->
+             {{ nameOrTitle(props.tab as Tab) }}
+          </span>
 
         </div>
 
-        <div class="col text-right q-mr-md">
-          <span>
-              <q-icon name="more_vert" class="cursor-pointer" color="black" size="16px"/>
-            </span>
-          <PanelTabListContextMenu
-            :tabset="props.tabset"
-            :tabsetId="props.tabsetId"
-            :tab="tab" v-if="!props.hideMenu"/>
-        </div>
+
       </div>
     </q-item-label>
 
@@ -128,6 +128,9 @@
                     name="o_settings">
               <q-tooltip class="tooltip">{{ matcherTooltip() }}</q-tooltip>
             </q-icon>
+            <span v-if="showReadingMode()" class="cursor-pointer" @click.stop="showInReadingMode()">
+              [Reading Mode]
+            </span>
             <!-- <q-icon class="q-ml-xs" name="open_in_new"/>-->
             <ul v-if="placeholders.length > 0">
               <div v-for="placeholder in placeholders">
@@ -222,7 +225,8 @@
 
             <span>
               <TabListIconIndicatorsHook :tabId="props.tab.id" :tabUrl="props.tab.url"/>
-              <span v-if="props.tab.extension !== UrlExtension.RSS && useUiStore().listDetailLevelGreaterEqual(ListDetailLevel.MAXIMAL, props.tabset?.details)">last active: {{
+              <span
+                v-if="props.tab.extension !== UrlExtension.RSS && useUiStore().listDetailLevelGreaterEqual(ListDetailLevel.MAXIMAL, props.tabset?.details)">last active: {{
                   formatDate(props.tab.lastActive)
                 }}</span>
               <span v-else-if="props.tab.extension === UrlExtension.RSS">published: {{
@@ -256,6 +260,13 @@
       </div>
     </q-item-label>
 
+    <!-- === snippets === -->
+    <q-item-label v-if="TabService.isCurrentTab(props.tab)" class="text-grey-10" text-subtitle1>
+      <div v-for="s in props.tab.snippets" class="ellipsis-2-lines q-my-xs text-body2">
+        {{ s.text }}
+      </div>
+    </q-item-label>
+
     <!-- === badges === -->
     <q-item-label v-if="props.showTabsets">
       <template v-for="badge in tsBadges">
@@ -267,6 +278,23 @@
     </q-item-label>
 
   </q-item-section>
+
+  <!-- right part -->
+  <q-item-section
+    class="q-ma-none q-pa-none"
+    @mouseover="hoveredTab = tab.id"
+    @mouseleave="hoveredTab = undefined"
+    :style="TabService.isCurrentTab(props.tab) ? 'border-right:3px solid #1565C0;border-radius:3px' : ''"
+    style="justify-content:start;width:30px;max-width:30px">
+    <span>
+      <q-icon name="more_vert" class="cursor-pointer q-mt-sm" color="black" size="20px"/>
+      <PanelTabListContextMenu
+        :tabset="props.tabset"
+        :tabsetId="props.tabsetId"
+        :tab="tab" v-if="!props.hideMenu"/>
+    </span>
+  </q-item-section>
+
 </template>
 
 <script setup lang="ts">
@@ -305,12 +333,14 @@ import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {useFeaturesStore} from "src/features/stores/featuresStore";
 import TabService from "src/services/TabService";
 import {DeleteCommentCommand} from "src/domain/tabs/DeleteCommentCommand";
-import {UpdateTabNameCommand} from "src/domain/tabs/UpdateTabName";
 import {SavedBlob} from "src/snapshots/models/SavedBlob";
 import {useThumbnailsService} from "src/thumbnails/services/ThumbnailsService";
 import CommentDialog from "src/tabsets/dialogues/CommentDialog.vue";
 import TabListIconIndicatorsHook from "src/app/hooks/tabsets/TabListIconIndicatorsHook.vue";
 import {OpenTabCommand} from "src/tabsets/commands/OpenTabCommand";
+import {useNavigationService} from "src/core/services/NavigationService";
+import {TabReferenceType} from "src/content/models/TabReference";
+import BrowserApi from "src/app/BrowserApi";
 
 const {inBexMode} = useUtils()
 
@@ -545,12 +575,6 @@ const showSuggestion = () => {
 
 const openImage = () => window.open(chrome.runtime.getURL('www/index.html#/mainpanel/png/' + props.tab.id + "/" + pngs.value[0].id))
 
-// const deleteAnnotation = async (tab: Tab, annotationToDelete: any) => {
-//   //console.log("deleting annotatin", tab, annotationToDelete)
-//   tab.annotations = _.filter(tab.annotations, (a:any) => a.id !== annotationToDelete.id)
-//   useTabsetService().saveCurrentTabset()
-// }
-
 const showComments = () =>
   showCommentList.value &&
   useUiStore().listDetailLevelGreaterEqual(ListDetailLevel.SOME, props.tabset?.details) &&
@@ -579,6 +603,9 @@ const addCommentDialog = () => $q.dialog({
   componentProps: {tabId: props.tab.id, sharedId: props.tabset?.sharedId}
 })
 
+const showInReadingMode = () => useNavigationService()
+  .browserTabFor(chrome.runtime.getURL(`/www/index.html#/mainpanel/readingmode/${props.tab.id}`))
+
 const togglePreview = () => {
   if (props.tab) {
     props.tab.preview = (props.tab.preview === undefined || props.tab.preview === TabPreview.FAVICON) ?
@@ -596,9 +623,14 @@ const deleteSelectedComment = () => {
   }
 }
 
-const setCustomTitle = (tab: Tab, newValue: string) =>
-  useCommandExecutor().executeFromUi(new UpdateTabNameCommand(tab, newValue))
-
+const showReadingMode = () => {
+  if (props.tab) {
+    //console.log("xxx", props.tab.id)
+    const t: Tab = Object.assign(new Tab(props.tab.id, BrowserApi.createChromeTabObject("","")), props.tab)
+    return useFeaturesStore().hasFeature(FeatureIdent.READING_MODE) && t.hasTabReference(TabReferenceType.READING_MODE)
+  }
+  return false
+}
 </script>
 
 <!--https://stackoverflow.com/questions/41078478/css-animated-checkmark -->

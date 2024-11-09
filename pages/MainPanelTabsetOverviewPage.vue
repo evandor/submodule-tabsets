@@ -9,12 +9,12 @@
       </div>
       <div class="col-4 text-right">
 
-        <q-btn @click="openAllTabsetsOverview()"
-               style="width:14px"
-               class="q-mr-sm" size="8px"
-               icon="stars">
-          <q-tooltip class="tooltip">Show all favorites</q-tooltip>
-        </q-btn>
+<!--        <q-btn @click="openAllTabsetsOverview()"-->
+<!--               style="width:14px"-->
+<!--               class="q-mr-sm" size="8px"-->
+<!--               icon="stars">-->
+<!--          <q-tooltip class="tooltip">Show all favorites</q-tooltip>-->
+<!--        </q-btn>-->
 
 
       </div>
@@ -33,7 +33,7 @@
     narrow-indicator>
     <q-tab name="grid" label="As Grid" @click="setView('grid')"/>
     <q-tab name="list" label="As List" @click="setView('list')"/>
-    <q-tab name="list" label="As Timeline" @click="setView('timeline')"/>
+<!--    <q-tab name="list" label="As Timeline" @click="setView('timeline')"/>-->
   </q-tabs>
 
 
@@ -60,12 +60,7 @@
 
     <q-tab-panel class="q-ma-none q-pa-none" name="timeline">
       todo
-<!--      <Timeline-->
-<!--        :groups="groups"-->
-<!--        :items="items"-->
-<!--        :viewportMin="1703112200000"-->
-<!--        :viewportMax="1714566600000"-->
-<!--      />-->
+
     </q-tab-panel>
 
   </q-tab-panels>

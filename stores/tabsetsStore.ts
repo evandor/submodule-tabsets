@@ -46,7 +46,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       // TODO remove after version 0.5.0
       await storage.migrate()
 
-      console.debug(" ...initialized tabsets: Store",'✅')
+      console.debug(" ...initialized tabsets: Store", '✅')
       await storage.loadTabsets()
     }
 
@@ -70,7 +70,6 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       color: string | undefined = undefined,
       dynamicUrl: URL | undefined = undefined,
       spaceId: string | undefined = undefined
-
     ): Promise<Tabset> {
       const currentTabsetsCount = tabsets.value.size
       if (useAuthStore().limitExceeded(AccessItem.TABSETS, currentTabsetsCount)) {
@@ -103,7 +102,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
         ts.spaces = [spaceId]
       }
       tabsets.value.set(ts.id, ts)
-     // console.log("storage", storage)
+      // console.log("storage", storage)
       await storage.addTabset(ts)
 
       // TODO
@@ -137,13 +136,6 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       }
 
       useWindowsStore().addToWindowSet(ts.window)
-
-      if (ts.sharing === TabsetSharing.PUBLIC_LINK || ts.sharing === TabsetSharing.PUBLIC_LINK_OUTDATED) {
-        // MqttService.init()
-        // if (ts.sharedId) {
-        //   MqttService.subscribe(ts.sharedId)
-        // }
-      }
 
       tabsets.value.set(ts.id, ts)
       // TODO markDuplicates(ts)
@@ -217,6 +209,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
 
     const getTabset = computed(() => {
       return (tabsetId: string): Tabset | undefined => {
+        console.log("searching for tabset", tabsetId)
         return tabsets.value.get(tabsetId) as Tabset | undefined
       }
     })
@@ -276,9 +269,14 @@ export const useTabsetsStore = defineStore('tabsets', () => {
 
     const allTabsCount = computed(() => {
       var count = 0
-      for (const value of tabsets.value.values()) {
-        const nr = value.tabs?.length
-        count = count + nr
+
+      function countAllTabs(ts: Tabset): number {
+        const directCount: number = ts.tabs?.length || 0
+        const childrenCount: number = ts.folders?.map((f: Tabset) => countAllTabs(f)).reduce((a, b) => a + b, 0)
+        return directCount + childrenCount;
+      }
+      for (const ts of tabsets.value.values()) {
+        count = count + countAllTabs(ts)
       }
       return count;
     })
@@ -301,19 +299,24 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       return _.map(
         _.flatMap(
           [...useTabsetsStore().tabsets.values()] as Tabset[],
-          ((ts:Tabset) => ts.tabs)),
+          ((ts: Tabset) => ts.tabs)),
         (t: Tab) => t.url || '')
     }
 
-    const  getActiveFolder = (root: Tabset, folderActive: string | undefined = root.folderActive):Tabset | undefined => {
-      if (!folderActive) {
+    const getActiveFolder = (root: Tabset, folderActive: string | undefined = root.folderActive, level = 0): Tabset | undefined => {
+      // console.log(`get active folder: root# ${root.id}, folderActive: ${folderActive}, level: ${level}`)
+      if (level > 5) {
+        //return undefined
+      }
+      if (!folderActive || root.id === folderActive) {
         return root
       }
-      for(const f of root.folders) {
+      for (const f of root.folders) {
+        console.log("checking", f.id, folderActive)
         if (f.id === folderActive) {
           return f
         } else {
-          const subFolder = getActiveFolder(f, folderActive)
+          const subFolder = getActiveFolder(f, folderActive, level+1)
           if (subFolder) {
             return subFolder
           }

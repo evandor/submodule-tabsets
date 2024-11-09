@@ -1,48 +1,52 @@
 <template>
   <!-- SidePanelPageTabList -->
-  <q-list separator class="q-ma-none">
+  <div style="width:100%;max-width:100%;">
+    <q-list class="q-ma-none">
 
-    <!-- supporting drag & drop when not on mobile -->
-    <template v-if="!props.preventDragAndDrop"
-              v-for="column in getColumns()"> <!-- there's only one (default) column now -->
+      <!-- supporting drag & drop when not on mobile -->
+      <template v-if="!props.preventDragAndDrop"
+                v-for="column in getColumns()"> <!-- there's only one (default) column now -->
 
-      <vue-draggable-next
-        class="q-ma-none"
-        :list="tabsForColumn() as Array<IndexedTab>"
-        :group="{ name: 'tabs', pull: 'clone' }"
-        @change="(event:any) => handleDragAndDrop(event,  column)">
+        <vue-draggable-next
+          class="q-ma-none"
+          :list="tabsForColumn() as Array<IndexedTab>"
+          :group="{ name: 'tabs', pull: 'clone' }"
+          @change="(event:any) => handleDragAndDrop(event,  column)">
 
-        <SidePanelTabListHelper v-for="tab in tabsForColumn() as Array<IndexedTab>"
-                                :tab="tab.tab as Tab"
-                                :indent="props.indent"
-                                :index="tab.index"
-                                :type="props.type"
-                                :sorting="props.sorting"
-                                :preventDragAndDrop="false"
-                                :tabset="props.tabset"
-                                :show-tabsets="props.showTabsets"
-                                :hide-menu="props.hideMenu"/>
-      </vue-draggable-next>
-    </template>
+          <SidePanelTabListHelper v-for="tab in tabsForColumn() as Array<IndexedTab>"
+                                  :tab="tab.tab as Tab"
+                                  :index="tab.index"
+                                  :type="props.type"
+                                  :sorting="props.sorting"
+                                  :preventDragAndDrop="false"
+                                  :tabset="props.tabset"
+                                  :show-tabsets="props.showTabsets"
+                                  :hide-menu="props.hideMenu"/>
 
-    <!-- no drag & drop on mobile -->
-    <template v-else>
-      <SidePanelTabListHelper
-        v-for="tab in tabsForColumn() as Array<IndexedTab>"
-        :tab="tab.tab as Tab"
-        :index="0"
-        :type="props.type"
-        :sorting="props.tabset?.type === TabsetType.RSS_FOLDER ? TabSorting.TITLE : props.sorting"
-        :preventDragAndDrop="true"
-        :tabset="props.tabset"
-        :show-tabsets="props.showTabsets"
-        :hide-menu="props.hideMenu"/>
-    </template>
-  </q-list>
 
-  <audio id="myAudio">
-    <source src="mp3/click.mp3" type="audio/mp3">
-  </audio>
+        </vue-draggable-next>
+
+      </template>
+
+      <!-- no drag & drop on mobile -->
+      <template v-else>
+        <SidePanelTabListHelper
+          v-for="tab in tabsForColumn() as Array<IndexedTab>"
+          :tab="tab.tab as Tab"
+          :index="0"
+          :type="props.type"
+          :sorting="props.tabset?.type === TabsetType.RSS_FOLDER ? TabSorting.TITLE : props.sorting"
+          :preventDragAndDrop="true"
+          :tabset="props.tabset"
+          :show-tabsets="props.showTabsets"
+          :hide-menu="props.hideMenu"/>
+      </template>
+    </q-list>
+
+    <audio id="myAudio">
+      <source src="mp3/click.mp3" type="audio/mp3">
+    </audio>
+  </div>
 
 </template>
 
@@ -58,13 +62,13 @@ import {TabsetColumn} from "src/tabsets/models/TabsetColumn";
 import {SPECIAL_ID_FOR_NO_GROUP_ASSIGNED} from "boot/constants";
 import {IndexedTab} from "src/tabsets/models/IndexedTab";
 import SidePanelTabListHelper from "src/tabsets/layouts/SidePanelTabListHelper.vue";
+import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 
 const props = defineProps({
   hideMenu: {type: Boolean, default: false},
   sorting: {type: String as PropType<TabSorting>, default: TabSorting.CUSTOM},
   type: {type: String, default: 'sidepanel'},
   showTabsets: {type: Boolean, default: false},
-  indent: {type: Boolean, default: false},
   preventDragAndDrop: {type: Boolean, default: false},
   tabset: {type: Object as PropType<Tabset>, required: false},
   tabsCount: {type: Number, default: -1},
@@ -73,9 +77,9 @@ const props = defineProps({
 
 const tabs = ref<Tab[]>([])
 
-const handleDragAndDrop =  async (event: any, column: TabsetColumn) => {
-  const {moved, added} = event
+const handleDragAndDrop = async (event: any, column: TabsetColumn) => {
   console.log("SidePanelPageTabList d&d event:", event)
+  const {moved, added} = event
   if (moved) {
     console.log(`moved event: '${moved.element.tab.id}' ${moved.oldIndex} -> ${moved.newIndex} (${props.activeFolder})`)
     const tabsInColumn = tabsForColumn()
@@ -86,7 +90,7 @@ const handleDragAndDrop =  async (event: any, column: TabsetColumn) => {
     console.log("hier: ", props.tabset)
     if (props.tabset) {
       tabs.value = useTabsetService().tabsToShow(props.tabset)
-      console.log("tabs.value", _.map(tabs.value, (t:Tab) => t.url))
+      console.log("tabs.value", _.map(tabs.value, (t: Tab) => t.url))
     }
 
   }
@@ -119,9 +123,10 @@ const getColumns = () => {
 
 const tabsForColumn = (): IndexedTab[] => {
   return (tabs.value as Tab[])
-    .sort((a:Tab, b:Tab) => {
-      // console.log("comparing", props.)
-      return props.tabset && props.tabset.type === TabsetType.RSS_FOLDER ? b.created - a.created : 0}
+    .sort((a: Tab, b: Tab) => {
+        // console.log("comparing", props.)
+        return props.tabset && props.tabset.type === TabsetType.RSS_FOLDER ? b.created - a.created : 0
+      }
     )
     .map((t: Tab, index: number) => new IndexedTab(index, t))
   //return   _.map(tabs.value as Tab[], (t: Tab, index: number) => new IndexedTab(index, t))

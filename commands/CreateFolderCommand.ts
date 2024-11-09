@@ -32,7 +32,7 @@ export class CreateFolderCommand implements Command<Tabset> {
       if (this.parentFolder) {
         tabset.folderActive = this.parentFolder
       }
-      if (!tabset.folderActive) { // assuming root
+      if (!tabset.folderActive || tabset.id === tabset.folderActive) { // assuming root
         const tabs = _.map(this.tabsToUse, (t: chrome.tabs.Tab) => new Tab(uid(), t))
         const newFolder = new Tabset(this.folderId, this.folderName, tabs)
         newFolder.type = this.type || TabsetType.DEFAULT

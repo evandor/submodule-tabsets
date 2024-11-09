@@ -24,16 +24,16 @@
         <q-icon name="o_info" class="q-my-xs q-mr-xs" color="grey-5" style="position:relative;top:-1px"/>
         Tabset Details...
       </q-item>
-      <q-item v-if="props.tabset?.status === TabsetStatus.DEFAULT && props.tabset?.type !== TabsetType.SPECIAL"
-              clickable v-close-popup @click="markAsFavorite(props.tabset.id)">
-        <q-icon name="stars" class="q-my-xs q-mr-xs" color="grey-5" style="position:relative;top:-1px"/>
-        Make favorite
-      </q-item>
-      <q-item v-if="props.tabset.status === TabsetStatus.FAVORITE"
-              clickable v-close-popup @click="markAsDefault(props.tabset.id)">
-        <q-icon name="o_stars" class="q-my-xs q-mr-xs" color="grey-5" style="position:relative;top:-1px"/>
-        Remove as favorite
-      </q-item>
+<!--      <q-item v-if="props.tabset?.status === TabsetStatus.DEFAULT && props.tabset?.type !== TabsetType.SPECIAL"-->
+<!--              clickable v-close-popup @click="markAsFavorite(props.tabset.id)">-->
+<!--        <q-icon name="stars" class="q-my-xs q-mr-xs" color="grey-5" style="position:relative;top:-1px"/>-->
+<!--        Make favorite-->
+<!--      </q-item>-->
+<!--      <q-item v-if="props.tabset.status === TabsetStatus.FAVORITE"-->
+<!--              clickable v-close-popup @click="markAsDefault(props.tabset.id)">-->
+<!--        <q-icon name="o_stars" class="q-my-xs q-mr-xs" color="grey-5" style="position:relative;top:-1px"/>-->
+<!--        Remove as favorite-->
+<!--      </q-item>-->
 
       <q-item v-if="tabset.type === TabsetType.SESSION && tabset.status !== TabsetStatus.DELETED"
               clickable v-close-popup @click="stopSession(props.tabset.id)">

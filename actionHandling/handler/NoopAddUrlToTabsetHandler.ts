@@ -2,7 +2,8 @@ import {DialogChainObject} from "quasar";
 import {Tabset} from "src/tabsets/models/Tabset";
 import {ExecutionResult} from "src/core/domain/ExecutionResult";
 import {Tab} from "src/tabsets/models/Tab";
-import {AddUrlToTabsetHandler, ButtonActions} from "src/tabsets/specialHandling/AddUrlToTabsetHandler";
+import {AddUrlToTabsetHandler, ButtonActions} from "src/tabsets/actionHandling/AddUrlToTabsetHandler";
+import {ActionContext} from "src/tabsets/actionHandling/model/ActionContext";
 
 export class NoopAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
 
@@ -14,7 +15,7 @@ export class NoopAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
     return true
   }
 
-  actions(): { label: string, identifier: ButtonActions }[] {
+  actions(): ActionContext[] {
     return []
   }
 

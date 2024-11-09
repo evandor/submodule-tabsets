@@ -2,12 +2,13 @@ import {DialogChainObject, QVueGlobals, uid} from "quasar";
 import {Tabset} from "src/tabsets/models/Tabset";
 import {ExecutionResult} from "src/core/domain/ExecutionResult";
 import {Tab, UrlExtension} from "src/tabsets/models/Tab";
-import {AddUrlToTabsetHandler, ButtonActions} from "src/tabsets/specialHandling/AddUrlToTabsetHandler";
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {AddTabToTabsetCommand} from "src/tabsets/commands/AddTabToTabsetCommand";
 import BrowserApi from "src/app/BrowserApi";
 import {useUtils} from "src/core/services/Utils";
 import * as cheerio from 'cheerio';
+import {AddUrlToTabsetHandler, ButtonActions} from "src/tabsets/actionHandling/AddUrlToTabsetHandler";
+import {ActionContext} from "src/tabsets/actionHandling/model/ActionContext";
 
 const {sanitizeAsPlainText} = useUtils()
 
@@ -25,8 +26,8 @@ export class RssFolderHandler implements AddUrlToTabsetHandler {
     return true
   }
 
-  actions(): { label: string, identifier: ButtonActions }[] {
-    return [{label: "(Re-)Load", identifier: ButtonActions.LoadRssFeed}]
+  actions(): ActionContext[] {
+    return [new ActionContext("(Re-)Load", ButtonActions.LoadRssFeed)]
   }
 
   withDialog(action: ButtonActions): DialogChainObject | undefined {
@@ -60,6 +61,7 @@ export class RssFolderHandler implements AddUrlToTabsetHandler {
     console.log("items", items)
     Array.from(items).forEach((item: any) => {
       console.log("item", item)
+      //const title = additionalData['feedname'] || 'no title' //this.getFromItem(item, "title", "no title")
       const title = this.getFromItem(item, "title", "no title")
       const url = item.querySelector("link")?.innerHTML || chromeTab.url
 
@@ -67,6 +69,7 @@ export class RssFolderHandler implements AddUrlToTabsetHandler {
       const published = item.querySelector("pubDate")?.innerHTML || undefined
       const enclosure: Element | null = item.querySelector("enclosure")
       let img = enclosure ? enclosure.getAttribute("url") : undefined
+      console.log("img", img)
       if (!img) {
         const snippet = "<p>" + this.getFromItem(item, "description") + "</p>"
         console.log("snippet", snippet)
@@ -96,23 +99,5 @@ export class RssFolderHandler implements AddUrlToTabsetHandler {
 
   }
 
-  storeAsFeed() {
-    if (this.$q) {
-      return this.$q!.dialog({
-        title: 'Display RSS Feed?',
-        message: 'This file seems to contain an RSS Feed',
-        options: {
-          type: 'checkbox',
-          model: [],
-          items: [
-            {label: 'Display Feed', value: 'displayFeed', color: 'secondary'}
-          ]
-        },
-        cancel: true,
-        persistent: true
-      })
-    } else {
-      console.warn("could not display storeAsFeed, quasar not set")
-    }
-  }
+
 }
