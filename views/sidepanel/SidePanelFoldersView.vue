@@ -133,34 +133,34 @@ const overDrag2 = (event: any) => {
 }
 
 const endDrag = (evt: any, folder: Tabset) => {
-  console.log("end drag", evt, folder)
+  // console.log("end drag", evt, folder)
 }
 const drop = (evt: any, folder: Tabset) => {
   console.log("drop", evt, folder)
   const tabToDrag = useUiStore().tabBeingDragged
   const tabset = useTabsetsStore().getCurrentTabset as Tabset | undefined
   if (tabToDrag && tabset) {
-    console.log("tabToDrag", tabToDrag)
+    // console.log("tabToDrag", tabToDrag)
     const moveToFolderId = folder.id
-    console.log("moveToFolderId", moveToFolderId)
+    // console.log("moveToFolderId", moveToFolderId)
     useTabsetService().moveTabToFolder(tabset, tabToDrag, moveToFolderId)
   }
 }
 
 const dropAtBreadcrumb = (evt: any, f?: any) => {
-  console.log("dropAtBreadcrumb", evt, f)
+  // console.log("dropAtBreadcrumb", evt, f)
   const tabToDrag = useUiStore().tabBeingDragged
   const tabset = useTabsetsStore().getCurrentTabset as Tabset | undefined
-  console.log("tabToDrag", tabToDrag, tabset?.id)
+  // console.log("tabToDrag", tabToDrag, tabset?.id)
   if (tabToDrag && tabset) {
     const moveToFolderId = f?.id || undefined
-    console.log("moveToFolderId", moveToFolderId)
+    // console.log("moveToFolderId", moveToFolderId)
     useTabsetService().moveTabToFolder(tabset, tabToDrag, moveToFolderId)
   }
 }
 
 const selectFolder = (tabset: Tabset, folder?: Tabset) => {
-  console.log(`selecting folder '${folder?.id}' (${folder?.name}) in tabset ${tabset.id} (${tabset.name})`)
+  // console.log(`selecting folder '${folder?.id}' (${folder?.name}) in tabset ${tabset.id} (${tabset.name})`)
   tabset.folderActive = folder
     ? tabset.id === folder.id
       ? undefined
@@ -176,30 +176,28 @@ const folderCaption = (folder: Tabset): string =>
     : ""
 
 const handleButtonClicked = async (tabset: Tabset, args: ActionHandlerButtonClickedHolder, folder?: Tabset) => {
-  console.log(`button clicked: tsId=${tabset.id}, folderId=${folder?.id}, args=...`)
+  // console.log(`button clicked: tsId=${tabset.id}, folderId=${folder?.id}, args=...`)
   await useActionHandlers(undefined).handleClick(tabset, currentChromeTab.value!, args, folder)
 }
 
 const parentChain = (tabset: Tabset, folder?: Tabset, chain: Tabset[] = []): Tabset[] => {
-  console.log(`parentChain tabset: ${tabset.id} (active: ${tabset.folderActive}), folder:${folder?.id}, chain.length: ${chain.length}`)
+  // console.log(`parentChain tabset: ${tabset.id} (active: ${tabset.folderActive}), folder:${folder?.id}, chain.length: ${chain.length}`)
   if (chain.length >5) { // safety net
     return chain
   }
   // if (!tabset.folderActive || tabset.id === folder?.folderParent) {
   if (!tabset.folderActive || tabset.id === folder?.folderParent || tabset.id === tabset.folderActive) { //|| tabset.folderActive === folder?.id) {
-    console.log("returning chain...")
+    // console.log("returning chain...")
     return chain
   }
   if (!folder) {
-    console.log("!folder", tabset.folderActive)
+    // console.log("!folder", tabset.folderActive)
     const f: Tabset | undefined = useTabsetsStore().getActiveFolder(tabset, tabset.folderActive)
     if (f) {
-      console.log("pushing", f.id)
       chain.push(f)
       return parentChain(tabset, f, chain)
     }
   } else {
-    console.log("folder", folder.folderParent)
     const f: Tabset | undefined = useTabsetsStore().getActiveFolder(tabset, folder.folderParent)
     if (f) {
       chain.push(f)
@@ -211,7 +209,6 @@ const parentChain = (tabset: Tabset, folder?: Tabset, chain: Tabset[] = []): Tab
 
 const currentFolderPath = (): Tabset[] => {
   const res:Tabset[] = parentChain(props.tabset)
-  console.log("=================== res", res)
   return res ? res.reverse() : []
 }
 

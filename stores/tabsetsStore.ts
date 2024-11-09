@@ -304,7 +304,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     }
 
     const getActiveFolder = (root: Tabset, folderActive: string | undefined = root.folderActive, level = 0): Tabset | undefined => {
-      console.log(`get active folder: root# ${root.id}, folderActive: ${folderActive}, level: ${level}`)
+      // console.log(`get active folder: root# ${root.id}, folderActive: ${folderActive}, level: ${level}`)
       if (level > 5) {
         //return undefined
       }
@@ -314,10 +314,8 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       for (const f of root.folders) {
         console.log("checking", f.id, folderActive)
         if (f.id === folderActive) {
-          console.log("returning", f)
           return f
         } else {
-          console.log("???")
           const subFolder = getActiveFolder(f, folderActive, level+1)
           if (subFolder) {
             return subFolder
