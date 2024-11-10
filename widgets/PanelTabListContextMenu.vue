@@ -78,17 +78,17 @@
         </q-item>
       </template>
 
-      <template v-if="useAuthStore().isAuthenticated">
-        <q-separator inset/>
-        <q-item clickable v-close-popup @click.stop="openSimilar()">
-          <q-item-section style="padding-right:0;min-width:25px;max-width: 25px;">
-            <q-icon size="xs" name="o_equal"/>
-          </q-item-section>
-          <q-item-section>
-            Open similar websites
-          </q-item-section>
-        </q-item>
-      </template>
+<!--      <template v-if="useAuthStore().isAuthenticated">-->
+<!--        <q-separator inset/>-->
+<!--        <q-item clickable v-close-popup @click.stop="openSimilar()">-->
+<!--          <q-item-section style="padding-right:0;min-width:25px;max-width: 25px;">-->
+<!--            <q-icon size="xs" name="o_equal"/>-->
+<!--          </q-item-section>-->
+<!--          <q-item-section>-->
+<!--            Open similar websites-->
+<!--          </q-item-section>-->
+<!--        </q-item>-->
+<!--      </template>-->
 
       <q-separator inset/>
       <q-item clickable v-close-popup @click.stop="deleteTab()">
@@ -109,22 +109,19 @@
 import {PropType, ref} from "vue";
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {useQuasar} from "quasar";
-import {Tab, TabFavorite} from "src/tabsets/models/Tab";
+import {Tab} from "src/tabsets/models/Tab";
 import {useRouter} from "vue-router";
 import NavigationService from "src/services/NavigationService";
-import {Tabset, TabsetType} from "src/tabsets/models/Tabset";
+import {Tabset} from "src/tabsets/models/Tabset";
 import {FeatureIdent} from "src/app/models/FeatureIdent";
 import {PlaceholdersType} from "src/tabsets/models/Placeholders";
 import ColorSelector from "src/core/dialog/ColorSelector.vue";
 import {UpdateTabColorCommand} from "src/domain/tabs/UpdateTabColor";
-import {useAuthStore} from "stores/authStore";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {useFeaturesStore} from "src/features/stores/featuresStore";
-import CommentDialog from "src/tabsets/dialogues/CommentDialog.vue";
 import EditUrlDialog from "src/tabsets/dialogues/EditUrlDialog.vue";
 import PanelTabListContextMenuHook from "src/app/hooks/tabsets/PanelTabListContextMenuHook.vue";
 import {DeleteTabCommand} from "src/tabsets/commands/DeleteTabCommand";
-import {ToggleTabFavoriteCommand} from "src/tabsets/commands/ToggleTabFavoriteCommand";
 
 const props = defineProps({
   tab: {type: Object as PropType<Tab>, required: true},
@@ -149,9 +146,6 @@ async function tabToUse(tab: Tab) {
     }
   }
   return useTab;
-}
-
-const openSimilar = async () => {
 }
 
 const deleteTab = async () => {
@@ -188,12 +182,6 @@ const deleteTab = async () => {
   // }
 }
 
-
-const addCommentDialog = () => $q.dialog({
-  component: CommentDialog,
-  componentProps: {tabId: props.tab.id, sharedId: props.tabset?.sharedId}
-})
-
 const showTabDetails = async (tab: Tab) => {
   const useTab: Tab = await tabToUse(tab)
   console.log("showing tab details for", useTab)
@@ -219,10 +207,6 @@ const editURL = async (tab: Tab) => {
       tab: useTab
     }
   })
-}
-
-const toggleFav = (tab: Tab) => {
- useCommandExecutor().execute(new ToggleTabFavoriteCommand(tab.id))
 }
 
 const assignTab = async (tab: Tab) =>

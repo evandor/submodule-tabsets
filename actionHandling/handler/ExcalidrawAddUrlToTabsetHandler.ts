@@ -8,7 +8,6 @@ import {AddUrlToTabsetHandler, ButtonActions} from "src/tabsets/actionHandling/A
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {ActionContext} from "src/tabsets/actionHandling/model/ActionContext";
 import {ExcalidrawStorage} from "src/tabsets/actionHandling/model/ExcalidrawStorage";
-import {useContentStore} from "src/content/stores/contentStore";
 
 /**
  * does not work as intended; cannot overwrite local storage of excalidraw.com

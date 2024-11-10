@@ -76,7 +76,6 @@ import {Tabset} from "src/tabsets/models/Tabset";
 import Analytics from "src/core/utils/google-analytics";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import TabsetPageCards from "src/tabsets/pages/pwa/TabsetPageCards.vue";
-import NavigationService from "src/services/NavigationService";
 import TabList from "src/tabsets/pages/pwa/TabList.vue";
 
 const route = useRoute()
@@ -102,19 +101,5 @@ watchEffect(() => {
   console.log("watch effect in tabsetpage", tabsetId.value)
   //tab.value = route.query['tab'] ? route.query['tab'] as string : 'tabset'
 })
-
-// const groups = [
-//   { id: 'group1', label: 'Group 1' },
-//   { id: 'group2', label: 'Group 2' },
-// ];
-//
-// const items = [
-//   { group: 'group1', type: 'point', start: 1705878000000, cssVariables: { '--item-background': 'var(--color-2)' } },
-//   { group: 'group1', type: 'range', start: 1707135072000, end: 1708431072000, cssVariables: { '--item-background': 'var(--color-4)' } },
-//   { group: 'group2', type: 'range', start: 1706790600000, end: 1706877000000 },
-// ];
-
-const openAllTabsetsOverview = () =>
-  NavigationService.openOrCreateTab([chrome.runtime.getURL(`www/index.html#/mainpanel/tabsets/overview`)])
 
 </script>

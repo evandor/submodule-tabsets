@@ -226,10 +226,9 @@ import SidePanelPageTabList from "src/tabsets/layouts/SidePanelPageTabList.vue";
 import {LoadDynamicTabsCommand} from "src/tabsets/commands/LoadDynamicTabsCommand";
 import SidePanelNotesView from "src/notes/views/sidepanel/SidePanelNotesView.vue";
 import SpecialUrlAddToTabsetComponent from "src/tabsets/actionHandling/SpecialUrlAddToTabsetComponent.vue";
-import {ButtonActions} from "src/tabsets/actionHandling/AddUrlToTabsetHandler";
 import {ActionHandlerButtonClickedHolder} from "src/tabsets/actionHandling/model/ActionHandlerButtonClickedHolder";
-import getScrollTarget = scroll.getScrollTarget;
 import {useActionHandlers} from "src/tabsets/actionHandling/ActionHandlers";
+import getScrollTarget = scroll.getScrollTarget;
 
 const props = defineProps({
   tabsets: {type: Array as PropType<Array<Tabset>>, required: true}

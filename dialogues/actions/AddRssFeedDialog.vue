@@ -45,14 +45,7 @@ defineEmits([
   ...useDialogPluginComponent.emits
 ])
 
-const props = defineProps({
-  providedUrl: {
-    type: String,
-    default: ''
-  }
-})
-
-const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent()
+const { dialogRef, onDialogHide, onDialogOK } = useDialogPluginComponent()
 
 const displayFeed = ref(false)
 const feedName = ref<string>('')

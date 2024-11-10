@@ -93,7 +93,7 @@ import {Tab, TabSorting} from "src/tabsets/models/Tab";
 import {Tabset} from "src/tabsets/models/Tabset";
 import {useRoute} from "vue-router";
 import {useUtils} from "src/core/services/Utils";
-import FirstToolbarHelper from "pages/sidepanel/helper/FirstToolbarHelper.vue";
+import FirstToolbarHelper from "pages/sidepanel/helper/FirstToolbarHelper2.vue";
 import {useWindowsStore} from "src/windows/stores/windowsStore";
 import Analytics from "src/core/utils/google-analytics";
 import SidePanelTabsetsSelectorWidget from "components/widgets/SidePanelTabsetsSelectorWidget.vue";

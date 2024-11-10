@@ -68,7 +68,6 @@ import {useActionHandlers} from "src/tabsets/actionHandling/ActionHandlers";
 import {AddUrlToTabsetHandler, ButtonActions} from "src/tabsets/actionHandling/AddUrlToTabsetHandler";
 import {useQuasar} from "quasar";
 import {NoopAddUrlToTabsetHandler} from "src/tabsets/actionHandling/handler/NoopAddUrlToTabsetHandler";
-import {useContentStore} from "src/content/stores/contentStore";
 import {ActionHandlerButtonClickedHolder} from "src/tabsets/actionHandling/model/ActionHandlerButtonClickedHolder";
 import {useUiStore} from "src/ui/stores/uiStore";
 
