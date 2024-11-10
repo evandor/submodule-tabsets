@@ -88,7 +88,7 @@ export class LoadDynamicTabsCommand implements Command<any> {
             })
         }
       }
-      const iteration1 = f(tree)
+      //const iteration1 = f(tree)
       console.log("===>", folderByLevel.map(e => e.id))
       //console.log("iteration1", JSON.stringify(iteration1,null,2))
 
@@ -121,7 +121,7 @@ export class LoadDynamicTabsCommand implements Command<any> {
             })
         }
       }
-      const iteration2 = g(iteration1)
+      //const iteration2 = g(iteration1)
       //console.log("iteration2", iteration2)
 
       for (const f of foldersToCreate) {

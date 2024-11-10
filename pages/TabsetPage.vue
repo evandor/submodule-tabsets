@@ -279,7 +279,6 @@ import JsUtils from "src/utils/JsUtils";
 import {useUiStore} from "src/ui/stores/uiStore";
 import TabsetsSelectorWidget from "components/widgets/TabsetsSelectorWidget.vue";
 import Analytics from "src/core/utils/google-analytics";
-import {useAuthStore} from "stores/authStore";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {useFeaturesStore} from "src/features/stores/featuresStore";
 import AddUrlDialog from "src/tabsets/dialogues/AddUrlDialog.vue";

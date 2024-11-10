@@ -375,7 +375,6 @@ const pngs = ref<SavedBlob[]>([])
 const selectedAnnotation = ref<HTMLSelection | undefined>(undefined)
 const newComment = ref("")
 const selectedCommentId = ref<string | undefined>(undefined)
-const popModel = ref(false)
 
 onMounted(() => {
   if ((new Date().getTime() - props.tab.created) < 500) {

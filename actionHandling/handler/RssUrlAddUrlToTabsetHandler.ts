@@ -42,7 +42,7 @@ export class RssUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
       const newTab = new Tab(uid(), chromeTab)
       if (displayFeed) {
         // let title = chromeTab.url?.replace("https://","").replace("http://", "").replace(STRIP_CHARS_IN_USER_INPUT, '') || 'no title'
-        let title = additionalData['feedName'] || 'no title'
+        let title: string = additionalData['feedName' as keyof object] || 'no title'
         if (title.length > 32) {
           title = title.substring(0,28) + "..."
         }

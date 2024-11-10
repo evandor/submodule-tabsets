@@ -18,6 +18,9 @@ import {TabReference, TabReferenceType} from "src/content/models/TabReference";
 import {uid} from "quasar";
 import {useFeaturesStore} from "src/features/stores/featuresStore";
 import {FeatureIdent} from "src/app/models/FeatureIdent";
+import {useAuthStore} from "stores/authStore.ts";
+import {doc, setDoc} from "firebase/firestore";
+import FirebaseServices from "src/services/firebase/FirebaseServices.ts";
 
 const {sendMsg} = useUtils()
 const {info} = useLogger()
@@ -63,7 +66,7 @@ export class AddTabToTabsetCommand implements Command<any> {
       if (exists && !this.ignoreDuplicates) {
         return Promise.reject("tab already exists in this tabset")
       } else if (exists) {
-        return Promise.resolve(new ExecutionResult("", ""))
+        return Promise.resolve(new ExecutionResult("",""))
       }
     }
 

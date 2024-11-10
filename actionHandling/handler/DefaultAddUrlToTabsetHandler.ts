@@ -6,7 +6,6 @@ import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {AddTabToTabsetCommand} from "src/tabsets/commands/AddTabToTabsetCommand";
 import {AddUrlToTabsetHandler, ButtonActions} from "src/tabsets/actionHandling/AddUrlToTabsetHandler";
 import {ActionContext} from "src/tabsets/actionHandling/model/ActionContext";
-import {useContentStore} from "src/content/stores/contentStore";
 
 export class DefaultAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
 

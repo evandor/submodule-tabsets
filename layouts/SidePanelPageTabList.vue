@@ -62,7 +62,6 @@ import {TabsetColumn} from "src/tabsets/models/TabsetColumn";
 import {SPECIAL_ID_FOR_NO_GROUP_ASSIGNED} from "boot/constants";
 import {IndexedTab} from "src/tabsets/models/IndexedTab";
 import SidePanelTabListHelper from "src/tabsets/layouts/SidePanelTabListHelper.vue";
-import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 
 const props = defineProps({
   hideMenu: {type: Boolean, default: false},
