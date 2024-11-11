@@ -81,16 +81,6 @@
           <q-tooltip class="tooltip">Use grid layout to visualize your tabs</q-tooltip>
         </q-btn>
 
-<!--        <q-btn v-if="tabset?.tabs.length > 0 "-->
-<!--               @click="setView('group')"-->
-<!--               style="width:14px"-->
-<!--               class="q-mr-sm" size="8px"-->
-<!--               :flat="tabset?.view !== 'group'"-->
-<!--               :outline="tabset?.view === 'group'"-->
-<!--               icon="view_week">-->
-<!--          <q-tooltip class="tooltip">Use group layout to visualize your tabs</q-tooltip>-->
-<!--        </q-btn>-->
-
         <!-- default view, no need to show if there is no alternative -->
         <q-btn v-if="tabset?.tabs.length > 0 "
                @click="setView('list')"
@@ -102,26 +92,17 @@
           <q-tooltip class="tooltip">Use the list layout to visualize your tabs</q-tooltip>
         </q-btn>
 
-        <!--        <q-btn v-if="useFeaturesStore().hasFeature(FeatureIdent.EXPERIMENTAL_VIEWS) && tabset?.tabs.length > 0"-->
-        <!--               @click="setView('table')"-->
-        <!--               style="width:14px"-->
-        <!--               class="q-mr-xs" size="10px"-->
-        <!--               :flat="tabset?.view !== 'table'"-->
-        <!--               :outline="tabset?.view === 'table'"-->
-        <!--               icon="table_rows">-->
-        <!--          <q-tooltip>Use the table layout to visualize your tabs</q-tooltip>-->
-        <!--        </q-btn>-->
 
-                <q-btn
-                    v-if="useFeaturesStore().hasFeature(FeatureIdent.EXPERIMENTAL_VIEWS) && tabset?.tabs.length > 0"
-                    @click="setView('canvas')"
-                    style="width:14px"
-                    class="q-mr-sm" size="10px"
-                    :flat="tabset?.view !== 'canvas'"
-                    :outline="tabset?.view === 'canvas'"
-                    icon="o_shape_line">
-                  <q-tooltip>Use the canvas freestyle layout to visualize your tabs</q-tooltip>
-                </q-btn>
+        <q-btn
+          v-if="useFeaturesStore().hasFeature(FeatureIdent.EXPERIMENTAL_VIEWS) && tabset?.tabs.length > 0"
+          @click="setView('canvas')"
+          style="width:14px"
+          class="q-mr-sm" size="10px"
+          :flat="tabset?.view !== 'canvas'"
+          :outline="tabset?.view === 'canvas'"
+          icon="o_shape_line">
+          <q-tooltip>Use the canvas freestyle layout to visualize your tabs</q-tooltip>
+        </q-btn>
 
         <q-btn
           v-if="useFeaturesStore().hasFeature(FeatureIdent.EXPERIMENTAL_VIEWS) && tabset?.tabs.length > 0"
@@ -189,12 +170,12 @@
     narrow-indicator
   >
     <q-tab name="tabset" label="Tabs"/>
-<!--    <q-tab name="page" label="Page"-->
-<!--           v-if="useAuthStore().isAuthenticated()"-->
-<!--           :disable="!useTabsetsStore().currentTabsetId"/>-->
-    <q-tab name="canvas" label="Canvas"
+    <!--    <q-tab name="page" label="Page"-->
+    <!--           v-if="useAuthStore().isAuthenticated()"-->
+    <!--           :disable="!useTabsetsStore().currentTabsetId"/>-->
+    <!--    <q-tab name="canvas" label="Canvas"-->
 
-           :disable="!useTabsetsStore().currentTabsetId"/>
+    <!--           :disable="!useTabsetsStore().currentTabsetId"/>-->
   </q-tabs>
 
   <!--  <q-separator class="q-mb-md" />-->
@@ -245,21 +226,21 @@
         hint="This is a special type of tabset - it's meant for those tabs which you don't want to track. You can add urls and whenever
 a tab's url starts with one of the urls of this tabset, it will be ignored and not added to the tabs to be added."/>
 
-<!--      <DynamicTabsetPageCards-->
-<!--        v-if="tabset?.type === TabsetType.DYNAMIC"-->
-<!--        :tabset="tabset as unknown as Tabset"/>-->
+      <!--      <DynamicTabsetPageCards-->
+      <!--        v-if="tabset?.type === TabsetType.DYNAMIC"-->
+      <!--        :tabset="tabset as unknown as Tabset"/>-->
 
       <TabsetPageCards
-                       :tabset="tabset as unknown as Tabset"
-                       :simple-ui="false"/>
+        :tabset="tabset as unknown as Tabset"
+        :simple-ui="false"/>
 
     </q-tab-panel>
     <q-tab-panel name="page">
       <PageForTabset/>
     </q-tab-panel>
-<!--    <q-tab-panel name="canvas">-->
-<!--      <CanvasForTabset/>-->
-<!--    </q-tab-panel>-->
+    <!--    <q-tab-panel name="canvas">-->
+    <!--      <CanvasForTabset/>-->
+    <!--    </q-tab-panel>-->
   </q-tab-panels>
 
 </template>
@@ -283,8 +264,8 @@ import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {useFeaturesStore} from "src/features/stores/featuresStore";
 import AddUrlDialog from "src/tabsets/dialogues/AddUrlDialog.vue";
 import PageForTabset from "src/tabsets/layouts/PageForTabset.vue";
-import TabsetPageCards from "src/tabsets/pages/pwa/TabsetPageCards.vue";
 import OpenRightDrawerWidget from "src/ui/widgets/OpenRightDrawerWidget.vue";
+import TabsetPageCards from "src/tabsets/pages/pwa/TabsetPageCards.vue";
 
 const route = useRoute()
 const router = useRouter()
