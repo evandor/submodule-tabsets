@@ -257,9 +257,9 @@ a tab's url starts with one of the urls of this tabset, it will be ignored and n
     <q-tab-panel name="page">
       <PageForTabset/>
     </q-tab-panel>
-    <q-tab-panel name="canvas">
-      <CanvasForTabset/>
-    </q-tab-panel>
+<!--    <q-tab-panel name="canvas">-->
+<!--      <CanvasForTabset/>-->
+<!--    </q-tab-panel>-->
   </q-tab-panels>
 
 </template>
@@ -282,7 +282,6 @@ import Analytics from "src/core/utils/google-analytics";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {useFeaturesStore} from "src/features/stores/featuresStore";
 import AddUrlDialog from "src/tabsets/dialogues/AddUrlDialog.vue";
-import CanvasForTabset from "src/tabsets/layouts/CanvasForTabset.vue";
 import PageForTabset from "src/tabsets/layouts/PageForTabset.vue";
 import TabsetPageCards from "src/tabsets/pages/pwa/TabsetPageCards.vue";
 import OpenRightDrawerWidget from "src/ui/widgets/OpenRightDrawerWidget.vue";
