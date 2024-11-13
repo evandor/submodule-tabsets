@@ -312,7 +312,6 @@ export const useTabsetsStore = defineStore('tabsets', () => {
         return root
       }
       for (const f of root.folders) {
-        console.log("checking", f.id, folderActive)
         if (f.id === folderActive) {
           return f
         } else {
