@@ -107,6 +107,23 @@
       </template>
     </template>
 
+    <!-- === open search === -->
+    <q-item-label v-if="showOpenSearchInput()">
+      <div class="row q-ma-none q-pa-none q-my-xs">
+        <div class="col-5 text-body2" style="font-size:smaller">
+          <em>Direct Search:</em>
+        </div>
+        <div class="col-6">
+          <input type="text" v-model="opensearchterm"
+                 :style="$q.dark.isActive ? 'background-color:#282828;color:white':'background-color:#bfbfbf;color-primary'"
+                 style="max-height:20px;border:0 solid white;border-bottom:1px solid grey;font-size:12px" />
+        </div>
+        <div class="col text-right">
+          <q-btn icon="search" flat size="xs" @click="openSearch()"/>
+        </div>
+      </div>
+    </q-item-label>
+
     <!-- === url(s) === -->
     <q-item-label
       style="width:100%"
@@ -375,6 +392,7 @@ const pngs = ref<SavedBlob[]>([])
 const selectedAnnotation = ref<HTMLSelection | undefined>(undefined)
 const newComment = ref("")
 const selectedCommentId = ref<string | undefined>(undefined)
+const opensearchterm = ref<string | undefined>(undefined)
 
 onMounted(() => {
   if ((new Date().getTime() - props.tab.created) < 500) {
@@ -629,6 +647,23 @@ const showReadingMode = () => {
     return useFeaturesStore().hasFeature(FeatureIdent.READING_MODE) && t.hasTabReference(TabReferenceType.READING_MODE)
   }
   return false
+}
+
+const showOpenSearchInput = () => {
+  if (props.tab) {
+    const t: Tab = Object.assign(new Tab(props.tab.id, BrowserApi.createChromeTabObject("","")), props.tab)
+    return t.hasTabReference(TabReferenceType.OPEN_SEARCH)
+  }
+  return false
+}
+
+const openSearch = () => {
+  const ref: object[] = props.tab!.tabReferences.filter(ref => ref.type === TabReferenceType.OPEN_SEARCH)[0].data
+  const parser = new DOMParser();
+  const xml = ref[0]['xml' as keyof object]
+  const doc = parser.parseFromString(xml, "application/xml");
+  const templateURL:string = doc.getElementsByTagName("Url")[0].getAttribute("template") || ''
+  useNavigationService().browserTabFor(templateURL.replace("{searchTerms}", opensearchterm.value || ''))
 }
 </script>
 
