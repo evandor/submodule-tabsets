@@ -5,6 +5,8 @@ import {RssFolderHandler} from "src/tabsets/actionHandling/handler/RssFolderHand
 import {ActionHandlerButtonClickedHolder} from "src/tabsets/actionHandling/model/ActionHandlerButtonClickedHolder";
 import {ButtonActions} from "src/tabsets/actionHandling/AddUrlToTabsetHandler";
 import {useContentStore} from "src/content/stores/contentStore";
+import {useCommandExecutor} from "src/core/services/CommandExecutor";
+import {LoadDynamicTabsCommand} from "src/tabsets/commands/LoadDynamicTabsCommand";
 
 export function useActionHandlers($q: QVueGlobals | undefined) {
 
@@ -46,10 +48,10 @@ export function useActionHandlers($q: QVueGlobals | undefined) {
           handler.clicked(chromeTab, tabset, undefined, {filename})
         })
         break;
-      // case ButtonActions.DynamicLoad:
-      //   console.log(`loading dynamic data for tabset/folder ${tabset.id}/${args.folder?.id} `)
-      //   await useCommandExecutor().execute(new LoadDynamicTabsCommand(tabset, args.folder))
-      //   break;
+      case ButtonActions.DynamicLoad:
+        console.log(`loading dynamic data for tabset/folder ${tabset.id}/${args['folder' as keyof object]} `)
+        await useCommandExecutor().execute(new LoadDynamicTabsCommand(tabset, args['folder' as keyof object]))
+        break;
       case ButtonActions.AddRssFeed:
         console.log("===>", args.actionContext)
         handler.withDialog(args.actionContext?.identifier)?.onOk((data: {b: boolean, s: string}) => {

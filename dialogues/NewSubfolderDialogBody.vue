@@ -60,6 +60,8 @@ import DialogButton from "src/core/dialog/buttons/DialogButton.vue";
 import {CreateFolderCommand} from "src/tabsets/commands/CreateFolderCommand";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {useTabsStore2} from "src/tabsets/stores/tabsStore2";
+import _ from "lodash";
+import {Tab} from "src/tabsets/models/Tab";
 
 // @ts-ignore
 const {dialogRef, onDialogHide, onDialogCancel} = useDialogPluginComponent()
@@ -91,10 +93,9 @@ const doesNotExistYet = (val: string) => {
 }
 
 const submit = () => {
-  //console.log("submit", addAllOpenTabs.value, useTabsStore2().browserTabs)
   let tabsToUse = addAllOpenTabs.value ? useTabsStore2().browserTabs : []
   useCommandExecutor()
-    .executeFromUi(new CreateFolderCommand(uid(),newFolderName.value, tabsToUse, props.tabsetId, props.parentFolder))
+    .executeFromUi(new CreateFolderCommand(uid(),newFolderName.value, _.map(tabsToUse, (t: chrome.tabs.Tab) => new Tab(uid(), t)), props.tabsetId, props.parentFolder))
 }
 
 </script>

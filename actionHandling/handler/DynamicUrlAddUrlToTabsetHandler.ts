@@ -1,4 +1,4 @@
-import {DialogChainObject, uid} from "quasar";
+import {DialogChainObject, QVueGlobals, uid} from "quasar";
 import {Tabset} from "src/tabsets/models/Tabset";
 import {ExecutionResult} from "src/core/domain/ExecutionResult";
 import {Tab} from "src/tabsets/models/Tab";
@@ -9,11 +9,14 @@ import {ActionContext} from "src/tabsets/actionHandling/model/ActionContext";
 
 export class DynamicUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
 
-  constructor(
-    private tabset: Tabset,
-    private folder?: Tabset
-  ) {
+
+  constructor(public $q: QVueGlobals | undefined) {
   }
+  // constructor(
+  //   private tabset: Tabset,
+  //   private folder?: Tabset
+  // ) {
+  // }
   urlMatcher() {
     return /.*/;
   }
@@ -23,7 +26,8 @@ export class DynamicUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   }
 
   actions():ActionContext[] {
-    return [new ActionContext("Dynamic Load", ButtonActions.DynamicLoad, this.folder)]
+    // return [new ActionContext("Dynamic Load", ButtonActions.DynamicLoad, this.folder)]
+    return [new ActionContext("Dynamic Load", ButtonActions.DynamicLoad, undefined)]
   }
 
   withDialog(action: ButtonActions): DialogChainObject | undefined {

@@ -114,9 +114,11 @@
           <em>Direct Search:</em>
         </div>
         <div class="col-6">
-          <input type="text" v-model="opensearchterm"
-                 :style="$q.dark.isActive ? 'background-color:#282828;color:white':'background-color:#bfbfbf;color-primary'"
-                 style="max-height:20px;border:0 solid white;border-bottom:1px solid grey;font-size:12px" />
+          <form @submit.prevent="openSearch()">
+            <input type="text" v-model="opensearchterm" autocomplete="on" :id="'opensearch_' + props.tab.id"
+                   :style="$q.dark.isActive ? 'background-color:#282828;color:white':'background-color:#F0F0F0;color-primary'"
+                   style="max-height:20px;border:0 solid white;border-bottom:1px solid #C0C0C0;font-size:12px;border-radius:3px;"/>
+          </form>
         </div>
         <div class="col text-right">
           <q-btn icon="search" flat size="xs" @click="openSearch()"/>
@@ -643,7 +645,7 @@ const deleteSelectedComment = () => {
 const showReadingMode = () => {
   if (props.tab) {
     //console.log("xxx", props.tab.id)
-    const t: Tab = Object.assign(new Tab(props.tab.id, BrowserApi.createChromeTabObject("","")), props.tab)
+    const t: Tab = Object.assign(new Tab(props.tab.id, BrowserApi.createChromeTabObject("", "")), props.tab)
     return useFeaturesStore().hasFeature(FeatureIdent.READING_MODE) && t.hasTabReference(TabReferenceType.READING_MODE)
   }
   return false
@@ -651,7 +653,7 @@ const showReadingMode = () => {
 
 const showOpenSearchInput = () => {
   if (props.tab) {
-    const t: Tab = Object.assign(new Tab(props.tab.id, BrowserApi.createChromeTabObject("","")), props.tab)
+    const t: Tab = Object.assign(new Tab(props.tab.id, BrowserApi.createChromeTabObject("", "")), props.tab)
     return t.hasTabReference(TabReferenceType.OPEN_SEARCH)
   }
   return false
@@ -662,7 +664,7 @@ const openSearch = () => {
   const parser = new DOMParser();
   const xml = ref[0]['xml' as keyof object]
   const doc = parser.parseFromString(xml, "application/xml");
-  const templateURL:string = doc.getElementsByTagName("Url")[0].getAttribute("template") || ''
+  const templateURL: string = doc.getElementsByTagName("Url")[0].getAttribute("template") || ''
   useNavigationService().browserTabFor(templateURL.replace("{searchTerms}", opensearchterm.value || ''))
 }
 </script>
