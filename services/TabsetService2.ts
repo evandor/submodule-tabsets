@@ -22,7 +22,6 @@ import {useSpacesStore} from "src/spaces/stores/spacesStore";
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {GithubLogCommand} from "src/tabsets/commands/github/GithubLogCommand";
 import {ContentItem} from "src/content/models/ContentItem";
-import {useSearchStore} from "src/search/stores/searchStore";
 
 // let db: TabsetsPersistence = null as unknown as TabsetsPersistence
 
