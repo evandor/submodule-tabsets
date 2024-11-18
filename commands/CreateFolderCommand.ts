@@ -27,7 +27,6 @@ export class CreateFolderCommand implements Command<Tabset> {
 
   async execute(): Promise<ExecutionResult<Tabset>> {
     try {
-      debugger
       const tabset = useTabsetsStore().getTabset(this.tabsetId)!
       const oldFolderActive = tabset.folderActive
       if (this.parentFolder) {

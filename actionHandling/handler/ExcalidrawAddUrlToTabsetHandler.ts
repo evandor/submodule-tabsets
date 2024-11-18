@@ -31,14 +31,6 @@ export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
       var actions = (tabset.tabs as Tab[])
         .filter((t: Tab) => t.url !== undefined)
         .filter((t: Tab) => t.url!.match(this.urlMatcher()))
-        // .filter((t: Tab) => {
-        //   const currentTabId = useContentStore().currentTabId as string | undefined
-        //   if (currentTabId) {
-        //     return currentTabId === t.id
-        //   } else {
-        //     return true
-        //   }
-        // })
         .map((t: Tab) => {
           return new ActionContext(t.title || 'undefined', ButtonActions.Save)
         })

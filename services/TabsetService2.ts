@@ -21,6 +21,8 @@ import throttledQueue from "throttled-queue";
 import {useSpacesStore} from "src/spaces/stores/spacesStore";
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {GithubLogCommand} from "src/tabsets/commands/github/GithubLogCommand";
+import {ContentItem} from "src/content/models/ContentItem";
+import {useSearchStore} from "src/search/stores/searchStore";
 
 // let db: TabsetsPersistence = null as unknown as TabsetsPersistence
 
@@ -329,7 +331,7 @@ export function useTabsetService() {
     const title = tab.title || ''
     const tabsetIds: string[] = tabsetsFor(tab.url)
 
-    useContentService().saveContent(tab.id, text, metas, title, tabsetIds)
+    useContentService().saveContent(tab!, text, metas, title, tabsetIds)
       .catch((err: any) => console.log("err", err))
 
     const tabsets = [...useTabsetsStore().tabsets.values()] as Tabset[]
@@ -652,59 +654,36 @@ export function useTabsetService() {
     //const urlSet: Set<string> = new Set()
     const minimalIndex: object[] = []
 
-    for (const tabset of [...useTabsetsStore().tabsets.values()] as Tabset[]) {
+    const contents: ContentItem[] = await useContentService().getContents()
+
+    async function pushToIndex(tabset: Tabset) {
       for (const tab of tabset.tabs) {
         if (!tab.url) {
           continue
         }
-        if (typeof (tab.id) === 'number') {
-          console.log("tab.id", tab.id, typeof (tab.id))
-
-        }
-        // if (urlSet.has(tab.url)) {
-        //   const existingDocIndex = _.findIndex(minimalIndex, (d: any) => {
-        //     return d.url === tab.title
-        //   })
-        //   if (existingDocIndex >= 0) {
-        //     const existingDoc = minimalIndex[existingDocIndex]
-        //     // console.log("existingDoc", existingDoc)
-        //     if ((existingDoc['tabsets' as keyof object] as string[]).indexOf(tabset.id) < 0) {
-        //       const newTabsetIds = (existingDoc['tabsets' as keyof object] as string[]).concat([tabset.id])
-        //       //@ts-ignore
-        //       existingDoc['tabsets'] = newTabsetIds
-        //       minimalIndex.splice(existingDocIndex, 1, existingDoc)
-        //     }
-        //   } else {
-        //     //const doc = new SearchDoc(uid(), tab.name || '', tab.title || '', tab.url, "", "", "", [tabset.id], '', "")
-        //     minimalIndex.push({
-        //       name: tab.name || '',
-        //       title: tab.title || '',
-        //       url: tab.url || '',
-        //       description: tab.description,
-        //       content: '',
-        //       tabsets: [tabset.id],
-        //       favIconUrl: tab.favIconUrl || '',
-        //       tags: tab.tags ? tab.tags.join(' ') : ''
-        //     })
-        //   }
-        // } else {
-        const content = await useContentService().getContent(tab.id)
+        //const content = await useContentService().getContent(tab.id)
+        const content = contents.find((item) => item.url === tab.url) || new ContentItem("","","","",[],[])
         const addToIndex = {
           name: tab.name || '',
           title: tab.title || '',
           url: tab.url || '',
           description: tab.description,
-          content: content?.content || '',
+          content: content.content || '',
           tabsets: [tabset.id],
           favIconUrl: tab.favIconUrl || '',
           tags: tab.tags ? tab.tags.join(' ') : ''
         }
-        //console.log("adding to index: ", addToIndex)
+       // console.log("adding", addToIndex)
         minimalIndex.push(addToIndex)
-        // AppEventDispatcher.dispatchEvent('upsert-in-search', addToIndex)
-        // urlSet.add(tab.url)
-        // }
+       // console.log("minimalIndex", minimalIndex.length)
       }
+      tabset.folders.forEach(folder => {
+        pushToIndex(folder)
+      })
+    }
+
+    for (const tabset of [...useTabsetsStore().tabsets.values()] as Tabset[]) {
+      await pushToIndex(tabset);
     }
 
     console.debug(` ...populating search index from tabsets with ${minimalIndex.length} entries`)
@@ -723,6 +702,27 @@ export function useTabsetService() {
       promises.push(p)
     })
     Promise.all(promises).finally(() => useUiStore().stopProgress())
+
+    // adding content in a second round
+    // useContentService().getContents()
+    //   .then((contents: ContentItem[]) => {
+    //
+    //     useSearchStore().
+    //
+    //     contents.forEach(content => {
+    //       const addToIndex = {
+    //         name: content.name || '',
+    //         title: content.title || '',
+    //         url: content.url || '',
+    //         description: content.description,
+    //         content: content?.content || '',
+    //         tabsets: [tabset.id],
+    //         favIconUrl: content.favIconUrl || '',
+    //         tags: content.tags ? content.tags.join(' ') : ''
+    //       }
+    //     })
+    //   })
+
   }
 
   const addToSearchIndex = (tsId: string, tabs: Tab[]) => {
