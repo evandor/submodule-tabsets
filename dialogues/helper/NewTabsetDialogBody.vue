@@ -109,7 +109,7 @@ import {MarkTabsetAsDefaultCommand} from "src/tabsets/commands/MarkTabsetAsDefau
 import {useTabsStore2} from "src/tabsets/stores/tabsStore2";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {useFeaturesStore} from "src/features/stores/featuresStore";
-import {SidePanelViews} from "src/models/SidePanelViews";
+import {SidePanelViews} from "src/app/models/SidePanelViews";
 
 // @ts-ignore
 const {dialogRef, onDialogHide, onDialogCancel} = useDialogPluginComponent()

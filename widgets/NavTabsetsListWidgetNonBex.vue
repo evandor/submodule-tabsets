@@ -73,11 +73,11 @@ import {Tabset, TabsetStatus, TabsetType} from "src/tabsets/models/Tabset";
 import {useRouter} from "vue-router";
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {SelectTabsetCommand} from "src/tabsets/commands/SelectTabset";
-import {MoveToTabsetCommand} from "src/domain/tabs/MoveToTabset";
 import TabsetListContextMenu from "src/tabsets/widgets/TabsetListContextMenu.vue";
 import {useUiStore} from "src/ui/stores/uiStore";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {useSpacesStore} from "src/spaces/stores/spacesStore";
+import {MoveToTabsetCommand} from "src/tabsets/commands/MoveToTabset";
 
 const router = useRouter()
 

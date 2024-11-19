@@ -5,7 +5,6 @@ import {uid} from "quasar";
 import ChromeApi from "src/app/BrowserApi";
 import {TabPredicate} from "src/domain/Types";
 import {Tabset, TabsetStatus, TabsetType} from "src/tabsets/models/Tabset";
-import {MetaLink} from "src/models/MetaLink";
 // @ts-ignore
 import {v5 as uuidv5} from 'uuid';
 import {useSettingsStore} from "src/stores/settingsStore"
@@ -330,7 +329,7 @@ export function useTabsetService() {
     const title = tab.title || ''
     const tabsetIds: string[] = tabsetsFor(tab.url)
 
-    useContentService().saveContent(tab!, text, metas, title, tabsetIds)
+    useContentService().saveContent(tab.id, tab.url, text, metas, title, tabsetIds)
       .catch((err: any) => console.log("err", err))
 
     const tabsets = [...useTabsetsStore().tabsets.values()] as Tabset[]
@@ -393,14 +392,6 @@ export function useTabsetService() {
     })
 
     return Promise.all(savePromises)
-  }
-
-  const saveMetaLinksFor = (tab: chrome.tabs.Tab, metaLinks: MetaLink[]) => {
-    if (tab && tab.url) {
-      // db.saveMetaLinks(tab.url, metaLinks)
-      //   //.then(() => console.debug("added meta links"))
-      //   .catch(err => console.log("err", err))
-    }
   }
 
   const saveLinksFor = (tab: chrome.tabs.Tab, links: any) => {
@@ -765,7 +756,6 @@ export function useTabsetService() {
     saveTabset,
     saveCurrentTabset,
     saveText,
-    saveMetaLinksFor,
     saveLinksFor,
     addToTabsetId,
     addToTabset,
@@ -778,7 +768,6 @@ export function useTabsetService() {
     saveBlob,
     getBlob,
     reloadTabset,
-    //handleAnnotationMessage,
     tabsToShow,
     deleteTabsetDescription,
     findTabInFolder,
