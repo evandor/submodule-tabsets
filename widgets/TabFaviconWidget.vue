@@ -18,7 +18,7 @@
          :height="props.tab?.extension === UrlExtension.RSS ? '38px' : props.height"
          :src="getFaviconUrl(tab as Tab)">
     <q-tooltip v-if="!props.preventDragAndDrop" class="tooltip">
-      drag and drop to reorder in tabset {{props.height}} {{ useSettingsStore().isEnabled("dev") ? 'Tab#: ' + tab.id : ''}}
+      drag and drop to reorder in tabset
     </q-tooltip>
     <q-tooltip v-else class="tooltip">This is a sorted list, you cannot drag and drop</q-tooltip>
   </q-img>

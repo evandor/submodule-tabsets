@@ -4,6 +4,9 @@ import {ExcalidrawAddUrlToTabsetHandler} from "src/tabsets/actionHandling/handle
 import {MarkdownFileAddUrlToTabsetHandler} from "src/tabsets/actionHandling/handler/MarkdownFileAddUrlToTabsetHandler";
 import {AddUrlToTabsetHandler} from "src/tabsets/actionHandling/AddUrlToTabsetHandler";
 import {RssUrlAddUrlToTabsetHandler} from "src/tabsets/actionHandling/handler/RssUrlAddUrlToTabsetHandler";
+import {
+  FileProtocolUrlAddUrlToTabsetHandler
+} from "src/tabsets/actionHandling/handler/FileProtocolUrlAddUrlToTabsetHandler";
 
 export class AddUrlToTabsetHandlers {
 
@@ -12,9 +15,11 @@ export class AddUrlToTabsetHandlers {
   handlers: AddUrlToTabsetHandler[] = []
 
   constructor(public quasar: QVueGlobals | undefined) {
+    // this.handlers.push(new DynamicUrlAddUrlToTabsetHandler(this.quasar))
     this.handlers.push(new ExcalidrawAddUrlToTabsetHandler(this.quasar))
     this.handlers.push(new MarkdownFileAddUrlToTabsetHandler(this.quasar))
     this.handlers.push(new RssUrlAddUrlToTabsetHandler(this.quasar))
+    this.handlers.push(new FileProtocolUrlAddUrlToTabsetHandler(this.quasar))
   }
 
   handlerFor(url: string, content: string, article?: object): AddUrlToTabsetHandler {

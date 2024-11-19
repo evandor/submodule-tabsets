@@ -17,7 +17,7 @@ export class CreateFolderCommand implements Command<Tabset> {
   constructor(
     public folderId: string,
     public folderName: string,
-    public tabsToUse: chrome.tabs.Tab[],
+    public tabsToUse: Tab[],
     public tabsetId: string,
     public parentFolder?: string,
     public dynamicUrl?: string,
@@ -33,8 +33,9 @@ export class CreateFolderCommand implements Command<Tabset> {
         tabset.folderActive = this.parentFolder
       }
       if (!tabset.folderActive || tabset.id === tabset.folderActive) { // assuming root
-        const tabs = _.map(this.tabsToUse, (t: chrome.tabs.Tab) => new Tab(uid(), t))
+        const tabs = this.tabsToUse //_.map(this.tabsToUse, (t: chrome.tabs.Tab) => new Tab(uid(), t))
         const newFolder = new Tabset(this.folderId, this.folderName, tabs)
+        console.log("newFolder", newFolder)
         newFolder.type = this.type || TabsetType.DEFAULT
         newFolder.dynamicUrl = this.dynamicUrl
         newFolder.folderParent = tabset.id
@@ -48,7 +49,7 @@ export class CreateFolderCommand implements Command<Tabset> {
       }
       const parentFolder = useTabsetsStore().getActiveFolder(tabset)
       if (parentFolder) {
-        const newFolder = new Tabset(this.folderId, this.folderName, [])
+        const newFolder = new Tabset(this.folderId, this.folderName, this.tabsToUse)
         newFolder.type = this.type ||  TabsetType.DEFAULT
         newFolder.folderParent = parentFolder.id
         if (!tabset.folders) {
@@ -71,5 +72,5 @@ export class CreateFolderCommand implements Command<Tabset> {
 }
 
 CreateFolderCommand.prototype.toString = function cmdToString() {
-  return `CreateFolderCommand: {tabsetId=${this.tabsetId}, folderId: ${this.folderId}, folderName=${this.folderName}, parentFolder=${this.parentFolder}}`;
+  return `CreateFolderCommand: {tabsetId='${this.tabsetId}', folderId: '${this.folderId}', folderName='${this.folderName}', parentFolder=${this.parentFolder}, tabs#=${this.tabsToUse.length}`;
 };

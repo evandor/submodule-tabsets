@@ -3,10 +3,25 @@ import {Tabset} from "src/tabsets/models/Tabset";
 import {ExecutionFailureResult, ExecutionResult} from "src/core/domain/ExecutionResult";
 import {fromMarkdown} from 'mdast-util-from-markdown'
 import {uid} from "quasar";
-import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import * as cheerio from "cheerio";
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {CreateFolderCommand} from "src/tabsets/commands/CreateFolderCommand";
+import {Parent, Root, RootContent, Text} from "mdast";
+import BrowserApi from "src/app/BrowserApi";
+import {useTabsetService} from "src/tabsets/services/TabsetService2";
+import {Tab} from "src/tabsets/models/Tab";
+import {TabReference, TabReferenceType} from "src/content/models/TabReference";
+
+class TabNode {
+  constructor(public text: string, public url: string, public description?: string, public dynamicUrl?: string) {
+  }
+}
+
+class FolderNode {
+
+  constructor(public name: string, public id: string, public children: FolderNode[] = [], public tabs: TabNode[] = []) {
+  }
+}
 
 export class LoadDynamicTabsCommand implements Command<any> {
 
@@ -14,153 +29,151 @@ export class LoadDynamicTabsCommand implements Command<any> {
 
   constructor(
     private tabset: Tabset,
-    private folder?: Tabset
+    private dynamicUrl: string
   ) {
   }
 
+
   async execute(): Promise<ExecutionResult<any>> {
-    if (!this.tabset.dynamicUrl && !this.folder?.dynamicUrl) {
-      return Promise.resolve(new ExecutionFailureResult("", "not a dynamic tabset/folder"))
+
+    let currentHeadings: string[] = ["", "", "", "", "", "", "", "", "", "", "", "", ""]
+
+    function visitChildren(c: Parent, links: object[]): object[] {
+      //console.log("checking", typeof c, c)
+      if (c.type === "heading") {
+        var t = c.children
+          .filter((c: RootContent) => c.type === "text")
+          .map((c: Text) => c.value || 'no title')
+        if (t.length > 0) {
+          //currentHeading = t[0]
+          console.log("testing header:", t[0], c['depth' as keyof object])
+          currentHeadings[c['depth' as keyof object]] = t[0]
+        }
+      } else if (c.type === "paragraph") {
+        if (c.children) {
+          const linkChildren = c.children.filter((c => c.type === "link"))
+          const descriptions = c.children.filter((c => c.type === "text"))
+          //console.log("found", linkChildren, descriptions, linkChildren.length > 0 && descriptions.length > 0)
+          if (linkChildren.length > 0 && descriptions.length > 0) {
+            const texts: string[] = linkChildren[0].children
+              .filter((c: RootContent) => c.type === "text") // "links" -> "text"
+              .map((c: Text) => c.value || 'no title')
+            const description = descriptions[0].value
+            const res = {
+              url: linkChildren[0]['url' as keyof object] as string,
+              text: texts.length > 0 ? texts[0] : 'no title2',
+              description: description,
+              headings: currentHeadings.filter(h => h.trim().length > 0)
+            }
+            //console.log("res", res)
+            links.push(res)
+          }
+        }
+      } else {
+        if (c.children) {
+          c.children.map((child: RootContent) => visitChildren(child as Parent, links))
+        }
+      }
+      return links
     }
-    const dynamicUrl: string = this.folder?.dynamicUrl ? this.folder.dynamicUrl! : this.tabset.dynamicUrl!
+
+    function analyzse(node: Root, links: object[] = []) {
+      console.log(`type ${node.type}, children# ${node.children.length}`)
+      node.children.map((c: RootContent) => visitChildren(c as Parent, links))
+      return links
+    }
+
+    function createFolderIfNotExisting(headings: string[], headingMapping: Map<string, FolderNode>) {
+      //console.log("createFolderIfNotExisting", headings, headingMapping)
+      const parentPath = headings.length > 0 ? headings.slice(0, headings.length - 1) : [""]
+      const parent = headingMapping.get(parentPath.join("->")) // assuming always found
+      const headingsPath = headings.join("->")
+      if (!headingMapping.has(headingsPath)) {
+        const newFolder = new FolderNode(headings[headings.length - 1], uid())
+        headingMapping.set(headingsPath, newFolder)
+        parent!.children.push(newFolder)
+      }
+
+    }
+
+    async function createFolders(parentNode: FolderNode, tabsetId: string, parentFolder: string) {
+      console.log("creating folders ---", parentNode, tabsetId, parentFolder)
+      for (const child of parentNode.children) {
+        const tabs: Tab[] = child.tabs.map((t: TabNode) => {
+          const tab:Tab = new Tab(uid(), BrowserApi.createChromeTabObject(t.text, t.url))
+          tab.description = t.description || ''
+          tab.tags = ['markdown import']
+          tab.tabReferences.push(new TabReference(uid(), TabReferenceType.SOURCE, "original URL", [], t.dynamicUrl))
+          return tab
+        })
+        await useCommandExecutor().executeFromUi(new CreateFolderCommand(uid(), child.name, tabs, tabsetId, parentFolder))
+      }
+    }
+
     //const folderOrTabset: Tabset = this.folder ? this.folder : this.tabset
-    if (dynamicUrl.endsWith(".md")) {
-      const doc = await fetch(dynamicUrl)
+    if (this.dynamicUrl.endsWith(".md")) {
+      const doc = await fetch(this.dynamicUrl)
       const body = await doc.text()
-      const tree = fromMarkdown(body)
-      console.log("tree", JSON.stringify(tree,null,2))
-      this.folder
-        ? this.folder.tabs = []
-        : this.tabset.tabs = []
-      //this.parseLinks("ROOT", tree)
+      const tree: Root = fromMarkdown(body)
+      // console.log("tree", JSON.stringify(tree, null, 2))
 
-      let level = 0
-      let folderByLevel: Tabset[] = [this.folder ? this.folder : this.tabset]
-      console.log("===>", folderByLevel.map(e => e.id))
-      let freshFolder = false
-      const f = ({type = "unknown", depth=0, value = "", title = "", children = {}}, folder?: Tabset): {
-        type: string,
-        depth: number,
-        value: string,
-        title: string,
-        folder: Tabset | undefined,
-        children: object
-      } => {
-        return {
-          type,
-          depth,
-          value,
-          title,
-          folder,
-          children: Object.values(children)
-            .filter((elem: any) => {
-              return elem.type === "heading" || elem.type === "text" || elem.type === "link" || elem.type === "paragraph"
-            })
-            .map((elem: any) => {
-              //console.log("in", type, depth, folder)
-              if (elem.type === "heading" && elem.depth) {
-                const folder = new Tabset(uid(), "xxx")
-                freshFolder = true
-                if (elem.depth > level) {
-                  console.log(`create new folder +1, depth ${elem.depth}, level: ${level}, folderId: ${folder.id}, parentId: ${folderByLevel[level].id}`)
-                  folder.folderParent = folderByLevel[level].id
-                  level = elem.depth
-                  folderByLevel[level] = folder
-                  return f(elem, folder)
-                } else if (elem.depth === level) {
-                  console.log(`create new folder 0, depth ${elem.depth}, level: ${level}, folderId: ${folder.id}, parentId: ${folderByLevel[level].id}`)
-                  folder.folderParent = folderByLevel[level-1].id
-                  return f(elem, folder)
-                } else if (elem.depth < level) {
-                  console.log(`create new folder -1, depth ${elem.depth}, level: ${level}, folderId: ${folder.id}, parentId: ${folderByLevel[level].id}`)
-                  level = elem.depth
-                  folder.folderParent = folderByLevel[elem.depth-1].id
-                  return f(elem, folder)
-                }
-              } else {
-                if (freshFolder && elem.type === "text" && folder) {
-                  folder.name = elem.value
-                  freshFolder = false
-                }
-                return f(elem, undefined)
-              }
+      // cleanup
+      const onlyLinkTree = analyzse(tree)
 
-            })
+      console.log("onlyLinkTree", JSON.stringify(onlyLinkTree, null, 2))
+
+      const rootFolder: FolderNode = new FolderNode("root", uid())
+      const headingMapping: Map<string, FolderNode> = new Map()
+      headingMapping.set("", rootFolder)
+
+      onlyLinkTree.forEach((e: object) => {
+
+        const headings = e['headings' as keyof object] as string[]
+        const headingsPath = headings.join("->")
+       // console.log("got headingsPath", headingsPath)
+        if (headingMapping.has(headingsPath)) {
+
+        } else {
+          for (let i = 0; i <= headings.length; i++) {
+            //console.log("testing", headings, i)
+            createFolderIfNotExisting(headings.slice(0,i), headingMapping)
+          }
         }
-      }
-      //const iteration1 = f(tree)
-      console.log("===>", folderByLevel.map(e => e.id))
-      //console.log("iteration1", JSON.stringify(iteration1,null,2))
+      })
 
-      const foldersToCreate : Tabset[] = []
-      const g = ({type = "unknown", value = "", title = "", children = {}}, folder?: Tabset): {
-        type: string,
-        value: string,
-        title: string,
-        folder: Tabset | undefined,
-        children: object
-      } => {
+      console.log("rootFolder", rootFolder)
 
-        return {
-          type,
-          value,
-          title,
-          folder,
-          children: Object.values(children)
-            .filter((elem: any) => {
-              // console.log(`in ${elem.type},${elem.folder}: ${(elem.type === "root" || elem.folder !== undefined)}`, )
-              return  elem.type === "root" || elem.folder !== undefined
-            })
-            .map((elem: any) => {
-              console.log("---new folder---:", elem.folder.id)
-              if (elem.folder) {
-                const f:Tabset = elem.folder
-                foldersToCreate.push(f)
-              }
-              return g(elem)
-            })
+      onlyLinkTree.forEach((e: object) => {
+        const tab = new Tab(uid(), BrowserApi.createChromeTabObject(e['text' as keyof object], e['url' as keyof object]))
+        tab.description = e['description' as keyof object]
+        //tab.date = new Date().getTime()
+        tab.tags = ['markdown import']
+        tab.tabReferences.push(new TabReference(uid(), TabReferenceType.SOURCE, "original URL", [], this.dynamicUrl))
+
+        const headingsPath = (e['headings' as keyof object] as string[]).join("->")
+        if (headingMapping.has(headingsPath)) {
+          const folder = headingMapping.get(headingsPath)!
+          folder.tabs.push(new TabNode(e['text' as keyof object], e['url' as keyof object],e['description' as keyof object], this.dynamicUrl))
         }
-      }
-      //const iteration2 = g(iteration1)
-      //console.log("iteration2", iteration2)
+      })
 
-      for (const f of foldersToCreate) {
-        console.log(`createing folder id: ${f.id}, parentId: ${f.folderParent}`)
-        await useCommandExecutor().execute(new CreateFolderCommand(f.id, f.name, [], this.tabset.id, f.folderParent))
-      }
+      const mainFolderResult:ExecutionResult<Tabset> = await useCommandExecutor()
+        .executeFromUi(new CreateFolderCommand(uid(), "Extracted Links", [], this.tabset.id, undefined, this.dynamicUrl))
+      await createFolders(rootFolder, this.tabset.id, mainFolderResult.result.id)
 
-      //console.log("tabsets.tabs", this.tabset.tabs.length)
-      await useTabsetsStore().saveTabset(this.tabset)
+      // const mainFolderResult = await useCommandExecutor().executeFromUi(new CreateFolderCommand(uid(), "Extracted Links", tabs, this.tabset.id, undefined, this.dynamicUrl))
+      // const mainFolder = mainFolderResult.result as Tabset
+      //
+      //
+      // await useTabsetService().saveTabset(this.tabset)
 
       return Promise.resolve(new ExecutionResult("", ""))
-    } else if (dynamicUrl.endsWith(".rss")) {
+    } else if (this.dynamicUrl.endsWith(".rss")) {
 
-      // const CORS_PROXY = "https://cors-anywhere.herokuapp.com/"
-      //
-      // let parser = new Parser();
-      // await parser.parseURL(CORS_PROXY + 'https://www.reddit.com/.rss', function (err, feed) {
-      //   if (err) throw err;
-      //   console.log(feed.title);
-      //   feed.items.forEach(function (entry) {
-      //     console.log(entry.title + ':' + entry.link);
-      //   })
-      // })
-
-      // const doc = await fetch(dynamicUrl)
-      // const body = await doc.text()
-      // console.log("here", body)
-      //
-      // const parser = new Parser();
-      // const feed = await parser.parseURL('https://www.reddit.com/.rss');
-      // console.log(feed.title); // feed will have a `foo` property, type as a string
-      //
-      // feed.items.forEach(item => {
-      //   console.log(item.title + ':' + item.link) // item will have a `bar` property type as a number
-      // });
 
       return Promise.resolve(new ExecutionResult("", "xxx"))
-    } else if (dynamicUrl.startsWith("https://www.youtube.com/watch")) {
-      const doc = await fetch(dynamicUrl)
+    } else if (this.dynamicUrl.startsWith("https://www.youtube.com/watch")) {
+      const doc = await fetch(this.dynamicUrl)
       const body = await doc.text()
       console.log("body", body)
       const $ = cheerio.load(body);
@@ -181,6 +194,7 @@ export class LoadDynamicTabsCommand implements Command<any> {
     }
 
   }
+
 
 }
 

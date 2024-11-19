@@ -6,18 +6,16 @@ import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {AddTabToTabsetCommand} from "src/tabsets/commands/AddTabToTabsetCommand";
 import {CreateFolderCommand} from "src/tabsets/commands/CreateFolderCommand";
 import {AddUrlToTabsetHandler, ButtonActions} from "src/tabsets/actionHandling/AddUrlToTabsetHandler";
+import {LoadDynamicTabsCommand} from "src/tabsets/commands/LoadDynamicTabsCommand";
+import {useTabsetService} from "src/tabsets/services/TabsetService2";
 
-/**
- * disabled for now
- */
 export class MarkdownFileAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
 
   constructor(public $q: QVueGlobals | undefined) {
   }
 
-  // Disabled
   urlMatcher(): RegExp {
-    return /.*\.mdXXX$/;
+    return /.*\.md$/;
   }
 
   contentMatcher(content: string) {
@@ -44,7 +42,10 @@ export class MarkdownFileAddUrlToTabsetHandler implements AddUrlToTabsetHandler 
       const newTab = new Tab(uid(), chromeTab)
       await useCommandExecutor().execute(new AddTabToTabsetCommand(newTab, ts, ts.folderActive))
       if (useForLinks) {
-        await useCommandExecutor().executeFromUi(new CreateFolderCommand(uid(),"Extracted Links", [],ts.id,undefined, newTab.url!))
+        // const res = await useCommandExecutor().executeFromUi(new CreateFolderCommand(uid(),"Extracted Links", [],ts.id,undefined, newTab.url!))
+        // await useTabsetService().saveTabset(ts)
+        // await useCommandExecutor().execute(new LoadDynamicTabsCommand(ts, res.result as Tabset))
+        await useCommandExecutor().execute(new LoadDynamicTabsCommand(ts,newTab.url!))
       }
       return Promise.resolve(new ExecutionResult("","done"))
     } catch (error: any) {

@@ -5,12 +5,14 @@ import {RssFolderHandler} from "src/tabsets/actionHandling/handler/RssFolderHand
 import {ActionHandlerButtonClickedHolder} from "src/tabsets/actionHandling/model/ActionHandlerButtonClickedHolder";
 import {ButtonActions} from "src/tabsets/actionHandling/AddUrlToTabsetHandler";
 import {useContentStore} from "src/content/stores/contentStore";
+import {useCommandExecutor} from "src/core/services/CommandExecutor";
+import {LoadDynamicTabsCommand} from "src/tabsets/commands/LoadDynamicTabsCommand";
 
 export function useActionHandlers($q: QVueGlobals | undefined) {
 
   const actionHandlerRepo = new AddUrlToTabsetHandlers($q)
 
-  function getHandler(url?: string,  folder?: Tabset) {
+  function getHandler(url?: string, folder?: Tabset) {
     //console.log(`getHandler for '${url}', folderId=${folder?.id}`)
     if (folder && folder.type === TabsetType.RSS_FOLDER) {
       return new RssFolderHandler($q)
@@ -23,6 +25,7 @@ export function useActionHandlers($q: QVueGlobals | undefined) {
 
   async function handleClick(tabset: Tabset, chromeTab: chrome.tabs.Tab, args: ActionHandlerButtonClickedHolder, folder: Tabset | undefined) {
     const handler = args.actionHandler
+    console.log("handleClick: ", tabset.id, handler, args.actionContext?.identifier)
     switch (args.actionContext?.identifier) {
       case ButtonActions.AddTab:
         await handler.clicked(chromeTab, tabset, undefined, {})
@@ -46,13 +49,13 @@ export function useActionHandlers($q: QVueGlobals | undefined) {
           handler.clicked(chromeTab, tabset, undefined, {filename})
         })
         break;
-      // case ButtonActions.DynamicLoad:
-      //   console.log(`loading dynamic data for tabset/folder ${tabset.id}/${args.folder?.id} `)
-      //   await useCommandExecutor().execute(new LoadDynamicTabsCommand(tabset, args.folder))
-      //   break;
+      case ButtonActions.DynamicLoad:
+        console.log(`loading dynamic data for tabset/folder ${tabset.id}/${args['folder' as keyof object]} `)
+        await useCommandExecutor().execute(new LoadDynamicTabsCommand(tabset, args['folder' as keyof object]))
+        break;
       case ButtonActions.AddRssFeed:
         console.log("===>", args.actionContext)
-        handler.withDialog(args.actionContext?.identifier)?.onOk((data: {b: boolean, s: string}) => {
+        handler.withDialog(args.actionContext?.identifier)?.onOk((data: { b: boolean, s: string }) => {
           console.log("in", data)
           handler.clicked(chromeTab, tabset, undefined, data)
         })
