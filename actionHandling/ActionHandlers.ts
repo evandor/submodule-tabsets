@@ -17,7 +17,7 @@ export function useActionHandlers($q: QVueGlobals | undefined) {
     if (folder && folder.type === TabsetType.RSS_FOLDER) {
       return new RssFolderHandler($q)
     }
-    const content = useContentStore().currentTabContent
+    const content = useContentStore().getCurrentTabContent
     const handler = url ? actionHandlerRepo.handlerFor(url, content || '') : actionHandlerRepo.defaultAddUrlToTabsetHandler
     //console.log("getting url handler for ", url, handler)
     return handler
