@@ -34,7 +34,7 @@ import DialogButton from "src/core/dialog/buttons/DialogButton.vue";
 import {PropType} from "vue";
 import {Tabset} from "src/tabsets/models/Tabset";
 import {DeleteTabsetFolderCommand} from "src/tabsets/commands/DeleteTabsetFolderCommand";
-import {SidePanelViews} from "src/models/SidePanelViews";
+import {SidePanelViews} from "src/app/models/SidePanelViews";
 
 defineEmits([
   ...useDialogPluginComponent.emits
