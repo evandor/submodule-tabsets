@@ -8,7 +8,6 @@ import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {CreateFolderCommand} from "src/tabsets/commands/CreateFolderCommand";
 import {Parent, Root, RootContent, Text} from "mdast";
 import BrowserApi from "src/app/BrowserApi";
-import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {Tab} from "src/tabsets/models/Tab";
 import {TabReference, TabReferenceType} from "src/content/models/TabReference";
 
