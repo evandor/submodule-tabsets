@@ -41,14 +41,6 @@
           </q-item-section>
         </q-item>
 
-<!--        <q-item-->
-<!--          clickable dense v-close-popup-->
-<!--          @click.stop="emits('buttonClicked', new ActionHandlerButtonClickedHolder(handler, ButtonActions.SaveAs))">-->
-<!--          <q-item-section>-->
-<!--            <q-item-label>as new file</q-item-label>-->
-<!--          </q-item-section>-->
-<!--        </q-item>-->
-
       </q-list>
     </q-btn-dropdown>
   </template>
@@ -90,6 +82,7 @@ const animateAddtabButton = ref(false)
 
 watchEffect(() => {
   handler.value = getHandler(props.currentChromeTab.url, props.folder)
+  console.log("===>",JSON.stringify(handler.value.actions()), props.folder)
 })
 
 watchEffect(() => {

@@ -17,13 +17,7 @@ export class DefaultAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
     return true
   }
 
-
   actions():ActionContext[] {
-    // const article = useContentStore().currentTabArticle
-    // console.log("aritcle2:", article)
-    // if (article && article['title' as keyof object]) {
-    //   return [new ActionContext("Add Tab", ButtonActions.AddTab),new ActionContext("Reading Mode", ButtonActions.AddReadingModeTab)]
-    // }
     return [new ActionContext("Add Tab", ButtonActions.AddTab)]
   }
 
@@ -33,7 +27,7 @@ export class DefaultAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
 
   clicked(chromeTab: chrome.tabs.Tab, ts: Tabset, folder?: Tabset,  additionalData: object = {}): Promise<ExecutionResult<any>> {
     const newTab: Tab = new Tab(uid(), chromeTab)
-    return useCommandExecutor().execute(new AddTabToTabsetCommand(newTab, ts, ts.folderActive))
+    return useCommandExecutor().execute(new AddTabToTabsetCommand(newTab, ts, folder?.id))
   }
 
   updateInTabset(chromeTab: chrome.tabs.Tab, ts: Tabset, additionalData: object = {}): Promise<ExecutionResult<any>> {

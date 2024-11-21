@@ -43,9 +43,9 @@ export class MarkdownFileAddUrlToTabsetHandler implements AddUrlToTabsetHandler 
         // const res = await useCommandExecutor().executeFromUi(new CreateFolderCommand(uid(),"Extracted Links", [],ts.id,undefined, newTab.url!))
         // await useTabsetService().saveTabset(ts)
         // await useCommandExecutor().execute(new LoadDynamicTabsCommand(ts, res.result as Tabset))
-        await useCommandExecutor().execute(new LoadDynamicTabsCommand(ts,newTab.url!))
+        await useCommandExecutor().execute(new LoadDynamicTabsCommand(ts, newTab.url!))
       }
-      return Promise.resolve(new ExecutionResult("","done"))
+      return Promise.resolve(new ExecutionResult("", "done"))
     } catch (error: any) {
       console.warn("error", error)
       return Promise.reject("error creating markdown tab")

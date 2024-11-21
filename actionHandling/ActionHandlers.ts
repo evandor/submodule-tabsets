@@ -3,7 +3,7 @@ import {Tabset, TabsetType} from "src/tabsets/models/Tabset";
 import {AddUrlToTabsetHandlers} from "src/tabsets/actionHandling/AddUrlToTabsetHandlers";
 import {RssFolderHandler} from "src/tabsets/actionHandling/handler/RssFolderHandler";
 import {ActionHandlerButtonClickedHolder} from "src/tabsets/actionHandling/model/ActionHandlerButtonClickedHolder";
-import {ButtonActions} from "src/tabsets/actionHandling/AddUrlToTabsetHandler";
+import {AddUrlToTabsetHandler, ButtonActions} from "src/tabsets/actionHandling/AddUrlToTabsetHandler";
 import {useContentStore} from "src/content/stores/contentStore";
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {LoadDynamicTabsCommand} from "src/tabsets/commands/LoadDynamicTabsCommand";
@@ -12,14 +12,14 @@ export function useActionHandlers($q: QVueGlobals | undefined) {
 
   const actionHandlerRepo = new AddUrlToTabsetHandlers($q)
 
-  function getHandler(url?: string, folder?: Tabset) {
+  function getHandler(url?: string, folder?: Tabset):AddUrlToTabsetHandler {
     //console.log(`getHandler for '${url}', folderId=${folder?.id}`)
     if (folder && folder.type === TabsetType.RSS_FOLDER) {
       return new RssFolderHandler($q)
     }
     const content = useContentStore().getCurrentTabContent
-    const handler = url ? actionHandlerRepo.handlerFor(url, content || '') : actionHandlerRepo.defaultAddUrlToTabsetHandler
-    //console.log("getting url handler for ", url, handler)
+    const handler = url ? actionHandlerRepo.handlerFor(url, content || '', folder) : actionHandlerRepo.defaultAddUrlToTabsetHandler
+    console.log("getting url handler for ", url, handler)
     return handler
   }
 
@@ -28,7 +28,7 @@ export function useActionHandlers($q: QVueGlobals | undefined) {
     console.log("handleClick: ", tabset.id, handler, args.actionContext?.identifier)
     switch (args.actionContext?.identifier) {
       case ButtonActions.AddTab:
-        await handler.clicked(chromeTab, tabset, undefined, {})
+        await handler.clicked(chromeTab, tabset, folder, {})
         break;
       case ButtonActions.AddTabWithDynamicFolder:
         handler.withDialog(args.actionContext?.identifier)?.onOk((data: string[]) => {

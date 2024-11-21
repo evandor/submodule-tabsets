@@ -9,7 +9,7 @@ import {useUtils} from "src/core/services/Utils";
 import * as cheerio from 'cheerio';
 import {AddUrlToTabsetHandler, ButtonActions} from "src/tabsets/actionHandling/AddUrlToTabsetHandler";
 import {ActionContext} from "src/tabsets/actionHandling/model/ActionContext";
-import { parseFeed } from '@rowanmanning/feed-parser';
+import {parseFeed} from '@rowanmanning/feed-parser';
 
 const {sanitizeAsPlainText} = useUtils()
 
