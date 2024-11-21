@@ -103,6 +103,9 @@ export class Tabset {
     if (!this.view) {
       this.view = 'grid'
     }
+    if (!this.folders) {
+      this.folders = []
+    }
   }
 
   static newTabsetNameIsValid = (val: string) => {

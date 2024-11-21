@@ -19,7 +19,11 @@ export class RssUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   }
 
   contentMatcher(content: string) {
-    return content.indexOf("<rss ") >= 0
+    //console.log("content", content.indexOf("<feed "), content)
+    return content.indexOf("<rss ") >= 0 ||
+      content.indexOf("<rdf:RDF ") >= 0 ||
+      content.indexOf("<feed ") >= 0 ||
+      content.indexOf("&lt;feed ") >= 0
   }
 
   actions():  ActionContext[] {

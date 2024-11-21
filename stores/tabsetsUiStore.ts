@@ -11,7 +11,7 @@ export const useTabsetsUiStore = defineStore('tabsetsUi', () => {
   function setMatchingTabsFor(url: string) {
     const tabAndTabsetIds = useTabsetsStore().tabsForUrl(url)
     matchingTabs.value = tabAndTabsetIds
-    console.log("matchingTabs", matchingTabs.value)
+    //console.log("matchingTabs", matchingTabs.value)
   }
 
 

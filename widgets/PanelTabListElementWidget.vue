@@ -126,6 +126,25 @@
       </div>
     </q-item-label>
 
+    <!-- === RSS Links === -->
+    <Transition name="fade" mode="out-in">
+      <q-item-label  v-if="showRssReferencesInfo()">
+        <div class="row q-ma-none q-pa-none q-my-xs"
+             v-for="ref in props.tab?.tabReferences.filter((r: TabReference) => r.type === TabReferenceType.RSS)">
+          <div class="col-1 text-body2" style="font-size:smaller">
+            <q-icon name="rss_feed" class="q-ma-none q-pa-none" color="warning" size="xs"/>
+          </div>
+          <div class="col-7 ellipsis" style="font-size:smaller" @click="useNavigationService().browserTabFor(ref.href!)">
+            {{ ref.href }}
+          </div>
+          <div class="col text-right">
+            <q-btn icon="o_open_in_new" flat size="xs" class="q-ma-none q-pa-none" @click="openSearch()"/>
+            <q-btn icon="o_close" flat size="xs" class="q-ma-none q-pa-none" @click="openSearch()"/>
+          </div>
+        </div>
+      </q-item-label>
+    </Transition>
+
     <!-- === url(s) === -->
     <q-item-label
       style="width:100%"
@@ -358,7 +377,7 @@ import CommentDialog from "src/tabsets/dialogues/CommentDialog.vue";
 import TabListIconIndicatorsHook from "src/app/hooks/tabsets/TabListIconIndicatorsHook.vue";
 import {OpenTabCommand} from "src/tabsets/commands/OpenTabCommand";
 import {useNavigationService} from "src/core/services/NavigationService";
-import {TabReferenceType} from "src/content/models/TabReference";
+import {TabReference, TabReferenceType} from "src/content/models/TabReference";
 import BrowserApi from "src/app/BrowserApi";
 
 const {inBexMode} = useUtils()
@@ -651,12 +670,17 @@ const showReadingMode = () => {
   return false
 }
 
+function hasReference(tab: Tab, refType: TabReferenceType) {
+  const t: Tab = Object.assign(new Tab(tab.id, BrowserApi.createChromeTabObject("", "")), tab)
+  return t.hasTabReference(refType)
+}
+
 const showOpenSearchInput = () => {
-  if (props.tab) {
-    const t: Tab = Object.assign(new Tab(props.tab.id, BrowserApi.createChromeTabObject("", "")), props.tab)
-    return t.hasTabReference(TabReferenceType.OPEN_SEARCH)
-  }
-  return false
+  return props.tab ? hasReference(props.tab, TabReferenceType.OPEN_SEARCH) : false
+}
+
+const showRssReferencesInfo = () => {
+  return props.tab ? hasReference(props.tab, TabReferenceType.RSS) && TabService.isCurrentTab(props.tab) : false
 }
 
 const openSearch = () => {
@@ -667,6 +691,8 @@ const openSearch = () => {
   const templateURL: string = doc.getElementsByTagName("Url")[0].getAttribute("template") || ''
   useNavigationService().browserTabFor(templateURL.replace("{searchTerms}", opensearchterm.value || ''))
 }
+
+
 </script>
 
 <!--https://stackoverflow.com/questions/41078478/css-animated-checkmark -->

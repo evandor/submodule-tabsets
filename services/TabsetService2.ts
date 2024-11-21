@@ -667,6 +667,9 @@ export function useTabsetService() {
         minimalIndex.push(addToIndex)
        // console.log("minimalIndex", minimalIndex.length)
       }
+      if (!tabset.folders) {
+        tabset.folders = []
+      }
       tabset.folders.forEach(folder => {
         pushToIndex(folder)
       })
