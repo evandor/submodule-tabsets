@@ -90,8 +90,8 @@ export class FileProtocolUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandl
           //   pre2.textContent = `Retrieved directroy handle "${directoryHandleOrUndefined.name}" from IndexedDB.`;
           //   return;
           // }
-          const [directoryHandle] = await window.showDirectoryPicker({ mode: "read" });
-          console.log(directoryHandle)
+          //const [directoryHandle] = await window.showDirectoryPicker({mode: "read"});
+          //console.log(directoryHandle)
           // await set('directory', directoryHandle);
           // pre2.textContent = `Stored directory handle for "${directoryHandle.name}" in IndexedDB.`;
         } catch (error: any) {

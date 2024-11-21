@@ -4,10 +4,8 @@ import {ExecutionResult} from "src/core/domain/ExecutionResult";
 import {Tab} from "src/tabsets/models/Tab";
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {AddTabToTabsetCommand} from "src/tabsets/commands/AddTabToTabsetCommand";
-import {CreateFolderCommand} from "src/tabsets/commands/CreateFolderCommand";
 import {AddUrlToTabsetHandler, ButtonActions} from "src/tabsets/actionHandling/AddUrlToTabsetHandler";
 import {LoadDynamicTabsCommand} from "src/tabsets/commands/LoadDynamicTabsCommand";
-import {useTabsetService} from "src/tabsets/services/TabsetService2";
 
 export class MarkdownFileAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
 
@@ -45,9 +43,9 @@ export class MarkdownFileAddUrlToTabsetHandler implements AddUrlToTabsetHandler 
         // const res = await useCommandExecutor().executeFromUi(new CreateFolderCommand(uid(),"Extracted Links", [],ts.id,undefined, newTab.url!))
         // await useTabsetService().saveTabset(ts)
         // await useCommandExecutor().execute(new LoadDynamicTabsCommand(ts, res.result as Tabset))
-        await useCommandExecutor().execute(new LoadDynamicTabsCommand(ts,newTab.url!))
+        await useCommandExecutor().execute(new LoadDynamicTabsCommand(ts, newTab.url!))
       }
-      return Promise.resolve(new ExecutionResult("","done"))
+      return Promise.resolve(new ExecutionResult("", "done"))
     } catch (error: any) {
       console.warn("error", error)
       return Promise.reject("error creating markdown tab")

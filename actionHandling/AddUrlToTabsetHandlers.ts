@@ -7,6 +7,7 @@ import {RssUrlAddUrlToTabsetHandler} from "src/tabsets/actionHandling/handler/Rs
 import {
   FileProtocolUrlAddUrlToTabsetHandler
 } from "src/tabsets/actionHandling/handler/FileProtocolUrlAddUrlToTabsetHandler";
+import {Tabset} from "src/tabsets/models/Tabset";
 
 export class AddUrlToTabsetHandlers {
 
@@ -22,8 +23,12 @@ export class AddUrlToTabsetHandlers {
     this.handlers.push(new FileProtocolUrlAddUrlToTabsetHandler(this.quasar))
   }
 
-  handlerFor(url: string, content: string, article?: object): AddUrlToTabsetHandler {
+  handlerFor(url: string, content: string, folder?: Tabset): AddUrlToTabsetHandler {
     const handler = this.handlers.filter((h: AddUrlToTabsetHandler) => url.match(h.urlMatcher()) || h.contentMatcher(content))
-    return handler && handler.length > 0 ? handler[0] : this.defaultAddUrlToTabsetHandler
+    if (handler && handler.length > 0) {
+      handler[0].setFolder(folder)
+      return handler[0]
+    }
+    return this.defaultAddUrlToTabsetHandler
   }
 }

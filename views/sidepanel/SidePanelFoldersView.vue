@@ -176,7 +176,7 @@ const folderCaption = (folder: Tabset): string =>
     : ""
 
 const handleButtonClicked = async (tabset: Tabset, args: ActionHandlerButtonClickedHolder, folder?: Tabset) => {
-  // console.log(`button clicked: tsId=${tabset.id}, folderId=${folder?.id}, args=...`)
+  console.log(`button clicked: tsId=${tabset.id}, folderId=${folder?.id}, args=...`)
   await useActionHandlers(undefined).handleClick(tabset, currentChromeTab.value!, args, folder)
 }
 
