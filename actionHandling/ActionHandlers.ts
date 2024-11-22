@@ -19,7 +19,7 @@ export function useActionHandlers($q: QVueGlobals | undefined) {
     }
     const content = useContentStore().getCurrentTabContent
     const handler = url ? actionHandlerRepo.handlerFor(url, content || '', folder) : actionHandlerRepo.defaultAddUrlToTabsetHandler
-    console.log("getting url handler for ", url, handler)
+    //console.log("getting url handler for ", url, handler)
     return handler
   }
 

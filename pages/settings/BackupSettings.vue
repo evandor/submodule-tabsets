@@ -44,16 +44,17 @@
       </div>
     </div>
 
-    <div class="row q-pa-md" v-if="username && reponame && githubToken">
+    <div class="row q-pa-md" v-if="username && reponame">
       <div class="col-3"><b>Save</b></div>
       <div class="col-3">
-        <q-checkbox v-model="autobackup" label="Automatic daily backup"/>
+        <q-checkbox :disable="!githubToken" v-model="autobackup" label="Automatic daily backup"/>
         <br>
-        <q-checkbox v-model="githubLog" label="Keep action log"/>
+        <q-checkbox :disable="!githubToken" v-model="githubLog" label="Keep action log"/>
       </div>
       <div class="col-1"></div>
       <div class="col-5">
-        <q-btn class="q-px-md" dense label="Backup now" :loading="useUiStore().commandExecuting" @click="runGithubBackup()"/>
+        <q-btn class="q-px-md q-pr-md" dense label="Backup now" :disabled="!githubToken" :loading="useUiStore().commandExecuting" @click="runGithubBackup()"/>
+        <q-btn class="q-px-md" dense icon="open_in_new" @click="useNavigationService().browserTabFor(`http://github.com/${username}/${reponame}/${githubPath || ''}`)" />
       </div>
     </div>
 
@@ -77,6 +78,7 @@ import {
 import {GithubBackupCommand} from "src/tabsets/commands/github/GithubBackupCommand";
 import {NotificationType} from "src/core/services/ErrorHandler";
 import {useUiStore} from "src/ui/stores/uiStore";
+import {useNavigationService} from "src/core/services/NavigationService";
 
 const username = ref<string>(LocalStorage.getItem(GITHUB_USERNAME) as string)
 const reponame = ref<string>(LocalStorage.getItem(GITHUB_REPONAME) as string)
