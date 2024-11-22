@@ -82,7 +82,7 @@ const animateAddtabButton = ref(false)
 
 watchEffect(() => {
   handler.value = getHandler(props.currentChromeTab.url, props.folder)
-  console.log("===>",JSON.stringify(handler.value.actions()), props.folder)
+  // console.log("===>",JSON.stringify(handler.value.actions()), props.folder)
 })
 
 watchEffect(() => {
