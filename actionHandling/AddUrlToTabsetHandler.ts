@@ -6,6 +6,7 @@ import {ActionContext} from "src/tabsets/actionHandling/model/ActionContext";
 
 export enum ButtonActions {
   AddTab = "AddTab",
+  OpenTab = "OpenTab",
   AddReadingModeTab = "AddReadingModeTab",
   AddTabWithDynamicFolder = "AddTabWithDynamicFolder",
   NewFile = "NewFile",

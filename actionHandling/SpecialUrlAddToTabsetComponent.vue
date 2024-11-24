@@ -28,7 +28,8 @@
   <template v-else-if="handler.actions().length > 1">
     <q-btn-dropdown :label="handler.actions()[0].label"
                     @click.stop="emits('buttonClicked', new ActionHandlerButtonClickedHolder(handler, ButtonActions.Save, handler.actions()[0], {filename: handler.actions()[0].label}))"
-                    class="q-ma-none q-px-sm q-py-none"
+                    class="q-ma-none q-px-none q-py-none"
+                    :color="alreadyInTabset() ? 'grey-5': tsBadges.length > 0 ? 'positive':'primary'"
                     size="xs"
                     split
                     outline>
@@ -37,12 +38,16 @@
                 clickable dense
                 @click.stop="emits('buttonClicked', new ActionHandlerButtonClickedHolder(handler, ButtonActions.Save, l, {}))">
           <q-item-section>
-            <q-item-label>{{ l.label }}</q-item-label>
+            <q-item-label style="font-size:smaller">{{ l.label }}</q-item-label>
           </q-item-section>
         </q-item>
 
       </q-list>
     </q-btn-dropdown>
+    <q-tooltip class="tooltip-small" v-if="alreadyInTabset()">
+      Tab is already contained in tabset '{{ props.tabset?.name }}'
+    </q-tooltip>
+
   </template>
 
 
