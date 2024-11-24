@@ -8,7 +8,6 @@ import {
   FileProtocolUrlAddUrlToTabsetHandler
 } from "src/tabsets/actionHandling/handler/FileProtocolUrlAddUrlToTabsetHandler";
 import {Tabset} from "src/tabsets/models/Tabset";
-import {TtlUrlAddUrlToTabsetHandler} from "src/tabsets/actionHandling/handler/TtlUrlAddUrlToTabsetHandler";
 
 export class AddUrlToTabsetHandlers {
 
