@@ -55,7 +55,7 @@ export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
     }
   }
 
-  async clicked(chromeTab: chrome.tabs.Tab, ts: Tabset, folderId?: string, additionalData?: object): Promise<ExecutionResult<any>> {
+  async clicked(chromeTab: chrome.tabs.Tab, ts: Tabset, folder?: Tabset, additionalData?: object): Promise<ExecutionResult<any>> {
 
     console.log("saving...", chromeTab.id, additionalData)
     try {

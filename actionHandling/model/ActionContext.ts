@@ -5,7 +5,8 @@ export class ActionContext {
   constructor(
     public label: string,
     public identifier: ButtonActions,
-    public folder?: Tabset
+    public folder?: Tabset,
+    public additionalData?: object
   ) {
   }
 }

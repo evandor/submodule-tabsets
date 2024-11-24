@@ -28,7 +28,10 @@ export function useActionHandlers($q: QVueGlobals | undefined) {
     console.log("handleClick: ", tabset.id, handler, args.actionContext?.identifier)
     switch (args.actionContext?.identifier) {
       case ButtonActions.AddTab:
-        await handler.clicked(chromeTab, tabset, folder, {})
+        await handler.clicked(chromeTab, tabset, folder, {action: args.actionContext})
+        break;
+      case ButtonActions.OpenTab:
+        await handler.clicked(chromeTab, tabset, folder, {action: args.actionContext})
         break;
       case ButtonActions.AddTabWithDynamicFolder:
         handler.withDialog(args.actionContext?.identifier)?.onOk((data: string[]) => {
