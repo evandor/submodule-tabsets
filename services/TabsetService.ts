@@ -66,9 +66,6 @@ class TabsetService {
   //   return Promise.reject("url not provided");
   // }
   //
-  // async getRequestForUrl(url: string): Promise<any> {
-  //   return Promise.reject("not implemented")//db.getRequest(url)
-  // }
 
   async getContentFor(selectedTab: Tab): Promise<ContentItem | undefined> {
     return this.getContentForUrl(selectedTab.id)
@@ -87,7 +84,7 @@ class TabsetService {
   }
 
   async getMetaLinksForUrl(url: string): Promise<any> {
-    return Promise.reject("not implemented")//db.getMetaLinks(url)
+    return Promise.reject("not implemented N")//db.getMetaLinks(url)
   }
 
   async getLinksFor(selectedTab: Tab): Promise<any> {
@@ -98,7 +95,7 @@ class TabsetService {
   }
 
   async getLinksForUrl(url: string): Promise<any> {
-    return Promise.reject("not implemented") //db.getLinks(url)
+    return Promise.reject("not implemented O") //db.getLinks(url)
   }
 
   setCustomTitle(tab: Tab, title: string, desc: string): Promise<any> {

@@ -155,6 +155,7 @@ export class AddTabToTabsetCommand implements Command<any> {
         favIconUrl: this.tab.favIconUrl || ''
       })
       info("tab created")
+      localStorage.setItem("test.tabId", this.tab.id)
       sendMsg('tab-added', {tabsetId: this.tabset!.id})
       return res
     } catch (err) {

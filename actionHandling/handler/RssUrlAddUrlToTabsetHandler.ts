@@ -63,7 +63,7 @@ export class RssUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   }
 
   updateInTabset(chromeTab: chrome.tabs.Tab, ts: Tabset, additionalData: object = {}): Promise<ExecutionResult<any>> {
-    throw new Error("not implemented")
+    throw new Error("not implemented M")
   }
 
   handleOpenedTab(browserTab: chrome.tabs.Tab, tab: Tab) {

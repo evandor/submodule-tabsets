@@ -127,7 +127,7 @@ const onDrop = (evt: DragEvent, tabsetId: string) => {
 const hoveredOver = (tabsetId: string) => hoveredTab.value === tabsetId
 
 const toggleExpand = (index:any) => {
-  console.warn("not implemented")
+  console.warn("not implemented Q")
 }
 </script>
 

@@ -59,6 +59,7 @@ export class CreateTabsetCommand implements Command<SaveOrReplaceResult> {
             }
             info("tabset created")
             sendMsg('tabset-added', {tabsetId: res.tabset.id})
+            localStorage.setItem("test.tabsetId", res.tabset.id)
             return res
           }
         )
