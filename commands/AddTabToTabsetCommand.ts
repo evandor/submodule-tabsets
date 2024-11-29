@@ -18,6 +18,8 @@ import {TabReference, TabReferenceType} from "src/content/models/TabReference";
 import {uid} from "quasar";
 import {useFeaturesStore} from "src/features/stores/featuresStore";
 import {FeatureIdent} from "src/app/models/FeatureIdent";
+import {useRequestsService} from "src/requests/services/RequestsService";
+import {useRequestsStore} from "src/requests/stores/requestsStore";
 
 const {sendMsg} = useUtils()
 const {info} = useLogger()
@@ -150,6 +152,12 @@ export class AddTabToTabsetCommand implements Command<any> {
       info("tab created")
       localStorage.setItem("test.tabId", this.tab.id)
       sendMsg('tab-added', {tabsetId: this.tabset!.id})
+
+      const req  = useRequestsStore().getCurrentTabRequest
+      if (req && req.url === this.tab.url) {
+        useRequestsService().logWebRequest(JSON.parse(JSON.stringify(req)))
+      }
+
       return res
     } catch (err) {
       console.warn("hier: ", err)
