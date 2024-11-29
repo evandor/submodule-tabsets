@@ -20,7 +20,8 @@ import {useFeaturesStore} from "src/features/stores/featuresStore";
 import {FeatureIdent} from "src/app/models/FeatureIdent";
 import {useAuthStore} from "stores/authStore.ts";
 import {doc, setDoc} from "firebase/firestore";
-import FirebaseServices from "src/services/firebase/FirebaseServices.ts";
+import FirebaseServices from "src/services/firebase/FirebaseServices";
+import {useRequestsStore} from "src/requests/stores/requestsStore";
 
 const {sendMsg} = useUtils()
 const {info} = useLogger()
@@ -157,6 +158,12 @@ export class AddTabToTabsetCommand implements Command<any> {
       info("tab created")
       localStorage.setItem("test.tabId", this.tab.id)
       sendMsg('tab-added', {tabsetId: this.tabset!.id})
+
+      const req  = useRequestsStore().getCurrentTabRequest
+      if (req && req.url === this.tab.url) {
+        useRequestsService().logWebRequest(JSON.parse(JSON.stringify(req)))
+      }
+
       return res
     } catch (err) {
       console.warn("hier: ", err)
