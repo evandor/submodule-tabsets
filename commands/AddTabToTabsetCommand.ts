@@ -22,6 +22,7 @@ import {useAuthStore} from "stores/authStore.ts";
 import {doc, setDoc} from "firebase/firestore";
 import FirebaseServices from "src/services/firebase/FirebaseServices";
 import {useRequestsStore} from "src/requests/stores/requestsStore";
+import {useRequestsService} from "src/requests/services/RequestsService.ts";
 
 const {sendMsg} = useUtils()
 const {info} = useLogger()

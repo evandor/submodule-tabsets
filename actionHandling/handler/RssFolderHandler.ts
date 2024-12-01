@@ -5,16 +5,12 @@ import {Tab, UrlExtension} from "src/tabsets/models/Tab";
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {AddTabToTabsetCommand} from "src/tabsets/commands/AddTabToTabsetCommand";
 import BrowserApi from "src/app/BrowserApi";
-import {useUtils} from "src/core/services/Utils";
 import * as cheerio from 'cheerio';
 import {AddUrlToTabsetHandler, ButtonActions} from "src/tabsets/actionHandling/AddUrlToTabsetHandler";
 import {ActionContext} from "src/tabsets/actionHandling/model/ActionContext";
 import {parseFeed} from '@rowanmanning/feed-parser';
 
-const {sanitizeAsPlainText} = useUtils()
-
 export class RssFolderHandler implements AddUrlToTabsetHandler {
-
 
   constructor(public $q: QVueGlobals | undefined) {
   }
@@ -33,11 +29,6 @@ export class RssFolderHandler implements AddUrlToTabsetHandler {
 
   withDialog(action: ButtonActions): DialogChainObject | undefined {
     return undefined
-  }
-
-  private getFromItem(item: any, identifier: string, def?: string) {
-    const val = item.querySelector(identifier)?.innerHTML || def
-    return val ? val.replace("<![CDATA[", "").replace("]]>", "") : undefined
   }
 
   async clicked(chromeTab: chrome.tabs.Tab, ts: Tabset, folder?: Tabset, additionalData: object = {}): Promise<ExecutionResult<any>> {

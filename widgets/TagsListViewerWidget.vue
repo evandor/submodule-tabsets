@@ -54,11 +54,7 @@
 
 <script lang="ts" setup>
 
-import {PropType, ref, watchEffect} from "vue";
-import _ from "lodash";
-import {Tabset, TabsetStatus, TabsetType} from "src/tabsets/models/Tabset";
-import {Tab} from "src/tabsets/models/Tab";
-import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
+import {PropType, ref} from "vue";
 
 const emit = defineEmits(['tagSelected']);
 
