@@ -12,6 +12,7 @@ import {parseFeed} from '@rowanmanning/feed-parser';
 
 export class RssFolderHandler implements AddUrlToTabsetHandler {
 
+
   constructor(public $q: QVueGlobals | undefined) {
   }
 
