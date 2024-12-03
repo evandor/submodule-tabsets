@@ -506,7 +506,7 @@ const selectFolder = (tabset: Tabset, folder: Tabset) => {
 
 
 const loadDynamicTabs = (tabset: Tabset) => {
-  useCommandExecutor().execute(new LoadDynamicTabsCommand(tabset))
+  useCommandExecutor().execute(new LoadDynamicTabsCommand(tabset, ""))
 }
 
 const tabsetForTabList = (tabset: Tabset) => {
