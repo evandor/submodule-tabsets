@@ -175,7 +175,7 @@ import {useFeaturesStore} from "src/features/stores/featuresStore";
 import {CopyTabsetCommand} from "src/domain/tabsets/CopyTabset";
 import {useEntityRegistryStore} from "src/core/stores/entityRegistryStore";
 import {SpaceInfo} from "src/core/models/SpaceInfo";
-import {DeleteTabsetCommand} from "src/tabsets/commands/DeleteTabset";
+import {DeleteTabsetCommand} from "src/tabsets/commands/DeleteTabsetCommand";
 
 const {inBexMode} = useUtils()
 

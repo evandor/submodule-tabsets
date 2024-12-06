@@ -34,8 +34,9 @@ export class MarkTabsetAsFavoriteCommand implements Command<TabsetStatus> {
       .then(oldStatus => Promise.resolve(
         new ExecutionResult(
           oldStatus,
-          "Tabset was marked as favorite",
-          new Map([["Undo", new UndoCommand(this.tabsetId, oldStatus)]])))
+          "Tabset set as favorite",
+          //new Map([["Undo", new UndoCommand(this.tabsetId, oldStatus)]])
+          ))
       )
       .catch(err => Promise.reject(err))
   }

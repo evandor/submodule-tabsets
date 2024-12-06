@@ -4,6 +4,7 @@ import {useUtils} from "src/core/services/Utils";
 import {Tabset} from "src/tabsets/models/Tabset";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
+import {useTabsetsUiStore} from "src/tabsets/stores/tabsetsUiStore";
 
 const {inBexMode, sendMsg} = useUtils()
 
@@ -11,7 +12,8 @@ export class SelectTabsetCommand implements Command<Tabset | undefined> {
 
   public merge: boolean = true
 
-  constructor(public tabsetId: string,
+  constructor(
+    public tabsetId: string,
     public folderId?: string
   ) {
   }
@@ -34,6 +36,7 @@ export class SelectTabsetCommand implements Command<Tabset | undefined> {
         ignore: true, // doing this to keep the logic, might be needed again
         data: {tabsetId: this.tabsetId}
       }
+      useTabsetsUiStore().addTabsetToLastUsedList(this.tabsetId)
       sendMsg('current-tabset-id-change', data);
     }
 

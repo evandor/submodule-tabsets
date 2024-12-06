@@ -35,7 +35,7 @@ import {useDialogPluginComponent} from 'quasar'
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import DialogButton from "src/core/dialog/buttons/DialogButton.vue";
 import {ref} from "vue";
-import {DeleteTabsetCommand} from "src/tabsets/commands/DeleteTabset";
+import {DeleteTabsetCommand} from "src/tabsets/commands/DeleteTabsetCommand";
 import {useRouter} from "vue-router";
 
 defineEmits([
