@@ -72,12 +72,13 @@ import {PropType, ref, watchEffect} from "vue";
 import {Tabset, TabsetStatus, TabsetType} from "src/tabsets/models/Tabset";
 import {useRouter} from "vue-router";
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
-import {SelectTabsetCommand} from "src/tabsets/commands/SelectTabset";
+import {SelectTabsetCommand} from "src/tabsets/commands/SelectTabsetCommand";
 import TabsetListContextMenu from "src/tabsets/widgets/TabsetListContextMenu.vue";
 import {useUiStore} from "src/ui/stores/uiStore";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {useSpacesStore} from "src/spaces/stores/spacesStore";
 import {MoveToTabsetCommand} from "src/tabsets/commands/MoveToTabset";
+import {useTabsetsUiStore} from "src/tabsets/stores/tabsetsUiStore";
 
 const router = useRouter()
 
@@ -96,10 +97,14 @@ watchEffect(() => {
 
 const selectTS = (tabset: Tabset) => {
   console.log("selecting tabset/space", tabset.id, props.spaceId)
+  useSpacesStore().setSpace(props.spaceId)
   useCommandExecutor()
     .execute(new SelectTabsetCommand(tabset.id))
     .then(() => {
-      useSpacesStore().setSpace(props.spaceId)
+
+    })
+    .then(() => {
+      useTabsetsUiStore().addTabsetToLastUsedList(tabset.id)
     })
     .then(() => {
       console.log("tabset was selected", tabset.id, tabset.type, props.fromPanel)

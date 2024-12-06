@@ -20,16 +20,17 @@ class UndoCommand implements Command<TabsetStatus> {
 export class MarkTabsetAsDefaultCommand implements Command<TabsetStatus> {
 
   constructor(
-    public tabsetId: string)
-  {}
+    public tabsetId: string) {
+  }
 
   async execute(): Promise<ExecutionResult<TabsetStatus>> {
     return TabsetService.markAs(this.tabsetId, TabsetStatus.DEFAULT)
       .then(oldStatus => Promise.resolve(
         new ExecutionResult(
           oldStatus,
-          "Tabset was unmarked as favorite",
-          new Map([["Undo", new UndoCommand(this.tabsetId, oldStatus)]])))
+          "unmarked as favorite",
+          //new Map([["Undo", new UndoCommand(this.tabsetId, oldStatus)]]))
+        ))
       )
       .catch(err => Promise.reject(err))
   }

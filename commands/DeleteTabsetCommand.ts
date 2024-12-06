@@ -2,6 +2,8 @@ import Command from "src/core/domain/Command";
 import {ExecutionResult} from "src/core/domain/ExecutionResult";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {useLogger} from "src/services/Logger";
+import {useTabsetsUiStore} from "src/tabsets/stores/tabsetsUiStore";
+import {useSpacesStore} from "src/spaces/stores/spacesStore";
 
 const {info} = useLogger()
 
@@ -14,6 +16,7 @@ export class DeleteTabsetCommand implements Command<string> {
     return useTabsetService().deleteTabset(this.tabsetId)
       .then(res => {
         //sendMsg('tabset-deleted', {tabsetId: this.tabsetId})
+        useTabsetsUiStore().clearFromLastUsedTabsets(useSpacesStore().space?.id || undefined, this.tabsetId)
         info("tabset deleted")
         return res
       })

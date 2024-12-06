@@ -215,7 +215,7 @@ import {useUtils} from "src/core/services/Utils";
 import {useWindowsStore} from "src/windows/stores/windowsStore";
 import {useTabsStore2} from "src/tabsets/stores/tabsStore2";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
-import {SelectTabsetCommand} from "src/tabsets/commands/SelectTabset";
+import {SelectTabsetCommand} from "src/tabsets/commands/SelectTabsetCommand";
 import {useFeaturesStore} from "src/features/stores/featuresStore";
 import SidePanelSubfolderContextMenu from "src/tabsets/widgets/SidePanelSubfolderContextMenu.vue";
 import SidePanelPageContextMenu from "pages/sidepanel/SidePanelPageContextMenu.vue";
@@ -228,6 +228,7 @@ import SidePanelNotesView from "src/notes/views/sidepanel/SidePanelNotesView.vue
 import SpecialUrlAddToTabsetComponent from "src/tabsets/actionHandling/SpecialUrlAddToTabsetComponent.vue";
 import {ActionHandlerButtonClickedHolder} from "src/tabsets/actionHandling/model/ActionHandlerButtonClickedHolder";
 import {useActionHandlers} from "src/tabsets/actionHandling/ActionHandlers";
+import {useTabsetsUiStore} from "src/tabsets/stores/tabsetsUiStore";
 import getScrollTarget = scroll.getScrollTarget;
 
 const props = defineProps({
@@ -348,6 +349,7 @@ const updateSelectedTabset = (tabsetId: string, open: boolean, index: number | u
 
     useCommandExecutor()
       .execute(new SelectTabsetCommand(tabsetId))
+      // .then(() => useTabsetsUiStore().addTabsetToLastUsedList(tabsetId))
       .then(() => handleHeadRequests(useTabsetsStore().getTabset(tabsetId)!))
 
   } else {
