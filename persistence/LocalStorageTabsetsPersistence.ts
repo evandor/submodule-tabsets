@@ -8,7 +8,6 @@ export class LocalStorageTabsetsPersistence {
     const space = spaceId ? spaceId : 'nospace'
     if (fromStorage) {
       var allUsedTabsets = JSON.parse(fromStorage) as TabsetForSpace[]
-      console.log("xxx", allUsedTabsets)
       const res = allUsedTabsets.filter((t: TabsetForSpace) => t.identifier === space)
       return res.length > 0 ? res[0].tabsets : []
     }
@@ -18,7 +17,6 @@ export class LocalStorageTabsetsPersistence {
   updateLastUsedTabsets(spaceId: string | undefined, list: string[]): void {
     const fromStorage = LocalStorage.getItem("ui.tabsets.lastUsed") as string
     const space = spaceId ? spaceId : 'nospace'
-    console.log("setting", spaceId, list, fromStorage)
     var allUsedTabsets: TabsetForSpace[] = fromStorage ? JSON.parse(fromStorage) as TabsetForSpace[] : []
     const foundIndex = allUsedTabsets.findIndex(t => t.identifier === space)
     if (foundIndex >= 0) {

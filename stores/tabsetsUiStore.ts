@@ -32,7 +32,6 @@ export const useTabsetsUiStore = defineStore('tabsetsUi', () => {
   function addTabsetToLastUsedList(id: string) {
     const spaceId: string | undefined = useSpacesStore().space?.id || undefined
     let lastUsedList: string[] = storage.getLastUsedTabsets(spaceId)
-    console.log("lastused", lastUsedList)
     if (lastUsedList.indexOf(id) < 0) {
       lastUsedList.push(id)
       const nonFavorites = _.difference(lastUsedList, favorites.value)
