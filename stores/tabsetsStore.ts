@@ -51,6 +51,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     }
 
     function setTabset(ts: Tabset) {
+      console.log("setting tabset", ts.id, ts)
       tabsets.value.set(ts.id, ts)
     }
 
@@ -101,9 +102,9 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       if (spaceId) {
         ts.spaces = [spaceId]
       }
-      tabsets.value.set(ts.id, ts)
+      //tabsets.value.set(ts.id, ts)
       // console.log("storage", storage)
-      await storage.addTabset(ts)
+      //await storage.addTabset(ts)
 
       // TODO
       // if (currentSpace && currentSpace.id && ts.spaces.findIndex(s => s === currentSpace.id) < 0) {
@@ -156,19 +157,24 @@ export const useTabsetsStore = defineStore('tabsets', () => {
         })
     }
 
-    function selectCurrentTabset(tabsetId: string): Tabset | undefined {
+    function selectCurrentTabset(tabsetId: string, stop: boolean = false): Tabset | undefined {
       const found = _.find([...tabsets.value.values()] as Tabset[], (k: any) => {
         const ts = k || new Tabset("", "", [])
         return ts.id === tabsetId
       })
       if (found) {
-        //console.log("found", found)
         currentTabsetId.value = found.id //this.tabsets.get(found) || new Tabset("", "", [])
-
-        //ChromeApi.buildContextMenu("tabsStore")
         return found
       } else {
-        console.debug("not found:", tabsetId)//, [...this.tabsets.values()])
+        if (!stop) {
+          console.debug(`did not find tabset ${tabsetId}, resorting to reload`)
+          useTabsetsStore().loadTabsets()
+            .then(() => {
+              selectCurrentTabset(tabsetId, true)
+            })
+        } else {
+          console.debug(`did not find tabset ${tabsetId}, not trying to reload`)
+        }
       }
       return undefined
     }

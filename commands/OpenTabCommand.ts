@@ -5,6 +5,8 @@ import {Tab} from "src/tabsets/models/Tab";
 import {useNavigationService} from "src/core/services/NavigationService";
 import {AddUrlToTabsetHandler} from "src/tabsets/actionHandling/AddUrlToTabsetHandler";
 import {useActionHandlers} from "src/tabsets/actionHandling/ActionHandlers";
+import {useContentStore} from "src/content/stores/contentStore";
+import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 
 const {getHandler} = useActionHandlers(undefined)
 

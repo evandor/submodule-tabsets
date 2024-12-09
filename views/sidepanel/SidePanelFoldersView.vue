@@ -1,9 +1,10 @@
 <template>
   <!-- SidePanelFoldersView -->
-  <div class="q-ma-none q-pa-sm q-pl-md greyBorderBottom" v-if="props.tabset?.folders?.length > 0 && currentFolderPath().length > 0">
+  <div class="q-ma-none q-pa-sm q-pl-md greyBorderBottom"
+       v-if="props.tabset?.folders?.length > 0 && currentFolderPath().length > 0">
     <q-breadcrumbs>
 
-      <q-breadcrumbs-el class="cursor-pointer" icon="home" label="Home"
+      <q-breadcrumbs-el class="cursor-pointer" icon="home"
                         @click="selectFolder(props.tabset)"
                         @dragover="overDrag2($event)"
                         @drop="dropAtBreadcrumb($event)"
@@ -41,6 +42,10 @@
         <q-item-label>
           <div class="text-subtitle2 ellipsis">
             {{ folder.name.substring(0, 20) }}
+            <q-icon name="o_bookmarks" size="12px" color="primary" class="q-mb-sm"
+                    v-if="folder.bookmarkId" @click.stop="openBookmark(folder.bookmarkId)">
+              <q-tooltip class="tooltip-small">Open in Browsers Bookmarks Manager</q-tooltip>
+            </q-icon>
           </div>
         </q-item-label>
         <q-item-label class="text-caption text-grey-5">
@@ -86,6 +91,7 @@ import {useWindowsStore} from "src/windows/stores/windowsStore";
 import {useTabsStore2} from "src/tabsets/stores/tabsStore2";
 import {useActionHandlers} from "src/tabsets/actionHandling/ActionHandlers";
 import SpecialUrlAddToTabsetComponent from "src/tabsets/actionHandling/SpecialUrlAddToTabsetComponent.vue";
+import {useNavigationService} from "src/core/services/NavigationService";
 
 const props = defineProps({
   tabset: {type: Object as PropType<Tabset>, required: true}
@@ -160,7 +166,7 @@ const dropAtBreadcrumb = (evt: any, f?: any) => {
 }
 
 const selectFolder = (tabset: Tabset, folder?: Tabset) => {
-  // console.log(`selecting folder '${folder?.id}' (${folder?.name}) in tabset ${tabset.id} (${tabset.name})`)
+  console.log(`selecting folder '${folder?.id}' (${folder?.name}) in tabset ${tabset.id} (${tabset.name})`)
   tabset.folderActive = folder
     ? tabset.id === folder.id
       ? undefined
@@ -168,6 +174,7 @@ const selectFolder = (tabset: Tabset, folder?: Tabset) => {
     : undefined
 
   useTabsetService().saveTabset(tabset)
+  useTabsetService().handleHeadRequests(tabset, folder?.id)
 }
 
 const folderCaption = (folder: Tabset): string =>
@@ -182,7 +189,7 @@ const handleButtonClicked = async (tabset: Tabset, args: ActionHandlerButtonClic
 
 const parentChain = (tabset: Tabset, folder?: Tabset, chain: Tabset[] = []): Tabset[] => {
   // console.log(`parentChain tabset: ${tabset.id} (active: ${tabset.folderActive}), folder:${folder?.id}, chain.length: ${chain.length}`)
-  if (chain.length >5) { // safety net
+  if (chain.length > 5) { // safety net
     return chain
   }
   // if (!tabset.folderActive || tabset.id === folder?.folderParent) {
@@ -208,9 +215,11 @@ const parentChain = (tabset: Tabset, folder?: Tabset, chain: Tabset[] = []): Tab
 }
 
 const currentFolderPath = (): Tabset[] => {
-  const res:Tabset[] = parentChain(props.tabset)
+  const res: Tabset[] = parentChain(props.tabset)
   return res ? res.reverse() : []
 }
+
+const openBookmark = (id: string) => useNavigationService().browserTabFor(`chrome://bookmarks/?id=${id}`)
 
 
 </script>

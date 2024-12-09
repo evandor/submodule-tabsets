@@ -40,7 +40,7 @@ export class RssUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   }
 
   async clicked(chromeTab: chrome.tabs.Tab, ts: Tabset, folder?: Tabset, additionalData: object = {}): Promise<ExecutionResult<any>> {
-    console.log("saving...", chromeTab.id, additionalData)
+    console.log("saving...", chromeTab, additionalData)
     try {
       const displayFeed = additionalData['displayFeed' as keyof object] as boolean
       const newTab = new Tab(uid(), chromeTab)

@@ -33,7 +33,7 @@
       NEW
       <q-tooltip class="tooltip">This page indicates that its content has changed in the meantime.</q-tooltip>
     </div>
-    <div v-else-if="props.tab?.httpStatus >= 300 && !props.tab?.placeholders"
+    <div v-else-if="(props.tab?.httpStatus >= 300 || props.tab?.httpStatus === 0) && !props.tab?.placeholders"
          class="q-my-xs q-mx-none q-pa-none text-white items-center justify-center"
          :class="props.tab?.httpStatus >= 500 ? 'bg-red' : 'bg-warning'"
          style="border-radius: 3px;max-height:15px;font-size:8px;text-align: center;">
