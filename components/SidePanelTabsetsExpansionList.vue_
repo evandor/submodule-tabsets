@@ -338,7 +338,7 @@ const headerStyle = (tabset: Tabset) => {
 }
 
 const updateSelectedTabset = (tabsetId: string, open: boolean, index: number | undefined = undefined) => {
-  //console.log(`updating: selectedTabset=${tabsetId} ${open ? 'open':'closed'}`)
+  console.log(`updating: selectedTabset=${tabsetId} ${open ? 'open':'closed'}`)
   tabsetExpanded.value.set(tabsetId, open)
   if (open) {
     if (index) {
@@ -527,7 +527,7 @@ async function handleHeadRequests(selectedTabset: Tabset) {
   //selectedTabset.tabs.forEach((t: Tab) => {
   for (const t of selectedTabset.tabs) {
     if (t.url && !t.url.startsWith("chrome")) {
-      // console.log("checking HEAD", t.url)
+      console.log("checking HEAD", t.url)
       try {
         const response = await fetch(t.url, {
           method: 'HEAD',

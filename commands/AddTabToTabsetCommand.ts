@@ -18,11 +18,8 @@ import {TabReference, TabReferenceType} from "src/content/models/TabReference";
 import {uid} from "quasar";
 import {useFeaturesStore} from "src/features/stores/featuresStore";
 import {FeatureIdent} from "src/app/models/FeatureIdent";
-import {useAuthStore} from "stores/authStore.ts";
-import {doc, setDoc} from "firebase/firestore";
-import FirebaseServices from "src/services/firebase/FirebaseServices";
 import {useRequestsStore} from "src/requests/stores/requestsStore";
-import {useRequestsService} from "src/requests/services/RequestsService.ts";
+import {useRequestsService} from "src/requests/services/RequestsService";
 
 const {sendMsg} = useUtils()
 const {info} = useLogger()

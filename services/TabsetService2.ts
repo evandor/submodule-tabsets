@@ -26,6 +26,8 @@ import {ContentItem} from "src/content/models/ContentItem";
 
 export function useTabsetService() {
 
+  const throttleOne50Millis = throttledQueue(1, 50, true)
+
   const init = async (doNotInitSearchIndex: boolean = false) => {
 
     function selectFirstAvailableTabset() {
@@ -93,14 +95,9 @@ export function useTabsetService() {
     try {
       const dynUrl = dynamicSource ? new URL(dynamicSource) : undefined
       const tabset = await useTabsetsStore().createTabset(trustedName, tabs, trustedColor, dynUrl, spaceId)
+      await useTabsetsStore().saveTabset(tabset)
 
-
-      //await saveTabset(result.tabset)
-      // result.tabset.tabs.forEach((tab: Tab) => {
-      //   console.info(tab, "created tab")
-      // })
       selectTabset(tabset.id)
-      //useSearchStore().indexTabs(tabset.id, tabs)
       useTabsetService().addToSearchIndex(tabset.id, tabs)
       return new SaveOrReplaceResult(false, tabset, false)
     } catch (err) {
@@ -183,17 +180,8 @@ export function useTabsetService() {
     useTabsetsStore().reloadTabset(tabsetId)
   }
 
-  const resetSelectedTabs = () => {
-    // const currentTabset = getCurrentTabset()
-    // if (currentTabset) {
-    //   _.forEach(currentTabset.tabs, (t: Tab) => t.selected = false)
-    // }
-    // useNotificationsStore().setSelectedTab(null as unknown as Tab)
-  }
-
   const selectTabset = (tabsetId: string | undefined): void => {
-    //console.debug("selecting tabset", tabsetId)
-    resetSelectedTabs()
+    console.debug("selecting tabset", tabsetId)
     if (tabsetId) {
       useTabsetsStore().selectCurrentTabset(tabsetId)
     }
@@ -282,11 +270,7 @@ export function useTabsetService() {
       const rootTabset = rootTabsetFor(tabset)
       console.debug(`saving (sub-)tabset '${tabset.name}' with ${tabset.tabs.length} tab(s) at id ${rootTabset?.id}`)
       if (rootTabset) {
-
-        // TODO in progress: NEW APPROACH
         return await useTabsetsStore().saveTabset(rootTabset)
-
-        //return db.saveTabset(rootTabset)
       }
     }
     return Promise.reject("tabset id not set")
@@ -652,7 +636,7 @@ export function useTabsetService() {
           continue
         }
         //const content = await useContentService().getContent(tab.id)
-        const content = contents.find((item) => item.url === tab.url) || new ContentItem("","","","",[],[])
+        const content = contents.find((item) => item.url === tab.url) || new ContentItem("", "", "", "", [], [])
         const addToIndex = {
           name: tab.name || '',
           title: tab.title || '',
@@ -663,9 +647,9 @@ export function useTabsetService() {
           favIconUrl: tab.favIconUrl || '',
           tags: tab.tags ? tab.tags.join(' ') : ''
         }
-       // console.log("adding", addToIndex)
+        // console.log("adding", addToIndex)
         minimalIndex.push(addToIndex)
-       // console.log("minimalIndex", minimalIndex.length)
+        // console.log("minimalIndex", minimalIndex.length)
       }
       if (!tabset.folders) {
         tabset.folders = []
@@ -747,6 +731,136 @@ export function useTabsetService() {
     })
   }
 
+  async function handleResponse(t: Tab, method: string, timeout: number): Promise<number> {
+
+    try {
+      const response = await fetch(t.url!, {
+        method: method,
+        cache: 'no-cache',
+        redirect: 'manual',
+        signal: AbortSignal.timeout(timeout)
+      })
+
+      // just for logging
+      const ignoreList = ["connection", "content-type", "content-language", "charset", "date", "pragma", "x-content-type-options",
+        "keep-alive", "last-modified", "vary", "content-encoding", "server", "referrer-policy", "strict-transport-security", "content-length", "via",
+        "expires", "permissions-policy", "priority", "nel",
+        "reporting-endpoints", "etag", "age"]
+      response.headers.forEach((value: string, key: string, parent: Headers) => {
+        if (ignoreList.indexOf(key) < 0 && !key.startsWith("cf-") && !key.startsWith("x-") && !key.startsWith("alt-")
+          && !key.startsWith("report-")
+          && !key.startsWith("medium-")
+          && !key.startsWith("access-")
+          && !key.startsWith("accept-")
+          && !key.startsWith("origin-")
+          && !key.startsWith("cross-")
+          && !key.startsWith("server-")
+          && !key.startsWith("atl-")
+          && !key.startsWith("expect-")
+          && !key.startsWith("cache-")
+          && !key.startsWith("transfer-")
+          && !key.startsWith("content-security-")
+          && !key.startsWith("worker-")) {
+          // hs += key +": " + value
+          console.debug("got header", key + ": " + value)
+        }
+      })
+      // just for logging - end
+
+      const oldLastModified = t.httpLastModified
+      const oldEtag = t.httpEtag
+
+      t.httpStatus = response.status
+      t.httpContentType = response.headers.get("content-type") || 'unknown'
+      t.httpLastModified = response.headers.get("last-modified") || 'unknown'
+      t.httpExpires = response.headers.get("expires")?.toString() || 'unknown'
+      t.httpEtag = response.headers.get("etag")?.toString() || ''
+      t.httpCheckedAt = new Date().getTime()
+
+      if (t.httpStatus >= 200 && t.httpStatus < 300) {
+        t.httpInfo = ''
+      }
+
+      if (response.status >= 301 && response.status <= 399) {
+        console.log(`checking HEAD found status ${response.status} for url ${t.url}`)
+        t.httpInfo = "REDIRECTED"
+      }
+      if (method === 'GET' && response.status > 200) {
+        console.log("got t>>>", response.status, t)
+      }
+      try {
+        if (t.httpLastModified && oldLastModified) {
+          if (Date.parse(t.httpLastModified) > Date.parse(oldLastModified)) {
+            t.httpInfo = "UPDATED"
+          }
+        }
+      } catch (err) {
+      }
+      if (t.httpEtag && oldEtag && t.httpEtag !== oldEtag) {
+        t.httpInfo = "UPDATED"
+      }
+      return t.httpStatus
+    } catch (error: any) {
+      //console.debug('got a Problem fetching url "' + t.url + '": \n', error)
+      t.httpStatus = 404
+      t.httpCheckedAt = new Date().getTime()
+      t.httpError = error.toString()
+    }
+    if (t.httpStatus === 0 || t.httpStatus >= 300) {
+      //console.log(`result status for ${t.url}: ${t.httpStatus}, info: ${t.httpInfo}, error: ${t.httpError}`)
+    }
+    return t.httpStatus
+  }
+
+  const handleHeadRequests = async (selectedTabset: Tabset, folderId: string | undefined) => {
+    const useTabset = (folderId)
+      ? useTabsetsStore().getActiveFolder(selectedTabset, folderId)
+      : selectedTabset
+    if (!useTabset) {
+      console.log(`could not determine tabset for ${selectedTabset.id}, folder ${folderId}`)
+      return
+    }
+    if (!useUiStore().networkOnline) {
+      console.log("not checking HEAD requests due to network offline")
+      return
+    }
+    const networkState = useUiStore().networkState
+    if (networkState && networkState['rtt' as keyof object]) {
+      if (networkState['rtt' as keyof object] > 500) {
+        console.log("no HEAD request check due to bad network:", networkState)
+      }
+    }
+
+    console.log(`checking current urls using HEAD requests for tabset ${selectedTabset.id}, folder ${folderId}`)
+    let missed = 0
+    for (const t of useTabset.tabs) {
+      throttleOne50Millis(async () => {
+        const oldEnough = t.httpCheckedAt ? new Date().getTime() - t.httpCheckedAt > 1000 * 60 : true // 1min
+        if (t.url && !t.url.startsWith("chrome") && oldEnough) {
+          var status = await handleResponse(t, 'HEAD', 1500)
+          if (status === 0 || status === 404) {
+            missed++
+            //console.log("===>>>", useTabset.tabs.length, missed )
+            if (useTabset.tabs.length > 5 && missed / useTabset.tabs.length >= 0.5) {
+              missed = 0
+              useUiStore().checkConnection()
+              setTimeout(() => {
+                useUiStore().checkConnection()
+              }, 1000 * 60)
+            }
+
+          }
+          if (status === 0) {
+            handleResponse(t, 'GET', 5000)
+          }
+        }
+      }).then(() => {
+      })
+    }
+
+    await useTabsetService().saveTabset(selectedTabset)
+  }
+
 
   return {
     init,
@@ -780,7 +894,8 @@ export function useTabsetService() {
     populateSearch,
     addToSearchIndex,
     exportDataAsJson,
-    findFolder
+    findFolder,
+    handleHeadRequests
   }
 
 }

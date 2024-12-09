@@ -58,10 +58,15 @@ export class RssFolderHandler implements AddUrlToTabsetHandler {
     // }
     //console.log("items", items)
     Array.from(feed.items).forEach((item: any) => {
-      console.log("item", item)
+      console.log("item: ", item)
       //const title = additionalData['feedname'] || 'no title' //this.getFromItem(item, "title", "no title")
       const title = item.title
       const url = item.url
+
+      if (!item.content) {
+        console.log("skipping item as content is missing", item)
+        return
+      }
 
       const desc = item.description || ''
       const published = item.published //item.querySelector("pubDate")?.innerHTML || undefined

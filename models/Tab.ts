@@ -145,6 +145,8 @@ export class Tab {
   httpContentType: string = 'undefined'
   httpLastModified: string = 'undefined'
   httpCheckedAt: number = 0
+  httpExpires: string = ''
+  httpEtag: string = ''
   httpError: string = ''
   httpInfo: string = 'undefined'
 

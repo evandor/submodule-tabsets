@@ -49,6 +49,7 @@ export class CreateFolderCommand implements Command<Tabset> {
       if (parentFolder) {
         const newFolder = new Tabset(this.folderId, this.folderName, this.tabsToUse)
         newFolder.type = this.type ||  TabsetType.DEFAULT
+        newFolder.dynamicUrl = this.dynamicUrl
         newFolder.folderParent = parentFolder.id
         if (!tabset.folders) {
           tabset.folders = []
@@ -70,5 +71,5 @@ export class CreateFolderCommand implements Command<Tabset> {
 }
 
 CreateFolderCommand.prototype.toString = function cmdToString() {
-  return `CreateFolderCommand: {tabsetId='${this.tabsetId}', folderId: '${this.folderId}', folderName='${this.folderName}', parentFolder=${this.parentFolder}, tabs#=${this.tabsToUse.length}`;
+  return `CreateFolderCommand: {tabsetId='${this.tabsetId}', folderId: '${this.folderId}', folderName='${this.folderName}', parentFolder=${this.parentFolder}, dynamicUrl=${this.dynamicUrl}, tabs#=${this.tabsToUse.length}`;
 };

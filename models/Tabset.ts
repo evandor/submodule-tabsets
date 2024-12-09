@@ -57,6 +57,8 @@ export class Tabset {
   status: TabsetStatus = TabsetStatus.DEFAULT
   type: TabsetType = TabsetType.DEFAULT
 
+  bookmarkId: string | undefined = undefined
+
   // sharing
   sharing: TabsetSharing = TabsetSharing.UNSHARED
   sharedBy: string | undefined = undefined
