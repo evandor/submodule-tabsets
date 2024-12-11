@@ -56,7 +56,9 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     }
 
     async function loadTabsets() {
-      await storage.loadTabsets()
+      if (storage) {
+        await storage.loadTabsets()
+      }
     }
 
     async function reloadTabset(tabsetId: string) {
