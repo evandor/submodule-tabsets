@@ -107,7 +107,7 @@ function getCoordinate(t: Tab, ident: string, def: number) {
 watchEffect(() => {
   _.forEach(props.tabset?.columns, (c: TabsetColumn) => {
     if (c.id.startsWith("grid_")) {
-      var index = parseInt(c.id.split("_")[1])
+      var index = parseInt(c.id.split("_")[1]!)
       if (index >= 0 && index <= 6) {
         columns.value[index] = {title: c.title}
       }

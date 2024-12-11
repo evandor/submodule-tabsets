@@ -260,7 +260,7 @@ export class Tab {
       try {
         const url = new URL(chromeTab.url)
         ext = UrlExtension.HTML
-        const urlToCheck = url.href.toLowerCase().split("?")[0]
+        const urlToCheck = url.href.toLowerCase().split("?")[0]!
         //console.log("urlToCheck", urlToCheck)
         if (urlToCheck.endsWith(".rss")) {
           ext = UrlExtension.RSS

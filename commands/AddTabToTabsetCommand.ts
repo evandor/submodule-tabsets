@@ -20,6 +20,9 @@ import {useFeaturesStore} from "src/features/stores/featuresStore";
 import {FeatureIdent} from "src/app/models/FeatureIdent";
 import {useRequestsStore} from "src/requests/stores/requestsStore";
 import {useRequestsService} from "src/requests/services/RequestsService";
+import FirebaseServices from "src/services/firebase/FirebaseServices";
+import {useAuthStore} from "stores/authStore";
+import {doc, setDoc} from "firebase/firestore";
 
 const {sendMsg} = useUtils()
 const {info} = useLogger()

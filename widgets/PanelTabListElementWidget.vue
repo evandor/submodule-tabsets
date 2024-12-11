@@ -327,8 +327,8 @@
     <span>
       <q-icon name="more_vert" class="cursor-pointer q-mt-sm" color="black" size="20px"/>
       <PanelTabListContextMenu
-        :tabset="props.tabset"
-        :tabsetId="props.tabsetId"
+        :tabset="props.tabset!"
+        :tabsetId="props.tabsetId!"
         :tab="tab" v-if="!props.hideMenu"/>
     </span>
   </q-item-section>
@@ -611,7 +611,7 @@ const showSuggestion = () => {
   NavigationService.openOrCreateTab([url])
 }
 
-const openImage = () => window.open(chrome.runtime.getURL('www/index.html#/mainpanel/png/' + props.tab.id + "/" + pngs.value[0].id))
+const openImage = () => window.open(chrome.runtime.getURL('www/index.html#/mainpanel/png/' + props.tab.id + "/" + pngs.value[0]!.id))
 
 const showComments = () =>
   showCommentList.value &&
@@ -684,11 +684,11 @@ const showRssReferencesInfo = () => {
 }
 
 const openSearch = () => {
-  const ref: object[] = props.tab!.tabReferences.filter(ref => ref.type === TabReferenceType.OPEN_SEARCH)[0].data
+  const ref: object[] = props.tab!.tabReferences.filter(ref => ref.type === TabReferenceType.OPEN_SEARCH)[0]!.data
   const parser = new DOMParser();
-  const xml = ref[0]['xml' as keyof object]
+  const xml = ref[0]!['xml' as keyof object]
   const doc = parser.parseFromString(xml, "application/xml");
-  const templateURL: string = doc.getElementsByTagName("Url")[0].getAttribute("template") || ''
+  const templateURL: string = doc.getElementsByTagName("Url")[0]!.getAttribute("template") || ''
   useNavigationService().browserTabFor(templateURL.replace("{searchTerms}", opensearchterm.value || ''))
 }
 

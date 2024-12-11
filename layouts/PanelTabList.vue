@@ -16,7 +16,7 @@
                               :sorting="props.sorting"
                               :preventDragAndDrop="false"
                               :tabsetType="props.tabsetType"
-                              :tabset="props.tabset"
+                              :tabset="props.tabset!"
                               :show-tabsets="props.showTabsets"
                               :hide-menu="props.hideMenu"/>
     </vue-draggable-next>
@@ -30,7 +30,7 @@
                             :sorting="props.sorting"
                             :preventDragAndDrop="true"
                             :tabsetType="props.tabsetType"
-                            :tabset="props.tabset"
+                            :tabset="props.tabset!"
                             :show-tabsets="props.showTabsets"
                             :hide-menu="props.hideMenu"/>
   </q-list>

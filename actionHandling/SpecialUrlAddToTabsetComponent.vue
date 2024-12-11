@@ -11,7 +11,7 @@
            :color="alreadyInTabset() ? 'grey-5': tsBadges.length > 0 ? 'positive':'primary'"
            size="xs"
            data-testid="saveInTabsetBtn">
-      <div>{{ handler.actions()[0].label }}</div>
+      <div>{{ handler.actions()[0]!.label }}</div>
       <!--                  <q-icon right class="q-ma-none q-pa-none" size="2em" name="o_south" />-->
     </q-btn>
     <q-tooltip class="tooltip-small" v-if="alreadyInTabset()">
@@ -26,8 +26,8 @@
   </template>
 
   <template v-else-if="handler.actions().length > 1">
-    <q-btn-dropdown :label="handler.actions()[0].label"
-                    @click.stop="emits('buttonClicked', new ActionHandlerButtonClickedHolder(handler, ButtonActions.Save, handler.actions()[0], {filename: handler.actions()[0].label}))"
+    <q-btn-dropdown :label="handler.actions()[0]!.label"
+                    @click.stop="emits('buttonClicked', new ActionHandlerButtonClickedHolder(handler, ButtonActions.Save, handler.actions()[0], {filename: handler.actions()[0]!.label}))"
                     class="q-ma-none q-px-none q-py-none"
                     :color="alreadyInTabset() ? 'grey-5': tsBadges.length > 0 ? 'positive':'primary'"
                     size="xs"

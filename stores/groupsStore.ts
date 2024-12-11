@@ -179,7 +179,7 @@ export const useGroupsStore = defineStore('groups', () => {
       } else {
         const existingGroup = existingGroups[index]
         console.debug("replacing group", existingGroup, group)
-        await storage.deleteGroupByTitle(existingGroup.title || '')
+        await storage.deleteGroupByTitle(existingGroup!.title || '')
         await persistGroup(group)
       }
     }

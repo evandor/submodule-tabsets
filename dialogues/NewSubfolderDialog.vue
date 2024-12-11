@@ -2,8 +2,8 @@
     <q-dialog ref="dialogRef" @hide="onDialogHide">
       <NewSubfolderDialogBody
         :name="props.name"
-        :tabsetId="props.tabsetId"
-        :parentFolder="props.parentFolder"
+        :tabsetId="props.tabsetId!"
+        :parentFolder="props.parentFolder!"
         />
     </q-dialog>
 </template>

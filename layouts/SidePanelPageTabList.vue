@@ -19,7 +19,7 @@
                                   :type="props.type"
                                   :sorting="props.sorting"
                                   :preventDragAndDrop="false"
-                                  :tabset="props.tabset"
+                                  :tabset="props.tabset!"
                                   :show-tabsets="props.showTabsets"
                                   :hide-menu="props.hideMenu"/>
 
@@ -37,7 +37,7 @@
           :type="props.type"
           :sorting="props.tabset?.type === TabsetType.RSS_FOLDER ? TabSorting.TITLE : props.sorting"
           :preventDragAndDrop="true"
-          :tabset="props.tabset"
+          :tabset="props.tabset!"
           :show-tabsets="props.showTabsets"
           :hide-menu="props.hideMenu"/>
       </template>
@@ -82,8 +82,8 @@ const handleDragAndDrop = async (event: any, column: TabsetColumn) => {
   if (moved) {
     console.log(`moved event: '${moved.element.tab.id}' ${moved.oldIndex} -> ${moved.newIndex} (${props.activeFolder})`)
     const tabsInColumn = tabsForColumn()
-    const movedElement: Tab = tabsInColumn[moved.oldIndex].tab
-    const realNewIndex = tabsInColumn[moved.newIndex].index
+    const movedElement: Tab = tabsInColumn[moved.oldIndex]!.tab
+    const realNewIndex = tabsInColumn[moved.newIndex]!.index
     console.log(`             '${movedElement.id}' ${moved.oldIndex} -> ${realNewIndex}`)
     await TabsetService.moveTo(movedElement.id, realNewIndex, column)
     console.log("hier: ", props.tabset)
@@ -98,7 +98,7 @@ const handleDragAndDrop = async (event: any, column: TabsetColumn) => {
     const tabsInColumn = tabsForColumn()
     const movedElement: Tab = added.element.tab
     const realNewIndex = added.newIndex < tabsInColumn.length ?
-      tabsInColumn[added.newIndex].index : 0
+      tabsInColumn[added.newIndex]!.index : 0
     console.log(`             '${added.element.tab.id}' ${added.oldIndex} -> ${realNewIndex}`)
     movedElement.columnId = column.id
     useTabsetService().saveCurrentTabset()

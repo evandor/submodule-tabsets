@@ -20,13 +20,13 @@ export class GithubBackupCommand extends GithubCommands<string> {
     let existing = ''
     try {
       for (let i = 0; i < this.filenames.length; i++) {
-        const existingResponse = await this.githubGetContentRequest(this.filenames[0]);
+        const existingResponse = await this.githubGetContentRequest(this.filenames[0]!);
         let sha: string | undefined = undefined
         if (existingResponse.ok) {
           existing = await existingResponse.json()
           sha = existing['sha' as keyof object]
         }
-        const r = await this.githubPutContentRequest(this.filenames[i], data, sha);
+        const r = await this.githubPutContentRequest(this.filenames[i]!, data, sha);
         console.log("got", r)
       }
       const username = (LocalStorage.getItem(GITHUB_USERNAME) as string).replace(STRIP_CHARS_IN_USER_INPUT, '')

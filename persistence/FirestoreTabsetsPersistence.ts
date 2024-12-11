@@ -120,7 +120,7 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
       const thumb = await useThumbnailsService().getThumbnailFor(tab.url)
       if (thumb) {
         if (thumb && thumb['thumbnail' as keyof object]) {
-          tab.image = thumb['thumbnail' as keyof object]
+          tab.image = thumb['thumbnail' as keyof object]!
         }
       }
     }
@@ -171,7 +171,7 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
 
   }
 
-  reloadTabset(tabsetId: string): Promise<Tabset> {
+  reloadTabset(): Promise<Tabset> {
     throw new Error("reload tabset not yet implemented")
   }
 

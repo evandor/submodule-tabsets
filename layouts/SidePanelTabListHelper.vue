@@ -12,10 +12,10 @@
     <PanelTabListElementWidget :key="'ptlew__' + tab.id"
                                :tab="tab"
                                :type="props.type"
-                               :sorting="props.sorting"
+                               :sorting="props.sorting!"
                                :show-tabsets="props.showTabsets"
                                :preventDragAndDrop="props.preventDragAndDrop"
-                               :tabset="props.tabset"
+                               :tabset="props.tabset!"
                                :hide-menu="props.hideMenu"/>
 
   </q-item>

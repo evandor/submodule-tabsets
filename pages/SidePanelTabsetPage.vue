@@ -5,11 +5,11 @@
 
       <SidePanelPageTabList
         v-if="tabset"
-        :sorting="sorting"
+        :sorting="sorting!"
         :show-tabsets="true"
         :preventDragAndDrop="preventDragAndDrop(sorting)"
-        :tabset="tabset as Tabset"
-        :activeFolder="(tabset as Tabset).folderActive"
+        :tabset="tabset! as Tabset"
+        :activeFolder="(tabset! as Tabset).folderActive!"
       />
 
     </div>

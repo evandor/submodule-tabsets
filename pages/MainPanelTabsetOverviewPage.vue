@@ -52,8 +52,8 @@
       <TabList
         group="otherTabs"
         :tabsetId="tabset.id"
-        :tabsetSorting="tabset?.sorting"
-        :tabsetSharedId="tabset?.sharedId"
+        :tabsetSorting="tabset.sorting"
+        :tabsetSharedId="tabset.sharedId!"
         :tabs="tabset.tabs"/>
 
     </q-tab-panel>

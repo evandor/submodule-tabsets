@@ -6,9 +6,9 @@
       <TabList v-if="props.tabset?.view === 'list'"
                group="otherTabs"
                :highlightUrl="highlightUrl"
-               :tabsetId="props.tabset?.id"
-               :tabsetSorting="props.tabset?.sorting"
-               :tabsetSharedId="props.tabset?.sharedId"
+               :tabsetId="props.tabset.id"
+               :tabsetSorting="props.tabset.sorting"
+               :tabsetSharedId="props.tabset.sharedId!"
                :simpleUi="props.simpleUi"
                :tabs="currentTabs()"/>
 
@@ -83,7 +83,7 @@ watchEffect(() => {
   const highlightUrls: string[] = useUiStore().getHighlightUrls
   if (highlightUrls.length > 0) {
     //console.log("found hightlight", highlightUrls)
-    highlightUrl.value = highlightUrls[0]
+    highlightUrl.value = highlightUrls[0]!
   } else {
     highlightUrl.value = ''
   }
@@ -120,7 +120,7 @@ function getOrder() {
       case 'alphabeticalTitle':
         return (t: Tab) => t.title?.toUpperCase()
       default:
-        return (t: Tab) => 1
+        return () => 1
     }
   }
 }

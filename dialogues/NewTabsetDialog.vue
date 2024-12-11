@@ -1,9 +1,9 @@
 <template>
     <q-dialog ref="dialogRef" @hide="onDialogHide">
       <NewTabsetDialogBody
-        :space-id="props.spaceId"
+        :space-id="props.spaceId!"
         :name="props.name"
-        :window-id="props.windowId"
+        :window-id="props.windowId!"
         :from-panel="props.fromPanel"/>
     </q-dialog>
 </template>
