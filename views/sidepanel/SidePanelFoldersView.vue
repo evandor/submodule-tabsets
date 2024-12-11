@@ -42,10 +42,6 @@
         <q-item-label>
           <div class="text-subtitle2 ellipsis">
             {{ folder.name.substring(0, 20) }}
-            <q-icon name="o_bookmarks" size="12px" color="primary" class="q-mb-sm"
-                    v-if="folder.bookmarkId" @click.stop="openBookmark(folder.bookmarkId)">
-              <q-tooltip class="tooltip-small">Open in Browsers Bookmarks Manager</q-tooltip>
-            </q-icon>
           </div>
         </q-item-label>
         <q-item-label class="text-caption text-grey-5">
@@ -218,8 +214,6 @@ const currentFolderPath = (): Tabset[] => {
   const res: Tabset[] = parentChain(props.tabset)
   return res ? res.reverse() : []
 }
-
-const openBookmark = (id: string) => useNavigationService().browserTabFor(`chrome://bookmarks/?id=${id}`)
 
 
 </script>
