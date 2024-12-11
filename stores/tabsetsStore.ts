@@ -102,7 +102,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       if (spaceId) {
         ts.spaces = [spaceId]
       }
-      //tabsets.value.set(ts.id, ts)
+      tabsets.value.set(ts.id, ts)
       // console.log("storage", storage)
       //await storage.addTabset(ts)
 
