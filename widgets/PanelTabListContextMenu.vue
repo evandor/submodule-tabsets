@@ -2,7 +2,7 @@
   <q-menu :offset="[0, 0]" @click.stop="">
     <q-list dense style="min-width: 200px">
 
-      <PanelTabListContextMenuHook :tab="props.tab" :tabset="props.tabset"/>
+      <PanelTabListContextMenuHook :tab="props.tab" :tabset="props.tabset!"/>
 
       <template v-if="showTabDetailsMenuEntry(props['tab' as keyof object])">
         <q-item clickable v-close-popup @click.stop="showTabDetails(props['tab' as keyof object])">

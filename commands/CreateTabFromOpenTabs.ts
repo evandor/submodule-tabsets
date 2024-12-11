@@ -93,7 +93,7 @@ export class CreateTabFromOpenTabsCommand implements Command<any> {
       const oldIndex = _.findIndex(useTabsetsStore().getCurrentTabs, (t: any) => t.id === tab.id)
       if (oldIndex >= 0) {
         const tab = useTabsetsStore().getCurrentTabs.splice(oldIndex, 1)[0];
-        useTabsetsStore().getCurrentTabs.splice(useIndex, 0, tab);
+        useTabsetsStore().getCurrentTabs.splice(useIndex, 0, tab!);
       }
       return saveCurrentTabset()
         .then(result => new ExecutionResult(

@@ -63,7 +63,7 @@ watchEffect(() => {
   const highlightUrls: string[] = useUiStore().getHighlightUrls
   if (highlightUrls.length > 0) {
     //console.log("found hightlight", highlightUrls)
-    highlightUrl.value = highlightUrls[0]
+    highlightUrl.value = highlightUrls[0]!
   } else {
     highlightUrl.value = ''
   }

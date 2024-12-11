@@ -58,7 +58,7 @@
         <div class="row q-pa-xs q-mt-none q-pl-sm q-gutter-sm">
           <ColorSelector
               @colorSet="(color:string) => theColor = color"
-              :selectedColor="props.tabsetColor"/>
+              :selectedColor="props.tabsetColor!"/>
         </div>
 
       </q-card-section>

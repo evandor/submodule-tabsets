@@ -104,7 +104,7 @@ export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
         const tabCandidates = ts.tabs.filter((t: Tab) => t.url!.match(this.urlMatcher()) && t.title === filename)
         const firstFrameReturned = returned.at(0)
         if (firstFrameReturned && firstFrameReturned.result && tabCandidates.length > 0) {
-          tabCandidates[0].storage = new ExcalidrawStorage(
+          tabCandidates[0]!.storage = new ExcalidrawStorage(
             JSON.stringify(JSON.parse(firstFrameReturned.result['excalidraw' as keyof object])),
             firstFrameReturned.result['excalidrawState' as keyof object],
             firstFrameReturned.result['versionFiles' as keyof object],

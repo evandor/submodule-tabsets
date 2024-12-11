@@ -53,9 +53,9 @@
             </span>
 
           <TabsetListContextMenu
-            :tabset="tabset"
-            :index="index"
-            :hoveredTab="hoveredTab"
+            :tabset="tabset!"
+            :index="index!"
+            :hoveredTab="hoveredTab!"
             :in-side-panel="props.fromPanel"
             @toggleExpand="(index:number) => toggleExpand(index)"/>
 

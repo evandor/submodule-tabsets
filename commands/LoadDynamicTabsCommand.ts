@@ -8,7 +8,6 @@ import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {CreateFolderCommand} from "src/tabsets/commands/CreateFolderCommand";
 import {Parent, Root, RootContent, Text} from "mdast";
 import BrowserApi from "src/app/BrowserApi";
-import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {Tab} from "src/tabsets/models/Tab";
 import {TabReference, TabReferenceType} from "src/content/models/TabReference";
 
@@ -47,7 +46,7 @@ export class LoadDynamicTabsCommand implements Command<any> {
         if (t.length > 0) {
           //currentHeading = t[0]
           console.log("testing header:", t[0], c['depth' as keyof object])
-          currentHeadings[c['depth' as keyof object]] = t[0]
+          currentHeadings[c['depth' as keyof object]] = t[0]!
         }
       } else if (c.type === "paragraph") {
         if (c.children) {
@@ -55,12 +54,12 @@ export class LoadDynamicTabsCommand implements Command<any> {
           const descriptions = c.children.filter((c => c.type === "text"))
           //console.log("found", linkChildren, descriptions, linkChildren.length > 0 && descriptions.length > 0)
           if (linkChildren.length > 0 && descriptions.length > 0) {
-            const texts: string[] = linkChildren[0].children
+            const texts: string[] = linkChildren[0]!.children
               .filter((c: RootContent) => c.type === "text") // "links" -> "text"
               .map((c: Text) => c.value || 'no title')
-            const description = descriptions[0].value
+            const description = descriptions[0]!.value
             const res = {
-              url: linkChildren[0]['url' as keyof object] as string,
+              url: linkChildren[0]!['url' as keyof object] as string,
               text: texts.length > 0 ? texts[0] : 'no title2',
               description: description,
               headings: currentHeadings.filter(h => h.trim().length > 0)
@@ -89,7 +88,7 @@ export class LoadDynamicTabsCommand implements Command<any> {
       const parent = headingMapping.get(parentPath.join("->")) // assuming always found
       const headingsPath = headings.join("->")
       if (!headingMapping.has(headingsPath)) {
-        const newFolder = new FolderNode(headings[headings.length - 1], uid())
+        const newFolder = new FolderNode(headings[headings.length - 1]!, uid())
         headingMapping.set(headingsPath, newFolder)
         parent!.children.push(newFolder)
       }

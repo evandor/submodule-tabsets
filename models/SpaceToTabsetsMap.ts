@@ -9,7 +9,7 @@ export class SpaceToTabsetsMap {
   get(spaceId: string | undefined): string[] {
     const space = spaceId ? spaceId : "nospace"
     const l = this.data.filter((t: TabsetForSpace) => t.identifier === space)
-    return (l.length > 0) ? l[0].tabsets : []
+    return (l.length > 0) ? l[0]!.tabsets : []
   }
 
   set(spaceId: string | undefined, list: string[]) {

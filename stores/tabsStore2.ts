@@ -86,8 +86,8 @@ export const useTabsStore2 = defineStore('browsertabs', () => {
       const historyLength = chromeTabsHistory.value.length
       chromeTabsHistoryPosition.value = Math.min(MAX_HISTORY_LENGTH - 1, historyLength)
       if (historyLength > 0 &&
-        chromeTabsHistory.value[historyLength - 1][0] !== tab.id &&
-        chromeTabsHistory.value[historyLength - 1][1] !== tab.url
+        chromeTabsHistory.value[historyLength - 1]![0] !== tab.id &&
+        chromeTabsHistory.value[historyLength - 1]![1] !== tab.url
       ) {
         chromeTabsHistory.value.push([tab.id, tab.url || ''])
       } else if (historyLength === 0) {

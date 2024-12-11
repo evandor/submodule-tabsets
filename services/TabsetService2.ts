@@ -33,7 +33,7 @@ export function useTabsetService() {
     function selectFirstAvailableTabset() {
       const ts = [...useTabsetsStore().tabsets.values()] as Tabset[]
       if (ts.length > 0) {
-        useTabsetsStore().selectCurrentTabset(ts[0].id)
+        useTabsetsStore().selectCurrentTabset(ts[0]!.id)
       }
     }
 

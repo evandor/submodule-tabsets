@@ -28,7 +28,7 @@ export class AddUrlToTabsetHandlers {
     const handler = this.handlers.filter((h: AddUrlToTabsetHandler) => url.match(h.urlMatcher()) || h.contentMatcher(content))
     if (handler && handler.length > 0) {
       //handler[0].setFolder(folder)
-      return handler[0]
+      return handler[0]!
     }
     return this.defaultAddUrlToTabsetHandler
   }

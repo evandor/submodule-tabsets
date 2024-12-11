@@ -14,10 +14,10 @@
       @change="handleDragAndDrop">
 
       <TabListHelper
-        :group="group"
-        :tabset-id="tabsetId"
-        :tabset-shared-id="tabsetSharedId"
-        :tabset-mqtt-url="tabsetMqttUrl"
+        :group="group!"
+        :tabset-id="tabsetId!"
+        :tabset-shared-id="tabsetSharedId!"
+        :tabset-mqtt-url="tabsetMqttUrl!"
         :simpleUi="props.simpleUi"
         :tabs="props.tabs"/>
 
@@ -27,8 +27,8 @@
   <TabListHelper v-else
                  :group="group"
                  :tabset-id="tabsetId"
-                 :tabset-shared-id="tabsetSharedId"
-                 :tabset-mqtt-url="tabsetMqttUrl"
+                 :tabset-shared-id="tabsetSharedId!"
+                 :tabset-mqtt-url="tabsetMqttUrl!"
                  :simpleUi="props.simpleUi"
                  :tabs="props.tabs"/>
 
@@ -67,10 +67,10 @@ function adjustIndex(element: any, tabs: Tab[]) {
   //console.log("filtered", tabs)
   if (element.newIndex === 0) { // first element
     //console.log(" 0 - searching for ", tabs[0].id)
-    return _.findIndex(tabsetsStore.getCurrentTabs, (t:Tab) => t.id === tabs[0].id)
+    return _.findIndex(tabsetsStore.getCurrentTabs, (t:Tab) => t.id === tabs[0]!.id)
   } else {
     //console.log(" 1 - searching for ", tabs[element.newIndex - 1].id)
-    return 1 + _.findIndex(tabsetsStore.getCurrentTabs, (t:Tab) => t.id === tabs[element.newIndex - 1].id)
+    return 1 + _.findIndex(tabsetsStore.getCurrentTabs, (t:Tab) => t.id === tabs[element.newIndex - 1]!.id)
   }
 }
 

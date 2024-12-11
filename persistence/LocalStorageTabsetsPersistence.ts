@@ -9,7 +9,7 @@ export class LocalStorageTabsetsPersistence {
     if (fromStorage) {
       var allUsedTabsets = JSON.parse(fromStorage) as TabsetForSpace[]
       const res = allUsedTabsets.filter((t: TabsetForSpace) => t.identifier === space)
-      return res.length > 0 ? res[0].tabsets : []
+      return res.length > 0 ? res[0]!.tabsets : []
     }
     return []
   }

@@ -134,7 +134,7 @@ class TabsetService {
       const targetTabset = useTabsetsStore().getTabset(toTabsetId)
 
       if (tabIndex >= 0 && targetTabset) {
-        targetTabset.tabs.push(tabset.tabs[tabIndex])
+        targetTabset.tabs.push(tabset.tabs[tabIndex]!)
         return saveTabset(targetTabset)
           .then(() => {
             if (copy) {
@@ -351,7 +351,7 @@ class TabsetService {
     if (oldIndex >= 0) {
       console.log("found old index", oldIndex)
       const tab = tabs.splice(oldIndex, 1)[0];
-      tabs.splice(newIndex, 0, tab);
+      tabs.splice(newIndex, 0, tab!);
 
       // Sharing
       if (currentTabset.sharedId && currentTabset.sharing === TabsetSharing.PUBLIC_LINK) {
