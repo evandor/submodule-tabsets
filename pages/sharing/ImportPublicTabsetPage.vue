@@ -42,7 +42,7 @@
     </div>
   </div>
 
-  <div class="absolute-bottom text-right text-caption text-blue-10 q-mr-lg q-mb-lg cursor-pointer" @click="openURL('https://bibbly.me')">
+  <div class="absolute-bottom text-right text-caption text-accent q-mr-lg q-mb-lg cursor-pointer" @click="openURL('https://bibbly.me')">
     Bibbly {{ version }}
   </div>
 
