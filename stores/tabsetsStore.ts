@@ -88,16 +88,13 @@ export const useTabsetsStore = defineStore('tabsets', () => {
 
 
       const tabsetWithSameName: Tabset | undefined = _.find([...tabsets.value.values()] as Tabset[], (ts: Tabset) => ts.name === trustedName)
-      let ts: Tabset = null as unknown as Tabset
       if (tabsetWithSameName) {
-        if (tabsetWithSameName.status === TabsetStatus.DELETED) {
-          // TODO
-          // delete Tabset(tabsetWithSameName)
-        } else {
+        if (tabsetWithSameName.status !== TabsetStatus.DELETED) {
           return Promise.reject(`tabset with same name ('${trustedName}') exists already`)
         }
       }
 
+      let ts: Tabset = null as unknown as Tabset
       ts = new Tabset(uid(), trustedName, tabs, [])
       ts.color = trustedColor
       ts.dynamicUrl = dynamicUrl?.toString()

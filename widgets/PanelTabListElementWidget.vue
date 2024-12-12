@@ -149,7 +149,7 @@
     <q-item-label
       style="width:100%"
       v-if="props.tab?.url"
-      caption class="ellipsis-2-lines text-blue-10 q-pt-xs"
+      caption class="ellipsis-2-lines text-accent q-pt-xs"
       @mouseover="showButtonsProp = true"
       @mouseleave="showButtonsProp = false">
       <div class="row q-ma-none">
@@ -194,7 +194,7 @@
     <q-item-label
       style="width:100%;margin-top:0"
       v-if="props.tab?.url"
-      caption class="ellipsis-2-lines text-blue-10"
+      caption class="ellipsis-2-lines text-accent"
       @mouseover="showButtonsProp = true"
       @mouseleave="showButtonsProp = false">
       <div class="row q-ma-none" @click="gotoTab()">
