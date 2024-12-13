@@ -157,8 +157,8 @@ export class Tab {
 
   groupName: string | undefined = undefined
 
-  canvasLeft: number | undefined
-  canvasTop: number | undefined
+  // canvasLeft: number | undefined
+  // canvasTop: number | undefined
   canvasWidth: number | undefined
   canvasHeight: number | undefined
 
@@ -173,6 +173,8 @@ export class Tab {
   storage: ExcalidrawStorage | undefined = undefined
 
   tabReferences: TabReference[] = []
+
+  quickaccess: string = ''
 
   // article: object | undefined = undefined
 

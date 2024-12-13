@@ -162,7 +162,8 @@ export function useTabsetService() {
       return tab
     })
 
-    const tabset = await useTabsetsStore().createTabset(name, tabs)
+    const ignoreDuplicates = dryRun
+    const tabset = await useTabsetsStore().createTabset(name, tabs, undefined, undefined, undefined, ignoreDuplicates)
     if (!dryRun) {
       await saveTabset(tabset)
       selectTabset(tabset.id)

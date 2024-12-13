@@ -31,9 +31,9 @@
       <q-card-section class="q-pt-none" v-if="placeholders.length > 0">
         <b>Substitutions for</b>
       </q-card-section>
-      <q-card-section class="q-pt-none text-caption" v-else>
-        You can use placeholder like this as well: https://dax.de/${wkn}
-      </q-card-section>
+<!--      <q-card-section class="q-pt-none text-caption" v-else>-->
+<!--        You can use placeholder like this as well: https://dax.de/${wkn}-->
+<!--      </q-card-section>-->
 
       <q-card-section class="q-pt-none" v-for="placeholder in placeholders">
         <div class="text-body">Placeholder <i>{{ placeholder }}</i></div>
