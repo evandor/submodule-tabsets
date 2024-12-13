@@ -44,7 +44,7 @@
             {{ folder.name.substring(0, 20) }}
           </div>
         </q-item-label>
-        <q-item-label class="text-caption text-grey-5">
+        <q-item-label class="text-caption text-secondary">
           {{ folderCaption(folder) }}
         </q-item-label>
       </q-item-section>

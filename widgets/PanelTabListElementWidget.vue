@@ -128,13 +128,14 @@
 
     <!-- === RSS Links === -->
     <Transition name="fade" mode="out-in">
-      <q-item-label  v-if="showRssReferencesInfo()">
+      <q-item-label v-if="showRssReferencesInfo()">
         <div class="row q-ma-none q-pa-none q-my-xs"
              v-for="ref in props.tab?.tabReferences.filter((r: TabReference) => r.type === TabReferenceType.RSS)">
           <div class="col-1 text-body2" style="font-size:smaller">
             <q-icon name="rss_feed" class="q-ma-none q-pa-none" color="warning" size="xs"/>
           </div>
-          <div class="col-7 ellipsis" style="font-size:smaller" @click="useNavigationService().browserTabFor(ref.href!)">
+          <div class="col-7 ellipsis" style="font-size:smaller"
+               @click="useNavigationService().browserTabFor(ref.href!)">
             {{ ref.href }}
           </div>
           <div class="col text-right">
@@ -324,12 +325,16 @@
     @mouseleave="hoveredTab = undefined"
     :style="TabService.isCurrentTab(props.tab) ? 'border-right:3px solid #1565C0;border-radius:3px' : ''"
     style="justify-content:start;width:30px;max-width:30px">
-    <span>
+    <span v-if="props.tabset!.type !== TabsetType.SESSION">
       <q-icon name="more_vert" class="cursor-pointer q-mt-sm" color="black" size="20px"/>
       <PanelTabListContextMenu
+        v-if="!props.hideMenu"
         :tabset="props.tabset!"
         :tabsetId="props.tabsetId!"
-        :tab="tab" v-if="!props.hideMenu"/>
+        :tab="tab"/>
+    </span>
+    <span v-else @click="removeSessionTab(tab)">
+      x
     </span>
   </q-item-section>
 
@@ -357,7 +362,7 @@ import ShortUrl from "src/core/utils/ShortUrl.vue";
 import PanelTabListContextMenu from "src/tabsets/widgets/PanelTabListContextMenu.vue";
 import _ from "lodash";
 import {formatDistance} from "date-fns";
-import {Tabset} from "src/tabsets/models/Tabset";
+import {Tabset, TabsetType} from "src/tabsets/models/Tabset";
 import {FeatureIdent} from "src/app/models/FeatureIdent";
 import {useUtils} from "src/core/services/Utils";
 import {useRouter} from "vue-router";
@@ -379,6 +384,7 @@ import {OpenTabCommand} from "src/tabsets/commands/OpenTabCommand";
 import {useNavigationService} from "src/core/services/NavigationService";
 import {TabReference, TabReferenceType} from "src/content/models/TabReference";
 import BrowserApi from "src/app/BrowserApi";
+import {DeleteTabCommand} from "src/tabsets/commands/DeleteTabCommand";
 
 const {inBexMode} = useUtils()
 
@@ -690,6 +696,17 @@ const openSearch = () => {
   const doc = parser.parseFromString(xml, "application/xml");
   const templateURL: string = doc.getElementsByTagName("Url")[0]!.getAttribute("template") || ''
   useNavigationService().browserTabFor(templateURL.replace("{searchTerms}", opensearchterm.value || ''))
+}
+
+const removeSessionTab = (tab: Tab) => {
+  // const useTab = await tabToUse(props.tab)
+  //let useTabset = props.tabset
+  //if (!useTabset && props.tabsetId) {
+  // useTabset = useTabsetsStore().getTabset(props.tabsetId)
+  //}
+  //if (useTabset) {
+  useCommandExecutor().executeFromUi(new DeleteTabCommand(tab, props.tabset!))
+  //}
 }
 
 

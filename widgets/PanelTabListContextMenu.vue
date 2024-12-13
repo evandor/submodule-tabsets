@@ -157,29 +157,6 @@ const deleteTab = async () => {
   if (useTabset) {
     useCommandExecutor().executeFromUi(new DeleteTabCommand(useTab, useTabset))
   }
-  // if (useTab && useTab.url) {
-  //   const res = await useBookmarksStore().findBookmarksForUrl(useTab.url)
-  //   console.log("existing bookmarks", res)
-  //   if (res.length > 0) {
-  //     $q.dialog({
-  //       title: res.length === 1 ? 'Found Bookmark with same URL' : 'Found Bookmarks with same URL',
-  //       cancel: true,
-  //       message: res.length === 1 ?
-  //         'Do you want to delete this bookmark as well?' :
-  //         'Do you want to delete these ' + res.length + ' bookmarks as well?'
-  //     }).onOk(() => {
-  //       res.forEach(bm => {
-  //         chrome.bookmarks.remove(bm.id)
-  //       })
-  //       Notify.create({
-  //         color: 'positive',
-  //         message: res.length === 1 ? 'Deleted one bookmark' : 'Deleted ' + res.length + ' bookmarks'
-  //       })
-  //     }).onCancel(() => {
-  //     }).onDismiss(() => {
-  //     })
-  //   }
-  // }
 }
 
 const showTabDetails = async (tab: Tab) => {

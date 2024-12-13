@@ -72,7 +72,8 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       tabsetName: string, tabs: Tab[],
       color: string | undefined = undefined,
       dynamicUrl: URL | undefined = undefined,
-      spaceId: string | undefined = undefined
+      spaceId: string | undefined = undefined,
+      ignoreDuplicates: boolean = false
     ): Promise<Tabset> {
       const currentTabsetsCount = tabsets.value.size
       if (useAuthStore().limitExceeded(AccessItem.TABSETS, currentTabsetsCount)) {
@@ -87,10 +88,12 @@ export const useTabsetsStore = defineStore('tabsets', () => {
         : undefined
 
 
-      const tabsetWithSameName: Tabset | undefined = _.find([...tabsets.value.values()] as Tabset[], (ts: Tabset) => ts.name === trustedName)
-      if (tabsetWithSameName) {
-        if (tabsetWithSameName.status !== TabsetStatus.DELETED) {
-          return Promise.reject(`tabset with same name ('${trustedName}') exists already`)
+      if (!ignoreDuplicates) {
+        const tabsetWithSameName: Tabset | undefined = _.find([...tabsets.value.values()] as Tabset[], (ts: Tabset) => ts.name === trustedName)
+        if (tabsetWithSameName) {
+          if (tabsetWithSameName.status !== TabsetStatus.DELETED) {
+            return Promise.reject(`tabset with same name ('${trustedName}') exists already`)
+          }
         }
       }
 
@@ -214,7 +217,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
 
     const getTabset = computed(() => {
       return (tabsetId: string): Tabset | undefined => {
-        console.log("searching for tabset", tabsetId)
+       // console.log("searching for tabset", tabsetId)
         return tabsets.value.get(tabsetId) as Tabset | undefined
       }
     })
@@ -280,6 +283,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
         const childrenCount: number = ts.folders?.map((f: Tabset) => countAllTabs(f)).reduce((a, b) => a + b, 0)
         return directCount + childrenCount;
       }
+
       for (const ts of tabsets.value.values()) {
         count = count + countAllTabs(ts)
       }
@@ -320,7 +324,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
         if (f.id === folderActive) {
           return f
         } else {
-          const subFolder = getActiveFolder(f, folderActive, level+1)
+          const subFolder = getActiveFolder(f, folderActive, level + 1)
           if (subFolder) {
             return subFolder
           }
