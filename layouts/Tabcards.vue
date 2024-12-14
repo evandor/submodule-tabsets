@@ -15,7 +15,7 @@
 
       <TabCardWidget :key="props.group + '__' + tab.id"
                      :tab="tabAsTab(tab)"
-                     :highlightUrl="highlightUrl"/>
+                     :highlightUrl="highlightUrl!"/>
 
     </div>
 

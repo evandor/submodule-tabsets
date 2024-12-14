@@ -1,7 +1,7 @@
 <template>
   <div class="q-ma-none" style="height:100%;max-width:100%">
     <q-scroll-area style="height: 100%">
-      <TagsListViewerWidget @tagSelected="(value) => selectTag(value)" />
+<!--      <TagsListViewerWidget @tagSelected="(value) => selectTag(value)" />-->
     </q-scroll-area>
   </div>
 </template>

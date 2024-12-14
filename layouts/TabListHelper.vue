@@ -20,13 +20,13 @@
     @dragstart="startDrag($event, tab)"
     :key="props.group + '_' + tab.id">
 
-    <TabListElementWidget :showButtons="showButtonsProp.get(tab.id)"
+    <TabListElementWidget :showButtons="showButtonsProp.get(tab.id) || false"
                           :key="props.group + '__' + tab.id"
                           :tab="tabAsTab(tab)"
-                          :tabsetId="props.tabsetId"
-                          :tabsetSharedId="props.tabsetSharedId"
-                          :highlightUrl="highlightUrl"
-                          :simpleUi="props.simpleUi" />
+                          :tabsetId="props.tabsetId!"
+                          :tabsetSharedId="props.tabsetSharedId!"
+                          :highlightUrl="highlightUrl!"
+                          :simpleUi="props.simpleUi!" />
 
   </q-item>
 
