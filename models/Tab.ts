@@ -1,5 +1,5 @@
 import {uid} from "quasar";
-import {STRIP_CHARS_IN_USER_INPUT} from "boot/constants";
+import {STRIP_CHARS_IN_USER_INPUT} from "src/boot/constants";
 import _ from "lodash"
 import {Placeholders} from "src/tabsets/models/Placeholders";
 import {TabReference, TabReferenceType} from "src/content/models/TabReference";

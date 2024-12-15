@@ -29,7 +29,7 @@
 import {computed, ref, watchEffect} from "vue";
 import {uid, useQuasar} from "quasar";
 import {useDialogPluginComponent} from 'quasar'
-import {STRIP_CHARS_IN_USER_INPUT} from "boot/constants";
+import {STRIP_CHARS_IN_USER_INPUT} from "src/boot/constants";
 import TabsetService from "src/tabsets/services/TabsetService";
 import {Tab} from "src/tabsets/models/Tab";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";

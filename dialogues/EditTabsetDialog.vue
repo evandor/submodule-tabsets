@@ -81,7 +81,7 @@
 
 import {computed, ref, watchEffect} from "vue";
 import {useDialogPluginComponent} from "quasar";
-import {STRIP_CHARS_IN_USER_INPUT} from "boot/constants";
+import {STRIP_CHARS_IN_USER_INPUT} from "src/boot/constants";
 import {RenameTabsetCommand} from "src/tabsets/commands/RenameTabset";
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import ColorSelector from "src/core/dialog/ColorSelector.vue";

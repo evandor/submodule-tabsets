@@ -53,7 +53,7 @@ import {LocalStorage, useDialogPluginComponent} from "quasar";
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {AddCommentCommand} from "src/domain/tabs/AddCommentCommand";
 import {useUiStore} from "src/ui/stores/uiStore";
-import {SHARING_AUTHOR_IDENT} from "boot/constants";
+import {SHARING_AUTHOR_IDENT} from "src/boot/constants";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 
 defineEmits([

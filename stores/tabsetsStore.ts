@@ -7,10 +7,10 @@ import TabsetsPersistence from "src/tabsets/persistence/TabsetsPersistence";
 import {Tab, TabComment} from "src/tabsets/models/Tab";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {useWindowsStore} from "src/windows/stores/windowsStore";
-import {STRIP_CHARS_IN_COLOR_INPUT, STRIP_CHARS_IN_USER_INPUT} from "boot/constants";
+import {STRIP_CHARS_IN_COLOR_INPUT, STRIP_CHARS_IN_USER_INPUT} from "src/boot/constants";
 import {TabAndTabsetId} from "src/tabsets/models/TabAndTabsetId";
 import NavigationService from "src/services/NavigationService";
-import {AccessItem, useAuthStore} from "stores/authStore";
+import {AccessItem, useAuthStore} from "src/stores/authStore";
 
 /**
  * a pinia store for "Tabsets".

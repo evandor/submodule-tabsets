@@ -32,7 +32,7 @@
 
 import {computed, PropType, ref, watchEffect} from "vue";
 import {useDialogPluginComponent} from "quasar";
-import {STRIP_CHARS_IN_USER_INPUT} from "boot/constants";
+import {STRIP_CHARS_IN_USER_INPUT} from "src/boot/constants";
 import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {Tabset} from "src/tabsets/models/Tabset";
 import {RenameFolderCommand} from "src/tabsets/commands/RenameFolderCommand";

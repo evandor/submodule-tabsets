@@ -74,7 +74,7 @@ import {
   GITHUB_REPONAME,
   GITHUB_TOKEN,
   GITHUB_USERNAME
-} from "boot/constants";
+} from "src/boot/constants";
 import {GithubBackupCommand} from "src/tabsets/commands/github/GithubBackupCommand";
 import {NotificationType} from "src/core/services/ErrorHandler";
 import {useUiStore} from "src/ui/stores/uiStore";

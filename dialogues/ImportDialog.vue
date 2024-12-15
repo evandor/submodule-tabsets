@@ -41,7 +41,7 @@ import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {ImportTabsetsCommand} from "src/tabsets/commands/ImportTabsets";
 import {useUtils} from "src/core/services/Utils";
 import {ref, watchEffect} from "vue";
-import {GITHUB_PATH, GITHUB_REPONAME, GITHUB_TOKEN, GITHUB_USERNAME} from "boot/constants";
+import {GITHUB_PATH, GITHUB_REPONAME, GITHUB_TOKEN, GITHUB_USERNAME} from "src/boot/constants";
 import {GithubGetLatestBackupCommand} from "src/tabsets/commands/github/GithubGetLatestBackupCommand";
 
 defineEmits([

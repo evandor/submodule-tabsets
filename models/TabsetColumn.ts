@@ -1,4 +1,4 @@
-import {STRIP_CHARS_IN_USER_INPUT} from "boot/constants";
+import {STRIP_CHARS_IN_USER_INPUT} from "src/boot/constants";
 
 export class TabsetColumn {
 

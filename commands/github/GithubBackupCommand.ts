@@ -5,7 +5,7 @@ import {OpenTabCommand} from "src/tabsets/commands/OpenTabCommand";
 import {Tab} from "src/tabsets/models/Tab";
 import {LocalStorage, uid} from "quasar";
 import BrowserApi from "src/app/BrowserApi";
-import {GITHUB_PATH, GITHUB_REPONAME, GITHUB_USERNAME, STRIP_CHARS_IN_USER_INPUT} from "boot/constants";
+import {GITHUB_PATH, GITHUB_REPONAME, GITHUB_USERNAME, STRIP_CHARS_IN_USER_INPUT} from "src/boot/constants";
 
 export class GithubBackupCommand extends GithubCommands<string> {
 
