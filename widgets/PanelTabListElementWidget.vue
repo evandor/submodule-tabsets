@@ -426,7 +426,7 @@ onMounted(() => {
     newState.value = true
     const audio = document.getElementById('myAudio')
     if (audio) {
-      // @ts-ignore
+      // @ts-expect-error
       audio.play()
     }
     setTimeout(() => newState.value = false, 2000)
@@ -439,7 +439,7 @@ const thumbnailFor = async (tab: Tab): Promise<string> => {
 
 watchEffect(() => {
   if (props.tab && props.tab.preview === TabPreview.THUMBNAIL) {
-    // @ts-ignore
+    // @ts-expect-error
     thumbnailFor(props.tab)
       .then((tn: string) => {
         if (tn) {
@@ -539,7 +539,7 @@ const iconStyle = () => {
 const openTabset = (badge: any) => {
   console.log("clicked badge", badge)
   useTabsetService().selectTabset(badge.tabsetId)
-  // @ts-ignore
+  // @ts-expect-error
   if (!inBexMode() || !chrome.sidePanel) {
     router.push("/tabsets/" + badge.tabsetId + "?highlight=" + badge.encodedUrl)
   } else {

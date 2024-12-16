@@ -44,13 +44,13 @@ watchEffect(() => {
     useTabsetsStore().selectCurrentTabset(tabsetId.value)
 
     if (tabset.value && !editorJS2) { // && !editorJS2.isReady) {
-      // @ts-ignore
+      // @ts-expect-error
       editorJS2 = new EditorJS({
         holder: "editorjs",
         autofocus: true,
         readOnly: false,
         data: (tabset.value.page || {}) as OutputData,
-        // @ts-ignore
+        // @ts-expect-error
         tools: EditorJsConfig.toolsconfig
       });
     }

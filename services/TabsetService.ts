@@ -260,7 +260,7 @@ class TabsetService {
     if (!chrome.tabs) {
       return Promise.resolve(0)
     }
-    // @ts-ignore
+    // @ts-expect-error
     const result: chrome.tabs.Tab[] = await chrome.tabs.query({})
     let trackedTabs = 0
     _.forEach(result, (tab: chrome.tabs.Tab) => {
@@ -275,7 +275,7 @@ class TabsetService {
     // TODO long-Running action
     const currentTab = await BrowserApi.getCurrentTab()
 
-    // @ts-ignore
+    // @ts-expect-error
     const result: chrome.tabs.Tab[] = await chrome.tabs.query({})
     const tabsToClose: chrome.tabs.Tab[] = []
     const tabsToKeep: chrome.tabs.Tab[] = []

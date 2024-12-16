@@ -36,7 +36,7 @@ export class FileProtocolUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandl
       console.log("hier")
       if ('showOpenFilePicker' in self) {
         console.log("da")
-        // @ts-ignore
+        // @ts-expect-error
         const fileHandle = await window.showOpenFilePicker();
         console.log(fileHandle)
       }

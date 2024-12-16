@@ -57,7 +57,7 @@ const hideWarning = ref(false)
 const warning = ref('')
 
 
-// @ts-ignore
+// @ts-expect-error
 const props = defineProps({
   inSidePanel: {type: Boolean, default: false}
 })
@@ -72,7 +72,7 @@ watchEffect(() => {
 
 const exportData = () => {
   hideWarning.value = true
-  // @ts-ignore
+  // @ts-expect-error
   const appVersion = import.meta.env.PACKAGE_VERSION
   TabsetService.exportData(exportAs.value, appVersion)
     .then(() => {

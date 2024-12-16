@@ -79,7 +79,7 @@ const handleDragAndDrop = (event: any) => {
     let useIndex = moved.newIndex
     switch (props.group) {
       case 'otherTabs':
-        // @ts-ignore
+        // @ts-expect-error
         const unpinnedNoGroup: Tab[] = _.filter(tabsStore.getCurrentTabs, (t: Tab) => !t.pinned && t.groupId === -1)
         if (unpinnedNoGroup.length > 0) {
           useIndex = adjustIndex(moved, unpinnedNoGroup);
@@ -94,7 +94,7 @@ const handleDragAndDrop = (event: any) => {
       default:
         if (props.group.startsWith('groupedTabs_')) {
           const groupId = props.group.split('_')[1]
-          // @ts-ignore
+          // @ts-expect-error
           const filteredTabs: Tab[] = _.filter(tabsStore.getCurrentTabs, (t: Tab) => t.groupId === parseInt(groupId))
           if (filteredTabs.length > 0) {
             useIndex = adjustIndex(moved, filteredTabs);

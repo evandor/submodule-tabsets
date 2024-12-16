@@ -5,7 +5,7 @@ import {Tabset} from "src/tabsets/models/Tabset";
 import {Tab} from "src/tabsets/models/Tab";
 
 async function queryTabs(): Promise<chrome.tabs.Tab[]> {
-  // @ts-ignore
+  // @ts-expect-error
   return await chrome.tabs.query({currentWindow: true});
 }
 

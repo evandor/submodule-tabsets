@@ -111,7 +111,7 @@ import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {useFeaturesStore} from "src/features/stores/featuresStore";
 import {SidePanelViews} from "src/app/models/SidePanelViews";
 
-// @ts-ignore
+// @ts-expect-error
 const {dialogRef, onDialogHide, onDialogCancel} = useDialogPluginComponent()
 const {inBexMode} = useUtils()
 

@@ -55,7 +55,7 @@
 
 <script setup lang="ts">
 
-// @ts-ignore
+// @ts-expect-error
 import {GridItem, GridLayout} from 'vue-grid-layout-v3';
 
 import {onMounted, onUnmounted, PropType, ref, watchEffect} from "vue";

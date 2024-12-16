@@ -5,7 +5,7 @@ import {Tab} from "src/tabsets/models/Tab";
 import {AddUrlToTabsetHandler, ButtonActions} from "src/tabsets/actionHandling/AddUrlToTabsetHandler";
 import {ActionContext} from "src/tabsets/actionHandling/model/ActionContext";
 import AddRssFeedDialog from "src/tabsets/dialogues/actions/AddRssFeedDialog.vue";
-// @ts-ignore
+// @ts-expect-error
 import N3 from "n3/browser/n3.min"
 
 export class TtlUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
