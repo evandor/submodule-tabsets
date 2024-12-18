@@ -57,18 +57,17 @@ const {sendMsg} = useUtils()
 const importFrom = ref('json')
 const showGithubChoice = ref(false)
 
-// @ts-expect-error
 const props = defineProps({
   inSidePanel: {type: Boolean, default: false}
 })
 
 const importData = async () => {
   if (importFrom.value === "json") {
-    // @ts-expect-error
+    // @ts-expect-error TODO
     const file = document.getElementById("json2import").files[0];
     const reader = new FileReader();
     reader.onload = function (e) {
-      // @ts-expect-error
+      // @ts-expect-error TODO
       const json = e.target.result
       useCommandExecutor().executeFromUi(new ImportTabsetsCommand(json as unknown as string))
         .then(() => {

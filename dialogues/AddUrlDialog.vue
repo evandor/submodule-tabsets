@@ -57,7 +57,6 @@ const url = ref<string>(props.providedUrl)
 
 const {normalize} = useUtils()
 
-// @ts-expect-error
 const {dialogRef, onDialogHide, onDialogOK, onDialogCancel} = useDialogPluginComponent()
 
 const newTabsetName = ref('')

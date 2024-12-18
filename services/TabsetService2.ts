@@ -5,7 +5,6 @@ import {uid} from "quasar";
 import ChromeApi from "src/app/BrowserApi";
 import {TabPredicate} from "src/domain/Types";
 import {Tabset, TabsetStatus, TabsetType} from "src/tabsets/models/Tabset";
-// @ts-expect-error
 import {v5 as uuidv5} from 'uuid';
 import {useSettingsStore} from "src/stores/settingsStore"
 import {SaveOrReplaceResult} from "src/tabsets/models/SaveOrReplaceResult";
@@ -134,7 +133,7 @@ export function useTabsetService() {
     }
   }
 
-  // @ts-expect-error
+  // @ts-expect-error TODO
   const getOrCreateSpecialTabset = async (ident: SpecialTabsetIdent, type: TabsetType): Tabset => {
     // const result: Tabset = await useTabsStore().getOrCreateSpecialTabset(ident, type)
     // await saveTabset(result)
@@ -329,7 +328,6 @@ export function useTabsetService() {
           if (t.url === tab.url) {
             if (metas && metas['description' as keyof object]) {
               t.description = metas['description' as keyof object]
-              // @ts-expect-error
               // TODO
               //useSearchStore().update(tab.url, 'description', t.description)
             }

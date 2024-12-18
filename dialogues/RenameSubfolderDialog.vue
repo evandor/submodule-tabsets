@@ -48,7 +48,6 @@ const props = defineProps({
   name: {type: String, default: ''}
 })
 
-// @ts-expect-error
 const {dialogRef, onDialogOK, onDialogHide, onDialogCancel} = useDialogPluginComponent()
 
 const newSubfolderName = ref(props.name)
