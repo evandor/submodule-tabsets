@@ -197,8 +197,8 @@ const saveInTabset = () => {
 
 const startTabsetNote = () => {
   const url = chrome && chrome.runtime && chrome.runtime.getURL ?
-    chrome.runtime.getURL('www/index.html') + "#/mainpanel/notes/?tsId=" + tabsetId + "&edit=true" :
-    "#/mainpanel/notes/?tsId=" + tabsetId + "&edit=true"
+    chrome.runtime.getURL('www/index.html') + "#/mainpanel/notes/?tsId=" + (tabsetId?.toString() || '') + "&edit=true" :
+    "#/mainpanel/notes/?tsId=" + (tabsetId?.toString() || '') + "&edit=true"
   NavigationService.openOrCreateTab([url])
 }
 

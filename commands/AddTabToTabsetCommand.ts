@@ -1,28 +1,28 @@
-import Command from "src/core/domain/Command";
-import {ExecutionResult} from "src/core/domain/ExecutionResult";
-import {Tab} from "src/tabsets/models/Tab";
-import _ from "lodash";
-import {useTabsetService} from "src/tabsets/services/TabsetService2";
-import {Tabset, TabsetSharing} from "src/tabsets/models/Tabset";
-import {useUtils} from "src/core/services/Utils";
-import {useGroupsStore} from "src/tabsets/stores/groupsStore";
-import PlaceholderUtils from "src/tabsets/utils/PlaceholderUtils";
-import AppEventDispatcher from "src/app/AppEventDispatcher";
-import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
-import ContentUtils from "src/core/utils/ContentUtils";
-import BrowserApi from "src/app/BrowserApi";
-import {useThumbnailsService} from "src/thumbnails/services/ThumbnailsService";
-import {useLogger} from "src/services/Logger";
-import {useContentStore} from "src/content/stores/contentStore";
-import {TabReference, TabReferenceType} from "src/content/models/TabReference";
-import {uid} from "quasar";
-import {useFeaturesStore} from "src/features/stores/featuresStore";
-import {FeatureIdent} from "src/app/models/FeatureIdent";
-import {useRequestsStore} from "src/requests/stores/requestsStore";
-import {useRequestsService} from "src/requests/services/RequestsService";
+import Command from 'src/core/domain/Command'
+import { ExecutionResult } from 'src/core/domain/ExecutionResult'
+import { Tab } from 'src/tabsets/models/Tab'
+import _ from 'lodash'
+import { useTabsetService } from 'src/tabsets/services/TabsetService2'
+import { Tabset, TabsetSharing } from 'src/tabsets/models/Tabset'
+import { useUtils } from 'src/core/services/Utils'
+import { useGroupsStore } from 'src/tabsets/stores/groupsStore'
+import PlaceholderUtils from 'src/tabsets/utils/PlaceholderUtils'
+import AppEventDispatcher from 'src/app/AppEventDispatcher'
+import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+import ContentUtils from 'src/core/utils/ContentUtils'
+import BrowserApi from 'src/app/BrowserApi'
+import { useThumbnailsService } from 'src/thumbnails/services/ThumbnailsService'
+import { useLogger } from 'src/services/Logger'
+import { useContentStore } from 'src/content/stores/contentStore'
+import { TabReference, TabReferenceType } from 'src/content/models/TabReference'
+import { uid } from 'quasar'
+import { useFeaturesStore } from 'src/features/stores/featuresStore'
+import { FeatureIdent } from 'src/app/models/FeatureIdent'
+import { useRequestsStore } from 'src/requests/stores/requestsStore'
+import { useRequestsService } from 'src/requests/services/RequestsService'
 
-const {sendMsg} = useUtils()
-const {info} = useLogger()
+const { sendMsg } = useUtils()
+const { info } = useLogger()
 
 // No undo command, tab can be deleted manually easily
 
@@ -43,7 +43,7 @@ export class AddTabToTabsetCommand implements Command<any> {
       this.tabset = useTabsetsStore().getCurrentTabset
     }
     if (!this.tabset) {
-      throw new Error("could not set current tabset")
+      throw new Error('could not set current tabset')
     }
   }
 
@@ -61,17 +61,17 @@ export class AddTabToTabsetCommand implements Command<any> {
 
     if (!this.allowDuplicates) {
       const exists = _.findIndex(tabsetOrFolder.tabs, (t: any) => t.url === this.tab.url) >= 0
-      console.debug("checking 'tab exists' yields", exists)
+      console.debug('checking \'tab exists\' yields', exists)
       if (exists && !this.ignoreDuplicates) {
-        return Promise.reject("tab already exists in this tabset")
+        return Promise.reject('tab already exists in this tabset')
       } else if (exists) {
-        return Promise.resolve(new ExecutionResult("",""))
+        return Promise.resolve(new ExecutionResult('', ''))
       }
     }
 
     try {
       // manage (chrome) Group
-      console.log("updating tab group for group id", this.tab.groupId)
+      console.log('updating tab group for group id', this.tab.groupId)
       const currentGroup = useGroupsStore().currentGroupForId(this.tab.groupId)
       this.tab.groupName = currentGroup?.title || undefined
       if (currentGroup) {
@@ -86,7 +86,7 @@ export class AddTabToTabsetCommand implements Command<any> {
         const article = useContentStore().currentTabArticle
         if (article && article['title' as keyof object] &&
           article['textContent' as keyof object]) {
-          const content:string = article['textContent' as keyof object]
+          const content: string = article['textContent' as keyof object]
           if (content.length > 500) {
             this.tab.tabReferences.push(new TabReference(uid(), TabReferenceType.READING_MODE, article['title' as keyof object], [article], this.tab.url))
             //this.tab.url = chrome.runtime.getURL(`/www/index.html#/mainpanel/readingmode/${this.tab.id}`)
@@ -113,24 +113,34 @@ export class AddTabToTabsetCommand implements Command<any> {
       let content: any = undefined
       if (this.tab.chromeTabId) {
         // saving content excerpt and meta data
-        try {
-          const contentResult = await chrome.tabs.sendMessage(this.tab.chromeTabId, 'getExcerpt')
-          const tokens = ContentUtils.html2tokens(contentResult.html)
+        // try {
+        //   const contentResult = await chrome.tabs.sendMessage(this.tab.chromeTabId, 'getExcerpt')
+        //   const tokens = ContentUtils.html2tokens(contentResult.html)
+        //   content = [...tokens].join(" ")
+        //   await useTabsetService().saveText(this.tab, content, contentResult.metas)
+        // } catch (err) {
+        //   console.warn("got error when saving content and metadata:", err, this.tab?.url)
+        // }
+
+        const tabContent = useContentStore().getCurrentTabContent
+        const tabMetas = useContentStore().getCurrentTabMetas
+        if (tabContent) {
+          const tokens = ContentUtils.html2tokens(tabContent)
           content = [...tokens].join(" ")
-          await useTabsetService().saveText(this.tab, content, contentResult.metas)
-        } catch (err) {
-          console.warn("got error when saving content and metadata:", err, this.tab?.url)
+          await useTabsetService().saveText(this.tab, content, tabMetas)
         }
+
+
         //res = new ExecutionResult("result", "Link was added")
         const res2 = await useTabsetService().saveTabset(this.tabset!)
-        res = new ExecutionResult(res2, "Link was added")
+        res = new ExecutionResult(res2, 'Link was added')
 
         // saving thumbnail
         useThumbnailsService().captureVisibleTab(this.tab.id)
 
       } else {
         const res2 = await useTabsetService().saveTabset(this.tabset!)
-        res = new ExecutionResult(res2, "Link was added")
+        res = new ExecutionResult(res2, 'Link was added')
 
       }
 
@@ -149,19 +159,19 @@ export class AddTabToTabsetCommand implements Command<any> {
         tabsets: [this.tabset!.id],
         favIconUrl: this.tab.favIconUrl || ''
       })
-      info("tab created")
-      localStorage.setItem("test.tabId", this.tab.id)
-      sendMsg('tab-added', {tabsetId: this.tabset!.id})
+      info('tab created')
+      localStorage.setItem('test.tabId', this.tab.id)
+      sendMsg('tab-added', { tabsetId: this.tabset!.id })
 
-      const req  = useRequestsStore().getCurrentTabRequest
+      const req = useRequestsStore().getCurrentTabRequest
       if (req && req.url === this.tab.url) {
         useRequestsService().logWebRequest(JSON.parse(JSON.stringify(req)))
       }
 
       return res
-    } catch (err) {
-      console.warn("hier: ", err)
-      return Promise.reject("error: " + err)
+    } catch (err:any) {
+      console.warn('hier: ', err)
+      return Promise.reject('error: ' + err.toString())
     }
   }
 
@@ -169,5 +179,5 @@ export class AddTabToTabsetCommand implements Command<any> {
 }
 
 AddTabToTabsetCommand.prototype.toString = function cmdToString() {
-  return `AddTabToTabsetCommand: {tab=${this.tab.toString()}}`;
-};
+  return `AddTabToTabsetCommand: {tab=${this.tab.toString()}}`
+}

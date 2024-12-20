@@ -10,7 +10,7 @@
             <q-icon size="xs" name="o_info" color="accent"/>
           </q-item-section>
           <q-item-section>
-            Show Tab Details (dev)
+            Tab Details (dev)
           </q-item-section>
         </q-item>
       </template>

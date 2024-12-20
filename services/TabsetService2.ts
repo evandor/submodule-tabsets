@@ -99,8 +99,8 @@ export function useTabsetService() {
       selectTabset(tabset.id)
       useTabsetService().addToSearchIndex(tabset.id, tabs)
       return new SaveOrReplaceResult(false, tabset, false)
-    } catch (err) {
-      return Promise.reject("problem updating or creating tabset: " + err)
+    } catch (err:any) {
+      return Promise.reject("problem updating or creating tabset: " + err.toString())
     }
   }
 
@@ -128,8 +128,8 @@ export function useTabsetService() {
         tabset: tabsetCopy,
         merged: false
       }
-    } catch (err) {
-      return Promise.reject("problem copying tabset: " + err)
+    } catch (err:any) {
+      return Promise.reject("problem copying tabset: " + err.toString())
     }
   }
 
@@ -429,6 +429,7 @@ export function useTabsetService() {
       try {
         tab.tags.push(new URL(tab.url).hostname.replace("www.", ""))
       } catch (err) {
+        // ignore
       }
 
       if (useIndex !== undefined && useIndex >= 0) {
