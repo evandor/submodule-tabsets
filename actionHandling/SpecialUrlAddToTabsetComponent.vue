@@ -15,7 +15,7 @@
       <!--                  <q-icon right class="q-ma-none q-pa-none" size="2em" name="o_south" />-->
     </q-btn>
     <q-tooltip class="tooltip-small" v-if="alreadyInTabset()">
-      Tab is already contained in tabset '{{ props.tabset?.name }}'
+      Tab is already contained in tabset '{{ props.tabset?.name }}'...
     </q-tooltip>
     <q-tooltip class="tooltip-small" v-else-if="tsBadges.length > 0">
       {{ tooltipAlreadyInOtherTabsets(props.tabset!.name) }}
@@ -44,8 +44,8 @@
 
       </q-list>
     </q-btn-dropdown>
-    <q-tooltip class="tooltip-small" v-if="alreadyInTabset()">
-      Tab is already contained in tabset '{{ props.tabset?.name }}'
+    <q-tooltip class="tooltip-small" v-if="alreadyInTabset()" anchor="center left" self="center right" :offset="[10, 10]">
+      click the dropdown icon for more options
     </q-tooltip>
 
   </template>
