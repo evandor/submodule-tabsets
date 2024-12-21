@@ -93,27 +93,27 @@
         </q-btn>
 
 
-        <q-btn
-          v-if="useFeaturesStore().hasFeature(FeatureIdent.EXPERIMENTAL_VIEWS) && tabset?.tabs.length > 0"
-          @click="setView('canvas')"
-          style="width:14px"
-          class="q-mr-sm" size="10px"
-          :flat="tabset?.view !== 'canvas'"
-          :outline="tabset?.view === 'canvas'"
-          icon="o_shape_line">
-          <q-tooltip>Use the canvas freestyle layout to visualize your tabs</q-tooltip>
-        </q-btn>
+<!--        <q-btn-->
+<!--          v-if="useFeaturesStore().hasFeature(FeatureIdent.EXPERIMENTAL_VIEWS) && tabset?.tabs.length > 0"-->
+<!--          @click="setView('canvas')"-->
+<!--          style="width:14px"-->
+<!--          class="q-mr-sm" size="10px"-->
+<!--          :flat="tabset?.view !== 'canvas'"-->
+<!--          :outline="tabset?.view === 'canvas'"-->
+<!--          icon="o_shape_line">-->
+<!--          <q-tooltip>Use the canvas freestyle layout to visualize your tabs</q-tooltip>-->
+<!--        </q-btn>-->
 
-        <q-btn
-          v-if="useFeaturesStore().hasFeature(FeatureIdent.EXPERIMENTAL_VIEWS) && tabset?.tabs.length > 0"
-          @click="setView('exporter')"
-          style="width:14px"
-          class="q-mr-sm" size="10px"
-          :flat="tabset?.view !== 'exporter'"
-          :outline="tabset?.view === 'exporter'"
-          icon="o_ios_share">
-          <q-tooltip>Use the exporter layout if you want to copy and paste the urls of this tabset</q-tooltip>
-        </q-btn>
+<!--        <q-btn-->
+<!--          v-if="useFeaturesStore().hasFeature(FeatureIdent.EXPERIMENTAL_VIEWS) && tabset?.tabs.length > 0"-->
+<!--          @click="setView('exporter')"-->
+<!--          style="width:14px"-->
+<!--          class="q-mr-sm" size="10px"-->
+<!--          :flat="tabset?.view !== 'exporter'"-->
+<!--          :outline="tabset?.view === 'exporter'"-->
+<!--          icon="o_ios_share">-->
+<!--          <q-tooltip>Use the exporter layout if you want to copy and paste the urls of this tabset</q-tooltip>-->
+<!--        </q-btn>-->
 
         <!--        <q-separator vertical dark inset />-->
         <!--        <span>{{ useUiStore().tabsFilter }}</span>-->
