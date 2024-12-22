@@ -120,7 +120,7 @@ function getOrder() {
       case 'alphabeticalTitle':
         return (t: Tab) => t.title?.toUpperCase()
       default:
-        return (t: Tab) => 1
+        return () => 1
     }
   }
 }
