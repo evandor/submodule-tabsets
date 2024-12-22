@@ -59,7 +59,7 @@ import TabsetService from "src/tabsets/services/TabsetService";
 import {Tabset, TabsetType} from "src/tabsets/models/Tabset";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {TabsetColumn} from "src/tabsets/models/TabsetColumn";
-import {SPECIAL_ID_FOR_NO_GROUP_ASSIGNED} from "boot/constants";
+import {SPECIAL_ID_FOR_NO_GROUP_ASSIGNED} from "src/boot/constants";
 import {IndexedTab} from "src/tabsets/models/IndexedTab";
 import SidePanelTabListHelper from "src/tabsets/layouts/SidePanelTabListHelper.vue";
 

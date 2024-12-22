@@ -88,7 +88,6 @@ const props = defineProps({
   tab: {type: Object as PropType<Tab>, required: true}
 })
 
-// @ts-ignore
 const {dialogRef, onDialogHide, onDialogCancel} = useDialogPluginComponent()
 
 const newTabUrl = ref(props.tab.url || '')

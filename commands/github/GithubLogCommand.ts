@@ -1,6 +1,6 @@
 import {ExecutionResult} from "src/core/domain/ExecutionResult";
 import {LocalStorage} from "quasar";
-import {GITHUB_LOG, STRIP_CHARS_IN_USER_INPUT} from "boot/constants";
+import {GITHUB_LOG, STRIP_CHARS_IN_USER_INPUT} from "src/boot/constants";
 import {GithubCommands} from "src/tabsets/commands/github/GithubCommands";
 
 export class GithubLogCommand extends GithubCommands<string> {

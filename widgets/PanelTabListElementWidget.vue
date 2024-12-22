@@ -374,7 +374,6 @@ import {useSuggestionsStore} from "src/suggestions/stores/suggestionsStore";
 import {Suggestion, SuggestionState} from "src/suggestions/models/Suggestion";
 import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
 import {useFeaturesStore} from "src/features/stores/featuresStore";
-import TabService from "src/services/TabService";
 import {DeleteCommentCommand} from "src/domain/tabs/DeleteCommentCommand";
 import {SavedBlob} from "src/snapshots/models/SavedBlob";
 import {useThumbnailsService} from "src/thumbnails/services/ThumbnailsService";
@@ -385,6 +384,7 @@ import {useNavigationService} from "src/core/services/NavigationService";
 import {TabReference, TabReferenceType} from "src/content/models/TabReference";
 import BrowserApi from "src/app/BrowserApi";
 import {DeleteTabCommand} from "src/tabsets/commands/DeleteTabCommand";
+import TabService from "src/services/TabService";
 
 const {inBexMode} = useUtils()
 
@@ -426,7 +426,7 @@ onMounted(() => {
     newState.value = true
     const audio = document.getElementById('myAudio')
     if (audio) {
-      // @ts-ignore
+      // @ts-expect-error TODO
       audio.play()
     }
     setTimeout(() => newState.value = false, 2000)
@@ -439,7 +439,6 @@ const thumbnailFor = async (tab: Tab): Promise<string> => {
 
 watchEffect(() => {
   if (props.tab && props.tab.preview === TabPreview.THUMBNAIL) {
-    // @ts-ignore
     thumbnailFor(props.tab)
       .then((tn: string) => {
         if (tn) {
@@ -539,7 +538,6 @@ const iconStyle = () => {
 const openTabset = (badge: any) => {
   console.log("clicked badge", badge)
   useTabsetService().selectTabset(badge.tabsetId)
-  // @ts-ignore
   if (!inBexMode() || !chrome.sidePanel) {
     router.push("/tabsets/" + badge.tabsetId + "?highlight=" + badge.encodedUrl)
   } else {

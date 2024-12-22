@@ -2,7 +2,7 @@ import {uid} from "quasar";
 import _ from "lodash";
 import {Tab, UrlExtension} from "src/tabsets/models/Tab";
 import {Tabset, TabsetSharing, TabsetStatus, TabsetType} from "src/tabsets/models/Tabset";
-import {STRIP_CHARS_IN_COLOR_INPUT, STRIP_CHARS_IN_USER_INPUT} from "boot/constants";
+import {STRIP_CHARS_IN_COLOR_INPUT, STRIP_CHARS_IN_USER_INPUT} from "src/boot/constants";
 import {useTabsetService} from "src/tabsets/services/TabsetService2";
 import {useSpacesStore} from "src/spaces/stores/spacesStore";
 import PlaceholderUtils from "src/tabsets/utils/PlaceholderUtils";
@@ -43,7 +43,7 @@ class TabsetService {
   chromeTabIdFor(tabUrl: string): number | undefined {
     const tabsStore = useTabsStore2()
     const candidates = _.filter(tabsStore.browserTabs, (t: chrome.tabs.Tab) => t?.url === tabUrl)
-    return candidates.length > 0 ? candidates[0].id : undefined
+    return candidates.length > 0 ? candidates[0]!.id : undefined
   }
 
   saveSelectedPendingTabs() {
@@ -260,7 +260,6 @@ class TabsetService {
     if (!chrome.tabs) {
       return Promise.resolve(0)
     }
-    // @ts-ignore
     const result: chrome.tabs.Tab[] = await chrome.tabs.query({})
     let trackedTabs = 0
     _.forEach(result, (tab: chrome.tabs.Tab) => {
@@ -275,7 +274,6 @@ class TabsetService {
     // TODO long-Running action
     const currentTab = await BrowserApi.getCurrentTab()
 
-    // @ts-ignore
     const result: chrome.tabs.Tab[] = await chrome.tabs.query({})
     const tabsToClose: chrome.tabs.Tab[] = []
     const tabsToKeep: chrome.tabs.Tab[] = []

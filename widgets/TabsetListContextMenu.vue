@@ -256,7 +256,7 @@ const removeFromSpaces = (tabset: Tabset) => {
   _.forEach(hasSpaces, (availableSpace: string) => {
     removeList.push({
       spaceId: availableSpace,
-      spaceName: _.filter(allSpaces, (s: SpaceInfo) => s.id === availableSpace)?.name || "---"
+      spaceName: _.filter(allSpaces, (s: SpaceInfo) => s.id === availableSpace)[0]?.name || "---"
     })
   })
   return removeList

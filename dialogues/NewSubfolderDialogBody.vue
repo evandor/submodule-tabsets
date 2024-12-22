@@ -63,7 +63,6 @@ import {useTabsStore2} from "src/tabsets/stores/tabsStore2";
 import _ from "lodash";
 import {Tab} from "src/tabsets/models/Tab";
 
-// @ts-ignore
 const {dialogRef, onDialogHide, onDialogCancel} = useDialogPluginComponent()
 const {inBexMode} = useUtils()
 

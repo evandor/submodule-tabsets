@@ -1,11 +1,10 @@
-import {STRIP_CHARS_IN_COLOR_INPUT, STRIP_CHARS_IN_USER_INPUT} from "boot/constants";
+import {STRIP_CHARS_IN_COLOR_INPUT, STRIP_CHARS_IN_USER_INPUT} from "src/boot/constants";
 import {Tab} from "src/tabsets/models/Tab";
 import _ from "lodash";
 import {uid} from "quasar";
 import ChromeApi from "src/app/BrowserApi";
 import {TabPredicate} from "src/domain/Types";
 import {Tabset, TabsetStatus, TabsetType} from "src/tabsets/models/Tabset";
-// @ts-ignore
 import {v5 as uuidv5} from 'uuid';
 import {useSettingsStore} from "src/stores/settingsStore"
 import {SaveOrReplaceResult} from "src/tabsets/models/SaveOrReplaceResult";
@@ -100,8 +99,8 @@ export function useTabsetService() {
       selectTabset(tabset.id)
       useTabsetService().addToSearchIndex(tabset.id, tabs)
       return new SaveOrReplaceResult(false, tabset, false)
-    } catch (err) {
-      return Promise.reject("problem updating or creating tabset: " + err)
+    } catch (err:any) {
+      return Promise.reject("problem updating or creating tabset: " + err.toString())
     }
   }
 
@@ -129,12 +128,12 @@ export function useTabsetService() {
         tabset: tabsetCopy,
         merged: false
       }
-    } catch (err) {
-      return Promise.reject("problem copying tabset: " + err)
+    } catch (err:any) {
+      return Promise.reject("problem copying tabset: " + err.toString())
     }
   }
 
-  // @ts-ignore
+  // @ts-expect-error TODO
   const getOrCreateSpecialTabset = async (ident: SpecialTabsetIdent, type: TabsetType): Tabset => {
     // const result: Tabset = await useTabsStore().getOrCreateSpecialTabset(ident, type)
     // await saveTabset(result)
@@ -329,7 +328,6 @@ export function useTabsetService() {
           if (t.url === tab.url) {
             if (metas && metas['description' as keyof object]) {
               t.description = metas['description' as keyof object]
-              // @ts-ignore
               // TODO
               //useSearchStore().update(tab.url, 'description', t.description)
             }
@@ -431,6 +429,7 @@ export function useTabsetService() {
       try {
         tab.tags.push(new URL(tab.url).hostname.replace("www.", ""))
       } catch (err) {
+        // ignore
       }
 
       if (useIndex !== undefined && useIndex >= 0) {

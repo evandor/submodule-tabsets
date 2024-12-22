@@ -5,7 +5,6 @@ import {Tabset} from "src/tabsets/models/Tabset";
 import {Tab} from "src/tabsets/models/Tab";
 
 async function queryTabs(): Promise<chrome.tabs.Tab[]> {
-  // @ts-ignore
   return await chrome.tabs.query({currentWindow: true});
 }
 
@@ -60,12 +59,6 @@ export const useTabsStore2 = defineStore('browsertabs', () => {
 
   async function loadTabs(eventName: string) {
     browserTabs.value = await queryTabs()
-    // const current = new Tabset("current", "current",
-    //   _.map(browserTabs.value, t => {
-    //     return new Tab(uid(), t)
-    //   }))
-    //markDuplicates(current)
-    //this.browserTabset = current
   }
 
   function setCurrentChromeTab(tab: chrome.tabs.Tab) {

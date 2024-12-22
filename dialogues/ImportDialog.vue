@@ -41,7 +41,7 @@ import {useCommandExecutor} from "src/core/services/CommandExecutor";
 import {ImportTabsetsCommand} from "src/tabsets/commands/ImportTabsets";
 import {useUtils} from "src/core/services/Utils";
 import {ref, watchEffect} from "vue";
-import {GITHUB_PATH, GITHUB_REPONAME, GITHUB_TOKEN, GITHUB_USERNAME} from "boot/constants";
+import {GITHUB_PATH, GITHUB_REPONAME, GITHUB_TOKEN, GITHUB_USERNAME} from "src/boot/constants";
 import {GithubGetLatestBackupCommand} from "src/tabsets/commands/github/GithubGetLatestBackupCommand";
 
 defineEmits([
@@ -57,18 +57,17 @@ const {sendMsg} = useUtils()
 const importFrom = ref('json')
 const showGithubChoice = ref(false)
 
-// @ts-ignore
 const props = defineProps({
   inSidePanel: {type: Boolean, default: false}
 })
 
 const importData = async () => {
   if (importFrom.value === "json") {
-    // @ts-ignore
+    // @ts-expect-error TODO
     const file = document.getElementById("json2import").files[0];
     const reader = new FileReader();
     reader.onload = function (e) {
-      // @ts-ignore
+      // @ts-expect-error TODO
       const json = e.target.result
       useCommandExecutor().executeFromUi(new ImportTabsetsCommand(json as unknown as string))
         .then(() => {
