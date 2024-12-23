@@ -7,7 +7,7 @@
         <div class="row justify-start items-baseline">
           <div class="col-10"><span>Tabs</span> (no tabset selected)</div>
           <div class="col-2 text-right">
-            <OpenRightDrawerWidget/>
+            <OpenRightDrawerWidget />
           </div>
         </div>
       </q-toolbar-title>
@@ -27,7 +27,7 @@
                   {{ useTabsetsStore().currentTabsetName }}
                    <q-popup-edit :model-value="tabset?.name" v-slot="scope"
                                  @update:model-value="(val:string) => setNewName(  val)">
-                     <q-input v-model="scope.value" dense autofocus counter @keyup.enter="scope.set"/>
+                     <q-input v-model="scope.value" dense autofocus counter @keyup.enter="scope.set" />
                    </q-popup-edit>
                 <span
                   v-if="tabset.sharedId"
@@ -43,10 +43,10 @@
 
           </template>
           <template v-else>
-            <TabsetsSelectorWidget/>
+            <TabsetsSelectorWidget />
           </template>
           <q-icon v-if="showEditButton" style="position:relative;top:-11px;left:-5px" color="primary" name="edit"
-                  size="16px"/>
+                  size="16px" />
 
         </q-toolbar-title>
       </div>
@@ -93,27 +93,27 @@
         </q-btn>
 
 
-<!--        <q-btn-->
-<!--          v-if="useFeaturesStore().hasFeature(FeatureIdent.EXPERIMENTAL_VIEWS) && tabset?.tabs.length > 0"-->
-<!--          @click="setView('canvas')"-->
-<!--          style="width:14px"-->
-<!--          class="q-mr-sm" size="10px"-->
-<!--          :flat="tabset?.view !== 'canvas'"-->
-<!--          :outline="tabset?.view === 'canvas'"-->
-<!--          icon="o_shape_line">-->
-<!--          <q-tooltip>Use the canvas freestyle layout to visualize your tabs</q-tooltip>-->
-<!--        </q-btn>-->
+        <!--        <q-btn-->
+        <!--          v-if="useFeaturesStore().hasFeature(FeatureIdent.EXPERIMENTAL_VIEWS) && tabset?.tabs.length > 0"-->
+        <!--          @click="setView('canvas')"-->
+        <!--          style="width:14px"-->
+        <!--          class="q-mr-sm" size="10px"-->
+        <!--          :flat="tabset?.view !== 'canvas'"-->
+        <!--          :outline="tabset?.view === 'canvas'"-->
+        <!--          icon="o_shape_line">-->
+        <!--          <q-tooltip>Use the canvas freestyle layout to visualize your tabs</q-tooltip>-->
+        <!--        </q-btn>-->
 
-<!--        <q-btn-->
-<!--          v-if="useFeaturesStore().hasFeature(FeatureIdent.EXPERIMENTAL_VIEWS) && tabset?.tabs.length > 0"-->
-<!--          @click="setView('exporter')"-->
-<!--          style="width:14px"-->
-<!--          class="q-mr-sm" size="10px"-->
-<!--          :flat="tabset?.view !== 'exporter'"-->
-<!--          :outline="tabset?.view === 'exporter'"-->
-<!--          icon="o_ios_share">-->
-<!--          <q-tooltip>Use the exporter layout if you want to copy and paste the urls of this tabset</q-tooltip>-->
-<!--        </q-btn>-->
+        <!--        <q-btn-->
+        <!--          v-if="useFeaturesStore().hasFeature(FeatureIdent.EXPERIMENTAL_VIEWS) && tabset?.tabs.length > 0"-->
+        <!--          @click="setView('exporter')"-->
+        <!--          style="width:14px"-->
+        <!--          class="q-mr-sm" size="10px"-->
+        <!--          :flat="tabset?.view !== 'exporter'"-->
+        <!--          :outline="tabset?.view === 'exporter'"-->
+        <!--          icon="o_ios_share">-->
+        <!--          <q-tooltip>Use the exporter layout if you want to copy and paste the urls of this tabset</q-tooltip>-->
+        <!--        </q-btn>-->
 
         <!--        <q-separator vertical dark inset />-->
         <!--        <span>{{ useUiStore().tabsFilter }}</span>-->
@@ -130,7 +130,7 @@
           icon="o_filter_alt">
           <q-popup-edit :model-value="useUiStore().tabsFilter" v-slot="scope"
                         @update:model-value="(val:string) => setFilter(  val)">
-            <q-input v-model="scope.value" dense autofocus counter @keyup.enter="scope.set"/>
+            <q-input v-model="scope.value" dense autofocus counter @keyup.enter="scope.set" />
           </q-popup-edit>
           <q-tooltip
             class="tooltip"
@@ -153,7 +153,7 @@
           </q-tooltip>
         </q-icon>
 
-        <OpenRightDrawerWidget/>
+        <OpenRightDrawerWidget />
       </div>
     </div>
   </q-toolbar>
@@ -167,22 +167,13 @@
     active-color="primary"
     indicator-color="primary"
     align="left"
-    narrow-indicator
-  >
-    <q-tab name="tabset" label="Tabs"/>
-    <!--    <q-tab name="page" label="Page"-->
-    <!--           v-if="useAuthStore().isAuthenticated()"-->
-    <!--           :disable="!useTabsetsStore().currentTabsetId"/>-->
-    <!--    <q-tab name="canvas" label="Canvas"-->
-
-    <!--           :disable="!useTabsetsStore().currentTabsetId"/>-->
+    narrow-indicator>
+    <q-tab name="grid" label="As Grid"/>
+    <q-tab name="list" label="As List"/>
   </q-tabs>
 
-  <!--  <q-separator class="q-mb-md" />-->
-
   <q-tab-panels v-model="tab" animated>
-    <q-tab-panel class="q-ma-none q-pa-none" name="tabset">
-      <!--  <q-banner rounded class="bg-amber-1 text-black q-ma-md"-->
+    <q-tab-panel class="q-ma-none q-pa-none" name="grid">
       <q-banner rounded class="text-primary q-ma-md" style="border: 1px solid #efefef"
                 v-if="!useTabsetsStore().currentTabsetId && useTabsetsStore().tabsets.size > 0">
         <div class="text-body2">
@@ -201,71 +192,59 @@
       </q-banner>
 
       <InfoMessageWidget
-        v-if="tabset?.type === TabsetType.DYNAMIC"
-        :probability="1"
-        ident="tabsetPage_dynamicTabset"
-        hint="This is a 'dynamic' Tabset, i.e. it gets its data from some kind of query (e.g. checking for tags in your tabsets) and is readonly for that reason."/>
-
-      <InfoMessageWidget
-        v-if="route?.query?.first && route.query.first === 'true' && tabset?.tabs.length > 0"
-        :probability="1"
-        ident="tabsetPage_firstTime"
-        hint="Congrats - you created your first tabset. Your open tabs have been added automatically to get you started with tabsets!"/>
-
-      <InfoMessageWidget
         v-if="tabsetId === 'BACKUP'"
         :probability="1"
         ident="tabsetPage_backupTabset"
         hint="This is a special type of tabset - it's meant for Backups. You can use it as any other tabset, but when you use the feature
- 'backup and close current tabs' from the 'open tabs' menu, all tabs will be closed and automatically added to this backup tabset."/>
+ 'backup and close current tabs' from the 'open tabs' menu, all tabs will be closed and automatically added to this backup tabset." />
 
       <InfoMessageWidget
         v-if="tabsetId === 'IGNORE'"
         :probability="1"
         ident="tabsetPage_ignoreTabset"
         hint="This is a special type of tabset - it's meant for those tabs which you don't want to track. You can add urls and whenever
-a tab's url starts with one of the urls of this tabset, it will be ignored and not added to the tabs to be added."/>
-
-      <!--      <DynamicTabsetPageCards-->
-      <!--        v-if="tabset?.type === TabsetType.DYNAMIC"-->
-      <!--        :tabset="tabset as unknown as Tabset"/>-->
+a tab's url starts with one of the urls of this tabset, it will be ignored and not added to the tabs to be added." />
 
       <TabsetPageCards
         :tabset="tabset as unknown as Tabset"
+        :tabsetFolder="tabsetFolder as unknown as Tabset"
         :simple-ui="false"/>
 
     </q-tab-panel>
-    <q-tab-panel name="page">
-      <PageForTabset/>
+
+    <q-tab-panel class="q-ma-none q-pa-none" name="list">
+
+      <TabList
+        group="otherTabs"
+        :tabsetId="tabset.id"
+        :tabsetSorting="tabset.sorting"
+        :tabsetSharedId="tabset.sharedId!"
+        :tabs="tabset.tabs"/>
+
     </q-tab-panel>
-    <!--    <q-tab-panel name="canvas">-->
-    <!--      <CanvasForTabset/>-->
-    <!--    </q-tab-panel>-->
   </q-tab-panels>
 
 </template>
 
 <script setup lang="ts">
-import {onMounted, onUpdated, ref, watchEffect} from 'vue'
-import {useRoute, useRouter} from "vue-router";
-import {date, uid, useQuasar} from "quasar";
-import TabsetService from "src/tabsets/services/TabsetService";
-import InfoMessageWidget from "src/ui/widgets/InfoMessageWidget.vue";
-import {useCommandExecutor} from "src/core/services/CommandExecutor";
-import {RenameTabsetCommand} from "src/tabsets/commands/RenameTabset";
-import {Tabset, TabsetType} from "src/tabsets/models/Tabset";
-import {FeatureIdent} from "src/app/models/FeatureIdent";
-import {ToggleSortingCommand} from "src/domain/tabsets/ToggleSorting";
-import JsUtils from "src/utils/JsUtils";
-import {useUiStore} from "src/ui/stores/uiStore";
-import TabsetsSelectorWidget from "components/widgets/TabsetsSelectorWidget.vue";
-import Analytics from "src/core/utils/google-analytics";
-import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
-import {useFeaturesStore} from "src/features/stores/featuresStore";
-import AddUrlDialog from "src/tabsets/dialogues/AddUrlDialog.vue";
-import PageForTabset from "src/tabsets/layouts/PageForTabset.vue";
-import OpenRightDrawerWidget from "src/ui/widgets/OpenRightDrawerWidget.vue";
-import TabsetPageCards from "src/tabsets/pages/pwa/TabsetPageCards.vue";
+import { onMounted, onUpdated, ref, watchEffect } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { date, uid, useQuasar } from 'quasar'
+import TabsetService from 'src/tabsets/services/TabsetService'
+import InfoMessageWidget from 'src/ui/widgets/InfoMessageWidget.vue'
+import { useCommandExecutor } from 'src/core/services/CommandExecutor'
+import { RenameTabsetCommand } from 'src/tabsets/commands/RenameTabset'
+import { Tabset, TabsetType } from 'src/tabsets/models/Tabset'
+import JsUtils from 'src/utils/JsUtils'
+import { useUiStore } from 'src/ui/stores/uiStore'
+import TabsetsSelectorWidget from 'components/widgets/TabsetsSelectorWidget.vue'
+import Analytics from 'src/core/utils/google-analytics'
+import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+import AddUrlDialog from 'src/tabsets/dialogues/AddUrlDialog.vue'
+import OpenRightDrawerWidget from 'src/ui/widgets/OpenRightDrawerWidget.vue'
+import TabsetPageCards from 'src/tabsets/pages/pwa/TabsetPageCards.vue'
+import { ToggleSortingCommand } from 'src/tabsets/commands/ToggleSorting'
+import TabList from 'src/tabsets/pages/pwa/TabList.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -273,14 +252,15 @@ const router = useRouter()
 const $q = useQuasar()
 
 const tabsetId = ref(null as unknown as string)
-const tabset = ref<Tabset>(new Tabset(uid(), "empty", []))
+const tabset = ref<Tabset>(new Tabset(uid(), 'empty', []))
+const tabsetFolder = ref<Tabset>(new Tabset(uid(), 'empty', []))
 const orderDesc = ref(false)
 const showEditButton = ref(false)
 
-const tab = ref('tabset')
+const tab = ref('grid')
 
 onMounted(() => {
-  Analytics.firePageViewEvent('TabsetPage', document.location.href);
+  Analytics.firePageViewEvent('TabsetPage', document.location.href)
   //setTimeout(() => client.stop(), 5000)
 })
 
@@ -294,16 +274,17 @@ watchEffect(() => {
     return
   }
   tabsetId.value = route?.params.tabsetId as string
-  tabset.value = useTabsetsStore().getTabset(tabsetId.value) || new Tabset(uid(), "empty", [])
-  console.log("watch effect in tabsetpage", tabsetId.value)
-  tab.value = route.query['tab'] ? route.query['tab'] as string : 'tabset'
+  tabset.value = useTabsetsStore().getTabset(tabsetId.value) || new Tabset(uid(), 'empty', [])
+  console.log('watch effect in tabsetpage', tabsetId.value)
+  tab.value = route.query['tab'] ? route.query['tab'] as string : 'grid'
+  tabsetFolder.value = useTabsetsStore().getActiveFolder(tabset.value) || tabset.value
 })
 
 
 const setNewName = (newValue: string) => useCommandExecutor().executeFromUi(new RenameTabsetCommand(useTabsetsStore().currentTabsetId!, newValue))
 
 const setFilter = (newValue: string) => {
-  console.log("filter", newValue)
+  console.log('filter', newValue)
   const useValue = newValue && newValue.trim().length > 0 ? newValue.trim() : undefined
   useUiStore().tabsFilter = useValue
   useUiStore().setHighlightTerm(useValue)
@@ -311,7 +292,7 @@ const setFilter = (newValue: string) => {
 }
 
 
-const addUrlDialog = () => $q.dialog({component: AddUrlDialog})
+const addUrlDialog = () => $q.dialog({ component: AddUrlDialog })
 
 const setView = (view: string) => TabsetService.setView(tabsetId.value, view)
 

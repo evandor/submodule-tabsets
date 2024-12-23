@@ -4,18 +4,10 @@
     <div class="row fit">
       <div class="col-8 q-mt-xs">
         <q-toolbar-title>
-          Overview of <em>{{ tabset.name }}</em>
+          Overview of <em>{{ toolbarTitle() }}</em>
         </q-toolbar-title>
       </div>
       <div class="col-4 text-right">
-
-<!--        <q-btn @click="openAllTabsetsOverview()"-->
-<!--               style="width:14px"-->
-<!--               class="q-mr-sm" size="8px"-->
-<!--               icon="stars">-->
-<!--          <q-tooltip class="tooltip">Show all favorites</q-tooltip>-->
-<!--        </q-btn>-->
-
 
       </div>
     </div>
@@ -31,36 +23,27 @@
     indicator-color="primary"
     align="left"
     narrow-indicator>
-    <q-tab name="grid" label="As Grid" @click="setView('grid')"/>
-    <q-tab name="list" label="As List" @click="setView('list')"/>
-<!--    <q-tab name="list" label="As Timeline" @click="setView('timeline')"/>-->
+    <q-tab name="grid" label="As Grid" @click="setView('grid')" />
+    <q-tab name="list" label="As List" @click="setView('list')" />
   </q-tabs>
 
 
   <q-tab-panels v-model="tab" animated>
     <q-tab-panel class="q-ma-none q-pa-none" name="grid">
-
       <TabsetPageCards
-        :tabset="tabset as unknown as Tabset"
-        :simple-ui="false"/>
-
-
+        :tabset="tabset"
+        :tabsetFolder="tabsetFolder"
+        :key="tabsetFolder.id"
+        :simple-ui="false" />
     </q-tab-panel>
 
     <q-tab-panel class="q-ma-none q-pa-none" name="list">
-
       <TabList
         group="otherTabs"
-        :tabsetId="tabset.id"
+        :tabsetId="tabsetFolder.id"
         :tabsetSorting="tabset.sorting"
         :tabsetSharedId="tabset.sharedId!"
-        :tabs="tabset.tabs"/>
-
-    </q-tab-panel>
-
-    <q-tab-panel class="q-ma-none q-pa-none" name="timeline">
-      todo
-
+        :tabs="tabsetFolder.tabs" />
     </q-tab-panel>
 
   </q-tab-panels>
@@ -68,38 +51,64 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref, watchEffect} from 'vue'
-import {useRoute} from "vue-router";
-import {uid} from "quasar";
-import TabsetService from "src/tabsets/services/TabsetService";
-import {Tabset} from "src/tabsets/models/Tabset";
-import Analytics from "src/core/utils/google-analytics";
-import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
-import TabsetPageCards from "src/tabsets/pages/pwa/TabsetPageCards.vue";
-import TabList from "src/tabsets/pages/pwa/TabList.vue";
+import { onMounted, onUnmounted, ref } from 'vue'
+import { useRoute } from 'vue-router'
+import { uid } from 'quasar'
+import TabsetService from 'src/tabsets/services/TabsetService'
+import { Tabset } from 'src/tabsets/models/Tabset'
+import Analytics from 'src/core/utils/google-analytics'
+import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+import TabsetPageCards from 'src/tabsets/pages/pwa/TabsetPageCards.vue'
+import TabList from 'src/tabsets/pages/pwa/TabList.vue'
+import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 
 const route = useRoute()
 
 const tabsetId = ref(null as unknown as string)
-const tabset = ref<Tabset>(new Tabset(uid(), "empty", []))
+const folderId = ref<string | undefined>(undefined)
+const tabset = ref<Tabset>(new Tabset(uid(), 'empty', []))
+const tabsetFolder = ref<Tabset>(new Tabset(uid(), 'empty', []))
 
 const tab = ref('')
 
+const onMessageListener = (request: any, sender: chrome.runtime.MessageSender, sendResponse: any) => onMessage(request, sender, sendResponse)
+
 onMounted(() => {
-  Analytics.firePageViewEvent('MainPanelTabsetPage', document.location.href);
+  Analytics.firePageViewEvent('MainPanelTabsetPage', document.location.href)
+  console.log('--- adding/resetting message listener ---', chrome.runtime.onMessage.hasListener(onMessageListener))
+  //chrome.runtime.onMessage.removeListener(onMessageListener)
+  chrome.runtime.onMessage.addListener(onMessageListener)
+
+  if (!route || !route.params) {
+    return
+  }
+  // initial setup from route params
+  tabsetId.value = route?.params.tabsetId as string
+  tabset.value = useTabsetsStore().getTabset(tabsetId.value) || new Tabset(uid(), 'empty', [])
+  tab.value = tabset.value.view || 'grid'
+  folderId.value = tabset.value.folderActive
+  tabsetFolder.value = useTabsetsStore().getActiveFolder(tabset.value, folderId.value) || tabset.value
+})
+
+onUnmounted(() => {
+  console.log('--- removing message listener ---')
+  chrome.runtime.onMessage.removeListener(onMessageListener)
 })
 
 const setView = (view: string) => TabsetService.setView(tabsetId.value, view)
 
-watchEffect(() => {
-  if (!route || !route.params) {
-    return
+const onMessage = async (request: any, sender: chrome.runtime.MessageSender, sendResponse: any) => {
+  console.log(` <<< got message '${request.name}'`, request)
+  if (request.name === 'tabsets.app.change.currentTabset') {
+    tabset.value = await useTabsetService().reloadTabset(tabset.value.id)
+    tabsetFolder.value = useTabsetsStore().getActiveFolder(tabset.value) || tabset.value
   }
-  tabsetId.value = route?.params.tabsetId as string
-  tabset.value = useTabsetsStore().getTabset(tabsetId.value) || new Tabset(uid(), "empty", [])
-  tab.value = tabset.value.view || 'grid'
-  console.log("watch effect in tabsetpage", tabsetId.value)
-  //tab.value = route.query['tab'] ? route.query['tab'] as string : 'tabset'
-})
+  return true
+}
 
+const toolbarTitle = () => {
+  return (tabset.value.id === tabsetFolder.value.id)
+    ? tabset.value.name
+    : tabset.value.name + ' / ' + tabsetFolder.value.name
+}
 </script>

@@ -108,7 +108,7 @@ export class Tab {
   activatedCount: number
   loadedCount: number
 
-  // from chrome tab
+  // from Chrome tab
   chromeTabId: number | undefined
   favIconUrl: string | undefined
   url: string | undefined
@@ -159,8 +159,8 @@ export class Tab {
 
   // canvasLeft: number | undefined
   // canvasTop: number | undefined
-  canvasWidth: number | undefined
-  canvasHeight: number | undefined
+  // canvasWidth: number | undefined
+  // canvasHeight: number | undefined
 
   comments: TabComment[] = []
 
@@ -175,8 +175,6 @@ export class Tab {
   tabReferences: TabReference[] = []
 
   quickaccess: string = ''
-
-  // article: object | undefined = undefined
 
   constructor(public id: string, chromeTab: chrome.tabs.Tab) {
     this.created = new Date().getTime()
@@ -207,10 +205,6 @@ export class Tab {
     this.extension = this.determineUrlExtension(chromeTab)
     this.contentHash = ''
 
-    if (!this.favorite) {
-      this.favorite = TabFavorite.NONE
-    }
-
     this.preview = TabPreview.FAVICON
 
     this.tags = _.uniq(_.filter(
@@ -240,21 +234,6 @@ export class Tab {
 
   static titleIsShortEnough = (val: string) => val ? val.length <= 512 : true
   static descIsShortEnough = (val: string) => val ? val.length <= 1024 : true
-
-  setHistoryFrom(existingTab: Tab) {
-    if (existingTab.history) {
-      this.history = existingTab.history
-    } else {
-      this.history = []
-    }
-  }
-
-  addToHistory(url: string) {
-    if (!this.history) {
-      this.history = [] as unknown as string[]
-    }
-    this.history.push(url)
-  }
 
   determineUrlExtension(chromeTab: chrome.tabs.Tab): UrlExtension {
     let ext = UrlExtension.UNKNOWN
