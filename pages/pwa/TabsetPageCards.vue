@@ -1,11 +1,9 @@
 <template>
   <!-- TabsetPageCards -->
 
-  <InfoMessageWidget
-    :probability="1"
-    ident="tabsetpagecards_taggridinfo">
-    Click the image to move your tabs to your liking; right-click to create or remove favorites and click on the
-    URL to open the page.
+  <InfoMessageWidget :probability="1" ident="tabsetpagecards_taggridinfo">
+    Click the image to move your tabs to your liking; right-click to create or remove favorites and
+    click on the URL to open the page.
   </InfoMessageWidget>
 
   <TabGrid2
@@ -14,22 +12,20 @@
     coordinates-identifier="grid"
     :tabset="props.tabset"
     :tabsetFolder="props.tabsetFolder"
-    :tabs="currentTabs()"/>
-
-
+    :tabs="currentTabs()"
+  />
 </template>
 
 <script lang="ts" setup>
-
-import {PropType, ref, watchEffect} from "vue";
-import _ from "lodash";
-import {useRoute} from "vue-router";
-import {Tabset} from "src/tabsets/models/Tabset";
-import {useUiStore} from "src/ui/stores/uiStore";
-import {Tab} from "src/tabsets/models/Tab";
-import TabGrid2 from "src/tabsets/layouts/TabGrid2.vue";
-import {uid} from "quasar";
-import InfoMessageWidget from "src/ui/widgets/InfoMessageWidget.vue";
+import { PropType, ref, watchEffect } from 'vue'
+import _ from 'lodash'
+import { useRoute } from 'vue-router'
+import { Tabset } from 'src/tabsets/models/Tabset'
+import { useUiStore } from 'src/ui/stores/uiStore'
+import { Tab } from 'src/tabsets/models/Tab'
+import TabGrid2 from 'src/tabsets/layouts/TabGrid2.vue'
+import { uid } from 'quasar'
+import InfoMessageWidget from 'src/ui/widgets/InfoMessageWidget.vue'
 
 const route = useRoute()
 
@@ -39,11 +35,10 @@ const tabsetId = ref(null as unknown as string)
 const randomKey1 = ref<string>(uid())
 const randomKey2 = ref<string>(uid())
 
-
 const props = defineProps({
-  tabset: {type: Object as PropType<Tabset>, required: true},
-  tabsetFolder: {type: Object as PropType<Tabset>, required: true},
-  simpleUi: {type: Boolean, default: false}
+  tabset: { type: Object as PropType<Tabset>, required: true },
+  tabsetFolder: { type: Object as PropType<Tabset>, required: true },
+  simpleUi: { type: Boolean, default: false },
 })
 
 watchEffect(() => {
@@ -56,7 +51,7 @@ watchEffect(() => {
       // highlightUrl.value = atob(highlight)
       useUiStore().addHighlight(atob(highlight))
     } catch (e: any) {
-      console.error("highlight error", e)
+      console.error('highlight error', e)
     }
   }
 })
@@ -77,7 +72,7 @@ watchEffect(() => {
   }
   tabsetId.value = route?.params.tabsetId as string
   if (tabsetId.value) {
-    console.debug("got tabset id", tabsetId.value)
+    console.debug('got tabset id', tabsetId.value)
   }
 })
 
@@ -85,11 +80,17 @@ function currentTabs(): Tab[] {
   //console.log("got", props.tabset.tabs)
   const filter = useUiStore().tabsFilter
   if (filter && filter.trim() !== '') {
-    return _.orderBy(_.filter(props.tabsetFolder.tabs, (t: Tab) => {
-      return (t.url || '')?.indexOf(filter) >= 0 ||
-        (t.title || '')?.indexOf(filter) >= 0 ||
-        t.description.indexOf(filter) >= 0
-    }), getOrder(), [orderDesc.value ? 'desc' : 'asc'])
+    return _.orderBy(
+      _.filter(props.tabsetFolder.tabs, (t: Tab) => {
+        return (
+          (t.url || '')?.indexOf(filter) >= 0 ||
+          (t.title || '')?.indexOf(filter) >= 0 ||
+          t.description.indexOf(filter) >= 0
+        )
+      }),
+      getOrder(),
+      [orderDesc.value ? 'desc' : 'asc'],
+    )
   }
   return _.orderBy(props.tabsetFolder.tabs, getOrder(), [orderDesc.value ? 'desc' : 'asc'])
 }
@@ -98,7 +99,7 @@ function getOrder() {
   if (props.tabsetFolder) {
     switch (props.tabsetFolder?.sorting) {
       case 'alphabeticalUrl':
-        return (t: Tab) => t.url?.replace("https://", "").replace("http://", "").toUpperCase()
+        return (t: Tab) => t.url?.replace('https://', '').replace('http://', '').toUpperCase()
       case 'alphabeticalTitle':
         return (t: Tab) => t.title?.toUpperCase()
       default:
@@ -111,5 +112,4 @@ const updateGrids = () => {
   randomKey1.value = uid()
   randomKey2.value = uid()
 }
-
 </script>

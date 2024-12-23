@@ -1,28 +1,27 @@
-import {uid} from "quasar";
-import _ from "lodash";
-import {Tab, UrlExtension} from "src/tabsets/models/Tab";
-import {Tabset, TabsetSharing, TabsetStatus, TabsetType} from "src/tabsets/models/Tabset";
-import {STRIP_CHARS_IN_COLOR_INPUT, STRIP_CHARS_IN_USER_INPUT} from "src/boot/constants";
-import {useTabsetService} from "src/tabsets/services/TabsetService2";
-import {useSpacesStore} from "src/spaces/stores/spacesStore";
-import PlaceholderUtils from "src/tabsets/utils/PlaceholderUtils";
-import {ListDetailLevel} from "src/ui/stores/uiStore";
-import {TabsetColumn} from "src/tabsets/models/TabsetColumn";
-import {useContentService} from "src/content/services/ContentService";
-import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
-import {useTabsStore2} from "src/tabsets/stores/tabsStore2";
-import {Space} from "src/spaces/models/Space";
-import AppEventDispatcher from "src/app/AppEventDispatcher";
-import {ContentItem} from "src/content/models/ContentItem";
-import BrowserApi from "src/app/BrowserApi";
+import { uid } from 'quasar'
+import _ from 'lodash'
+import { Tab, UrlExtension } from 'src/tabsets/models/Tab'
+import { Tabset, TabsetSharing, TabsetStatus, TabsetType } from 'src/tabsets/models/Tabset'
+import { STRIP_CHARS_IN_COLOR_INPUT, STRIP_CHARS_IN_USER_INPUT } from 'src/boot/constants'
+import { useTabsetService } from 'src/tabsets/services/TabsetService2'
+import { useSpacesStore } from 'src/spaces/stores/spacesStore'
+import PlaceholderUtils from 'src/tabsets/utils/PlaceholderUtils'
+import { ListDetailLevel } from 'src/ui/stores/uiStore'
+import { TabsetColumn } from 'src/tabsets/models/TabsetColumn'
+import { useContentService } from 'src/content/services/ContentService'
+import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+import { useTabsStore2 } from 'src/tabsets/stores/tabsStore2'
+import { Space } from 'src/spaces/models/Space'
+import AppEventDispatcher from 'src/app/AppEventDispatcher'
+import { ContentItem } from 'src/content/models/ContentItem'
+import BrowserApi from 'src/app/BrowserApi'
 
-const {saveTabset, saveCurrentTabset, tabsetsFor, addToTabset} = useTabsetService()
+const { saveTabset, saveCurrentTabset, tabsetsFor, addToTabset } = useTabsetService()
 
 // const {db} = useDB()
 class TabsetService {
-
   setLocalStorage(localStorage: any) {
-//    this.localStorage = localStorage;
+    //    this.localStorage = localStorage;
   }
 
   async saveToCurrentTabset(tab: Tab, useIndex: number | undefined = undefined): Promise<Tabset> {
@@ -30,14 +29,16 @@ class TabsetService {
     if (currentTs) {
       return addToTabset(currentTs, tab, useIndex)
     }
-    return Promise.reject("could not get current tabset")
+    return Promise.reject('could not get current tabset')
   }
 
   isOpen(tabUrl: string): boolean {
     const tabsStore = useTabsStore2()
-    return _.filter(tabsStore.browserTabs, (t: chrome.tabs.Tab) => {
-      return t?.url === tabUrl
-    }).length > 0
+    return (
+      _.filter(tabsStore.browserTabs, (t: chrome.tabs.Tab) => {
+        return t?.url === tabUrl
+      }).length > 0
+    )
   }
 
   chromeTabIdFor(tabUrl: string): number | undefined {
@@ -75,27 +76,26 @@ class TabsetService {
     return useContentService().getContent(tabId)
   }
 
-
   async getMetaLinksFor(selectedTab: Tab): Promise<any> {
     if (selectedTab.url) {
       return this.getMetaLinksForUrl(selectedTab.url)
     }
-    return Promise.reject("url not provided");
+    return Promise.reject('url not provided')
   }
 
   async getMetaLinksForUrl(url: string): Promise<any> {
-    return Promise.reject("not implemented N")//db.getMetaLinks(url)
+    return Promise.reject('not implemented N') //db.getMetaLinks(url)
   }
 
   async getLinksFor(selectedTab: Tab): Promise<any> {
     if (selectedTab.url) {
       return this.getLinksForUrl(selectedTab.url)
     }
-    return Promise.reject("url not provided");
+    return Promise.reject('url not provided')
   }
 
   async getLinksForUrl(url: string): Promise<any> {
-    return Promise.reject("not implemented O") //db.getLinks(url)
+    return Promise.reject('not implemented O') //db.getLinks(url)
   }
 
   setCustomTitle(tab: Tab, title: string, desc: string): Promise<any> {
@@ -119,7 +119,7 @@ class TabsetService {
     url: string,
     placeholders: string[] = [],
     placeholderValues: Map<string, string> = new Map(),
-    extension: UrlExtension = UrlExtension.HTML
+    extension: UrlExtension = UrlExtension.HTML,
   ): Promise<any> {
     tab.url = url
     tab.extension = extension
@@ -130,7 +130,7 @@ class TabsetService {
   moveToTabset(tabId: string, toTabsetId: string, copy: boolean = false): Promise<any> {
     const tabset = useTabsetsStore().tabsetFor(tabId)
     if (tabset) {
-      const tabIndex = _.findIndex(tabset.tabs, {id: tabId})
+      const tabIndex = _.findIndex(tabset.tabs, { id: tabId })
       const targetTabset = useTabsetsStore().getTabset(toTabsetId)
 
       if (tabIndex >= 0 && targetTabset) {
@@ -140,23 +140,23 @@ class TabsetService {
             if (copy) {
               let tabWithNewId = Object.assign({}, tabset.tabs[tabIndex])
               tabWithNewId['id'] = uid()
-              console.log("copying", tabset.tabs[tabIndex], tabWithNewId)
+              console.log('copying', tabset.tabs[tabIndex], tabWithNewId)
               tabset.tabs.splice(tabIndex, 1, tabWithNewId)
             } else {
-              console.log("not copying...")
+              console.log('not copying...')
               tabset.tabs.splice(tabIndex, 1)
             }
           })
           .then(() => saveTabset(tabset))
       } else {
-        return Promise.reject("could not find tab/tabset " + tabId + "/" + toTabsetId)
+        return Promise.reject('could not find tab/tabset ' + tabId + '/' + toTabsetId)
       }
     }
-    return Promise.reject("could not find tab " + tabId)
+    return Promise.reject('could not find tab ' + tabId)
   }
 
-  exportData(exportAs: string, appVersion: string = "0.0.0"): Promise<any> {
-    console.log("exporting as ", exportAs)
+  exportData(exportAs: string, appVersion: string = '0.0.0'): Promise<any> {
+    console.log('exporting as ', exportAs)
 
     const spacesStore = useSpacesStore()
 
@@ -167,53 +167,58 @@ class TabsetService {
       const tabsets = [...useTabsetsStore().tabsets.values()] as Tabset[]
       data = JSON.stringify({
         tabsets: tabsets.filter((ts: Tabset) => ts.status !== TabsetStatus.DELETED),
-        spaces: [...spacesStore.spaces.values()]
+        spaces: [...spacesStore.spaces.values()],
       })
-      return this.createFile(data, filename);
+      return this.createFile(data, filename)
     } else if (exportAs === 'csv') {
-      data = "not implemented yet"
-      filename = "tabsets." + appVersion + ".csv"
-      return this.createFile(data, filename);
+      data = 'not implemented yet'
+      filename = 'tabsets.' + appVersion + '.csv'
+      return this.createFile(data, filename)
     } else if (exportAs === 'bookmarks') {
-      console.log("creating bookmarks...")
+      console.log('creating bookmarks...')
 
-      chrome.bookmarks.getChildren("1", (results: chrome.bookmarks.BookmarkTreeNode[]) => {
+      chrome.bookmarks.getChildren('1', (results: chrome.bookmarks.BookmarkTreeNode[]) => {
         _.forEach(results, (r: any) => {
-          if (r.title === "tabsetsBackup") {
-            console.log("deleting folder", r.id)
+          if (r.title === 'tabsetsBackup') {
+            console.log('deleting folder', r.id)
             chrome.bookmarks.removeTree(r.id)
           }
         })
       })
 
-      chrome.bookmarks.create({title: 'tabsetsBackup', parentId: '1'}, (result: chrome.bookmarks.BookmarkTreeNode) => {
-        // console.log("res", result)
-        _.forEach([...useTabsetsStore().tabsets.values()] as Tabset[], (ts: Tabset) => {
-          console.log("ts", ts)
-          chrome.bookmarks.create({
-            title: ts.name,
-            parentId: result.id
-          }, (folder: chrome.bookmarks.BookmarkTreeNode) => {
-            _.forEach(ts.tabs, (tab: Tab) => {
-              chrome.bookmarks.create({
-                title: tab.name || tab.title,
-                parentId: folder.id,
-                url: tab.url
-              })
-            })
+      chrome.bookmarks.create(
+        { title: 'tabsetsBackup', parentId: '1' },
+        (result: chrome.bookmarks.BookmarkTreeNode) => {
+          // console.log("res", result)
+          _.forEach([...useTabsetsStore().tabsets.values()] as Tabset[], (ts: Tabset) => {
+            console.log('ts', ts)
+            chrome.bookmarks.create(
+              {
+                title: ts.name,
+                parentId: result.id,
+              },
+              (folder: chrome.bookmarks.BookmarkTreeNode) => {
+                _.forEach(ts.tabs, (tab: Tab) => {
+                  chrome.bookmarks.create({
+                    title: tab.name || tab.title,
+                    parentId: folder.id,
+                    url: tab.url,
+                  })
+                })
+              },
+            )
           })
-        })
-      })
+        },
+      )
 
       // useBookmarksStore().loadBookmarks()
       //   .then(() => console.log("loaded in service"))
-
     }
     return Promise.resolve('done')
   }
 
   importData(json: string) {
-    console.log("importing from json")
+    console.log('importing from json')
     let data = JSON.parse(json)
     let tabsets = data.tabsets || data
     let spaces = data.spaces || []
@@ -235,22 +240,21 @@ class TabsetService {
           description: tab.description,
           content: '',
           tabsets: [tabset.id],
-          favIconUrl: tab.favIconUrl || ''
+          favIconUrl: tab.favIconUrl || '',
         })
       })
     })
   }
 
   createFile(data: string, filename: string) {
-    const file = window.URL.createObjectURL(new Blob([data]));
-    const docUrl = document.createElement('a');
-    docUrl.href = file;
-    docUrl.setAttribute('download', filename);
-    document.body.appendChild(docUrl);
-    docUrl.click();
+    const file = window.URL.createObjectURL(new Blob([data]))
+    const docUrl = document.createElement('a')
+    docUrl.href = file
+    docUrl.setAttribute('download', filename)
+    document.body.appendChild(docUrl)
+    docUrl.click()
     return Promise.resolve('done')
   }
-
 
   nameForTabsetId(tsId: string): string {
     return useTabsetsStore().tabsets.get(tsId)?.name || 'unknown'
@@ -305,12 +309,17 @@ class TabsetService {
    * @param tabsetId
    * @param tabsetName
    */
-  rename(tabsetId: string, tabsetName: string, newColor: string | undefined, window: string = 'current', details: ListDetailLevel = ListDetailLevel.MAXIMAL): Promise<object> {
+  rename(
+    tabsetId: string,
+    tabsetName: string,
+    newColor: string | undefined,
+    window: string = 'current',
+    details: ListDetailLevel = ListDetailLevel.MAXIMAL,
+  ): Promise<object> {
     const trustedName = tabsetName.replace(STRIP_CHARS_IN_USER_INPUT, '')
     let trustedColor = newColor ? newColor.replace(STRIP_CHARS_IN_COLOR_INPUT, '') : undefined
-    trustedColor = trustedColor && trustedColor.length > 20 ?
-      trustedColor?.substring(0, 19) :
-      trustedColor
+    trustedColor =
+      trustedColor && trustedColor.length > 20 ? trustedColor?.substring(0, 19) : trustedColor
 
     const tabset = useTabsetsStore().getTabset(tabsetId)
     if (tabset) {
@@ -321,13 +330,14 @@ class TabsetService {
       tabset.window = window
       tabset.details = details
       //console.log("saving tabset", tabset)
-      return saveTabset(tabset)
-        .then(() => Promise.resolve({
+      return saveTabset(tabset).then(() =>
+        Promise.resolve({
           oldName: oldName,
-          oldColor: oldColor
-        }))
+          oldColor: oldColor,
+        }),
+      )
     }
-    return Promise.reject("could not find tabset for id " + tabsetId)
+    return Promise.reject('could not find tabset for id ' + tabsetId)
   }
 
   canvasPosition(tabsetId: string, tabsetName: string) {
@@ -343,13 +353,16 @@ class TabsetService {
     const currentTabset = useTabsetsStore().getCurrentTabset!
     const activeFolder = useTabsetsStore().getActiveFolder(currentTabset)
     let tabs = activeFolder ? activeFolder.tabs : currentTabset.tabs
-    console.log("tabs before", _.map(tabs, (t: any) => t.url))
+    console.log(
+      'tabs before',
+      _.map(tabs, (t: any) => t.url),
+    )
     //tabs = _.filter(tabs, (t: Tab) => t.columnId === column.id)
     const oldIndex = _.findIndex(tabs, (t: any) => t.id === tabId)
     if (oldIndex >= 0) {
-      console.log("found old index", oldIndex)
-      const tab = tabs.splice(oldIndex, 1)[0];
-      tabs.splice(newIndex, 0, tab!);
+      console.log('found old index', oldIndex)
+      const tab = tabs.splice(oldIndex, 1)[0]
+      tabs.splice(newIndex, 0, tab!)
 
       // Sharing
       if (currentTabset.sharedId && currentTabset.sharing === TabsetSharing.PUBLIC_LINK) {
@@ -361,7 +374,7 @@ class TabsetService {
   }
 
   setView(tabsetId: string, view: string) {
-    console.log("setting view", tabsetId, view)
+    console.log('setting view', tabsetId, view)
     const tabset = useTabsetsStore().getTabset(tabsetId)
     if (tabset) {
       tabset.view = view
@@ -374,14 +387,14 @@ class TabsetService {
     if (tabset) {
       switch (tabset.sorting) {
         case 'custom':
-          tabset.sorting = 'alphabeticalUrl';
-          break;
+          tabset.sorting = 'alphabeticalUrl'
+          break
         case 'alphabeticalUrl':
-          tabset.sorting = 'alphabeticalTitle';
-          break;
+          tabset.sorting = 'alphabeticalTitle'
+          break
         case 'alphabeticalTitle':
-          tabset.sorting = 'custom';
-          break;
+          tabset.sorting = 'custom'
+          break
         default:
           tabset.sorting = 'custom'
       }
@@ -415,7 +428,9 @@ class TabsetService {
 
   saveNote(tabId: string, note: string, scheduledFor: Date | undefined): Promise<void> {
     // console.log("got", tabId, note)
-    const tab = _.find(useTabsetsStore().getCurrentTabset?.tabs, (t: Tab) => t.id === tabId) as Tab | undefined
+    const tab = _.find(useTabsetsStore().getCurrentTabset?.tabs, (t: Tab) => t.id === tabId) as
+      | Tab
+      | undefined
     if (tab) {
       tab.note = note
       if (scheduledFor) {
@@ -427,7 +442,7 @@ class TabsetService {
       }
       return saveCurrentTabset()
     }
-    return Promise.reject("did not find tab with id " + tabId)
+    return Promise.reject('did not find tab with id ' + tabId)
   }
 
   // markAsDeleted(tabsetId: string): Promise<Tabset> {
@@ -445,17 +460,20 @@ class TabsetService {
   //   return Promise.reject("could not mark as deleted: " + tabsetId)
   // }
 
-  markAs(tabsetId: string, status: TabsetStatus, type: TabsetType = TabsetType.DEFAULT): Promise<TabsetStatus> {
+  markAs(
+    tabsetId: string,
+    status: TabsetStatus,
+    type: TabsetType = TabsetType.DEFAULT,
+  ): Promise<TabsetStatus> {
     console.debug(`marking ${tabsetId} as ${status}`)
     const ts = useTabsetsStore().getTabset(tabsetId)
     if (ts) {
       const oldStatus = ts.status
       ts.status = status
       ts.type = type
-      return saveTabset(ts)
-        .then(() => oldStatus)
+      return saveTabset(ts).then(() => oldStatus)
     }
-    return Promise.reject("could not change status : " + tabsetId)
+    return Promise.reject('could not change status : ' + tabsetId)
   }
 
   share(tabsetId: string, sharing: TabsetSharing, sharedId: string | undefined, sharedBy: string) {
@@ -464,4 +482,4 @@ class TabsetService {
   }
 }
 
-export default new TabsetService();
+export default new TabsetService()

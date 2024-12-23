@@ -5,18 +5,19 @@
 In the initCoreSerivces method in the app/AppServices.vue file, make sure to add
 
 ```typescript
-  const tabsetsStore = useTabsetsStore()
-  // updates the registryStore whenever we have changes on 'tabsets'
-  watch(tabsetsStore.tabsets, (newTabsets:Map<string,any>) => {
-    const tsInfo = _.map([...newTabsets.values()], (ts: any) => new TabsetInfo(ts.id, ts.name, ts.window, ts.tabs.length))
-    registryStore.tabsetRegistry = tsInfo
-  })
-  // use the proper db connection (here: indexedDb)
-  await tabsetsStore.initialize(useDB().tabsetsIndexedDb)
-  await useTabsetService().init(false)
-  await useTabsStore2().initialize()
-
-
+const tabsetsStore = useTabsetsStore()
+// updates the registryStore whenever we have changes on 'tabsets'
+watch(tabsetsStore.tabsets, (newTabsets: Map<string, any>) => {
+  const tsInfo = _.map(
+    [...newTabsets.values()],
+    (ts: any) => new TabsetInfo(ts.id, ts.name, ts.window, ts.tabs.length),
+  )
+  registryStore.tabsetRegistry = tsInfo
+})
+// use the proper db connection (here: indexedDb)
+await tabsetsStore.initialize(useDB().tabsetsIndexedDb)
+await useTabsetService().init(false)
+await useTabsStore2().initialize()
 ```
 
 ### Hooks

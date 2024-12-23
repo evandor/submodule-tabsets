@@ -1,50 +1,56 @@
-import {AddUrlToTabsetHandler, ButtonActions} from "src/tabsets/actionHandling/AddUrlToTabsetHandler";
-import {ActionContext} from "src/tabsets/actionHandling/model/ActionContext";
-import {Tabset} from "src/tabsets/models/Tabset";
-import {ExecutionResult} from "src/core/domain/ExecutionResult";
-import {Tab} from "src/tabsets/models/Tab";
-import {DialogChainObject, QVueGlobals} from "quasar";
+import {
+  AddUrlToTabsetHandler,
+  ButtonActions,
+} from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
+import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
+import { Tabset } from 'src/tabsets/models/Tabset'
+import { ExecutionResult } from 'src/core/domain/ExecutionResult'
+import { Tab } from 'src/tabsets/models/Tab'
+import { DialogChainObject, QVueGlobals } from 'quasar'
 
 export class FileProtocolUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
-
-  constructor(public $q: QVueGlobals | undefined) {
-  }
+  constructor(public $q: QVueGlobals | undefined) {}
 
   chromePattern = /addRow\("([^"]*)","([^"]*)",([^,]*),([^,]*),"([^"]*)",([^,]*),"([^"])*"\)/gm
 
   // disabled, see https://issues.chromium.org/issues/40240444
   urlMatcher(): RegExp {
-    return /^fileXXX:\/\/.*\/$/;
+    return /^fileXXX:\/\/.*\/$/
   }
 
   contentMatcher(content: string): boolean {
-    return false;
+    return false
   }
 
   actions(): ActionContext[] {
-    return [new ActionContext("Save Local Directory", ButtonActions.Save)]
+    return [new ActionContext('Save Local Directory', ButtonActions.Save)]
   }
 
-  async clicked(browserTab: chrome.tabs.Tab, ts: Tabset, folder: Tabset | undefined, additionalData: object | undefined): Promise<ExecutionResult<any>> {
-    console.log("saving...", browserTab.id, additionalData)
+  async clicked(
+    browserTab: chrome.tabs.Tab,
+    ts: Tabset,
+    folder: Tabset | undefined,
+    additionalData: object | undefined,
+  ): Promise<ExecutionResult<any>> {
+    console.log('saving...', browserTab.id, additionalData)
     try {
       const filename = additionalData ? additionalData['filename' as keyof object] : undefined
       if (!filename) {
-        throw new Error("filename is missing")
+        throw new Error('filename is missing')
       }
 
-      console.log("hier")
+      console.log('hier')
       if ('showOpenFilePicker' in self) {
-        console.log("da")
+        console.log('da')
         // @ts-expect-error TODO
-        const fileHandle = await window.showOpenFilePicker();
+        const fileHandle = await window.showOpenFilePicker()
         console.log(fileHandle)
       }
 
       // const newTab = new Tab(uid(), browserTab)
 
       //const returned = await this.queryBrowserTab(browserTab, newTab.id, filename!)
-      return Promise.reject("error")
+      return Promise.reject('error')
       // if (returned.length > 0) {
       //
       //   newTab.title = filename
@@ -62,27 +68,29 @@ export class FileProtocolUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandl
       //   return useCommandExecutor().execute(new AddTabToTabsetCommand(newTab, ts, ts.folderActive, true))
       // }
     } catch (error: any) {
-      console.warn("error", error)
+      console.warn('error', error)
     }
 
-    return Promise.reject("error updating excalidraw")
-
+    return Promise.reject('error updating excalidraw')
   }
 
-  handleOpenedTab(browserTab: chrome.tabs.Tab, tab: Tab): void {
-  }
+  handleOpenedTab(browserTab: chrome.tabs.Tab, tab: Tab): void {}
 
-  async updateInTabset(browserTab: chrome.tabs.Tab, ts: Tabset, additionalData: object): Promise<ExecutionResult<any>> {
-    console.log("saving...", browserTab.id, additionalData)
+  async updateInTabset(
+    browserTab: chrome.tabs.Tab,
+    ts: Tabset,
+    additionalData: object,
+  ): Promise<ExecutionResult<any>> {
+    console.log('saving...', browserTab.id, additionalData)
     try {
       // const filename = additionalData ? additionalData['filename' as keyof object] : undefined
       // if (!filename) {
       //   throw new Error("filename is missing")
       // }
 
-      console.log("hier")
+      console.log('hier')
       if ('showOpenFilePicker' in self) {
-        console.log("da")
+        console.log('da')
 
         try {
           // const directoryHandleOrUndefined = await get('directory');
@@ -95,26 +103,23 @@ export class FileProtocolUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandl
           // await set('directory', directoryHandle);
           // pre2.textContent = `Stored directory handle for "${directoryHandle.name}" in IndexedDB.`;
         } catch (error: any) {
-          console.log("error", error)
+          console.log('error', error)
         }
-
-
       }
 
-     // const newTab = new Tab(uid(), browserTab)
+      // const newTab = new Tab(uid(), browserTab)
 
       //const returned = await this.queryBrowserTab(browserTab, newTab.id, filename!)
-      return Promise.reject("error")
+      return Promise.reject('error')
     } catch (error: any) {
-      console.warn("error", error)
+      console.warn('error', error)
     }
 
-    return Promise.reject("error updating excalidraw")
+    return Promise.reject('error updating excalidraw')
   }
 
   withDialog(action: ButtonActions): DialogChainObject | undefined {
     //
     return undefined
   }
-
 }

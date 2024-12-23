@@ -1,32 +1,27 @@
-import Command from "src/core/domain/Command";
-import {ExecutionResult} from "src/core/domain/ExecutionResult";
-import {Tabset} from "src/tabsets/models/Tabset";
-import {useTabsetService} from "src/tabsets/services/TabsetService2";
-import {useLogger} from "src/services/Logger";
+import Command from 'src/core/domain/Command'
+import { ExecutionResult } from 'src/core/domain/ExecutionResult'
+import { Tabset } from 'src/tabsets/models/Tabset'
+import { useTabsetService } from 'src/tabsets/services/TabsetService2'
+import { useLogger } from 'src/services/Logger'
 
-const {info} = useLogger()
+const { info } = useLogger()
 
 export class RenameFolderCommand implements Command<string> {
-
   constructor(
     public tabset: Tabset,
     public folder: Tabset,
-    public newName: string
-  ) {
-  }
+    public newName: string,
+  ) {}
 
   async execute(): Promise<ExecutionResult<string>> {
-
-    console.log("set folder name", this.tabset.id, this.folder.id, this.newName)
+    console.log('set folder name', this.tabset.id, this.folder.id, this.newName)
     // TODO validation
     if (this.newName && this.newName.toString().trim().length > 0) {
       this.folder.name = this.newName.toString().trim()
       await useTabsetService().saveTabset(this.tabset)
-      info("renamed folder")
-      return Promise.resolve(new ExecutionResult("done", "done"))
+      info('renamed folder')
+      return Promise.resolve(new ExecutionResult('done', 'done'))
     }
-    return Promise.reject("name was not valid")
+    return Promise.reject('name was not valid')
   }
-
-
 }

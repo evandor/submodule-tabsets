@@ -1,16 +1,14 @@
-import Command from "src/core/domain/Command";
-import {TabFavorite} from "src/tabsets/models/Tab";
-import {ExecutionResult} from "src/core/domain/ExecutionResult";
-import {useFeaturesStore} from "src/features/stores/featuresStore";
-import {FeatureIdent} from "src/app/models/FeatureIdent";
-import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
+import Command from 'src/core/domain/Command'
+import { TabFavorite } from 'src/tabsets/models/Tab'
+import { ExecutionResult } from 'src/core/domain/ExecutionResult'
+import { useFeaturesStore } from 'src/features/stores/featuresStore'
+import { FeatureIdent } from 'src/app/models/FeatureIdent'
+import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 
 export class ToggleTabFavoriteCommand implements Command<any> {
-
   public merge: boolean = true
 
-  constructor(public tabId: string) {
-  }
+  constructor(public tabId: string) {}
 
   async execute(): Promise<ExecutionResult<any>> {
     const tabAndTabsetId = useTabsetsStore().getTabAndTabsetId(this.tabId)!
@@ -23,9 +21,9 @@ export class ToggleTabFavoriteCommand implements Command<any> {
         tab.favorite = TabFavorite.TABSET
         break
       case TabFavorite.TABSET:
-        useFeaturesStore().hasFeature(FeatureIdent.SPACES) ?
-          tab.favorite = TabFavorite.SPACE :
-          tab.favorite = TabFavorite.NONE
+        useFeaturesStore().hasFeature(FeatureIdent.SPACES)
+          ? (tab.favorite = TabFavorite.SPACE)
+          : (tab.favorite = TabFavorite.NONE)
         break
       case TabFavorite.SPACE:
         tab.favorite = TabFavorite.NONE
@@ -34,13 +32,10 @@ export class ToggleTabFavoriteCommand implements Command<any> {
     if (ts) {
       await useTabsetsStore().saveTabset(ts)
     }
-    return Promise.resolve(new ExecutionResult("",""))
+    return Promise.resolve(new ExecutionResult('', ''))
   }
-
-
-
 }
 
 ToggleTabFavoriteCommand.prototype.toString = function cmdToString() {
-  return `ToggleTabFavoriteCommand: {tabsetId=${this.tabId}}`;
-};
+  return `ToggleTabFavoriteCommand: {tabsetId=${this.tabId}}`
+}

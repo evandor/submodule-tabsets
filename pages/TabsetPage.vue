@@ -1,5 +1,4 @@
 <template>
-
   <!-- toolbar -->
   <q-toolbar v-if="!useTabsetsStore().currentTabsetId">
     <div class="row fit">
@@ -13,85 +12,105 @@
       </q-toolbar-title>
     </div>
   </q-toolbar>
-  <q-toolbar v-else> <!-- we've got a current tabset id -->
+  <q-toolbar v-else>
+    <!-- we've got a current tabset id -->
     <div class="row fit">
       <div class="col-xs-12 col-md-6 q-mt-xs">
         <q-toolbar-title>
-
           <template v-if="useUiStore().leftDrawerOpen">
             <!--            <span class="text-dark" v-if="$q.screen.gt.xs">Tabs of </span>-->
             <span
               class="text-primary text-weight-bold cursor-pointer"
               @mouseenter="showEditButton = true"
-              @mouseout="showEditButton = false">
-                  {{ useTabsetsStore().currentTabsetName }}
-                   <q-popup-edit :model-value="tabset?.name" v-slot="scope"
-                                 @update:model-value="(val:string) => setNewName(  val)">
-                     <q-input v-model="scope.value" dense autofocus counter @keyup.enter="scope.set" />
-                   </q-popup-edit>
-                <span
-                  v-if="tabset.sharedId"
-                  class="text-caption">shared by {{
-                    tabset.sharedBy
-                  }}, {{ date.formatDate(tabset.sharedAt, 'DD.MM.YYYY HH:mm') }}</span>
-                </span>
+              @mouseout="showEditButton = false"
+            >
+              {{ useTabsetsStore().currentTabsetName }}
+              <q-popup-edit
+                :model-value="tabset?.name"
+                v-slot="scope"
+                @update:model-value="(val: string) => setNewName(val)"
+              >
+                <q-input v-model="scope.value" dense autofocus counter @keyup.enter="scope.set" />
+              </q-popup-edit>
+              <span v-if="tabset.sharedId" class="text-caption"
+                >shared by {{ tabset.sharedBy }},
+                {{ date.formatDate(tabset.sharedAt, 'DD.MM.YYYY HH:mm') }}</span
+              >
+            </span>
             <span v-if="tabset.sharedPath">
-              <q-icon class="q-ml-md cursor-pointer" name="refresh" @click="router.push(tabset.sharedPath)">
+              <q-icon
+                class="q-ml-md cursor-pointer"
+                name="refresh"
+                @click="router.push(tabset.sharedPath)"
+              >
                 <q-tooltip class="tooltip-small">Refresh</q-tooltip>
               </q-icon>
             </span>
-
           </template>
           <template v-else>
             <TabsetsSelectorWidget />
           </template>
-          <q-icon v-if="showEditButton" style="position:relative;top:-11px;left:-5px" color="primary" name="edit"
-                  size="16px" />
-
+          <q-icon
+            v-if="showEditButton"
+            style="position: relative; top: -11px; left: -5px"
+            color="primary"
+            name="edit"
+            size="16px"
+          />
         </q-toolbar-title>
       </div>
       <div class="col-xs-12 col-md-6 text-right">
-
-        <q-btn v-if="showSorting()"
-               @click="toggleSorting()"
-               style="width:14px"
-               class="q-mr-sm" size="10px"
-               outline
-               icon="o_sort_by_alpha">
+        <q-btn
+          v-if="showSorting()"
+          @click="toggleSorting()"
+          style="width: 14px"
+          class="q-mr-sm"
+          size="10px"
+          outline
+          icon="o_sort_by_alpha"
+        >
           <q-tooltip>Toggle through sorting</q-tooltip>
         </q-btn>
 
-        <q-btn v-if="showSorting()"
-               :disable="tabset?.sorting === 'custom'"
-               @click="toggleOrder()"
-               style="width:14px"
-               class="q-mr-xl" size="10px"
-               outline
-               :icon="orderDesc ? 'arrow_drop_up' : 'arrow_drop_down'">
+        <q-btn
+          v-if="showSorting()"
+          :disable="tabset?.sorting === 'custom'"
+          @click="toggleOrder()"
+          style="width: 14px"
+          class="q-mr-xl"
+          size="10px"
+          outline
+          :icon="orderDesc ? 'arrow_drop_up' : 'arrow_drop_down'"
+        >
           <q-tooltip>Sorting descending or ascending, currently {{ orderDesc }}</q-tooltip>
         </q-btn>
 
-        <q-btn v-if="tabset?.tabs.length > 0 "
-               @click="setView('grid')"
-               style="width:14px"
-               class="q-mr-sm" size="8px"
-               :flat="tabset?.view !== 'grid'"
-               :outline="tabset?.view === 'grid'"
-               icon="grid_on">
+        <q-btn
+          v-if="tabset?.tabs.length > 0"
+          @click="setView('grid')"
+          style="width: 14px"
+          class="q-mr-sm"
+          size="8px"
+          :flat="tabset?.view !== 'grid'"
+          :outline="tabset?.view === 'grid'"
+          icon="grid_on"
+        >
           <q-tooltip class="tooltip">Use grid layout to visualize your tabs</q-tooltip>
         </q-btn>
 
         <!-- default view, no need to show if there is no alternative -->
-        <q-btn v-if="tabset?.tabs.length > 0 "
-               @click="setView('list')"
-               style="width:14px"
-               class="q-mr-sm" size="10px"
-               :flat="tabset?.view !== 'list'"
-               :outline="tabset?.view === 'list'"
-               icon="o_list">
+        <q-btn
+          v-if="tabset?.tabs.length > 0"
+          @click="setView('list')"
+          style="width: 14px"
+          class="q-mr-sm"
+          size="10px"
+          :flat="tabset?.view !== 'list'"
+          :outline="tabset?.view === 'list'"
+          icon="o_list"
+        >
           <q-tooltip class="tooltip">Use the list layout to visualize your tabs</q-tooltip>
         </q-btn>
-
 
         <!--        <q-btn-->
         <!--          v-if="useFeaturesStore().hasFeature(FeatureIdent.EXPERIMENTAL_VIEWS) && tabset?.tabs.length > 0"-->
@@ -118,37 +137,45 @@
         <!--        <q-separator vertical dark inset />-->
         <!--        <span>{{ useUiStore().tabsFilter }}</span>-->
         <q-btn
-          v-if="useTabsetsStore().currentTabsetId !== '' &&
-                  useTabsetsStore().getTabset(useTabsetsStore().currentTabsetId!) &&
-                  useTabsetsStore().getCurrentTabset!?.tabs?.length > 10 &&
-                  $q.screen.gt.xs"
+          v-if="
+            useTabsetsStore().currentTabsetId !== '' &&
+            useTabsetsStore().getTabset(useTabsetsStore().currentTabsetId!) &&
+            useTabsetsStore().getCurrentTabset!?.tabs?.length > 10 &&
+            $q.screen.gt.xs
+          "
           flat
           :text-color="useUiStore().tabsFilter ? 'secondary' : 'primary'"
           :disable="tabset?.type === TabsetType.DYNAMIC"
           :label="useUiStore().tabsFilter"
-          class="cursor-pointer q-ml-lg" size="12px"
-          icon="o_filter_alt">
-          <q-popup-edit :model-value="useUiStore().tabsFilter" v-slot="scope"
-                        @update:model-value="(val:string) => setFilter(  val)">
+          class="cursor-pointer q-ml-lg"
+          size="12px"
+          icon="o_filter_alt"
+        >
+          <q-popup-edit
+            :model-value="useUiStore().tabsFilter"
+            v-slot="scope"
+            @update:model-value="(val: string) => setFilter(val)"
+          >
             <q-input v-model="scope.value" dense autofocus counter @keyup.enter="scope.set" />
           </q-popup-edit>
-          <q-tooltip
-            class="tooltip"
-            :delay="200"
-            anchor="center left" self="center right">
+          <q-tooltip class="tooltip" :delay="200" anchor="center left" self="center right">
             Filter this tabset
           </q-tooltip>
         </q-btn>
 
-        <q-icon v-if="useTabsetsStore().currentTabsetId !== '' &&
-          tabset?.type !== TabsetType.DYNAMIC &&
-          useTabsetsStore().getTabset(useTabsetsStore().currentTabsetId!)"
-                class="cursor-pointer" size="22px" color="warning"
-                name="add_circle" @click="addUrlDialog">
-          <q-tooltip
-            class="tooltip"
-            :delay="200"
-            anchor="center left" self="center right">
+        <q-icon
+          v-if="
+            useTabsetsStore().currentTabsetId !== '' &&
+            tabset?.type !== TabsetType.DYNAMIC &&
+            useTabsetsStore().getTabset(useTabsetsStore().currentTabsetId!)
+          "
+          class="cursor-pointer"
+          size="22px"
+          color="warning"
+          name="add_circle"
+          @click="addUrlDialog"
+        >
+          <q-tooltip class="tooltip" :delay="200" anchor="center left" self="center right">
             Copy and Paste or create a new Tab inside this tabset
           </q-tooltip>
         </q-icon>
@@ -167,15 +194,20 @@
     active-color="primary"
     indicator-color="primary"
     align="left"
-    narrow-indicator>
-    <q-tab name="grid" label="As Grid"/>
-    <q-tab name="list" label="As List"/>
+    narrow-indicator
+  >
+    <q-tab name="grid" label="As Grid" />
+    <q-tab name="list" label="As List" />
   </q-tabs>
 
   <q-tab-panels v-model="tab" animated>
     <q-tab-panel class="q-ma-none q-pa-none" name="grid">
-      <q-banner rounded class="text-primary q-ma-md" style="border: 1px solid #efefef"
-                v-if="!useTabsetsStore().currentTabsetId && useTabsetsStore().tabsets.size > 0">
+      <q-banner
+        rounded
+        class="text-primary q-ma-md"
+        style="border: 1px solid #efefef"
+        v-if="!useTabsetsStore().currentTabsetId && useTabsetsStore().tabsets.size > 0"
+      >
         <div class="text-body2">
           Select an existing tabset from the list or create a new tabset.
         </div>
@@ -186,8 +218,8 @@
       </q-banner>
 
       <q-banner v-else-if="tabset?.tabs.length === 0 && tabset?.type !== TabsetType.DYNAMIC">
-        To start adding new tabs to this empty tabset, open new browser tabs and come back to this extension to
-        associate them with a tabset.<br><br>
+        To start adding new tabs to this empty tabset, open new browser tabs and come back to this
+        extension to associate them with a tabset.<br /><br />
         <!--If you want to assign your open tabs straight away, click <span class="cursor-pointer text-blue" @click="addOpenTabs()"><u>here</u></span>.-->
       </q-banner>
 
@@ -196,34 +228,34 @@
         :probability="1"
         ident="tabsetPage_backupTabset"
         hint="This is a special type of tabset - it's meant for Backups. You can use it as any other tabset, but when you use the feature
- 'backup and close current tabs' from the 'open tabs' menu, all tabs will be closed and automatically added to this backup tabset." />
+ 'backup and close current tabs' from the 'open tabs' menu, all tabs will be closed and automatically added to this backup tabset."
+      />
 
       <InfoMessageWidget
         v-if="tabsetId === 'IGNORE'"
         :probability="1"
         ident="tabsetPage_ignoreTabset"
         hint="This is a special type of tabset - it's meant for those tabs which you don't want to track. You can add urls and whenever
-a tab's url starts with one of the urls of this tabset, it will be ignored and not added to the tabs to be added." />
+a tab's url starts with one of the urls of this tabset, it will be ignored and not added to the tabs to be added."
+      />
 
       <TabsetPageCards
         :tabset="tabset as unknown as Tabset"
         :tabsetFolder="tabsetFolder as unknown as Tabset"
-        :simple-ui="false"/>
-
+        :simple-ui="false"
+      />
     </q-tab-panel>
 
     <q-tab-panel class="q-ma-none q-pa-none" name="list">
-
       <TabList
         group="otherTabs"
         :tabsetId="tabset.id"
         :tabsetSorting="tabset.sorting"
         :tabsetSharedId="tabset.sharedId!"
-        :tabs="tabset.tabs"/>
-
+        :tabs="tabset.tabs"
+      />
     </q-tab-panel>
   </q-tab-panels>
-
 </template>
 
 <script setup lang="ts">
@@ -264,7 +296,6 @@ onMounted(() => {
   //setTimeout(() => client.stop(), 5000)
 })
 
-
 onUpdated(() => {
   JsUtils.runCssHighlight()
 })
@@ -276,12 +307,14 @@ watchEffect(() => {
   tabsetId.value = route?.params.tabsetId as string
   tabset.value = useTabsetsStore().getTabset(tabsetId.value) || new Tabset(uid(), 'empty', [])
   console.log('watch effect in tabsetpage', tabsetId.value)
-  tab.value = route.query['tab'] ? route.query['tab'] as string : 'grid'
+  tab.value = route.query['tab'] ? (route.query['tab'] as string) : 'grid'
   tabsetFolder.value = useTabsetsStore().getActiveFolder(tabset.value) || tabset.value
 })
 
-
-const setNewName = (newValue: string) => useCommandExecutor().executeFromUi(new RenameTabsetCommand(useTabsetsStore().currentTabsetId!, newValue))
+const setNewName = (newValue: string) =>
+  useCommandExecutor().executeFromUi(
+    new RenameTabsetCommand(useTabsetsStore().currentTabsetId!, newValue),
+  )
 
 const setFilter = (newValue: string) => {
   console.log('filter', newValue)
@@ -291,15 +324,14 @@ const setFilter = (newValue: string) => {
   JsUtils.runCssHighlight()
 }
 
-
 const addUrlDialog = () => $q.dialog({ component: AddUrlDialog })
 
 const setView = (view: string) => TabsetService.setView(tabsetId.value, view)
 
-const toggleSorting = () => useCommandExecutor().executeFromUi(new ToggleSortingCommand(tabsetId.value))
+const toggleSorting = () =>
+  useCommandExecutor().executeFromUi(new ToggleSortingCommand(tabsetId.value))
 
-const toggleOrder = () => orderDesc.value = !orderDesc.value
+const toggleOrder = () => (orderDesc.value = !orderDesc.value)
 
 const showSorting = () => useTabsetsStore().getCurrentTabs.length > 10 && $q.screen.gt.xs
-
 </script>

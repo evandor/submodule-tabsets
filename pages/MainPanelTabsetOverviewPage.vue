@@ -7,9 +7,7 @@
           Overview of <em>{{ toolbarTitle() }}</em>
         </q-toolbar-title>
       </div>
-      <div class="col-4 text-right">
-
-      </div>
+      <div class="col-4 text-right"></div>
     </div>
   </q-toolbar>
 
@@ -22,11 +20,11 @@
     active-color="primary"
     indicator-color="primary"
     align="left"
-    narrow-indicator>
+    narrow-indicator
+  >
     <q-tab name="grid" label="As Grid" @click="setView('grid')" />
     <q-tab name="list" label="As List" @click="setView('list')" />
   </q-tabs>
-
 
   <q-tab-panels v-model="tab" animated>
     <q-tab-panel class="q-ma-none q-pa-none" name="grid">
@@ -34,7 +32,8 @@
         :tabset="tabset"
         :tabsetFolder="tabsetFolder"
         :key="tabsetFolder.id"
-        :simple-ui="false" />
+        :simple-ui="false"
+      />
     </q-tab-panel>
 
     <q-tab-panel class="q-ma-none q-pa-none" name="list">
@@ -43,11 +42,10 @@
         :tabsetId="tabsetFolder.id"
         :tabsetSorting="tabset.sorting"
         :tabsetSharedId="tabset.sharedId!"
-        :tabs="tabsetFolder.tabs" />
+        :tabs="tabsetFolder.tabs"
+      />
     </q-tab-panel>
-
   </q-tab-panels>
-
 </template>
 
 <script setup lang="ts">
@@ -71,11 +69,15 @@ const tabsetFolder = ref<Tabset>(new Tabset(uid(), 'empty', []))
 
 const tab = ref('')
 
-const onMessageListener = (request: any, sender: chrome.runtime.MessageSender, sendResponse: any) => onMessage(request, sender, sendResponse)
+const onMessageListener = (request: any, sender: chrome.runtime.MessageSender, sendResponse: any) =>
+  onMessage(request, sender, sendResponse)
 
 onMounted(() => {
   Analytics.firePageViewEvent('MainPanelTabsetPage', document.location.href)
-  console.log('--- adding/resetting message listener ---', chrome.runtime.onMessage.hasListener(onMessageListener))
+  console.log(
+    '--- adding/resetting message listener ---',
+    chrome.runtime.onMessage.hasListener(onMessageListener),
+  )
   //chrome.runtime.onMessage.removeListener(onMessageListener)
   chrome.runtime.onMessage.addListener(onMessageListener)
 
@@ -87,7 +89,8 @@ onMounted(() => {
   tabset.value = useTabsetsStore().getTabset(tabsetId.value) || new Tabset(uid(), 'empty', [])
   tab.value = tabset.value.view || 'grid'
   folderId.value = tabset.value.folderActive
-  tabsetFolder.value = useTabsetsStore().getActiveFolder(tabset.value, folderId.value) || tabset.value
+  tabsetFolder.value =
+    useTabsetsStore().getActiveFolder(tabset.value, folderId.value) || tabset.value
 })
 
 onUnmounted(() => {
@@ -107,7 +110,7 @@ const onMessage = async (request: any, sender: chrome.runtime.MessageSender, sen
 }
 
 const toolbarTitle = () => {
-  return (tabset.value.id === tabsetFolder.value.id)
+  return tabset.value.id === tabsetFolder.value.id
     ? tabset.value.name
     : tabset.value.name + ' / ' + tabsetFolder.value.name
 }

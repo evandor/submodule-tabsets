@@ -1,16 +1,13 @@
-import {QVueGlobals} from "quasar";
-import {DefaultAddUrlToTabsetHandler} from "src/tabsets/actionHandling/handler/DefaultAddUrlToTabsetHandler";
-import {ExcalidrawAddUrlToTabsetHandler} from "src/tabsets/actionHandling/handler/ExcalidrawAddUrlToTabsetHandler";
-import {MarkdownFileAddUrlToTabsetHandler} from "src/tabsets/actionHandling/handler/MarkdownFileAddUrlToTabsetHandler";
-import {AddUrlToTabsetHandler} from "src/tabsets/actionHandling/AddUrlToTabsetHandler";
-import {RssUrlAddUrlToTabsetHandler} from "src/tabsets/actionHandling/handler/RssUrlAddUrlToTabsetHandler";
-import {
-  FileProtocolUrlAddUrlToTabsetHandler
-} from "src/tabsets/actionHandling/handler/FileProtocolUrlAddUrlToTabsetHandler";
-import {Tabset} from "src/tabsets/models/Tabset";
+import { QVueGlobals } from 'quasar'
+import { DefaultAddUrlToTabsetHandler } from 'src/tabsets/actionHandling/handler/DefaultAddUrlToTabsetHandler'
+import { ExcalidrawAddUrlToTabsetHandler } from 'src/tabsets/actionHandling/handler/ExcalidrawAddUrlToTabsetHandler'
+import { MarkdownFileAddUrlToTabsetHandler } from 'src/tabsets/actionHandling/handler/MarkdownFileAddUrlToTabsetHandler'
+import { AddUrlToTabsetHandler } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
+import { RssUrlAddUrlToTabsetHandler } from 'src/tabsets/actionHandling/handler/RssUrlAddUrlToTabsetHandler'
+import { FileProtocolUrlAddUrlToTabsetHandler } from 'src/tabsets/actionHandling/handler/FileProtocolUrlAddUrlToTabsetHandler'
+import { Tabset } from 'src/tabsets/models/Tabset'
 
 export class AddUrlToTabsetHandlers {
-
   defaultAddUrlToTabsetHandler = new DefaultAddUrlToTabsetHandler()
 
   handlers: AddUrlToTabsetHandler[] = []
@@ -25,7 +22,9 @@ export class AddUrlToTabsetHandlers {
   }
 
   handlerFor(url: string, content: string, folder?: Tabset): AddUrlToTabsetHandler {
-    const handler = this.handlers.filter((h: AddUrlToTabsetHandler) => url.match(h.urlMatcher()) || h.contentMatcher(content))
+    const handler = this.handlers.filter(
+      (h: AddUrlToTabsetHandler) => url.match(h.urlMatcher()) || h.contentMatcher(content),
+    )
     if (handler && handler.length > 0) {
       //handler[0].setFolder(folder)
       return handler[0]!

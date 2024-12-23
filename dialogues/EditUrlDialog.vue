@@ -7,23 +7,27 @@
       <q-card-section>
         <div class="text-body">
           <div class="text-body"><b>Tab Name:</b></div>
-          <q-input type="text" dense v-model="newTabName"/>
+          <q-input type="text" dense v-model="newTabName" />
         </div>
       </q-card-section>
 
       <q-card-section>
         <div class="text-body">
           <div class="text-body"><b>Tab Description:</b></div>
-          <q-input type="textarea" autogrow dense v-model="newTabDescription"/>
+          <q-input type="textarea" autogrow dense v-model="newTabDescription" />
         </div>
       </q-card-section>
 
       <q-card-section class="q-pt-none">
         <div class="text-body"><b>URL:</b></div>
-        <q-input type="url"
-                 dense v-model="newTabUrl" autofocus @keydown.enter="updateTab()"
-                 error-message="not a valid URL"
-                 :error="!newTabUrlIsValid"
+        <q-input
+          type="url"
+          dense
+          v-model="newTabUrl"
+          autofocus
+          @keydown.enter="updateTab()"
+          error-message="not a valid URL"
+          :error="!newTabUrlIsValid"
         />
         <div class="text-body2 text-warning">{{ newTabsetDialogWarning() }}</div>
       </q-card-section>
@@ -31,14 +35,19 @@
       <q-card-section class="q-pt-none" v-if="placeholders.length > 0">
         <b>Substitutions for</b>
       </q-card-section>
-<!--      <q-card-section class="q-pt-none text-caption" v-else>-->
-<!--        You can use placeholder like this as well: https://dax.de/${wkn}-->
-<!--      </q-card-section>-->
+      <!--      <q-card-section class="q-pt-none text-caption" v-else>-->
+      <!--        You can use placeholder like this as well: https://dax.de/${wkn}-->
+      <!--      </q-card-section>-->
 
       <q-card-section class="q-pt-none" v-for="placeholder in placeholders">
-        <div class="text-body">Placeholder <i>{{ placeholder }}</i></div>
-        <q-input dense :model-value="modelFor(placeholder)"
-                 @update:model-value="(val:any) => updatePlaceholder(placeholder, val)"/>
+        <div class="text-body">
+          Placeholder <i>{{ placeholder }}</i>
+        </div>
+        <q-input
+          dense
+          :model-value="modelFor(placeholder)"
+          @update:model-value="(val: any) => updatePlaceholder(placeholder, val)"
+        />
       </q-card-section>
 
       <template v-if="useFeaturesStore().hasFeature(FeatureIdent.DEV_MODE)">
@@ -56,39 +65,32 @@
       </template>
 
       <q-card-actions align="right">
-        <DialogButton label="Cancel" color="accent" v-close-popup/>
-        <DialogButton label="Update"
-                      @was-clicked="updateTab()"
-                      v-close-popup/>
+        <DialogButton label="Cancel" color="accent" v-close-popup />
+        <DialogButton label="Update" @was-clicked="updateTab()" v-close-popup />
       </q-card-actions>
-
     </q-card>
   </q-dialog>
-
 </template>
 
 <script lang="ts" setup>
+import { computed, PropType, ref, watchEffect } from 'vue'
 
-import {computed, PropType, ref, watchEffect} from "vue";
+import { useDialogPluginComponent } from 'quasar'
+import DialogButton from 'src/core/dialog/buttons/DialogButton.vue'
+import { useCommandExecutor } from 'src/core/services/CommandExecutor'
+import { Tab, UrlExtension } from 'src/tabsets/models/Tab'
+import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+import { useFeaturesStore } from 'src/features/stores/featuresStore'
+import { FeatureIdent } from 'src/app/models/FeatureIdent'
+import { UpdateTabCommand } from 'src/domain/tabs/UpdateTabCommand'
 
-import {useDialogPluginComponent} from 'quasar'
-import DialogButton from "src/core/dialog/buttons/DialogButton.vue";
-import {useCommandExecutor} from "src/core/services/CommandExecutor";
-import {Tab, UrlExtension} from "src/tabsets/models/Tab";
-import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
-import {useFeaturesStore} from "src/features/stores/featuresStore";
-import {FeatureIdent} from "src/app/models/FeatureIdent";
-import {UpdateTabCommand} from "src/domain/tabs/UpdateTabCommand";
-
-defineEmits([
-  ...useDialogPluginComponent.emits
-])
+defineEmits([...useDialogPluginComponent.emits])
 
 const props = defineProps({
-  tab: {type: Object as PropType<Tab>, required: true}
+  tab: { type: Object as PropType<Tab>, required: true },
 })
 
-const {dialogRef, onDialogHide, onDialogCancel} = useDialogPluginComponent()
+const { dialogRef, onDialogHide, onDialogCancel } = useDialogPluginComponent()
 
 const newTabUrl = ref(props.tab.url || '')
 const newTabName = ref(props.tab.name || props.tab.title)
@@ -99,15 +101,17 @@ const placeholders = ref<string[]>([])
 const placeholderValues = ref<Map<string, string>>(new Map())
 
 const placeholderReg = /\$\{(.*?)}/gm
-const extensionOption = ref<UrlExtension>(UrlExtension[props.tab.extension as keyof typeof UrlExtension])
+const extensionOption = ref<UrlExtension>(
+  UrlExtension[props.tab.extension as keyof typeof UrlExtension],
+)
 
 const extensionOptions = [
-  {label: 'HTML', value: UrlExtension.HTML},
-  {label: 'RSS', value: UrlExtension.RSS}
+  { label: 'HTML', value: UrlExtension.HTML },
+  { label: 'RSS', value: UrlExtension.RSS },
 ]
 
 watchEffect(() => {
-  newTabUrlExists.value = !!useTabsetsStore().existingInTabset(newTabUrl.value);
+  newTabUrlExists.value = !!useTabsetsStore().existingInTabset(newTabUrl.value)
 })
 
 watchEffect(() => {
@@ -123,23 +127,28 @@ watchEffect(() => {
 })
 
 watchEffect(() => {
-  console.log("placeholderValues", placeholderValues.value)
+  console.log('placeholderValues', placeholderValues.value)
 })
 
 const updateTab = () =>
-  useCommandExecutor().executeFromUi(new UpdateTabCommand(
-    props.tab, newTabUrl.value,
-    newTabName.value || '',
-    newTabDescription.value || '',
-    placeholders.value,
-    placeholderValues.value,
-    extensionOption.value
-  ))
-
+  useCommandExecutor().executeFromUi(
+    new UpdateTabCommand(
+      props.tab,
+      newTabUrl.value,
+      newTabName.value || '',
+      newTabDescription.value || '',
+      placeholders.value,
+      placeholderValues.value,
+      extensionOption.value,
+    ),
+  )
 
 const newTabsetDialogWarning = () => {
-  return (!hideWarning.value && newTabUrl.value !== props.tab.name && useTabsetsStore().existingInTabset(newTabUrl.value)) ?
-    "Tabset already exists" : ""
+  return !hideWarning.value &&
+    newTabUrl.value !== props.tab.name &&
+    useTabsetsStore().existingInTabset(newTabUrl.value)
+    ? 'Tabset already exists'
+    : ''
 }
 
 const newTabUrlIsValid = computed(() => {
@@ -153,11 +162,10 @@ const newTabUrlIsValid = computed(() => {
 })
 
 const updatePlaceholder = (placeholder: string, val: any) => {
-  console.log("updateing", placeholder, val)
+  console.log('updateing', placeholder, val)
   placeholderValues.value.set(placeholder, val)
-  console.log("placeholders", placeholders.value)
+  console.log('placeholders', placeholders.value)
 }
 
 const modelFor = (ident: string) => placeholderValues.value.get(ident)
-
 </script>

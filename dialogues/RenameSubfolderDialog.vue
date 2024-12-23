@@ -9,67 +9,73 @@
       </q-card-section>
 
       <q-card-section class="q-pt-none">
-        <q-input dense v-model="newSubfolderName" autofocus @keydown.enter="updateSubfolder()"
-                 error-message="Please do not use special Characters, maximum length is 32"
-                 :error="!newSubfolderNameIsValid" />
+        <q-input
+          dense
+          v-model="newSubfolderName"
+          autofocus
+          @keydown.enter="updateSubfolder()"
+          error-message="Please do not use special Characters, maximum length is 32"
+          :error="!newSubfolderNameIsValid"
+        />
       </q-card-section>
 
       <q-card-actions align="right" class="text-primary">
-        <q-btn label="Cancel" size="sm" color="accent" @click="onDialogCancel"/>
-        <q-btn label="Update" size="sm" color="warning"
-               :disable="disableSubmit()"
-               v-close-popup
-               @click="updateSubfolder()"/>
+        <q-btn label="Cancel" size="sm" color="accent" @click="onDialogCancel" />
+        <q-btn
+          label="Update"
+          size="sm"
+          color="warning"
+          :disable="disableSubmit()"
+          v-close-popup
+          @click="updateSubfolder()"
+        />
       </q-card-actions>
-
-
     </q-card>
   </q-dialog>
-
 </template>
 
 <script lang="ts" setup>
+import { computed, PropType, ref, watchEffect } from 'vue'
+import { useDialogPluginComponent } from 'quasar'
+import { STRIP_CHARS_IN_USER_INPUT } from 'src/boot/constants'
+import { useCommandExecutor } from 'src/core/services/CommandExecutor'
+import { Tabset } from 'src/tabsets/models/Tabset'
+import { RenameFolderCommand } from 'src/tabsets/commands/RenameFolderCommand'
+import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 
-import {computed, PropType, ref, watchEffect} from "vue";
-import {useDialogPluginComponent} from "quasar";
-import {STRIP_CHARS_IN_USER_INPUT} from "src/boot/constants";
-import {useCommandExecutor} from "src/core/services/CommandExecutor";
-import {Tabset} from "src/tabsets/models/Tabset";
-import {RenameFolderCommand} from "src/tabsets/commands/RenameFolderCommand";
-import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
-
-defineEmits([
-  ...useDialogPluginComponent.emits
-])
+defineEmits([...useDialogPluginComponent.emits])
 
 const props = defineProps({
-  tabset: {type: Object as PropType<Tabset>, required: true},
-  folder: {type: Object as PropType<Tabset>, required: true},
-  name: {type: String, default: ''}
+  tabset: { type: Object as PropType<Tabset>, required: true },
+  folder: { type: Object as PropType<Tabset>, required: true },
+  name: { type: String, default: '' },
 })
 
-const {dialogRef, onDialogOK, onDialogHide, onDialogCancel} = useDialogPluginComponent()
+const { dialogRef, onDialogOK, onDialogHide, onDialogCancel } = useDialogPluginComponent()
 
 const newSubfolderName = ref(props.name)
 const newSubfolderNameExists = ref(false)
 
 watchEffect(() => {
-  newSubfolderNameExists.value = !!useTabsetsStore().existingInTabset(newSubfolderName.value);
+  newSubfolderNameExists.value = !!useTabsetsStore().existingInTabset(newSubfolderName.value)
 })
 
-const updateSubfolder = () => useCommandExecutor()
-  .executeFromUi(new RenameFolderCommand(props.tabset, props.folder, newSubfolderName.value))
-  // .then((result: ExecutionResult<string>) => {
-  //   onDialogOK({ name: newSubfolderName.value })
-  // })
+const updateSubfolder = () =>
+  useCommandExecutor().executeFromUi(
+    new RenameFolderCommand(props.tabset, props.folder, newSubfolderName.value),
+  )
+// .then((result: ExecutionResult<string>) => {
+//   onDialogOK({ name: newSubfolderName.value })
+// })
 
-const newSubfolderNameIsValid = computed(() =>
-  newSubfolderName.value?.length <= 32 && !STRIP_CHARS_IN_USER_INPUT.test(newSubfolderName.value))
+const newSubfolderNameIsValid = computed(
+  () =>
+    newSubfolderName.value?.length <= 32 && !STRIP_CHARS_IN_USER_INPUT.test(newSubfolderName.value),
+)
 
 const disableSubmit = (): boolean => {
   return newSubfolderName.value.trim().length === 0
 }
-
 </script>
 
 <style lang="sass" scoped>
