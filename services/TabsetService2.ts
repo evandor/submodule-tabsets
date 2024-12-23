@@ -176,8 +176,8 @@ export function useTabsetService() {
     }
   }
 
-  const reloadTabset = async (tabsetId: string) => {
-    useTabsetsStore().reloadTabset(tabsetId)
+  const reloadTabset = async (tabsetId: string): Promise<Tabset> => {
+    return await useTabsetsStore().reloadTabset(tabsetId)
   }
 
   const selectTabset = (tabsetId: string | undefined): void => {

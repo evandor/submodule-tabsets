@@ -13,6 +13,7 @@
     @was-clicked="updateGrids()"
     coordinates-identifier="grid"
     :tabset="props.tabset"
+    :tabsetFolder="props.tabsetFolder"
     :tabs="currentTabs()"/>
 
 
@@ -41,6 +42,7 @@ const randomKey2 = ref<string>(uid())
 
 const props = defineProps({
   tabset: {type: Object as PropType<Tabset>, required: true},
+  tabsetFolder: {type: Object as PropType<Tabset>, required: true},
   simpleUi: {type: Boolean, default: false}
 })
 
@@ -83,18 +85,18 @@ function currentTabs(): Tab[] {
   //console.log("got", props.tabset.tabs)
   const filter = useUiStore().tabsFilter
   if (filter && filter.trim() !== '') {
-    return _.orderBy(_.filter(props.tabset.tabs, (t: Tab) => {
+    return _.orderBy(_.filter(props.tabsetFolder.tabs, (t: Tab) => {
       return (t.url || '')?.indexOf(filter) >= 0 ||
         (t.title || '')?.indexOf(filter) >= 0 ||
         t.description.indexOf(filter) >= 0
     }), getOrder(), [orderDesc.value ? 'desc' : 'asc'])
   }
-  return _.orderBy(props.tabset.tabs, getOrder(), [orderDesc.value ? 'desc' : 'asc'])
+  return _.orderBy(props.tabsetFolder.tabs, getOrder(), [orderDesc.value ? 'desc' : 'asc'])
 }
 
 function getOrder() {
-  if (props.tabset) {
-    switch (props.tabset?.sorting) {
+  if (props.tabsetFolder) {
+    switch (props.tabsetFolder?.sorting) {
       case 'alphabeticalUrl':
         return (t: Tab) => t.url?.replace("https://", "").replace("http://", "").toUpperCase()
       case 'alphabeticalTitle':

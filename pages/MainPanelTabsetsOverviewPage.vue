@@ -56,10 +56,10 @@
         <div v-if="_.filter(ts.tabs, (t: Tab) => t.favorite && t.favorite !== TabFavorite.NONE).length > 0">
           <div class="text-subtitle2 q-ma-md">{{ ts.name }}</div>
           <!--  @was-clicked="updateGrids()"-->
-          <TabGrid2
-            coordinates-identifier="grid-alltabsets"
-            :tabset="ts as Tabset"
-            :tabs="_.filter(ts.tabs, (t: Tab) => t.favorite && t.favorite !== TabFavorite.NONE)"/>
+<!--          <TabGrid2-->
+<!--            coordinates-identifier="grid-alltabsets"-->
+<!--            :tabset="ts as Tabset"-->
+<!--            :tabs="_.filter(ts.tabs, (t: Tab) => t.favorite && t.favorite !== TabFavorite.NONE)"/>-->
         </div>
       </template>
     </q-tab-panel>
