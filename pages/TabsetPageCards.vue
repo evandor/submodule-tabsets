@@ -1,57 +1,61 @@
 <template>
-
   <q-card flat>
     <q-card-section class="q-pa-none">
+      <TabList
+        v-if="props.tabset?.view === 'list'"
+        group="otherTabs"
+        :highlightUrl="highlightUrl"
+        :tabsetId="props.tabset.id"
+        :tabsetSorting="props.tabset.sorting"
+        :tabsetSharedId="props.tabset.sharedId!"
+        :simpleUi="props.simpleUi"
+        :tabs="currentTabs()"
+      />
 
-      <TabList v-if="props.tabset?.view === 'list'"
-               group="otherTabs"
-               :highlightUrl="highlightUrl"
-               :tabsetId="props.tabset.id"
-               :tabsetSorting="props.tabset.sorting"
-               :tabsetSharedId="props.tabset.sharedId!"
-               :simpleUi="props.simpleUi"
-               :tabs="currentTabs()"/>
+      <TabGroups
+        v-else-if="props.tabset?.view === 'group'"
+        group="otherTabs"
+        :highlightUrl="highlightUrl"
+        :tabsetId="props.tabset?.id"
+        :tabs="currentTabs()"
+      />
 
-      <TabGroups v-else-if="props.tabset?.view === 'group'"
-                 group="otherTabs"
-                 :highlightUrl="highlightUrl"
-                 :tabsetId="props.tabset?.id"
-                 :tabs="currentTabs()"/>
+      <TabGrid
+        v-else-if="props.tabset?.view === 'grid'"
+        group="otherTabs"
+        :highlightUrl="highlightUrl"
+        :tabs="currentTabs()"
+      />
 
-      <TabGrid v-else-if="props.tabset?.view === 'grid'"
-               group="otherTabs"
-               :highlightUrl="highlightUrl"
-               :tabs="currentTabs()"/>
-
-      <TabsExporter v-else-if="props.tabset?.view === 'exporter'"
-                    group="otherTabs"
-                    :tabs="currentTabs()"/>
+      <TabsExporter
+        v-else-if="props.tabset?.view === 'exporter'"
+        group="otherTabs"
+        :tabs="currentTabs()"
+      />
 
       <!-- fallback -->
-      <TabList v-else
-               group="otherTabs"
-               :highlightUrl="highlightUrl"
-               :tabsetId="props.tabset?.id"
-               :tabs="currentTabs()"/>
-
+      <TabList
+        v-else
+        group="otherTabs"
+        :highlightUrl="highlightUrl"
+        :tabsetId="props.tabset?.id"
+        :tabs="currentTabs()"
+      />
     </q-card-section>
-
   </q-card>
-
 </template>
 
 <script lang="ts" setup>
-
-import TabGroups from "components/layouts/TabGroups.vue";
-import TabsExporter from "components/layouts/TabsExporter.vue";
-import TabGrid from "components/layouts/TabGrid.vue";
-import {PropType, ref, watchEffect} from "vue";
-import _ from "lodash";
-import {useRoute} from "vue-router";
-import {useUiStore} from "src/ui/stores/uiStore";
-import {Tab} from "src/tabsets/models/Tab";
-import {Tabset} from "src/tabsets/models/Tabset";
-import TabList from "src/tabsets/pages/pwa/TabList.vue";
+import TabGroups from 'components/layouts/TabGroups.vue'
+import TabsExporter from 'components/layouts/TabsExporter.vue'
+import TabGrid from 'components/layouts/TabGrid.vue'
+import { PropType, ref, watchEffect } from 'vue'
+import _ from 'lodash'
+import { useRoute } from 'vue-router'
+import { useUiStore } from 'src/ui/stores/uiStore'
+import { Tab } from 'src/tabsets/models/Tab'
+import { Tabset } from 'src/tabsets/models/Tabset'
+import TabList from 'src/tabsets/pages/pwa/TabList.vue'
 
 const route = useRoute()
 
@@ -60,8 +64,8 @@ const orderDesc = ref(false)
 const tabsetId = ref(null as unknown as string)
 
 const props = defineProps({
-  tabset: {type: Object as PropType<Tabset>, required: true},
-  simpleUi: {type: Boolean, default: false}
+  tabset: { type: Object as PropType<Tabset>, required: true },
+  simpleUi: { type: Boolean, default: false },
 })
 
 watchEffect(() => {
@@ -74,7 +78,7 @@ watchEffect(() => {
       // highlightUrl.value = atob(highlight)
       useUiStore().addHighlight(atob(highlight))
     } catch (e: any) {
-      console.error("highlight error", e)
+      console.error('highlight error', e)
     }
   }
 })
@@ -95,7 +99,7 @@ watchEffect(() => {
   }
   tabsetId.value = route?.params.tabsetId as string
   if (tabsetId.value) {
-    console.debug("got tabset id", tabsetId.value)
+    console.debug('got tabset id', tabsetId.value)
   }
 })
 
@@ -103,11 +107,17 @@ function currentTabs(): Tab[] {
   //console.log("got", props.tabset.tabs)
   const filter = useUiStore().tabsFilter
   if (filter && filter.trim() !== '') {
-    return _.orderBy(_.filter(props.tabset.tabs, (t: Tab) => {
-      return (t.url || '')?.indexOf(filter) >= 0 ||
-        (t.title || '')?.indexOf(filter) >= 0 ||
-        t.description.indexOf(filter) >= 0
-    }), getOrder(), [orderDesc.value ? 'desc' : 'asc'])
+    return _.orderBy(
+      _.filter(props.tabset.tabs, (t: Tab) => {
+        return (
+          (t.url || '')?.indexOf(filter) >= 0 ||
+          (t.title || '')?.indexOf(filter) >= 0 ||
+          t.description.indexOf(filter) >= 0
+        )
+      }),
+      getOrder(),
+      [orderDesc.value ? 'desc' : 'asc'],
+    )
   }
   return _.orderBy(props.tabset.tabs, getOrder(), [orderDesc.value ? 'desc' : 'asc'])
 }
@@ -116,7 +126,7 @@ function getOrder() {
   if (props.tabset) {
     switch (props.tabset?.sorting) {
       case 'alphabeticalUrl':
-        return (t: Tab) => t.url?.replace("https://", "").replace("http://", "").toUpperCase()
+        return (t: Tab) => t.url?.replace('https://', '').replace('http://', '').toUpperCase()
       case 'alphabeticalTitle':
         return (t: Tab) => t.title?.toUpperCase()
       default:
@@ -124,5 +134,4 @@ function getOrder() {
     }
   }
 }
-
 </script>

@@ -1,18 +1,17 @@
-import {defineStore} from 'pinia';
+import { defineStore } from 'pinia'
 import _ from 'lodash'
-import {computed, ref} from "vue";
-import {Tabset} from "src/tabsets/models/Tabset";
-import {Tab} from "src/tabsets/models/Tab";
+import { computed, ref } from 'vue'
+import { Tabset } from 'src/tabsets/models/Tabset'
+import { Tab } from 'src/tabsets/models/Tab'
 
 async function queryTabs(): Promise<chrome.tabs.Tab[]> {
-  return await chrome.tabs.query({currentWindow: true});
+  return await chrome.tabs.query({ currentWindow: true })
 }
 
 /**
  * a pinia store for "browsertabs".
  */
 export const useTabsStore2 = defineStore('browsertabs', () => {
-
   // browser's current windows tabs, reloaded on various events
   const browserTabs = ref<chrome.tabs.Tab[]>([])
 
@@ -23,7 +22,7 @@ export const useTabsStore2 = defineStore('browsertabs', () => {
 
   // the ids of the tabs the user activated, limited to the last X entries
   // const chromeTabsHistory = new Array<[number, string]>()
-  const chromeTabsHistory =ref<[number, string][]>([]) //new Array<[number, string]>()
+  const chromeTabsHistory = ref<[number, string][]>([]) //new Array<[number, string]>()
 
   // where are we in the chromeTabsHistory?
   const chromeTabsHistoryPosition = ref(-1)
@@ -38,13 +37,13 @@ export const useTabsStore2 = defineStore('browsertabs', () => {
    * @param ps a persistence storage
    */
   async function initialize() {
-    console.debug(" ...initializing tabsStore2")
+    console.debug(' ...initializing tabsStore2')
     // storage = ps
     // await storage.init()
     // // TODO remove after version 0.4.12
     // await storage.migrate()
     // await storage.loadTabsets()
-    if ("bex" === process.env.MODE) {
+    if ('bex' === process.env.MODE) {
       // --- own tab id ---
       // const ownTab = await ChromeApi.getCurrentTab()
       // if (ownTab && ownTab.id) {
@@ -68,17 +67,17 @@ export const useTabsStore2 = defineStore('browsertabs', () => {
 
     // tab was activated without using the navigation
     if (tab.id && !chromeTabsHistoryNavigating.value) {
-
       // update urls for matching id
       chromeTabsHistory.value.forEach(([tabId, url], index) => {
         if (tabId === tab.id) {
           chromeTabsHistory.value[index] = [tabId, tab.url || '']
         }
-      });
+      })
 
       const historyLength = chromeTabsHistory.value.length
       chromeTabsHistoryPosition.value = Math.min(MAX_HISTORY_LENGTH - 1, historyLength)
-      if (historyLength > 0 &&
+      if (
+        historyLength > 0 &&
         chromeTabsHistory.value[historyLength - 1]![0] !== tab.id &&
         chromeTabsHistory.value[historyLength - 1]![1] !== tab.url
       ) {
@@ -100,7 +99,7 @@ export const useTabsStore2 = defineStore('browsertabs', () => {
 
   function tabHistoryBack() {
     if (chromeTabsHistoryPosition.value > 0) {
-      console.log("called tabHistoryBack with", chromeTabsHistoryPosition.value)
+      console.log('called tabHistoryBack with', chromeTabsHistoryPosition.value)
       chromeTabsHistoryPosition.value -= 1
       chromeTabsHistoryNavigating.value = true
     }
@@ -109,7 +108,11 @@ export const useTabsStore2 = defineStore('browsertabs', () => {
 
   function tabHistoryForward() {
     if (chromeTabsHistoryPosition.value < chromeTabsHistory.value.length - 1) {
-      console.log("called tabHistoryForward with", chromeTabsHistoryPosition.value, chromeTabsHistory.value.length)
+      console.log(
+        'called tabHistoryForward with',
+        chromeTabsHistoryPosition.value,
+        chromeTabsHistory.value.length,
+      )
       chromeTabsHistoryPosition.value += 1
       chromeTabsHistoryNavigating.value = true
     }
@@ -127,7 +130,6 @@ export const useTabsStore2 = defineStore('browsertabs', () => {
     }
   }
 
-
   // *** getters ***
   const tabsCount = computed(() => {
     return browserTabs.value.length
@@ -144,8 +146,6 @@ export const useTabsStore2 = defineStore('browsertabs', () => {
     }
   })
 
-
-
   return {
     initialize,
     browserTabs,
@@ -160,6 +160,6 @@ export const useTabsStore2 = defineStore('browsertabs', () => {
     chromeTabsHistoryNavigating,
     chromeTabsHistoryPosition,
     chromeTabsHistory,
-    removeTab
+    removeTab,
   }
 })

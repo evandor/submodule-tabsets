@@ -1,35 +1,37 @@
-import Command from "src/core/domain/Command";
-import TabsetService from "src/tabsets/services/TabsetService";
-import {ExecutionResult} from "src/core/domain/ExecutionResult";
-import {Tab} from "src/tabsets/models/Tab";
-import _ from "lodash";
-import {useTabsetService} from "src/tabsets/services/TabsetService2";
-import {useUiStore} from "src/ui/stores/uiStore";
-import {Tabset} from "src/tabsets/models/Tabset";
-import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
-import {DeleteTabCommand} from "src/tabsets/commands/DeleteTabCommand";
-import AppEventDispatcher from "src/app/AppEventDispatcher";
-import {uid} from "quasar";
+import Command from 'src/core/domain/Command'
+import TabsetService from 'src/tabsets/services/TabsetService'
+import { ExecutionResult } from 'src/core/domain/ExecutionResult'
+import { Tab } from 'src/tabsets/models/Tab'
+import _ from 'lodash'
+import { useTabsetService } from 'src/tabsets/services/TabsetService2'
+import { useUiStore } from 'src/ui/stores/uiStore'
+import { Tabset } from 'src/tabsets/models/Tabset'
+import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+import { DeleteTabCommand } from 'src/tabsets/commands/DeleteTabCommand'
+import AppEventDispatcher from 'src/app/AppEventDispatcher'
+import { uid } from 'quasar'
 
-const {saveCurrentTabset} = useTabsetService()
+const { saveCurrentTabset } = useTabsetService()
 
 class UndoCommand implements Command<any> {
-
-  constructor(public tab: Tab, public tabset: Tabset) {
-  }
+  constructor(
+    public tab: Tab,
+    public tabset: Tabset,
+  ) {}
 
   execute(): Promise<ExecutionResult<any>> {
-    console.info(this.tab, "execution undo command")
-    return new DeleteTabCommand(this.tab, this.tabset).execute()
-      .then((res: any) => Promise.resolve(new ExecutionResult(res, "Tab was deleted again")))
+    console.info(this.tab, 'execution undo command')
+    return new DeleteTabCommand(this.tab, this.tabset)
+      .execute()
+      .then((res: any) => Promise.resolve(new ExecutionResult(res, 'Tab was deleted again')))
   }
-
 }
 
 export class CreateTabFromOpenTabsCommand implements Command<any> {
-
-  constructor(public chromeTab: chrome.tabs.Tab, public newIndex: number) {
-  }
+  constructor(
+    public chromeTab: chrome.tabs.Tab,
+    public newIndex: number,
+  ) {}
 
   async execute(): Promise<ExecutionResult<any>> {
     const tab = new Tab(uid(), this.chromeTab)
@@ -38,7 +40,7 @@ export class CreateTabFromOpenTabsCommand implements Command<any> {
     const exists = _.findIndex(useTabsetsStore().getCurrentTabs, (t: any) => t.url === tab.url) >= 0
 
     let useIndex = this.newIndex
-    console.log("exists", exists)
+    console.log('exists', exists)
 
     const currentTabset: Tabset | undefined = useTabsetsStore().getCurrentTabset
 
@@ -62,7 +64,7 @@ export class CreateTabFromOpenTabsCommand implements Command<any> {
                 description: tab.description,
                 content: '',
                 tabsets: [currentTsId],
-                favIconUrl: tab.favIconUrl || ''
+                favIconUrl: tab.favIconUrl || '',
               })
             }
           }
@@ -70,44 +72,54 @@ export class CreateTabFromOpenTabsCommand implements Command<any> {
         })
         .then((res) => {
           if (currentTabset) {
-            return TabsetService.getContentFor(tab)
-              .then((content) => {
-                if (content) {
-                  return useTabsetService()
-                    .saveText(tab, content['content' as keyof object], content['metas' as keyof object])
-                    .then((res) => {
-                      return new ExecutionResult("result", "Tab was added",
-                        new Map([["Undo", new UndoCommand(tab, currentTabset)]]))
-                    })
-                } else {
-                  return saveCurrentTabset()
-                    .then(result => new ExecutionResult(result, "Tab was added",
-                      new Map([["Undo", new UndoCommand(tab, currentTabset)]])))
-                }
-              })
+            return TabsetService.getContentFor(tab).then((content) => {
+              if (content) {
+                return useTabsetService()
+                  .saveText(
+                    tab,
+                    content['content' as keyof object],
+                    content['metas' as keyof object],
+                  )
+                  .then((res) => {
+                    return new ExecutionResult(
+                      'result',
+                      'Tab was added',
+                      new Map([['Undo', new UndoCommand(tab, currentTabset)]]),
+                    )
+                  })
+              } else {
+                return saveCurrentTabset().then(
+                  (result) =>
+                    new ExecutionResult(
+                      result,
+                      'Tab was added',
+                      new Map([['Undo', new UndoCommand(tab, currentTabset)]]),
+                    ),
+                )
+              }
+            })
           } else {
-            return Promise.reject("could not determine current tabset")
+            return Promise.reject('could not determine current tabset')
           }
         })
     } else {
       const oldIndex = _.findIndex(useTabsetsStore().getCurrentTabs, (t: any) => t.id === tab.id)
       if (oldIndex >= 0) {
-        const tab = useTabsetsStore().getCurrentTabs.splice(oldIndex, 1)[0];
-        useTabsetsStore().getCurrentTabs.splice(useIndex, 0, tab!);
+        const tab = useTabsetsStore().getCurrentTabs.splice(oldIndex, 1)[0]
+        useTabsetsStore().getCurrentTabs.splice(useIndex, 0, tab!)
       }
-      return saveCurrentTabset()
-        .then(result => new ExecutionResult(
-          result,
-          "Tab was added",
-          new Map([["Undo", new UndoCommand(tab, currentTabset || null as unknown as Tabset)]])))
+      return saveCurrentTabset().then(
+        (result) =>
+          new ExecutionResult(
+            result,
+            'Tab was added',
+            new Map([['Undo', new UndoCommand(tab, currentTabset || (null as unknown as Tabset))]]),
+          ),
+      )
     }
-
-
   }
-
-
 }
 
 CreateTabFromOpenTabsCommand.prototype.toString = function cmdToString() {
-  return `CreateTabFromOpenTabs: {tab=${this.chromeTab.toString()}}`;
-};
+  return `CreateTabFromOpenTabs: {tab=${this.chromeTab.toString()}}`
+}

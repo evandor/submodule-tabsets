@@ -32,15 +32,13 @@ const { info } = useLogger()
  * Add provided Tab to provided Tabset.
  */
 export class AddTabToTabsetCommand implements Command<any> {
-
   constructor(
     public tab: Tab,
     public tabset: Tabset | undefined = undefined,
     public activeFolder: string | undefined = undefined,
     public allowDuplicates: boolean = false,
-    public ignoreDuplicates: boolean = false
+    public ignoreDuplicates: boolean = false,
   ) {
-
     if (!tabset) {
       this.tabset = useTabsetsStore().getCurrentTabset
     }
@@ -50,7 +48,9 @@ export class AddTabToTabsetCommand implements Command<any> {
   }
 
   async execute(): Promise<ExecutionResult<any>> {
-    console.info(`adding tab '${this.tab.id}' to tabset '${this.tabset!.id}', active folder: ${this.activeFolder}`)
+    console.info(
+      `adding tab '${this.tab.id}' to tabset '${this.tabset!.id}', active folder: ${this.activeFolder}`,
+    )
 
     let tabsetOrFolder = this.tabset!
     if (this.activeFolder) {
@@ -63,7 +63,7 @@ export class AddTabToTabsetCommand implements Command<any> {
 
     if (!this.allowDuplicates) {
       const exists = _.findIndex(tabsetOrFolder.tabs, (t: any) => t.url === this.tab.url) >= 0
-      console.debug('checking \'tab exists\' yields', exists)
+      console.debug("checking 'tab exists' yields", exists)
       if (exists && !this.ignoreDuplicates) {
         return Promise.reject('tab already exists in this tabset')
       } else if (exists) {
@@ -86,18 +86,30 @@ export class AddTabToTabsetCommand implements Command<any> {
       // Article (ReaderMode)
       if (useFeaturesStore().hasFeature(FeatureIdent.READING_MODE)) {
         const article = useContentStore().currentTabArticle
-        if (article && article['title' as keyof object] &&
-          article['textContent' as keyof object]) {
+        if (article && article['title' as keyof object] && article['textContent' as keyof object]) {
           const content: string = article['textContent' as keyof object]
           if (content.length > 500) {
-            this.tab.tabReferences.push(new TabReference(uid(), TabReferenceType.READING_MODE, article['title' as keyof object], [article], this.tab.url))
+            this.tab.tabReferences.push(
+              new TabReference(
+                uid(),
+                TabReferenceType.READING_MODE,
+                article['title' as keyof object],
+                [article],
+                this.tab.url,
+              ),
+            )
             //this.tab.url = chrome.runtime.getURL(`/www/index.html#/mainpanel/readingmode/${this.tab.id}`)
             useContentStore().resetCurrentTabArticle()
           }
         }
       }
 
-      const tabset: Tabset = await useTabsetService().addToTabset(tabsetOrFolder, this.tab, 0, this.allowDuplicates)
+      const tabset: Tabset = await useTabsetService().addToTabset(
+        tabsetOrFolder,
+        this.tab,
+        0,
+        this.allowDuplicates,
+      )
 
       // Analysis
       if (useAuthStore().user.uid && this.tab.url?.startsWith("https://")) {
@@ -132,10 +144,9 @@ export class AddTabToTabsetCommand implements Command<any> {
         const tabMetas = useContentStore().getCurrentTabMetas
         if (tabContent) {
           const tokens = ContentUtils.html2tokens(tabContent)
-          content = [...tokens].join(" ")
+          content = [...tokens].join(' ')
           await useTabsetService().saveText(this.tab, content, tabMetas)
         }
-
 
         //res = new ExecutionResult("result", "Link was added")
         const res2 = await useTabsetService().saveTabset(this.tabset!)
@@ -143,11 +154,9 @@ export class AddTabToTabsetCommand implements Command<any> {
 
         // saving thumbnail
         useThumbnailsService().captureVisibleTab(this.tab.id)
-
       } else {
         const res2 = await useTabsetService().saveTabset(this.tabset!)
         res = new ExecutionResult(res2, 'Link was added')
-
       }
 
       // add indicator icon
@@ -163,7 +172,7 @@ export class AddTabToTabsetCommand implements Command<any> {
         description: this.tab.description,
         content: content ? content : '',
         tabsets: [this.tabset!.id],
-        favIconUrl: this.tab.favIconUrl || ''
+        favIconUrl: this.tab.favIconUrl || '',
       })
       info('tab created')
       localStorage.setItem('test.tabId', this.tab.id)
@@ -175,13 +184,11 @@ export class AddTabToTabsetCommand implements Command<any> {
       }
 
       return res
-    } catch (err:any) {
+    } catch (err: any) {
       console.warn('hier: ', err)
       return Promise.reject('error: ' + err.toString())
     }
   }
-
-
 }
 
 AddTabToTabsetCommand.prototype.toString = function cmdToString() {

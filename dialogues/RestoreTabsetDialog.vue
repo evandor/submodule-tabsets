@@ -9,8 +9,9 @@
       </q-card-section>
 
       <q-card-section>
-        <div class="text-body">This means opening all the tabset's tabs in a new browser window, restoring
-          the tabset you want to work with.
+        <div class="text-body">
+          This means opening all the tabset's tabs in a new browser window, restoring the tabset you
+          want to work with.
         </div>
       </q-card-section>
 
@@ -22,36 +23,28 @@
       <!--      </q-card-section>-->
 
       <q-card-actions align="right" class="text-primary">
-        <q-btn flat label="Cancel" @click="onDialogCancel"/>
-        <q-btn flat label="Open Tabset" v-close-popup @click="openTabset()"/>
+        <q-btn flat label="Cancel" @click="onDialogCancel" />
+        <q-btn flat label="Open Tabset" v-close-popup @click="openTabset()" />
       </q-card-actions>
-
-
     </q-card>
   </q-dialog>
-
 </template>
 
 <script lang="ts" setup>
+import { useDialogPluginComponent } from 'quasar'
+import { useCommandExecutor } from 'src/core/services/CommandExecutor'
+import { RestoreTabsetCommand } from 'src/tabsets/commands/RestoreTabset'
 
-import {useDialogPluginComponent} from 'quasar'
-import {useCommandExecutor} from "src/core/services/CommandExecutor";
-import {RestoreTabsetCommand} from "src/tabsets/commands/RestoreTabset"
+defineEmits([...useDialogPluginComponent.emits])
 
-defineEmits([
-  ...useDialogPluginComponent.emits
-])
-
-const {dialogRef, onDialogHide, onDialogCancel} = useDialogPluginComponent()
+const { dialogRef, onDialogHide, onDialogCancel } = useDialogPluginComponent()
 
 const props = defineProps({
   tabsetId: {
     type: String,
-    required: true
-  }
+    required: true,
+  },
 })
 
 const openTabset = () => useCommandExecutor().execute(new RestoreTabsetCommand(props.tabsetId))
-
-
 </script>

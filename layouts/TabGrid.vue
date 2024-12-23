@@ -1,56 +1,53 @@
 <template>
-
   <vue-draggable-next
     class="dragArea list-group w-full container"
     tag="div"
     :list="props.tabs"
     :group="{ name: 'tabs', pull: 'clone' }"
-    @change="handleDragAndDrop">
-
+    @change="handleDragAndDrop"
+  >
     <div
       clickable
       v-for="tab in props.tabs"
       class="item"
       :style="itemStyle(tab)"
       @click.stop="showDetails(tab)"
-      @mouseover="showButtons(  tab.id,true)"
-      @mouseleave="showButtons( tab.id, false)"
+      @mouseover="showButtons(tab.id, true)"
+      @mouseleave="showButtons(tab.id, false)"
       @dragstart="startDrag($event, tab)"
-      :key="props.group + '_' + tab.id">
-
-      <TabGridWidget :key="props.group + '__' + tab.id" :tab="tabAsTab(tab)"/>
-
+      :key="props.group + '_' + tab.id"
+    >
+      <TabGridWidget :key="props.group + '__' + tab.id" :tab="tabAsTab(tab)" />
     </div>
   </vue-draggable-next>
-
 </template>
 
 <script setup lang="ts">
-import {Tab} from "src/tabsets/models/Tab";
-import TabsetService from "src/tabsets/services/TabsetService";
-import {PropType, ref} from "vue";
-import {VueDraggableNext} from 'vue-draggable-next'
-import _ from "lodash"
-import {DrawerTabs, useUiStore} from "src/ui/stores/uiStore";
-import {useCommandExecutor} from "src/core/services/CommandExecutor";
-import {CreateTabFromOpenTabsCommand} from "src/tabsets/commands/CreateTabFromOpenTabs";
-import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
-import TabGridWidget from "src/tabsets/widgets/TabGridWidget.vue";
-import {TabsetColumn} from "src/tabsets/models/TabsetColumn";
+import { Tab } from 'src/tabsets/models/Tab'
+import TabsetService from 'src/tabsets/services/TabsetService'
+import { PropType, ref } from 'vue'
+import { VueDraggableNext } from 'vue-draggable-next'
+import _ from 'lodash'
+import { DrawerTabs, useUiStore } from 'src/ui/stores/uiStore'
+import { useCommandExecutor } from 'src/core/services/CommandExecutor'
+import { CreateTabFromOpenTabsCommand } from 'src/tabsets/commands/CreateTabFromOpenTabs'
+import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+import TabGridWidget from 'src/tabsets/widgets/TabGridWidget.vue'
+import { TabsetColumn } from 'src/tabsets/models/TabsetColumn'
 
 const props = defineProps({
   tabs: {
     type: Array as PropType<Array<Tab>>,
-    required: true
+    required: true,
   },
   group: {
     type: String,
-    required: true
+    required: true,
   },
   highlightUrl: {
     type: String,
-    required: false
-  }
+    required: false,
+  },
 })
 
 const tabAsTab = (tab: Tab): Tab => tab as unknown as Tab
@@ -61,43 +58,55 @@ const showButtons = (tabId: string, show: boolean) => showButtonsProp.value.set(
 
 function adjustIndex(element: any, tabs: Tab[]) {
   //console.log("filtered", tabs)
-  if (element.newIndex === 0) { // first element
+  if (element.newIndex === 0) {
+    // first element
     //console.log(" 0 - searching for ", tabs[0].id)
-    return _.findIndex(useTabsetsStore().getCurrentTabs, (t:Tab) => t.id === tabs[0]!.id)
+    return _.findIndex(useTabsetsStore().getCurrentTabs, (t: Tab) => t.id === tabs[0]!.id)
   } else {
     //console.log(" 1 - searching for ", tabs[element.newIndex - 1].id)
-    return 1 + _.findIndex(useTabsetsStore().getCurrentTabs, (t:Tab) => t.id === tabs[element.newIndex - 1]!.id)
+    return (
+      1 +
+      _.findIndex(
+        useTabsetsStore().getCurrentTabs,
+        (t: Tab) => t.id === tabs[element.newIndex - 1]!.id,
+      )
+    )
   }
 }
 
-
 const handleDragAndDrop = (event: any) => {
-  console.log("event", event)
-  const {moved, added} = event
+  console.log('event', event)
+  const { moved, added } = event
   if (moved) {
     console.log('d&d tabs moved', moved.element.id, moved.newIndex, props.group)
     let useIndex = moved.newIndex
     switch (props.group) {
       case 'otherTabs':
         // @ts-expect-error TODO
-        const unpinnedNoGroup: Tab[] = _.filter(tabsStore.getCurrentTabs, (t: Tab) => !t.pinned && t.groupId === -1)
+        const unpinnedNoGroup: Tab[] = _.filter(
+          tabsStore.getCurrentTabs,
+          (t: Tab) => !t.pinned && t.groupId === -1,
+        )
         if (unpinnedNoGroup.length > 0) {
-          useIndex = adjustIndex(moved, unpinnedNoGroup);
+          useIndex = adjustIndex(moved, unpinnedNoGroup)
         }
-        break;
+        break
       case 'pinnedTabs':
         const filteredTabs: Tab[] = _.filter(useTabsetsStore().getCurrentTabs, (t: Tab) => t.pinned)
         if (filteredTabs.length > 0) {
-          useIndex = adjustIndex(moved, filteredTabs);
+          useIndex = adjustIndex(moved, filteredTabs)
         }
         break
       default:
         if (props.group.startsWith('groupedTabs_')) {
           const groupId = props.group.split('_')[1]
           // @ts-expect-error TODO
-          const filteredTabs: Tab[] = _.filter(tabsStore.getCurrentTabs, (t: Tab) => t.groupId === parseInt(groupId))
+          const filteredTabs: Tab[] = _.filter(
+            tabsStore.getCurrentTabs,
+            (t: Tab) => t.groupId === parseInt(groupId),
+          )
           if (filteredTabs.length > 0) {
-            useIndex = adjustIndex(moved, filteredTabs);
+            useIndex = adjustIndex(moved, filteredTabs)
           }
         }
         break
@@ -105,13 +114,14 @@ const handleDragAndDrop = (event: any) => {
     TabsetService.moveTo(moved.element.id, useIndex, null as unknown as TabsetColumn)
   }
   if (added) {
-    useCommandExecutor()
-      .executeFromUi(new CreateTabFromOpenTabsCommand(added.element, added.newIndex))
+    useCommandExecutor().executeFromUi(
+      new CreateTabFromOpenTabsCommand(added.element, added.newIndex),
+    )
   }
 }
 
 const startDrag = (evt: any, tab: Tab) => {
-  console.debug("start drag", evt, tab)
+  console.debug('start drag', evt, tab)
   if (evt.dataTransfer) {
     evt.dataTransfer.dropEffect = 'all'
     evt.dataTransfer.effectAllowed = 'all'
@@ -128,11 +138,10 @@ const showDetails = (tab: Tab) => {
 
 const itemStyle = (tab: Tab) => {
   if (tab.url === props.highlightUrl) {
-    return "border: 1px dotted orange; padding:15px; border-radius:5px"
+    return 'border: 1px dotted orange; padding:15px; border-radius:5px'
   }
-  return ""
+  return ''
 }
-
 </script>
 
 <style scoped>

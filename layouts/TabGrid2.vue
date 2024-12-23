@@ -3,11 +3,15 @@
   <div class="row">
     <div class="col-2 text-center cursor-pointer" v-for="index in 6">
       {{ columns[index]?.title || '&nbsp;' }}
-      <q-popup-edit v-if="columns[index]"
-                    v-model="columns[index].title" auto-save v-slot="scope">
-        <q-input v-model="scope.value" dense autofocus counter
-                 @update:model-value="val => setColumn( index, val)"
-                 @keyup.enter="scope.set" />
+      <q-popup-edit v-if="columns[index]" v-model="columns[index].title" auto-save v-slot="scope">
+        <q-input
+          v-model="scope.value"
+          dense
+          autofocus
+          counter
+          @update:model-value="(val) => setColumn(index, val)"
+          @keyup.enter="scope.set"
+        />
       </q-popup-edit>
     </div>
   </div>
@@ -19,7 +23,8 @@
     :is-draggable="state2.draggable"
     :is-resizable="false"
     :vertical-compact="false"
-    :use-css-transforms="true">
+    :use-css-transforms="true"
+  >
     <GridItem
       v-for="(item, index) in state2.layout"
       :key="index"
@@ -33,25 +38,21 @@
       :y="item.y"
       :w="item.w"
       :h="item.h"
-      :i="item.i">
+      :i="item.i"
+    >
       <TabGridWidget :key="item.tab.id" :tab="item.tab" />
-      <q-menu
-        touch-position
-        context-menu>
+      <q-menu touch-position context-menu>
         <q-list dense style="min-width: 100px">
           <q-item clickable v-close-popup @click="createThumbnail(item.tab)">
             <q-item-section>(re-)create thumbnail</q-item-section>
           </q-item>
         </q-list>
       </q-menu>
-
     </GridItem>
   </GridLayout>
-
 </template>
 
 <script setup lang="ts">
-
 import { GridItem, GridLayout } from 'vue-grid-layout-v3'
 
 import { onMounted, onUnmounted, PropType, reactive, ref, watch, watchEffect } from 'vue'
@@ -66,8 +67,16 @@ import { TabsetColumn } from 'src/tabsets/models/TabsetColumn'
 import TabGridWidget from 'src/tabsets/widgets/TabGridWidget.vue'
 import { useUtils } from 'src/core/services/Utils'
 
-type LayoutType = { tab: Tab, x: number, y: number, w: number, h: number, i: string, static: boolean }
-type StateType = { layout: LayoutType[], draggable: boolean, resizable: boolean, index: number }
+type LayoutType = {
+  tab: Tab
+  x: number
+  y: number
+  w: number
+  h: number
+  i: string
+  static: boolean
+}
+type StateType = { layout: LayoutType[]; draggable: boolean; resizable: boolean; index: number }
 
 const { sendMsg } = useUtils()
 
@@ -75,15 +84,14 @@ const props = defineProps({
   tabs: { type: Array as PropType<Array<Tab>>, required: true },
   tabset: { type: Object as PropType<Tabset>, required: true },
   tabsetFolder: { type: Object as PropType<Tabset>, required: true },
-  coordinatesIdentifier: { type: String, required: true }
+  coordinatesIdentifier: { type: String, required: true },
 })
-
 
 const state2 = reactive<StateType>({
   layout: [],
   draggable: true,
   resizable: true,
-  index: 0
+  index: 0,
 })
 
 const emits = defineEmits(['wasClicked'])
@@ -92,10 +100,17 @@ const layout = ref<any[]>([])
 
 let windowWidth = ref(window.innerWidth)
 const rowHeight = ref(Math.round(window.innerWidth / 9))
-const columns = ref<any[]>([{ title: 'click to add title' }, { title: ' ' }, { title: ' ' }, { title: ' ' }, { title: ' ' }, { title: ' ' }])
+const columns = ref<any[]>([
+  { title: 'click to add title' },
+  { title: ' ' },
+  { title: ' ' },
+  { title: ' ' },
+  { title: ' ' },
+  { title: ' ' },
+])
 const currentTabsetFolderId = ref<string | undefined>(useTabsetsStore().currentTabsetId)
 
-const onWidthChange = () => windowWidth.value = window.innerWidth
+const onWidthChange = () => (windowWidth.value = window.innerWidth)
 
 onMounted(() => {
   window.addEventListener('resize', onWidthChange)
@@ -109,12 +124,12 @@ onMounted(() => {
     }
     const griddata = {
       tab: t,
-      x: getCoordinate(t, 'x', (defForX++ % 6)),
+      x: getCoordinate(t, 'x', defForX++ % 6),
       y: getCoordinate(t, 'y', Math.floor(defForX / 6)),
       w: getCoordinate(t, 'w', 1),
       h: getCoordinate(t, 'h', 1),
       i: t.id,
-      static: false
+      static: false,
     }
     //console.log(`===> x=${JSON.stringify(griddata)})`)
     layout.value.push(griddata)
@@ -126,15 +141,20 @@ onUnmounted(() => window.removeEventListener('resize', onWidthChange))
 
 watchEffect(() => {
   rowHeight.value = Math.round(windowWidth.value / 9)
-  console.log("rowHeight:", windowWidth.value, rowHeight.value)
+  console.log('rowHeight:', windowWidth.value, rowHeight.value)
 })
 
 function getCoordinate(t: Tab, ident: string, def: number) {
   if (!t.coordinates) {
     return def
   }
-  const coordinates = _.find(t.coordinates, (c: TabCoordinate) => c.identifier === props.coordinatesIdentifier)
-  return coordinates && coordinates.val && (coordinates.val[ident as keyof object] >= 0) ? coordinates.val[ident as keyof object] : def
+  const coordinates = _.find(
+    t.coordinates,
+    (c: TabCoordinate) => c.identifier === props.coordinatesIdentifier,
+  )
+  return coordinates && coordinates.val && coordinates.val[ident as keyof object] >= 0
+    ? coordinates.val[ident as keyof object]
+    : def
 }
 
 watchEffect(() => {
@@ -148,10 +168,13 @@ watchEffect(() => {
   })
 })
 
-watch(() => useTabsetsStore().currentTabsetFolderId, (n: any, o: any) => {
-  currentTabsetFolderId.value = n
-  //console.log('=====>>>', currentTabsetFolderId.value, n, o)
-})
+watch(
+  () => useTabsetsStore().currentTabsetFolderId,
+  (n: any, o: any) => {
+    currentTabsetFolderId.value = n
+    //console.log('=====>>>', currentTabsetFolderId.value, n, o)
+  },
+)
 
 const setColumn = (i: number, v: any) => {
   console.log('setting column', i, v)
@@ -171,10 +194,16 @@ const movedEvent = (i: any, newX: any, newY: any) => {
     if (!tab.coordinates) {
       tab.coordinates = []
     }
-    const optionalGriddataIndex = _.findIndex(tab.coordinates, (c: TabCoordinate) => c.identifier === props.coordinatesIdentifier)
-    const gd: { [k: string]: any } = (optionalGriddataIndex >= 0)
-      ? tab.coordinates.at(optionalGriddataIndex) ? tab.coordinates.at(optionalGriddataIndex)!.val : {}
-      : {}
+    const optionalGriddataIndex = _.findIndex(
+      tab.coordinates,
+      (c: TabCoordinate) => c.identifier === props.coordinatesIdentifier,
+    )
+    const gd: { [k: string]: any } =
+      optionalGriddataIndex >= 0
+        ? tab.coordinates.at(optionalGriddataIndex)
+          ? tab.coordinates.at(optionalGriddataIndex)!.val
+          : {}
+        : {}
     gd['x'] = newX
     gd['y'] = newY
     if (optionalGriddataIndex < 0) {
@@ -191,7 +220,10 @@ const createThumbnail = async (tab: Tab) => {
   }
   const browserTabs = useTabsStore2().getChromeTabs as chrome.tabs.Tab[]
   console.log('checking for url', tab.url)
-  const openTab: chrome.tabs.Tab | undefined = _.find(browserTabs, (bt: chrome.tabs.Tab) => bt.url === tab.url)
+  const openTab: chrome.tabs.Tab | undefined = _.find(
+    browserTabs,
+    (bt: chrome.tabs.Tab) => bt.url === tab.url,
+  )
   const currentTab = await chrome.tabs.getCurrent()
   if (openTab) {
     console.log('found open tab', openTab.id)
@@ -199,13 +231,12 @@ const createThumbnail = async (tab: Tab) => {
     useThumbnailsService().captureVisibleTab(tab.id, (tabId: string, dataUrl: string) => {
       AppEventDispatcher.dispatchEvent('capture-screenshot', {
         tabId: tabId,
-        data: dataUrl
+        data: dataUrl,
       })
       if (currentTab) {
         setTimeout(() => {
           console.log('going back to ', currentTab.id)
-          chrome.tabs.update(currentTab.id || 0, { active: true })
-            .then(() => chrome.tabs.reload())
+          chrome.tabs.update(currentTab.id || 0, { active: true }).then(() => chrome.tabs.reload())
         }, 1000)
       }
     })
@@ -216,17 +247,15 @@ const createThumbnail = async (tab: Tab) => {
       useThumbnailsService().captureVisibleTab(tab.id, (tabId: string, dataUrl: string) => {
         AppEventDispatcher.dispatchEvent('capture-screenshot', {
           tabId: tabId,
-          data: dataUrl
+          data: dataUrl,
         })
       })
       setTimeout(() => {
-        chrome.tabs.remove(newTab.id || 0)
-          .then(() => chrome.tabs.reload())
+        chrome.tabs.remove(newTab.id || 0).then(() => chrome.tabs.reload())
       }, 1000)
     }, 2000)
   }
 }
-
 </script>
 
 <style scoped>
@@ -279,7 +308,8 @@ const createThumbnail = async (tab: Tab) => {
   height: 20px;
   top: 0;
   left: 0;
-  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10'><circle cx='5' cy='5' r='5' fill='#999999'/></svg>") no-repeat;
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10'><circle cx='5' cy='5' r='5' fill='#999999'/></svg>")
+    no-repeat;
   background-position: bottom right;
   padding: 0 8px 8px 0;
   background-repeat: no-repeat;
@@ -287,6 +317,4 @@ const createThumbnail = async (tab: Tab) => {
   box-sizing: border-box;
   cursor: pointer;
 }
-
-
 </style>

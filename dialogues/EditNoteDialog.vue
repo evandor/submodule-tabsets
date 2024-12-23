@@ -9,16 +9,11 @@
       </q-card-section>
 
       <q-card-section class="q-pt-none">
-
         <div class="q-pa-md q-gutter-sm">
           <!--          <q-editor v-model="editor" min-height="5rem" />-->
 
-          <q-input
-            v-model="editor"
-            filled
-            type="textarea"/>
+          <q-input v-model="editor" filled type="textarea" />
         </div>
-
       </q-card-section>
       <q-card-section v-if="props.schedule">
         {{ scheduleFor }}
@@ -28,7 +23,7 @@
               <q-popup-proxy cover transition-show="scale" transition-hide="scale">
                 <q-date v-model="scheduleFor" mask="YYYY-MM-DD HH:mm">
                   <div class="row items-center justify-end">
-                    <q-btn v-close-popup label="Close" color="primary" flat/>
+                    <q-btn v-close-popup label="Close" color="primary" flat />
                   </div>
                 </q-date>
               </q-popup-proxy>
@@ -40,7 +35,7 @@
               <q-popup-proxy cover transition-show="scale" transition-hide="scale">
                 <q-time v-model="scheduleFor" mask="YYYY-MM-DD HH:mm" format24h>
                   <div class="row items-center justify-end">
-                    <q-btn v-close-popup label="Close" color="primary" flat/>
+                    <q-btn v-close-popup label="Close" color="primary" flat />
                   </div>
                 </q-time>
               </q-popup-proxy>
@@ -50,57 +45,49 @@
       </q-card-section>
 
       <q-card-actions align="right" class="text-primary">
-        <q-btn flat label="Cancel" @click="onDialogCancel"/>
-        <q-btn flat label="Save Note"
-               v-close-popup
-               @click="saveNote()"/>
+        <q-btn flat label="Cancel" @click="onDialogCancel" />
+        <q-btn flat label="Save Note" v-close-popup @click="saveNote()" />
       </q-card-actions>
-
-
     </q-card>
   </q-dialog>
-
 </template>
 
 <script lang="ts" setup>
+import { ref, watchEffect } from 'vue'
+import { useDialogPluginComponent, date, useQuasar } from 'quasar'
+import TabsetService from 'src/tabsets/services/TabsetService'
+import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 
-import {ref, watchEffect} from "vue";
-import {useDialogPluginComponent, date, useQuasar} from "quasar";
-import TabsetService from "src/tabsets/services/TabsetService";
-import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
-
-defineEmits([
-  ...useDialogPluginComponent.emits
-])
+defineEmits([...useDialogPluginComponent.emits])
 
 const props = defineProps({
   tabId: {
     type: String,
-    required: true
+    required: true,
   },
   note: {
     type: String,
-    default: ''
+    default: '',
   },
   schedule: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 })
 
 const editor = ref(props.note)
 
-const {dialogRef, onDialogHide, onDialogCancel} = useDialogPluginComponent()
+const { dialogRef, onDialogHide, onDialogCancel } = useDialogPluginComponent()
 
 const $q = useQuasar()
 
-const dateFormat = "YYYY-MM-DD HH:mm"
+const dateFormat = 'YYYY-MM-DD HH:mm'
 const newTabsetName = ref('')
 const newTabsetNameExists = ref(false)
 const scheduleFor = ref(date.formatDate(new Date().getTime(), dateFormat))
 
 watchEffect(() => {
-  newTabsetNameExists.value = !!useTabsetsStore().existingInTabset(newTabsetName.value);
+  newTabsetNameExists.value = !!useTabsetsStore().existingInTabset(newTabsetName.value)
 })
 
 const parseDate = (str: string): Date => {
@@ -108,20 +95,22 @@ const parseDate = (str: string): Date => {
 }
 
 const saveNote = () => {
-  TabsetService.saveNote(props.tabId, editor.value, props.schedule ? parseDate(scheduleFor.value) : undefined)
+  TabsetService.saveNote(
+    props.tabId,
+    editor.value,
+    props.schedule ? parseDate(scheduleFor.value) : undefined,
+  )
     .then(() => {
       $q.notify({
         message: props.schedule ? 'The tab has been scheduled' : 'The note has been saved',
-        type: 'positive'
+        type: 'positive',
       })
     })
     .catch(() => {
       $q.notify({
         message: 'There was a problem saving the note',
-        type: 'negative'
+        type: 'negative',
       })
     })
 }
-
-
 </script>

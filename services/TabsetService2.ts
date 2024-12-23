@@ -1,34 +1,32 @@
-import {STRIP_CHARS_IN_COLOR_INPUT, STRIP_CHARS_IN_USER_INPUT} from "src/boot/constants";
-import {Tab} from "src/tabsets/models/Tab";
-import _ from "lodash";
-import {uid} from "quasar";
-import ChromeApi from "src/app/BrowserApi";
-import {TabPredicate} from "src/domain/Types";
-import {Tabset, TabsetStatus, TabsetType} from "src/tabsets/models/Tabset";
-import {v5 as uuidv5} from 'uuid';
-import {useSettingsStore} from "src/stores/settingsStore"
-import {SaveOrReplaceResult} from "src/tabsets/models/SaveOrReplaceResult";
-import JsUtils from "src/utils/JsUtils";
-import {useUiStore} from "src/ui/stores/uiStore";
-import {TabInFolder} from "src/tabsets/models/TabInFolder";
-import {useContentService} from "src/content/services/ContentService";
-import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
-import {useTabsStore2} from "src/tabsets/stores/tabsStore2";
-import AppEventDispatcher from "src/app/AppEventDispatcher";
-import throttledQueue from "throttled-queue";
-import {useSpacesStore} from "src/spaces/stores/spacesStore";
-import {useCommandExecutor} from "src/core/services/CommandExecutor";
-import {GithubLogCommand} from "src/tabsets/commands/github/GithubLogCommand";
-import {ContentItem} from "src/content/models/ContentItem";
+import { STRIP_CHARS_IN_COLOR_INPUT, STRIP_CHARS_IN_USER_INPUT } from 'src/boot/constants'
+import { Tab } from 'src/tabsets/models/Tab'
+import _ from 'lodash'
+import { uid } from 'quasar'
+import ChromeApi from 'src/app/BrowserApi'
+import { TabPredicate } from 'src/domain/Types'
+import { Tabset, TabsetStatus, TabsetType } from 'src/tabsets/models/Tabset'
+import { v5 as uuidv5 } from 'uuid'
+import { useSettingsStore } from 'src/stores/settingsStore'
+import { SaveOrReplaceResult } from 'src/tabsets/models/SaveOrReplaceResult'
+import JsUtils from 'src/utils/JsUtils'
+import { useUiStore } from 'src/ui/stores/uiStore'
+import { TabInFolder } from 'src/tabsets/models/TabInFolder'
+import { useContentService } from 'src/content/services/ContentService'
+import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+import { useTabsStore2 } from 'src/tabsets/stores/tabsStore2'
+import AppEventDispatcher from 'src/app/AppEventDispatcher'
+import throttledQueue from 'throttled-queue'
+import { useSpacesStore } from 'src/spaces/stores/spacesStore'
+import { useCommandExecutor } from 'src/core/services/CommandExecutor'
+import { GithubLogCommand } from 'src/tabsets/commands/github/GithubLogCommand'
+import { ContentItem } from 'src/content/models/ContentItem'
 
 // let db: TabsetsPersistence = null as unknown as TabsetsPersistence
 
 export function useTabsetService() {
-
   const throttleOne50Millis = throttledQueue(1, 50, true)
 
   const init = async (doNotInitSearchIndex: boolean = false) => {
-
     function selectFirstAvailableTabset() {
       const ts = [...useTabsetsStore().tabsets.values()] as Tabset[]
       if (ts.length > 0) {
@@ -36,9 +34,9 @@ export function useTabsetService() {
       }
     }
 
-    console.debug(" ...initializing tabsetService2 as (TODO)")
+    console.debug(' ...initializing tabsetService2 as (TODO)')
     await useTabsetsStore().loadTabsets()
-    const selectedTabsetId = localStorage.getItem("selectedTabset")
+    const selectedTabsetId = localStorage.getItem('selectedTabset')
     if (selectedTabsetId) {
       console.debug(` ...config: setting selected tabset from storage: ${selectedTabsetId}`)
       const selectedTabset = useTabsetsStore().selectCurrentTabset(selectedTabsetId)
@@ -72,12 +70,11 @@ export function useTabsetService() {
     tsType: TabsetType = TabsetType.DEFAULT,
     color: string | undefined = undefined,
     dynamicSource: string | undefined = undefined,
-    spaceId: string | undefined = undefined
+    spaceId: string | undefined = undefined,
   ): Promise<SaveOrReplaceResult> => {
-    const trustedName = name.replace(STRIP_CHARS_IN_USER_INPUT, '')
-      .substring(0, 31)
-    const trustedColor = color ?
-      color.replace(STRIP_CHARS_IN_COLOR_INPUT, '').substring(0, 31)
+    const trustedName = name.replace(STRIP_CHARS_IN_USER_INPUT, '').substring(0, 31)
+    const trustedColor = color
+      ? color.replace(STRIP_CHARS_IN_COLOR_INPUT, '').substring(0, 31)
       : undefined
     const tabs: Tab[] = _.filter(
       _.map(chromeTabs, (t: chrome.tabs.Tab) => {
@@ -87,29 +84,40 @@ export function useTabsetService() {
       }),
       (t: Tab) => {
         if (!useSettingsStore().isEnabled('extensionsAsTabs')) {
-          return !t.url?.startsWith("chrome-extension://")
+          return !t.url?.startsWith('chrome-extension://')
         }
         return true
-      })
+      },
+    )
     try {
       const dynUrl = dynamicSource ? new URL(dynamicSource) : undefined
-      const tabset = await useTabsetsStore().createTabset(trustedName, tabs, trustedColor, dynUrl, spaceId)
+      const tabset = await useTabsetsStore().createTabset(
+        trustedName,
+        tabs,
+        trustedColor,
+        dynUrl,
+        spaceId,
+      )
       await useTabsetsStore().saveTabset(tabset)
 
       selectTabset(tabset.id)
       useTabsetService().addToSearchIndex(tabset.id, tabs)
       return new SaveOrReplaceResult(false, tabset, false)
-    } catch (err:any) {
-      return Promise.reject("problem updating or creating tabset: " + err.toString())
+    } catch (err: any) {
+      return Promise.reject('problem updating or creating tabset: ' + err.toString())
     }
   }
 
-  const copyFromTabset = async (tabset: Tabset, spaceId: string | undefined = undefined): Promise<object> => {
-
+  const copyFromTabset = async (
+    tabset: Tabset,
+    spaceId: string | undefined = undefined,
+  ): Promise<object> => {
     function nameFrom(name: string): string {
-      const nameCandidate = name + " - Copy"
+      const nameCandidate = name + ' - Copy'
       const existsAlready = useTabsetsStore().existingInTabset(nameCandidate, spaceId)
-      return existsAlready ? nameFrom(nameCandidate) : nameCandidate.replace(STRIP_CHARS_IN_USER_INPUT, '')
+      return existsAlready
+        ? nameFrom(nameCandidate)
+        : nameCandidate.replace(STRIP_CHARS_IN_USER_INPUT, '')
     }
 
     const copyName = nameFrom(tabset.name)
@@ -126,10 +134,10 @@ export function useTabsetService() {
       return {
         replaced: false,
         tabset: tabsetCopy,
-        merged: false
+        merged: false,
       }
-    } catch (err:any) {
-      return Promise.reject("problem copying tabset: " + err.toString())
+    } catch (err: any) {
+      return Promise.reject('problem copying tabset: ' + err.toString())
     }
   }
 
@@ -137,7 +145,7 @@ export function useTabsetService() {
   const getOrCreateSpecialTabset = async (ident: SpecialTabsetIdent, type: TabsetType): Tabset => {
     // const result: Tabset = await useTabsStore().getOrCreateSpecialTabset(ident, type)
     // await saveTabset(result)
-    return null as unknown as Tabset// result
+    return null as unknown as Tabset // result
   }
 
   /**
@@ -150,19 +158,34 @@ export function useTabsetService() {
    * @param bms an array of Chrome bookmarks.
    * @param merge if true, the old values and the new ones will be merged.
    */
-  const saveOrReplaceFromBookmarks = async (name: string, bms: chrome.bookmarks.BookmarkTreeNode[], merge: boolean = false, dryRun = false): Promise<object> => {
+  const saveOrReplaceFromBookmarks = async (
+    name: string,
+    bms: chrome.bookmarks.BookmarkTreeNode[],
+    merge: boolean = false,
+    dryRun = false,
+  ): Promise<object> => {
     const now = new Date().getTime()
-    const tabs = _.map(_.filter(bms, (bm: any) => bm.url !== undefined), (c: any) => {
-      const tab = new Tab(uid(), ChromeApi.createChromeTabObject(c.title, c.url || '', ""))
-      tab.bookmarkUrl = c.url
-      tab.bookmarkId = c.id
-      tab.created = c.dateAdded || 0
-      tab.updated = now
-      return tab
-    })
+    const tabs = _.map(
+      _.filter(bms, (bm: any) => bm.url !== undefined),
+      (c: any) => {
+        const tab = new Tab(uid(), ChromeApi.createChromeTabObject(c.title, c.url || '', ''))
+        tab.bookmarkUrl = c.url
+        tab.bookmarkId = c.id
+        tab.created = c.dateAdded || 0
+        tab.updated = now
+        return tab
+      },
+    )
 
     const ignoreDuplicates = dryRun
-    const tabset = await useTabsetsStore().createTabset(name, tabs, undefined, undefined, undefined, ignoreDuplicates)
+    const tabset = await useTabsetsStore().createTabset(
+      name,
+      tabs,
+      undefined,
+      undefined,
+      undefined,
+      ignoreDuplicates,
+    )
     if (!dryRun) {
       await saveTabset(tabset)
       selectTabset(tabset.id)
@@ -172,7 +195,7 @@ export function useTabsetService() {
       replaced: false,
       merged: false,
       updated: now,
-      tabset: tabset
+      tabset: tabset,
     }
   }
 
@@ -181,16 +204,16 @@ export function useTabsetService() {
   }
 
   const selectTabset = (tabsetId: string | undefined): void => {
-    console.debug("selecting tabset", tabsetId)
+    console.debug('selecting tabset', tabsetId)
     if (tabsetId) {
       useTabsetsStore().selectCurrentTabset(tabsetId)
     }
     //tabsStore.currentTabsetId = tabsetId || null as unknown as string;
-    ChromeApi.buildContextMenu("tabsetService 230")
+    ChromeApi.buildContextMenu('tabsetService 230')
     if (tabsetId) {
-      localStorage.setItem("selectedTabset", tabsetId)
+      localStorage.setItem('selectedTabset', tabsetId)
     } else {
-      localStorage.removeItem("selectedTabset")
+      localStorage.removeItem('selectedTabset')
     }
   }
 
@@ -198,9 +221,9 @@ export function useTabsetService() {
     const tabset = useTabsetsStore().getTabset(tabsetId)
     if (tabset) {
       _.forEach(useTabsetsStore().getTabset(tabsetId)?.tabs, (t: Tab) => {
-        console.debug(t, "removing thumbnails")
+        console.debug(t, 'removing thumbnails')
         AppEventDispatcher.dispatchEvent('remove-captured-screenshot', {
-          tabId: t.id
+          tabId: t.id,
         })
         //useThumbnailsService().removeThumbnailsFor(t.id)
       })
@@ -211,11 +234,11 @@ export function useTabsetService() {
 
       //this.db.delete('tabsets', tabsetId)
       const nextKey: string | undefined = useTabsetsStore().tabsets.keys().next().value
-      console.log("setting next key to", nextKey)
+      console.log('setting next key to', nextKey)
       selectTabset(nextKey)
-      return Promise.resolve("ok")
+      return Promise.resolve('ok')
     }
-    return Promise.reject("could not get tabset for id")
+    return Promise.reject('could not get tabset for id')
   }
 
   const deleteTabsetDescription = (tabsetId: string): Promise<string> => {
@@ -223,31 +246,29 @@ export function useTabsetService() {
     if (tabset) {
       tabset.page = undefined
       useTabsetService().saveTabset(tabset)
-      return Promise.resolve("done")
+      return Promise.resolve('done')
     }
-    return Promise.reject("could not get tabset for id")
+    return Promise.reject('could not get tabset for id')
   }
 
   const deleteTabsetFolder = (tabset: Tabset, folder: Tabset): Promise<string> => {
     removeFolder(tabset, folder.id)
     tabset.folderActive = undefined
     useTabsetService().saveTabset(tabset)
-    return Promise.resolve("done")
+    return Promise.resolve('done')
   }
 
   const deleteFromTabset = (tabsetId: any, predicate: TabPredicate): Promise<number> => {
-    console.log("deleting from tabset")
+    console.log('deleting from tabset')
     const ts = useTabsetsStore().getTabset(tabsetId)
     if (ts) {
       const tabsCount = ts.tabs.length
       const tabsToKeep: Tab[] = _.filter(ts.tabs, (t: Tab) => !predicate(t))
-      console.debug("found tabsToKeep", tabsToKeep)
+      console.debug('found tabsToKeep', tabsToKeep)
       ts.tabs = tabsToKeep
-      return saveTabset(ts)
-        .then((res) => tabsCount - tabsToKeep.length)
+      return saveTabset(ts).then((res) => tabsCount - tabsToKeep.length)
     }
-    return Promise.reject("did not find tabset for id " + tabsetId)
-
+    return Promise.reject('did not find tabset for id ' + tabsetId)
   }
 
   const rootTabsetFor = (ts: Tabset | undefined): Tabset | undefined => {
@@ -268,29 +289,34 @@ export function useTabsetService() {
         tabset.type = TabsetType.DEFAULT
       }
       const rootTabset = rootTabsetFor(tabset)
-      console.debug(`saving (sub-)tabset '${tabset.name}' with ${tabset.tabs.length} tab(s) at id ${rootTabset?.id}`)
+      console.debug(
+        `saving (sub-)tabset '${tabset.name}' with ${tabset.tabs.length} tab(s) at id ${rootTabset?.id}`,
+      )
       if (rootTabset) {
         return await useTabsetsStore().saveTabset(rootTabset)
       }
     }
-    return Promise.reject("tabset id not set")
+    return Promise.reject('tabset id not set')
   }
 
-  const addToTabsetId = async (tsId: string, tab: Tab, useIndex: number | undefined = undefined): Promise<Tabset> => {
+  const addToTabsetId = async (
+    tsId: string,
+    tab: Tab,
+    useIndex: number | undefined = undefined,
+  ): Promise<Tabset> => {
     const ts = useTabsetsStore().getTabset(tsId)
     if (ts) {
       return addToTabset(ts, tab, useIndex)
     }
-    return Promise.reject("no tabset for given id " + tsId)
+    return Promise.reject('no tabset for given id ' + tsId)
   }
-
 
   const saveCurrentTabset = async (): Promise<any> => {
     const currentTabset = useTabsetsStore().getCurrentTabset as Tabset | undefined
     if (currentTabset) {
       return await saveTabset(currentTabset)
     }
-    return Promise.reject("current tabset could not be found")
+    return Promise.reject('current tabset could not be found')
   }
 
   /**
@@ -309,12 +335,13 @@ export function useTabsetService() {
     if (!tab || !tab.url) {
       return Promise.resolve('done')
     }
-    console.debug("saving text for", tab.id, tab.url, metas)
+    console.debug('saving text for', tab.id, tab.url, metas)
     const title = tab.title || ''
     const tabsetIds: string[] = tabsetsFor(tab.url)
 
-    useContentService().saveContent(tab.id, tab.url, text, metas, title, tabsetIds)
-      .catch((err: any) => console.log("err", err))
+    useContentService()
+      .saveContent(tab.id, tab.url, text, metas, title, tabsetIds)
+      .catch((err: any) => console.log('err', err))
 
     const tabsets = [...useTabsetsStore().tabsets.values()] as Tabset[]
 
@@ -337,13 +364,20 @@ export function useTabsetService() {
             if (metas && metas['keywords' as keyof object]) {
               t.keywords = metas['keywords' as keyof object]
               if (t.keywords) {
-                const blankSeparated = t.keywords.split(" ")
-                const commaSeparated = t.keywords.split(",")
-                const splits = (t.keywords.indexOf(",") >= 0) ? commaSeparated : blankSeparated
+                const blankSeparated = t.keywords.split(' ')
+                const commaSeparated = t.keywords.split(',')
+                const splits = t.keywords.indexOf(',') >= 0 ? commaSeparated : blankSeparated
                 if (!t.tags) {
                   t.tags = []
                 }
-                t.tags = t.tags.concat(_.union(_.filter(_.map(splits, (split: any) => split.trim()), (split: string) => split.length > 0)))
+                t.tags = t.tags.concat(
+                  _.union(
+                    _.filter(
+                      _.map(splits, (split: any) => split.trim()),
+                      (split: string) => split.length > 0,
+                    ),
+                  ),
+                )
               }
             }
             const author = getIfAvailable(metas, 'author')
@@ -366,7 +400,7 @@ export function useTabsetService() {
             if (text && text.length > 0) {
               t.contentHash = uuidv5(text, 'da42d8e8-2afd-446f-b72e-8b437aa03e46')
             } else {
-              t.contentHash = ""
+              t.contentHash = ''
             }
             savePromises.push(saveTabset(tabset))
           }
@@ -385,7 +419,6 @@ export function useTabsetService() {
     }
   }
 
-
   const tabsetsFor = (url: string): string[] => {
     const tabsets: string[] = []
     for (let ts of [...useTabsetsStore().tabsets.values()]) {
@@ -395,15 +428,19 @@ export function useTabsetService() {
         }
       }
     }
-    return tabsets;
+    return tabsets
   }
 
   const exportDataAsJson = () => {
     const tabsets = [...useTabsetsStore().tabsets.values()] as Tabset[]
-    return JSON.stringify({
-      tabsets: tabsets.filter((ts: Tabset) => ts.status !== TabsetStatus.DELETED),
-      spaces: [...useSpacesStore().spaces.values()]
-    }, null, 2)
+    return JSON.stringify(
+      {
+        tabsets: tabsets.filter((ts: Tabset) => ts.status !== TabsetStatus.DELETED),
+        spaces: [...useSpacesStore().spaces.values()],
+      },
+      null,
+      2,
+    )
   }
 
   /**
@@ -415,19 +452,24 @@ export function useTabsetService() {
    * @param tab
    * @param useIndex
    */
-  const addToTabset = async (ts: Tabset, tab: Tab, useIndex: number | undefined = undefined, allowDuplicates = false): Promise<Tabset> => {
+  const addToTabset = async (
+    ts: Tabset,
+    tab: Tab,
+    useIndex: number | undefined = undefined,
+    allowDuplicates = false,
+  ): Promise<Tabset> => {
     if (tab.url) {
       if (!allowDuplicates) {
         const indexInTabset = _.findIndex(ts.tabs, (t: any) => t.url === tab.url)
         if (indexInTabset >= 0 && !tab.image) {
-          return Promise.reject("tab exists already")
+          return Promise.reject('tab exists already')
         }
       }
 
       // add tabset's name to tab's tags
       tab.tags.push(ts.name)
       try {
-        tab.tags.push(new URL(tab.url).hostname.replace("www.", ""))
+        tab.tags.push(new URL(tab.url).hostname.replace('www.', ''))
       } catch (err) {
         // ignore
       }
@@ -438,12 +480,13 @@ export function useTabsetService() {
         ts.tabs.push(tab)
       }
 
-      useCommandExecutor().execute(new GithubLogCommand('newTab', tab as object))
+      useCommandExecutor()
+        .execute(new GithubLogCommand('newTab', tab as object))
         .catch((err) => console.warn(err))
 
       return Promise.resolve(ts)
     }
-    return Promise.reject("tab.url undefined")
+    return Promise.reject('tab.url undefined')
   }
 
   const saveBlob = (tab: chrome.tabs.Tab | undefined, blob: Blob): Promise<string> => {
@@ -453,11 +496,11 @@ export function useTabsetService() {
     //     .then(() => Promise.resolve(id))
     //     .catch(err => Promise.reject(err))
     // }
-    return Promise.reject("no tab or tab url")
+    return Promise.reject('no tab or tab url')
   }
 
   const getBlob = (blobId: string): Promise<any> => {
-    return Promise.reject("not implemented P")//db.getBlob(blobId)
+    return Promise.reject('not implemented P') //db.getBlob(blobId)
   }
 
   // const saveRequestFor = (url: string, requestInfo: RequestInfo) => {
@@ -473,25 +516,23 @@ export function useTabsetService() {
   }
 
   const deleteTab = (tab: Tab, tabset: Tabset): Promise<Tabset> => {
-    console.log("deleting tab", tab)//.id, tab.chromeTabId, tabset.id)
+    console.log('deleting tab', tab) //.id, tab.chromeTabId, tabset.id)
     const tabUrl = tab.url || ''
     if (tabsetsFor(tabUrl).length <= 1) {
-
       AppEventDispatcher.dispatchEvent('remove-captured-screenshot', {
-        tabId: tab.id
+        tabId: tab.id,
       })
       // useThumbnailsService().removeThumbnailsFor(tab.id)
       //  .then(() => console.debug("deleting thumbnail for ", tabUrl))
       //  .catch(err => console.log("error deleting thumbnail", err))
 
       removeContentFor(tab.id)
-        .then(() => console.debug("deleting content for ", tab.id))
-        .catch(err => console.log("error deleting content", err))
+        .then(() => console.debug('deleting content for ', tab.id))
+        .catch((err) => console.log('error deleting content', err))
     }
     useTabsStore2().removeTab(tabset, tab.id)
-    console.log("deletion: saving tabset", tabset)
-    return saveTabset(tabset)
-      .then(() => tabset)
+    console.log('deletion: saving tabset', tabset)
+    return saveTabset(tabset).then(() => tabset)
   }
 
   const getIfAvailable = (metas: object, key: string): string | undefined => {
@@ -509,24 +550,24 @@ export function useTabsetService() {
   const urlExistsInATabset = (url: string): boolean => {
     for (let ts of [...useTabsetsStore().tabsets.values()]) {
       if (_.find(ts.tabs, (t: any) => t.url === url)) {
-        return true;
+        return true
       }
     }
-    return false;
+    return false
   }
   const urlExistsInCurrentTabset = (url: string | undefined): boolean => {
     const currentTabset = useTabsetsStore().getCurrentTabset
     // console.log("testing exists in current tabset", currentTabset.id, url)
     if (currentTabset && url) {
-      if (_.find(currentTabset.tabs, (t: any) => {
-        return (t.matcher) ?
-          JsUtils.match(t.matcher, url) :
-          t.url === url
-      })) {
+      if (
+        _.find(currentTabset.tabs, (t: any) => {
+          return t.matcher ? JsUtils.match(t.matcher, url) : t.url === url
+        })
+      ) {
         return true
       }
     }
-    return false;
+    return false
   }
 
   const urlWasActivated = (url: string): void => {
@@ -542,7 +583,7 @@ export function useTabsetService() {
           hit = true
         })
         if (hit) {
-          console.debug("saving tabset on activated", ts.name)
+          console.debug('saving tabset on activated', ts.name)
           saveTabset(ts as Tabset)
         }
       }
@@ -550,9 +591,7 @@ export function useTabsetService() {
   }
 
   const tabsToShow = (tabset: Tabset): Tab[] => {
-
     let tabs: Tab[] = tabset.tabs
-
 
     // TODO order??
     const filter = useUiStore().tabsFilter
@@ -560,9 +599,11 @@ export function useTabsetService() {
       return tabs
     }
     return _.filter(tabs, (t: Tab) => {
-      return (t.url || '')?.indexOf(filter) >= 0 ||
+      return (
+        (t.url || '')?.indexOf(filter) >= 0 ||
         (t.title || '')?.indexOf(filter) >= 0 ||
         t.description?.indexOf(filter) >= 0
+      )
     })
   }
 
@@ -608,23 +649,25 @@ export function useTabsetService() {
   const moveTabToFolder = (tabset: Tabset, tabIdToDrag: string, moveToFolderId?: string) => {
     console.log(`moving tab ${tabIdToDrag} to folder ${moveToFolderId} in tabset ${tabset.id}`)
     const tabWithFolder = findTabInFolder([tabset], tabIdToDrag)
-    console.log("found tabWithFolder", tabWithFolder)
+    console.log('found tabWithFolder', tabWithFolder)
     //const newParentFolder = findFolder([tabset], moveToFolderId)
     const newParentFolder = moveToFolderId
       ? useTabsetsStore().getActiveFolder(tabset, moveToFolderId)
       : tabset
     if (newParentFolder && tabWithFolder) {
-      console.log("newParentFolder", newParentFolder)
+      console.log('newParentFolder', newParentFolder)
       newParentFolder.tabs.push(tabWithFolder.tab)
       saveTabset(tabset).then(() => {
-        tabWithFolder.folder.tabs = _.filter(tabWithFolder.folder.tabs, (t: any) => t.id !== tabIdToDrag)
+        tabWithFolder.folder.tabs = _.filter(
+          tabWithFolder.folder.tabs,
+          (t: any) => t.id !== tabIdToDrag,
+        )
         saveTabset(tabset)
       })
     }
   }
 
   const populateSearch = async () => {
-
     //const urlSet: Set<string> = new Set()
     const minimalIndex: object[] = []
 
@@ -636,7 +679,8 @@ export function useTabsetService() {
           continue
         }
         //const content = await useContentService().getContent(tab.id)
-        const content = contents.find((item) => item.url === tab.url) || new ContentItem("", "", "", "", [], [])
+        const content =
+          contents.find((item) => item.url === tab.url) || new ContentItem('', '', '', '', [], [])
         const addToIndex = {
           name: tab.name || '',
           title: tab.title || '',
@@ -645,7 +689,7 @@ export function useTabsetService() {
           content: content.content || '',
           tabsets: [tabset.id],
           favIconUrl: tab.favIconUrl || '',
-          tags: tab.tags ? tab.tags.join(' ') : ''
+          tags: tab.tags ? tab.tags.join(' ') : '',
         }
         // console.log("adding", addToIndex)
         minimalIndex.push(addToIndex)
@@ -654,13 +698,13 @@ export function useTabsetService() {
       if (!tabset.folders) {
         tabset.folders = []
       }
-      tabset.folders.forEach(folder => {
+      tabset.folders.forEach((folder) => {
         pushToIndex(folder)
       })
     }
 
     for (const tabset of [...useTabsetsStore().tabsets.values()] as Tabset[]) {
-      await pushToIndex(tabset);
+      await pushToIndex(tabset)
     }
 
     console.debug(` ...populating search index from tabsets with ${minimalIndex.length} entries`)
@@ -671,10 +715,14 @@ export function useTabsetService() {
     let index = 0
     minimalIndex.forEach((doc: object) => {
       const p = throttleRequests(async () => {
-        const progress = Math.round(100 * (1.1 * (perInterval * index / minimalIndex.length) + index++) / minimalIndex.length) / 100
-        useUiStore().setProgress(progress, "indexing search...")
+        const progress =
+          Math.round(
+            (100 * (1.1 * ((perInterval * index) / minimalIndex.length) + index++)) /
+              minimalIndex.length,
+          ) / 100
+        useUiStore().setProgress(progress, 'indexing search...')
         AppEventDispatcher.dispatchEvent('upsert-in-search', doc)
-        return Promise.resolve("")
+        return Promise.resolve('')
       })
       promises.push(p)
     })
@@ -699,7 +747,6 @@ export function useTabsetService() {
     //       }
     //     })
     //   })
-
   }
 
   const addToSearchIndex = (tsId: string, tabs: Tab[]) => {
@@ -717,7 +764,7 @@ export function useTabsetService() {
             content: '',
             tabsets: [tsId],
             favIconUrl: tab.favIconUrl || '',
-            tags: tab.tags.join(' ')
+            tags: tab.tags.join(' '),
           })
           urlSet.add(tab.url)
         }
@@ -726,43 +773,68 @@ export function useTabsetService() {
     // if (fuse.value) {
     //   minimalIndex.forEach((doc: SearchDoc) => fuse.value.add(doc))
     // }
-    minimalIndex.forEach(e => {
+    minimalIndex.forEach((e) => {
       AppEventDispatcher.dispatchEvent('add-to-search', e)
     })
   }
 
   async function handleResponse(t: Tab, method: string, timeout: number): Promise<number> {
-
     try {
       const response = await fetch(t.url!, {
         method: method,
         cache: 'no-cache',
         redirect: 'manual',
-        signal: AbortSignal.timeout(timeout)
+        signal: AbortSignal.timeout(timeout),
       })
 
       // just for logging
-      const ignoreList = ["connection", "content-type", "content-language", "charset", "date", "pragma", "x-content-type-options",
-        "keep-alive", "last-modified", "vary", "content-encoding", "server", "referrer-policy", "strict-transport-security", "content-length", "via",
-        "expires", "permissions-policy", "priority", "nel",
-        "reporting-endpoints", "etag", "age"]
+      const ignoreList = [
+        'connection',
+        'content-type',
+        'content-language',
+        'charset',
+        'date',
+        'pragma',
+        'x-content-type-options',
+        'keep-alive',
+        'last-modified',
+        'vary',
+        'content-encoding',
+        'server',
+        'referrer-policy',
+        'strict-transport-security',
+        'content-length',
+        'via',
+        'expires',
+        'permissions-policy',
+        'priority',
+        'nel',
+        'reporting-endpoints',
+        'etag',
+        'age',
+      ]
       response.headers.forEach((value: string, key: string, parent: Headers) => {
-        if (ignoreList.indexOf(key) < 0 && !key.startsWith("cf-") && !key.startsWith("x-") && !key.startsWith("alt-")
-          && !key.startsWith("report-")
-          && !key.startsWith("medium-")
-          && !key.startsWith("access-")
-          && !key.startsWith("accept-")
-          && !key.startsWith("origin-")
-          && !key.startsWith("cross-")
-          && !key.startsWith("server-")
-          && !key.startsWith("atl-")
-          && !key.startsWith("expect-")
-          && !key.startsWith("cache-")
-          && !key.startsWith("transfer-")
-          && !key.startsWith("content-security-")
-          && !key.startsWith("worker-")) {
+        if (
+          ignoreList.indexOf(key) < 0 &&
+          !key.startsWith('cf-') &&
+          !key.startsWith('x-') &&
+          !key.startsWith('alt-') &&
+          !key.startsWith('report-') &&
+          !key.startsWith('medium-') &&
+          !key.startsWith('access-') &&
+          !key.startsWith('accept-') &&
+          !key.startsWith('origin-') &&
+          !key.startsWith('cross-') &&
+          !key.startsWith('server-') &&
+          !key.startsWith('atl-') &&
+          !key.startsWith('expect-') &&
+          !key.startsWith('cache-') &&
+          !key.startsWith('transfer-') &&
+          !key.startsWith('content-security-') &&
+          !key.startsWith('worker-')
+        ) {
           // hs += key +": " + value
-          console.debug("got header", key + ": " + value)
+          console.debug('got header', key + ': ' + value)
         }
       })
       // just for logging - end
@@ -771,10 +843,10 @@ export function useTabsetService() {
       const oldEtag = t.httpEtag
 
       t.httpStatus = response.status
-      t.httpContentType = response.headers.get("content-type") || 'unknown'
-      t.httpLastModified = response.headers.get("last-modified") || 'unknown'
-      t.httpExpires = response.headers.get("expires")?.toString() || 'unknown'
-      t.httpEtag = response.headers.get("etag")?.toString() || ''
+      t.httpContentType = response.headers.get('content-type') || 'unknown'
+      t.httpLastModified = response.headers.get('last-modified') || 'unknown'
+      t.httpExpires = response.headers.get('expires')?.toString() || 'unknown'
+      t.httpEtag = response.headers.get('etag')?.toString() || ''
       t.httpCheckedAt = new Date().getTime()
 
       if (t.httpStatus >= 200 && t.httpStatus < 300) {
@@ -783,21 +855,20 @@ export function useTabsetService() {
 
       if (response.status >= 301 && response.status <= 399) {
         console.log(`checking HEAD found status ${response.status} for url ${t.url}`)
-        t.httpInfo = "REDIRECTED"
+        t.httpInfo = 'REDIRECTED'
       }
       if (method === 'GET' && response.status > 200) {
-        console.log("got t>>>", response.status, t)
+        console.log('got t>>>', response.status, t)
       }
       try {
         if (t.httpLastModified && oldLastModified) {
           if (Date.parse(t.httpLastModified) > Date.parse(oldLastModified)) {
-            t.httpInfo = "UPDATED"
+            t.httpInfo = 'UPDATED'
           }
         }
-      } catch (err) {
-      }
+      } catch (err) {}
       if (t.httpEtag && oldEtag && t.httpEtag !== oldEtag) {
-        t.httpInfo = "UPDATED"
+        t.httpInfo = 'UPDATED'
       }
       return t.httpStatus
     } catch (error: any) {
@@ -813,7 +884,7 @@ export function useTabsetService() {
   }
 
   const handleHeadRequests = async (selectedTabset: Tabset, folderId: string | undefined) => {
-    const useTabset = (folderId)
+    const useTabset = folderId
       ? useTabsetsStore().getActiveFolder(selectedTabset, folderId)
       : selectedTabset
     if (!useTabset) {
@@ -821,22 +892,26 @@ export function useTabsetService() {
       return
     }
     if (!useUiStore().networkOnline) {
-      console.log("not checking HEAD requests due to network offline")
+      console.log('not checking HEAD requests due to network offline')
       return
     }
     const networkState = useUiStore().networkState
     if (networkState && networkState['rtt' as keyof object]) {
       if (networkState['rtt' as keyof object] > 500) {
-        console.log("no HEAD request check due to bad network:", networkState)
+        console.log('no HEAD request check due to bad network:', networkState)
       }
     }
 
-    console.log(`checking current urls using HEAD requests for tabset ${selectedTabset.id}, folder ${folderId}`)
+    console.log(
+      `checking current urls using HEAD requests for tabset ${selectedTabset.id}, folder ${folderId}`,
+    )
     let missed = 0
     for (const t of useTabset.tabs) {
       throttleOne50Millis(async () => {
-        const oldEnough = t.httpCheckedAt ? new Date().getTime() - t.httpCheckedAt > 1000 * 60 : true // 1min
-        if (t.url && !t.url.startsWith("chrome") && oldEnough) {
+        const oldEnough = t.httpCheckedAt
+          ? new Date().getTime() - t.httpCheckedAt > 1000 * 60
+          : true // 1min
+        if (t.url && !t.url.startsWith('chrome') && oldEnough) {
           var status = await handleResponse(t, 'HEAD', 1500)
           if (status === 0 || status === 404) {
             missed++
@@ -848,19 +923,16 @@ export function useTabsetService() {
                 useUiStore().checkConnection()
               }, 1000 * 60)
             }
-
           }
           if (status === 0) {
             handleResponse(t, 'GET', 5000)
           }
         }
-      }).then(() => {
-      })
+      }).then(() => {})
     }
 
     await useTabsetService().saveTabset(selectedTabset)
   }
-
 
   return {
     init,
@@ -895,7 +967,6 @@ export function useTabsetService() {
     addToSearchIndex,
     exportDataAsJson,
     findFolder,
-    handleHeadRequests
+    handleHeadRequests,
   }
-
 }

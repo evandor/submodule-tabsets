@@ -1,11 +1,11 @@
-import {defineStore} from 'pinia';
-import {ref} from "vue";
-import {useUtils} from "src/core/services/Utils";
-import _ from "lodash"
-import {useTabsetService} from "src/tabsets/services/TabsetService2";
-import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
-import {Tabset} from "src/tabsets/models/Tabset";
-import TabsetsGroupsPersistence from "src/tabsets/persistence/TabsetsGroupsPersistence";
+import { defineStore } from 'pinia'
+import { ref } from 'vue'
+import { useUtils } from 'src/core/services/Utils'
+import _ from 'lodash'
+import { useTabsetService } from 'src/tabsets/services/TabsetService2'
+import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+import { Tabset } from 'src/tabsets/models/Tabset'
+import TabsetsGroupsPersistence from 'src/tabsets/persistence/TabsetsGroupsPersistence'
 
 /**
  * a pinia store for chrome groups.
@@ -21,8 +21,7 @@ import TabsetsGroupsPersistence from "src/tabsets/persistence/TabsetsGroupsPersi
 let storage: TabsetsGroupsPersistence = null as unknown as TabsetsGroupsPersistence
 
 export const useGroupsStore = defineStore('groups', () => {
-
-  const {inBexMode} = useUtils()
+  const { inBexMode } = useUtils()
 
   /**
    * the map of all 'ever used' Chrome tab groups, even if they are not currently in use,
@@ -40,19 +39,19 @@ export const useGroupsStore = defineStore('groups', () => {
    * @param providedDb a persistence storage
    */
   async function initialize(providedDb: TabsetsGroupsPersistence) {
-    console.debug(" ...initializing groupsStore")
+    console.debug(' ...initializing groupsStore')
     storage = providedDb
-    await init("initialization")
+    await init('initialization')
   }
 
-  async function init(trigger: string = "") {
+  async function init(trigger: string = '') {
     if (!inBexMode() || !chrome?.tabGroups) {
       return
     }
-    const groups = await chrome.tabGroups.query({})//, (groups) => {
+    const groups = await chrome.tabGroups.query({}) //, (groups) => {
 
     currentTabGroups.value = groups
-    console.log("initializing current tab groups with", currentTabGroups.value)
+    console.log('initializing current tab groups with', currentTabGroups.value)
 
     // adding potentially new groups to storage
     const res: Promise<any>[] = groups.flatMap((group: chrome.tabGroups.TabGroup) => {
@@ -63,12 +62,12 @@ export const useGroupsStore = defineStore('groups', () => {
     await Promise.all(res)
     tabGroups.value = new Map()
     const res2 = await storage.getGroups()
-    res2.forEach(r => tabGroups.value.set(r.title || '', r))
+    res2.forEach((r) => tabGroups.value.set(r.title || '', r))
   }
 
   // TODO: if groups without title are not tracked at all, this might be unnecessary
   function onCreated(group: chrome.tabGroups.TabGroup) {
-    console.debug("group: onCreated", group)
+    console.debug('group: onCreated', group)
     if (inBexMode() && chrome?.tabGroups && group.title) {
       chrome.tabGroups.query({}, (groups) => {
         currentTabGroups.value = groups
@@ -77,11 +76,11 @@ export const useGroupsStore = defineStore('groups', () => {
   }
 
   async function onUpdated(group: chrome.tabGroups.TabGroup) {
-    console.debug("group: onUpdated", group)
+    console.debug('group: onUpdated', group)
     if (!inBexMode() || !chrome?.tabGroups) {
       return Promise.resolve()
     }
-    const groups = await chrome.tabGroups.query({})//, (groups) => {
+    const groups = await chrome.tabGroups.query({}) //, (groups) => {
     currentTabGroups.value = groups
 
     await useGroupsStore().persistGroup(group)
@@ -113,15 +112,21 @@ export const useGroupsStore = defineStore('groups', () => {
 
   function initListeners() {
     if (inBexMode() && chrome && chrome.tabGroups) {
-      console.debug(" ...initializing GroupsStore Listeners")
+      console.debug(' ...initializing GroupsStore Listeners')
       chrome.tabGroups.onCreated.addListener((group: chrome.tabGroups.TabGroup) => onCreated(group))
-      chrome.tabGroups.onRemoved.addListener((group: chrome.tabGroups.TabGroup) => init("onRemoved"))
-      chrome.tabGroups.onMoved.addListener((group: chrome.tabGroups.TabGroup) => init("onMoved"))
+      chrome.tabGroups.onRemoved.addListener((group: chrome.tabGroups.TabGroup) =>
+        init('onRemoved'),
+      )
+      chrome.tabGroups.onMoved.addListener((group: chrome.tabGroups.TabGroup) => init('onMoved'))
       chrome.tabGroups.onUpdated.addListener((group: chrome.tabGroups.TabGroup) => onUpdated(group))
     }
   }
 
-  function findGroup(groups: chrome.tabGroups.TabGroup[], groupId: number | undefined, groupName: string | undefined) {
+  function findGroup(
+    groups: chrome.tabGroups.TabGroup[],
+    groupId: number | undefined,
+    groupName: string | undefined,
+  ) {
     if (groupId) {
       for (const g of groups) {
         if (g.id === groupId) {
@@ -141,12 +146,17 @@ export const useGroupsStore = defineStore('groups', () => {
 
   function groupForName(groupTitle: string | undefined): chrome.tabGroups.TabGroup | undefined {
     if (inBexMode() && chrome && chrome.tabGroups && groupTitle) {
-      return _.find([...tabGroups.value.values()], (g:chrome.tabGroups.TabGroup) => g.title === groupTitle)
+      return _.find(
+        [...tabGroups.value.values()],
+        (g: chrome.tabGroups.TabGroup) => g.title === groupTitle,
+      )
     }
     return undefined
   }
 
-  function currentGroupForName(groupName: string | undefined = undefined): chrome.tabGroups.TabGroup | undefined {
+  function currentGroupForName(
+    groupName: string | undefined = undefined,
+  ): chrome.tabGroups.TabGroup | undefined {
     if (inBexMode() && chrome?.tabGroups && groupName) {
       return findGroup(currentTabGroups.value, undefined, groupName)
     }
@@ -166,11 +176,11 @@ export const useGroupsStore = defineStore('groups', () => {
    */
   async function persistGroup(group: chrome.tabGroups.TabGroup) {
     if (group.title) {
-      console.debug("persisting group", group)
+      console.debug('persisting group', group)
       const existingGroups = await storage.getGroups()
       //console.log("got existing groups", existingGroups)
 
-      const index = existingGroups.findIndex(g => {
+      const index = existingGroups.findIndex((g) => {
         return g.id === group.id && g.title !== group.title
       })
       if (index < 0) {
@@ -178,7 +188,7 @@ export const useGroupsStore = defineStore('groups', () => {
         await storage.addGroup(JSON.parse(JSON.stringify(group)) as chrome.tabGroups.TabGroup)
       } else {
         const existingGroup = existingGroups[index]
-        console.debug("replacing group", existingGroup, group)
+        console.debug('replacing group', existingGroup, group)
         await storage.deleteGroupByTitle(existingGroup!.title || '')
         await persistGroup(group)
       }
@@ -204,6 +214,6 @@ export const useGroupsStore = defineStore('groups', () => {
     currentTabGroups,
     persistGroup,
     updateGroup,
-    deleteGroupByTitle
+    deleteGroupByTitle,
   }
 })

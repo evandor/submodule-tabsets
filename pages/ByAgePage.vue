@@ -1,31 +1,31 @@
 <template>
-
   <!-- toolbar -->
   <q-toolbar class="text-primary lightgrey">
     <div class="row fit">
       <div class="col-xs-12 col-md-5">
         <q-toolbar-title>
           <div class="row justify-start items-baseline">
-            <div class="col-1"><span class="text-dark">Age</span> <span
-              class="text-primary">
-              {{ age }}
-            </span></div>
+            <div class="col-1">
+              <span class="text-dark">Age</span>
+              <span class="text-primary">
+                {{ age }}
+              </span>
+            </div>
           </div>
         </q-toolbar-title>
       </div>
-      <div class="col-xs-12 col-md-7 text-right">
-
-      </div>
+      <div class="col-xs-12 col-md-7 text-right"></div>
     </div>
   </q-toolbar>
 
-  {{ groupedTabs}}
+  {{ groupedTabs }}
   <!-- rest: neither pinned, grouped, or pending -->
   <q-expansion-item
     icon="tabs"
     default-opened
     data-testid="expansion_item_unpinnedNoGroup"
-    expand-separator>
+    expand-separator
+  >
     <template v-slot:header>
       <q-item-section>
         <div>
@@ -37,31 +37,27 @@
 
     <q-card>
       <q-card-section>
-
-<!--        <TabList :tabs="groupedTabs"/>-->
-
+        <!--        <TabList :tabs="groupedTabs"/>-->
       </q-card-section>
-
     </q-card>
   </q-expansion-item>
-
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref, watchEffect} from 'vue'
-import {useRoute} from "vue-router";
-import _ from "lodash"
-import {Tab} from "src/tabsets/models/Tab";
-import {Tabset, TabsetStatus} from "src/tabsets/models/Tabset";
-import Analytics from "src/core/utils/google-analytics";
-import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
+import { onMounted, ref, watchEffect } from 'vue'
+import { useRoute } from 'vue-router'
+import _ from 'lodash'
+import { Tab } from 'src/tabsets/models/Tab'
+import { Tabset, TabsetStatus } from 'src/tabsets/models/Tabset'
+import Analytics from 'src/core/utils/google-analytics'
+import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 
-const route = useRoute();
+const route = useRoute()
 
 const age = ref(null as unknown as string)
 
 onMounted(() => {
-  Analytics.firePageViewEvent('ByAgePage', document.location.href);
+  Analytics.firePageViewEvent('ByAgePage', document.location.href)
 })
 
 watchEffect(() => {
@@ -74,42 +70,41 @@ watchEffect(() => {
 const groupedTabs = ref<Tab[]>([])
 
 watchEffect(() => {
-  const allTabs: Tab[] =
-    _.orderBy(
-      _.filter(
-        _.flatMap(
-          _.filter(
-            _.map([...useTabsetsStore().tabsets.values()] as Tabset[],
-              (ts: Tabset) => ts),
-            (ts: Tabset) => ts.status === TabsetStatus.DEFAULT || ts.status === TabsetStatus.FAVORITE),
-          (ts: Tabset) => ts.tabs), (t: Tab) => true),
-      (t: Tab) => t.activatedCount, ['desc'])
-  console.log("checkin tabs2....", allTabs)
-  groupedTabs.value =
-    _.filter(allTabs, (t: Tab) => {
-      if (t.url) {
-        try {
-          const hostname = new URL(t.url).hostname
-          console.log("comparing", hostname, age.value)
-          const splits = hostname.split('.')
-          switch (splits.length) {
-            case 3:
-              return hostname.substring(1 + hostname.indexOf(".")) === age.value
-            default:
-              return hostname === age.value
-          }
-        } catch (e) {
-          return false
+  const allTabs: Tab[] = _.orderBy(
+    _.filter(
+      _.flatMap(
+        _.filter(
+          _.map([...useTabsetsStore().tabsets.values()] as Tabset[], (ts: Tabset) => ts),
+          (ts: Tabset) => ts.status === TabsetStatus.DEFAULT || ts.status === TabsetStatus.FAVORITE,
+        ),
+        (ts: Tabset) => ts.tabs,
+      ),
+      (t: Tab) => true,
+    ),
+    (t: Tab) => t.activatedCount,
+    ['desc'],
+  )
+  console.log('checkin tabs2....', allTabs)
+  groupedTabs.value = _.filter(allTabs, (t: Tab) => {
+    if (t.url) {
+      try {
+        const hostname = new URL(t.url).hostname
+        console.log('comparing', hostname, age.value)
+        const splits = hostname.split('.')
+        switch (splits.length) {
+          case 3:
+            return hostname.substring(1 + hostname.indexOf('.')) === age.value
+          default:
+            return hostname === age.value
         }
-      } else {
+      } catch (e) {
         return false
       }
-    })
-
-
+    } else {
+      return false
+    }
+  })
 })
-
-
 </script>
 
 <style lang="sass" scoped>
@@ -119,5 +114,4 @@ watchEffect(() => {
 
 .greyBorderTop
   border-top: 1px solid $bordergrey
-
 </style>

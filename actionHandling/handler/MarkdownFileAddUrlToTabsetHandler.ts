@@ -1,27 +1,28 @@
-import {DialogChainObject, QVueGlobals, uid} from "quasar";
-import {Tabset} from "src/tabsets/models/Tabset";
-import {ExecutionResult} from "src/core/domain/ExecutionResult";
-import {Tab} from "src/tabsets/models/Tab";
-import {useCommandExecutor} from "src/core/services/CommandExecutor";
-import {AddTabToTabsetCommand} from "src/tabsets/commands/AddTabToTabsetCommand";
-import {AddUrlToTabsetHandler, ButtonActions} from "src/tabsets/actionHandling/AddUrlToTabsetHandler";
-import {LoadDynamicTabsCommand} from "src/tabsets/commands/LoadDynamicTabsCommand";
+import { DialogChainObject, QVueGlobals, uid } from 'quasar'
+import { Tabset } from 'src/tabsets/models/Tabset'
+import { ExecutionResult } from 'src/core/domain/ExecutionResult'
+import { Tab } from 'src/tabsets/models/Tab'
+import { useCommandExecutor } from 'src/core/services/CommandExecutor'
+import { AddTabToTabsetCommand } from 'src/tabsets/commands/AddTabToTabsetCommand'
+import {
+  AddUrlToTabsetHandler,
+  ButtonActions,
+} from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
+import { LoadDynamicTabsCommand } from 'src/tabsets/commands/LoadDynamicTabsCommand'
 
 export class MarkdownFileAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
-
-  constructor(public $q: QVueGlobals | undefined) {
-  }
+  constructor(public $q: QVueGlobals | undefined) {}
 
   urlMatcher(): RegExp {
-    return /.*\.md$/;
+    return /.*\.md$/
   }
 
   contentMatcher(content: string) {
     return false
   }
 
-  actions(): { label: string, identifier: ButtonActions }[] {
-    return [{label: "Add Markdown Page", identifier: ButtonActions.AddTabWithDynamicFolder}]
+  actions(): { label: string; identifier: ButtonActions }[] {
+    return [{ label: 'Add Markdown Page', identifier: ButtonActions.AddTabWithDynamicFolder }]
   }
 
   withDialog(action: ButtonActions): DialogChainObject | undefined {
@@ -29,12 +30,17 @@ export class MarkdownFileAddUrlToTabsetHandler implements AddUrlToTabsetHandler 
       case ButtonActions.AddTabWithDynamicFolder:
         return this.analyseMarkdownDialog()
       default:
-        console.log("no dialog for action", action)
+        console.log('no dialog for action', action)
     }
   }
 
-  async clicked(chromeTab: chrome.tabs.Tab, ts: Tabset,  folder?: Tabset, additionalData: object = {}): Promise<ExecutionResult<any>> {
-    console.log("saving...", chromeTab.id, additionalData)
+  async clicked(
+    chromeTab: chrome.tabs.Tab,
+    ts: Tabset,
+    folder?: Tabset,
+    additionalData: object = {},
+  ): Promise<ExecutionResult<any>> {
+    console.log('saving...', chromeTab.id, additionalData)
     try {
       const useForLinks = additionalData['useForLinks' as keyof object] as boolean
       const newTab = new Tab(uid(), chromeTab)
@@ -45,39 +51,38 @@ export class MarkdownFileAddUrlToTabsetHandler implements AddUrlToTabsetHandler 
         // await useCommandExecutor().execute(new LoadDynamicTabsCommand(ts, res.result as Tabset))
         await useCommandExecutor().execute(new LoadDynamicTabsCommand(ts, newTab.url!))
       }
-      return Promise.resolve(new ExecutionResult("", "done"))
+      return Promise.resolve(new ExecutionResult('', 'done'))
     } catch (error: any) {
-      console.warn("error", error)
-      return Promise.reject("error creating markdown tab")
+      console.warn('error', error)
+      return Promise.reject('error creating markdown tab')
     }
-
   }
 
-  updateInTabset(chromeTab: chrome.tabs.Tab, ts: Tabset, additionalData: object = {}): Promise<ExecutionResult<any>> {
-    throw new Error("not implemented K")
+  updateInTabset(
+    chromeTab: chrome.tabs.Tab,
+    ts: Tabset,
+    additionalData: object = {},
+  ): Promise<ExecutionResult<any>> {
+    throw new Error('not implemented K')
   }
 
-  handleOpenedTab(browserTab: chrome.tabs.Tab, tab: Tab) {
-
-  }
+  handleOpenedTab(browserTab: chrome.tabs.Tab, tab: Tab) {}
 
   analyseMarkdownDialog(filename: string = '') {
     if (this.$q) {
       return this.$q!.dialog({
         title: 'Save Markdown File',
-        message: 'The file\'s content can be analysed and dynamically extracted.',
+        message: "The file's content can be analysed and dynamically extracted.",
         options: {
           type: 'checkbox',
           model: [],
-          items: [
-            {label: 'Use for links', value: 'useForLinks', color: 'secondary'}
-          ]
+          items: [{ label: 'Use for links', value: 'useForLinks', color: 'secondary' }],
         },
         cancel: true,
-        persistent: true
+        persistent: true,
       })
     } else {
-      console.warn("could not display analyseMarkdownDialog, quasar not set")
+      console.warn('could not display analyseMarkdownDialog, quasar not set')
     }
   }
 }

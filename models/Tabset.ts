@@ -1,35 +1,34 @@
-import {Tab} from "src/tabsets/models/Tab";
-import {TabsetColumn} from "src/tabsets/models/TabsetColumn";
-import {STRIP_CHARS_IN_USER_INPUT} from "src/boot/constants";
-import {ListDetailLevel} from "src/ui/stores/uiStore";
+import { Tab } from 'src/tabsets/models/Tab'
+import { TabsetColumn } from 'src/tabsets/models/TabsetColumn'
+import { STRIP_CHARS_IN_USER_INPUT } from 'src/boot/constants'
+import { ListDetailLevel } from 'src/ui/stores/uiStore'
 
 export enum TabsetStatus {
-  DEFAULT = "DEFAULT",
-  FAVORITE = "FAVORITE",
-  ARCHIVED = "ARCHIVED",
-  DELETED = "DELETED",
-  HIDDEN = "HIDDEN"
+  DEFAULT = 'DEFAULT',
+  FAVORITE = 'FAVORITE',
+  ARCHIVED = 'ARCHIVED',
+  DELETED = 'DELETED',
+  HIDDEN = 'HIDDEN',
 }
 
 export enum TabsetType {
-  DEFAULT = "DEFAULT",
-  SESSION = "SESSION",
+  DEFAULT = 'DEFAULT',
+  SESSION = 'SESSION',
 
-  SPECIAL = "SPECIAL",
-  DYNAMIC = "DYNAMIC",
-  RSS_FOLDER = "RSS_FOLDER"
+  SPECIAL = 'SPECIAL',
+  DYNAMIC = 'DYNAMIC',
+  RSS_FOLDER = 'RSS_FOLDER',
 }
 
 export enum TabsetSharing {
-  UNSHARED = "UNSHARED",
-  PUBLIC_LINK = "PUBLIC_LINK",
-  PUBLIC_LINK_OUTDATED = "PUBLIC_LINK_OUTDATED",
-  USER = "USER",
-  ROLE = "ROLE"
+  UNSHARED = 'UNSHARED',
+  PUBLIC_LINK = 'PUBLIC_LINK',
+  PUBLIC_LINK_OUTDATED = 'PUBLIC_LINK_OUTDATED',
+  USER = 'USER',
+  ROLE = 'ROLE',
 }
 
-
-export const TABSET_NAME_MAX_LENGTH = 32;
+export const TABSET_NAME_MAX_LENGTH = 32
 
 export class Tabset {
   id: string
@@ -83,8 +82,13 @@ export class Tabset {
   // can be set (to the installtion.id) when saving the tabset in order to omit triggering an update
   origin: string = ''
 
-  constructor(id: string, name: string, tabs: Tab[] = [], columns: TabsetColumn[] = [], spaces: string[] = []) {
-
+  constructor(
+    id: string,
+    name: string,
+    tabs: Tab[] = [],
+    columns: TabsetColumn[] = [],
+    spaces: string[] = [],
+  ) {
     // some guards
     if (!Tabset.newTabsetNameIsValid(name)) {
       throw new Error(`Tabset name '${name}' is not valid`)
@@ -114,6 +118,6 @@ export class Tabset {
     return !STRIP_CHARS_IN_USER_INPUT.test(val)
   }
 
-  static newTabsetNameIsShortEnough = (val: string) => val ? val.length <= TABSET_NAME_MAX_LENGTH : true
-
+  static newTabsetNameIsShortEnough = (val: string) =>
+    val ? val.length <= TABSET_NAME_MAX_LENGTH : true
 }

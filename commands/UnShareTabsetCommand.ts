@@ -1,35 +1,30 @@
-import Command from "src/core/domain/Command";
-import {ExecutionResult} from "src/core/domain/ExecutionResult";
-import TabsetService from "src/tabsets/services/TabsetService";
-import {TabsetSharing} from "src/tabsets/models/Tabset";
-import {useLogger} from "src/services/Logger";
+import Command from 'src/core/domain/Command'
+import { ExecutionResult } from 'src/core/domain/ExecutionResult'
+import TabsetService from 'src/tabsets/services/TabsetService'
+import { TabsetSharing } from 'src/tabsets/models/Tabset'
+import { useLogger } from 'src/services/Logger'
 
-const {info} = useLogger()
+const { info } = useLogger()
 
 export class UnShareTabsetCommand implements Command<any> {
-
   constructor(
     public tabsetId: string,
-    public sharedId: string
-  ) {
-  }
+    public sharedId: string,
+  ) {}
 
   async execute(): Promise<ExecutionResult<any>> {
-    return TabsetService.share(this.tabsetId, TabsetSharing.UNSHARED, this.sharedId, "undefined")
+    return TabsetService.share(this.tabsetId, TabsetSharing.UNSHARED, this.sharedId, 'undefined')
       .then((res: any) => {
-        info("unsharing tabset")
+        info('unsharing tabset')
         return res
       })
-      .then((oldSharing:any) => Promise.resolve(
-        new ExecutionResult(
-          oldSharing,
-          "The tabset not shared anymore"))
+      .then((oldSharing: any) =>
+        Promise.resolve(new ExecutionResult(oldSharing, 'The tabset not shared anymore')),
       )
-      .catch((err:any) => Promise.reject(err))
+      .catch((err: any) => Promise.reject(err))
   }
-
 }
 
 UnShareTabsetCommand.prototype.toString = function cmdToString() {
-  return `UnShareTabsetCommand: {tabsetId=${this.tabsetId}}`;
-};
+  return `UnShareTabsetCommand: {tabsetId=${this.tabsetId}}`
+}

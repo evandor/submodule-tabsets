@@ -1,58 +1,55 @@
 <template>
   <q-dialog ref="dialogRef" @hide="onDialogHide">
     <div>
-        <q-card class="q-dialog-plugin" style="max-width:100%">
-          <q-card-section>
-            <div class="text-h6">Delete Folder</div>
-          </q-card-section>
-          <q-card-section>
-            <div class="text-body">Would you like to delete the folder: {{ props.folder.name }} (and existing subfolders)?</div>
-          </q-card-section>
-          <q-card-actions align="right">
-
-            <DialogButton label="Cancel" color="accent" v-close-popup/>
-            <DialogButton label="Delete"
-                          type="submit"
-                          :autofocus="true"
-                          @keyup.enter="deleteFolder()"
-                          @wasClicked="deleteFolder()"
-                          v-close-popup/>
-
-          </q-card-actions>
-        </q-card>
+      <q-card class="q-dialog-plugin" style="max-width: 100%">
+        <q-card-section>
+          <div class="text-h6">Delete Folder</div>
+        </q-card-section>
+        <q-card-section>
+          <div class="text-body">
+            Would you like to delete the folder: {{ props.folder.name }} (and existing subfolders)?
+          </div>
+        </q-card-section>
+        <q-card-actions align="right">
+          <DialogButton label="Cancel" color="accent" v-close-popup />
+          <DialogButton
+            label="Delete"
+            type="submit"
+            :autofocus="true"
+            @keyup.enter="deleteFolder()"
+            @wasClicked="deleteFolder()"
+            v-close-popup
+          />
+        </q-card-actions>
+      </q-card>
     </div>
   </q-dialog>
-
 </template>
 
 <script lang="ts" setup>
+import { useDialogPluginComponent } from 'quasar'
+import { useCommandExecutor } from 'src/core/services/CommandExecutor'
+import { useUiStore } from 'src/ui/stores/uiStore'
+import DialogButton from 'src/core/dialog/buttons/DialogButton.vue'
+import { PropType } from 'vue'
+import { Tabset } from 'src/tabsets/models/Tabset'
+import { DeleteTabsetFolderCommand } from 'src/tabsets/commands/DeleteTabsetFolderCommand'
+import { SidePanelViews } from 'src/app/models/SidePanelViews'
 
-import {useDialogPluginComponent} from 'quasar'
-import {useCommandExecutor} from "src/core/services/CommandExecutor";
-import {useUiStore} from "src/ui/stores/uiStore";
-import DialogButton from "src/core/dialog/buttons/DialogButton.vue";
-import {PropType} from "vue";
-import {Tabset} from "src/tabsets/models/Tabset";
-import {DeleteTabsetFolderCommand} from "src/tabsets/commands/DeleteTabsetFolderCommand";
-import {SidePanelViews} from "src/app/models/SidePanelViews";
-
-defineEmits([
-  ...useDialogPluginComponent.emits
-])
-
+defineEmits([...useDialogPluginComponent.emits])
 
 const props = defineProps({
-  tabset: {type: Object as PropType<Tabset>, required: true},
-  folder: {type: Object as PropType<Tabset>, required: true}
+  tabset: { type: Object as PropType<Tabset>, required: true },
+  folder: { type: Object as PropType<Tabset>, required: true },
 })
 
-const {dialogRef, onDialogHide} = useDialogPluginComponent()
+const { dialogRef, onDialogHide } = useDialogPluginComponent()
 
-const deleteFolder = () => useCommandExecutor().executeFromUi(new DeleteTabsetFolderCommand(props.tabset, props.folder))
+const deleteFolder = () =>
+  useCommandExecutor()
+    .executeFromUi(new DeleteTabsetFolderCommand(props.tabset, props.folder))
     .then((res: any) => {
-        useUiStore().sidePanelSetActiveView(SidePanelViews.MAIN)
+      useUiStore().sidePanelSetActiveView(SidePanelViews.MAIN)
       return res
     })
-
-
 </script>

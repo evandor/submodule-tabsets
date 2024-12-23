@@ -12,11 +12,9 @@
       </q-card-section>
 
       <q-card-section class="q-pt-none">
-
         <q-radio v-model="exportAs" val="json" label="as JSON"></q-radio>
         <!--        <q-radio v-model="exportAs" val="csv" label="as CSV (not implemented yet)"></q-radio>-->
         <q-radio v-model="exportAs" val="bookmarks" label="to Bookmarks Folder"></q-radio>
-
       </q-card-section>
 
       <q-card-section class="q-pt-none text-warning" v-if="warning !== ''">
@@ -24,31 +22,27 @@
       </q-card-section>
 
       <q-card-actions align="right" class="text-primary">
-        <q-btn flat label="Cancel" @click="onDialogCancel"/>
-        <q-btn flat label="Export" v-close-popup @click="exportData()"/>
+        <q-btn flat label="Cancel" @click="onDialogCancel" />
+        <q-btn flat label="Export" v-close-popup @click="exportData()" />
       </q-card-actions>
-
-
     </q-card>
   </q-dialog>
-
 </template>
 
 <script lang="ts" setup>
-
-import {ref, watchEffect} from "vue";
-import {useDialogPluginComponent, useQuasar} from "quasar";
-import TabsetService from "src/tabsets/services/TabsetService";
-import {useSpacesStore} from "src/spaces/stores/spacesStore";
-import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
+import { ref, watchEffect } from 'vue'
+import { useDialogPluginComponent, useQuasar } from 'quasar'
+import TabsetService from 'src/tabsets/services/TabsetService'
+import { useSpacesStore } from 'src/spaces/stores/spacesStore'
+import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 
 defineEmits([
   // REQUIRED; need to specify some events that your
   // component will emit through useDialogPluginComponent()
-  ...useDialogPluginComponent.emits
+  ...useDialogPluginComponent.emits,
 ])
 
-const {dialogRef, onDialogHide, onDialogCancel} = useDialogPluginComponent()
+const { dialogRef, onDialogHide, onDialogCancel } = useDialogPluginComponent()
 
 const $q = useQuasar()
 
@@ -56,9 +50,8 @@ const exportAs = ref('json')
 const hideWarning = ref(false)
 const warning = ref('')
 
-
 const props = defineProps({
-  inSidePanel: {type: Boolean, default: false}
+  inSidePanel: { type: Boolean, default: false },
 })
 
 watchEffect(() => {
@@ -77,17 +70,17 @@ const exportData = () => {
       //router.push("/tabsets/" + tabsStore.currentTabsetId)
       $q.notify({
         message: 'export successful',
-        type: 'positive'
+        type: 'positive',
       })
-    }).catch((ex: any) => {
-    console.error("ex", ex)
-    hideWarning.value = false
-    $q.notify({
-      message: 'Sorry, there was a problem exporting your data',
-      type: 'warning',
     })
-
-  })
+    .catch((ex: any) => {
+      console.error('ex', ex)
+      hideWarning.value = false
+      $q.notify({
+        message: 'Sorry, there was a problem exporting your data',
+        type: 'warning',
+      })
+    })
 }
 
 const foundLabel = () => {
@@ -95,10 +88,16 @@ const foundLabel = () => {
   const allTabsCount = useTabsetsStore().allTabsCount
   const tabsetsCount = useTabsetsStore().tabsets.size
   if (spacesCount > 0) {
-    return "Found " + allTabsCount + " tabs in " + tabsetsCount + " Tabsets and " + spacesCount + " Spaces"
+    return (
+      'Found ' +
+      allTabsCount +
+      ' tabs in ' +
+      tabsetsCount +
+      ' Tabsets and ' +
+      spacesCount +
+      ' Spaces'
+    )
   }
-  return "Found " + allTabsCount + " tabs in " + tabsetsCount + " Tabsets"
+  return 'Found ' + allTabsCount + ' tabs in ' + tabsetsCount + ' Tabsets'
 }
-
-
 </script>

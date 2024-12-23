@@ -1,14 +1,13 @@
-import {defineStore} from 'pinia';
-import {ref} from "vue";
-import {useTabsetsStore} from "src/tabsets/stores/tabsetsStore";
-import {TabAndTabsetId} from "src/tabsets/models/TabAndTabsetId";
-import {LocalStorageTabsetsPersistence} from "src/tabsets/persistence/LocalStorageTabsetsPersistence";
-import {useSpacesStore} from "src/spaces/stores/spacesStore";
-import {Tabset, TabsetStatus} from "src/tabsets/models/Tabset";
-import _ from "lodash"
+import { defineStore } from 'pinia'
+import { ref } from 'vue'
+import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+import { TabAndTabsetId } from 'src/tabsets/models/TabAndTabsetId'
+import { LocalStorageTabsetsPersistence } from 'src/tabsets/persistence/LocalStorageTabsetsPersistence'
+import { useSpacesStore } from 'src/spaces/stores/spacesStore'
+import { Tabset, TabsetStatus } from 'src/tabsets/models/Tabset'
+import _ from 'lodash'
 
 export const useTabsetsUiStore = defineStore('tabsetsUi', () => {
-
   const lastUpdate = ref(0)
 
   const matchingTabs = ref<TabAndTabsetId[]>([])
@@ -78,7 +77,6 @@ export const useTabsetsUiStore = defineStore('tabsetsUi', () => {
       .map((ts: Tabset) => ts.id)
 
     lastUsedTabsets.value = _.union(lastUsedTabsets.value, favorites.value)
-
   }
 
   return {
@@ -89,6 +87,6 @@ export const useTabsetsUiStore = defineStore('tabsetsUi', () => {
     lastUsedTabsets,
     lastUpdate,
     clearFromLastUsedTabsets,
-    load
+    load,
   }
 })
