@@ -20,9 +20,9 @@ import { useFeaturesStore } from 'src/features/stores/featuresStore'
 import { FeatureIdent } from 'src/app/models/FeatureIdent'
 import { useRequestsStore } from 'src/requests/stores/requestsStore'
 import { useRequestsService } from 'src/requests/services/RequestsService'
-import FirebaseServices from "src/services/firebase/FirebaseServices";
-import {useAuthStore} from "stores/authStore";
-import {doc, setDoc} from "firebase/firestore";
+import FirebaseServices from 'src/services/firebase/FirebaseServices'
+import { useAuthStore } from 'stores/authStore'
+import { doc, setDoc } from 'firebase/firestore'
 const { sendMsg } = useUtils()
 const { info } = useLogger()
 
@@ -112,9 +112,12 @@ export class AddTabToTabsetCommand implements Command<any> {
       )
 
       // Analysis
-      if (useAuthStore().user.uid && this.tab.url?.startsWith("https://")) {
+      if (useAuthStore().user.uid && this.tab.url?.startsWith('https://')) {
         const userId = useAuthStore().user.uid
-        setDoc(doc(FirebaseServices.getFirestore(), "users", userId, "queue", uid()),{"event": "new-tab", "url": this.tab.url})
+        setDoc(doc(FirebaseServices.getFirestore(), 'users', userId, 'queue', uid()), {
+          event: 'new-tab',
+          url: this.tab.url,
+        })
       }
 
       // Sharing
