@@ -36,15 +36,15 @@
 </template>
 
 <script setup lang="ts">
-import { PropType } from 'vue'
-import { VueDraggableNext } from 'vue-draggable-next'
+import {PropType} from 'vue'
+import {VueDraggableNext} from 'vue-draggable-next'
 import _ from 'lodash'
-import { useQuasar } from 'quasar'
-import { useTabsStore2 } from 'src/tabsets/stores/tabsStore2'
-import { Tab, TabSorting } from 'src/tabsets/models/Tab'
-import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
-import { useCommandExecutor } from 'src/core/services/CommandExecutor'
-import { CreateTabFromOpenTabsCommand } from 'src/tabsets/commands/CreateTabFromOpenTabs'
+import {useQuasar} from 'quasar'
+import {useTabsStore2} from 'src/tabsets/stores/tabsStore2'
+import {Tab, TabSorting} from 'src/tabsets/models/Tab'
+import {useTabsetsStore} from 'src/tabsets/stores/tabsetsStore'
+import {useCommandExecutor} from 'src/core/services/CommandExecutor'
+import {CreateTabFromOpenTabsCommand} from 'src/tabsets/commands/CreateTabFromOpenTabs'
 import TabListHelper from 'src/tabsets/pages/pwa/TabListHelper.vue'
 import InfoMessageWidget from 'src/ui/widgets/InfoMessageWidget.vue'
 
@@ -86,14 +86,13 @@ const handleDragAndDrop = (event: any) => {
     let useIndex = moved.newIndex
     switch (props.group) {
       case 'otherTabs':
-        // @ts-expect-error TODO
-        const unpinnedNoGroup: Tab[] = _.filter(
-          tabsStore.getCurrentTabs,
-          (t: Tab) => !t.pinned && t.groupId === -1,
-        )
-        if (unpinnedNoGroup.length > 0) {
-          useIndex = adjustIndex(moved, unpinnedNoGroup)
-        }
+        // const unpinnedNoGroup: Tab[] = _.filter(
+        //   tabsStore.getCurrentTabs,
+        //   (t: Tab) => !t.pinned && t.groupId === -1,
+        // )
+        // if (unpinnedNoGroup.length > 0) {
+        //   useIndex = adjustIndex(moved, unpinnedNoGroup)
+        // }
         break
       case 'pinnedTabs':
         const filteredTabs: Tab[] = _.filter(tabsetsStore.getCurrentTabs, (t: Tab) => t.pinned)
@@ -104,14 +103,13 @@ const handleDragAndDrop = (event: any) => {
       default:
         if (props.group.startsWith('groupedTabs_')) {
           const groupId = props.group.split('_')[1]
-          // @ts-expect-error TODO
-          const filteredTabs: Tab[] = _.filter(
-            tabsStore.getCurrentTabs,
-            (t: Tab) => t.groupId === parseInt(groupId),
-          )
-          if (filteredTabs.length > 0) {
-            useIndex = adjustIndex(moved, filteredTabs)
-          }
+          // const filteredTabs: Tab[] = _.filter(
+          //   tabsStore.getCurrentTabs,
+          //   (t: Tab) => t.groupId === parseInt(groupId),
+          // )
+          // if (filteredTabs.length > 0) {
+          //   useIndex = adjustIndex(moved, filteredTabs)
+          // }
         }
         break
     }

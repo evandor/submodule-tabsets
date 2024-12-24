@@ -86,20 +86,19 @@
 </template>
 
 <script lang="ts" setup>
-import { PropType, ref, watchEffect } from 'vue'
-import { Tabset, TabsetType } from 'src/tabsets/models/Tabset'
+import {PropType, ref, watchEffect} from 'vue'
+import {Tabset, TabsetType} from 'src/tabsets/models/Tabset'
 import '@he-tree/vue/style/default.css'
 import '@he-tree/vue/style/material-design.css'
-import { useTabsetService } from 'src/tabsets/services/TabsetService2'
+import {useTabsetService} from 'src/tabsets/services/TabsetService2'
 import SidePanelSubfolderContextMenu from 'src/tabsets/widgets/SidePanelSubfolderContextMenu.vue'
-import { ActionHandlerButtonClickedHolder } from 'src/tabsets/actionHandling/model/ActionHandlerButtonClickedHolder'
-import { useUiStore } from 'src/ui/stores/uiStore'
-import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
-import { useWindowsStore } from 'src/windows/stores/windowsStore'
-import { useTabsStore2 } from 'src/tabsets/stores/tabsStore2'
-import { useActionHandlers } from 'src/tabsets/actionHandling/ActionHandlers'
+import {ActionHandlerButtonClickedHolder} from 'src/tabsets/actionHandling/model/ActionHandlerButtonClickedHolder'
+import {useUiStore} from 'src/ui/stores/uiStore'
+import {useTabsetsStore} from 'src/tabsets/stores/tabsetsStore'
+import {useWindowsStore} from 'src/windows/stores/windowsStore'
+import {useTabsStore2} from 'src/tabsets/stores/tabsStore2'
+import {useActionHandlers} from 'src/tabsets/actionHandling/ActionHandlers'
 import SpecialUrlAddToTabsetComponent from 'src/tabsets/actionHandling/SpecialUrlAddToTabsetComponent.vue'
-import { useNavigationService } from 'src/core/services/NavigationService'
 
 const props = defineProps({
   tabset: { type: Object as PropType<Tabset>, required: true },
