@@ -44,15 +44,15 @@
 </template>
 
 <script setup lang="ts">
-import { PropType } from 'vue'
-import { VueDraggableNext } from 'vue-draggable-next'
-import { Tab, TabSorting } from 'src/tabsets/models/Tab'
-import TabsetService from 'src/tabsets/services/TabsetService'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import { CreateTabFromOpenTabsCommand } from 'src/tabsets/commands/CreateTabFromOpenTabs'
-import { Tabset, TabsetType } from 'src/tabsets/models/Tabset'
 import SidePanelTabListHelper from 'src/tabsets/layouts/SidePanelTabListHelper.vue'
+import { Tab, TabSorting } from 'src/tabsets/models/Tab'
+import { Tabset, TabsetType } from 'src/tabsets/models/Tabset'
 import { TabsetColumn } from 'src/tabsets/models/TabsetColumn'
+import TabsetService from 'src/tabsets/services/TabsetService'
+import { PropType } from 'vue'
+import { VueDraggableNext } from 'vue-draggable-next'
 
 const props = defineProps({
   tabs: { type: Array as PropType<Tab[]>, required: true },

@@ -30,11 +30,11 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watchEffect } from 'vue'
 import { useDialogPluginComponent, useQuasar } from 'quasar'
-import TabsetService from 'src/tabsets/services/TabsetService'
 import { useSpacesStore } from 'src/spaces/stores/spacesStore'
+import TabsetService from 'src/tabsets/services/TabsetService'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+import { ref, watchEffect } from 'vue'
 
 defineEmits([
   // REQUIRED; need to specify some events that your

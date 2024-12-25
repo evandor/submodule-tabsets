@@ -1,12 +1,12 @@
 import { DialogChainObject } from 'quasar'
-import { Tabset } from 'src/tabsets/models/Tabset'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
-import { Tab } from 'src/tabsets/models/Tab'
 import {
   AddUrlToTabsetHandler,
   ButtonActions,
 } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
+import { Tab } from 'src/tabsets/models/Tab'
+import { Tabset } from 'src/tabsets/models/Tabset'
 
 export class NoopAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   urlMatcher() {

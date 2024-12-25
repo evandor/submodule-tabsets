@@ -9,16 +9,15 @@
 <script setup lang="ts">
 // without this, getting "EvalError: Refused to evaluate a string as JavaScript because 'unsafe-eval' is not an allowed"
 import 'regenerator-runtime/runtime'
-import { ref, watchEffect } from 'vue'
-import { useRoute } from 'vue-router'
-import { Tab } from 'src/tabsets/models/Tab'
-import { useUtils } from 'src/core/services/Utils'
-import { Tabset, TabsetSharing } from 'src/tabsets/models/Tabset'
 import EditorJS, { OutputData } from '@editorjs/editorjs'
-
+import { useUtils } from 'src/core/services/Utils'
 import EditorJsConfig from 'src/notes/editorjs/EditorJsConfig'
+import { Tab } from 'src/tabsets/models/Tab'
+import { Tabset, TabsetSharing } from 'src/tabsets/models/Tabset'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+import { ref, watchEffect } from 'vue'
+import { useRoute } from 'vue-router'
 
 const { sendMsg } = useUtils()
 

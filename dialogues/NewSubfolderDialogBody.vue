@@ -52,17 +52,17 @@
 </template>
 
 <script lang="ts" setup>
+import _ from 'lodash'
 import { QForm, uid, useDialogPluginComponent } from 'quasar'
-import { Tabset, TabsetStatus } from 'src/tabsets/models/Tabset'
-import { ref } from 'vue'
+import DialogButton from 'src/core/dialog/buttons/DialogButton.vue'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import { useUtils } from 'src/core/services/Utils'
-import DialogButton from 'src/core/dialog/buttons/DialogButton.vue'
 import { CreateFolderCommand } from 'src/tabsets/commands/CreateFolderCommand'
+import { Tab } from 'src/tabsets/models/Tab'
+import { Tabset, TabsetStatus } from 'src/tabsets/models/Tabset'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { useTabsStore2 } from 'src/tabsets/stores/tabsStore2'
-import _ from 'lodash'
-import { Tab } from 'src/tabsets/models/Tab'
+import { ref } from 'vue'
 
 const { dialogRef, onDialogHide, onDialogCancel } = useDialogPluginComponent()
 const { inBexMode } = useUtils()

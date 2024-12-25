@@ -97,22 +97,22 @@
 </template>
 
 <script lang="ts" setup>
-import { PropType, ref } from 'vue'
-import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import { useQuasar } from 'quasar'
-import { Tab } from 'src/tabsets/models/Tab'
-import { useRouter } from 'vue-router'
-import NavigationService from 'src/services/NavigationService'
-import { Tabset } from 'src/tabsets/models/Tabset'
-import { FeatureIdent } from 'src/app/models/FeatureIdent'
-import { PlaceholdersType } from 'src/tabsets/models/Placeholders'
-import ColorSelector from 'src/core/dialog/ColorSelector.vue'
-import { UpdateTabColorCommand } from 'src/tabsets/commands/UpdateTabColor'
-import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
-import { useFeaturesStore } from 'src/features/stores/featuresStore'
-import EditUrlDialog from 'src/tabsets/dialogues/EditUrlDialog.vue'
 import PanelTabListContextMenuHook from 'src/app/hooks/tabsets/PanelTabListContextMenuHook.vue'
+import { FeatureIdent } from 'src/app/models/FeatureIdent'
+import ColorSelector from 'src/core/dialog/ColorSelector.vue'
+import { useCommandExecutor } from 'src/core/services/CommandExecutor'
+import { useFeaturesStore } from 'src/features/stores/featuresStore'
+import NavigationService from 'src/services/NavigationService'
 import { DeleteTabCommand } from 'src/tabsets/commands/DeleteTabCommand'
+import { UpdateTabColorCommand } from 'src/tabsets/commands/UpdateTabColor'
+import EditUrlDialog from 'src/tabsets/dialogues/EditUrlDialog.vue'
+import { PlaceholdersType } from 'src/tabsets/models/Placeholders'
+import { Tab } from 'src/tabsets/models/Tab'
+import { Tabset } from 'src/tabsets/models/Tabset'
+import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+import { PropType, ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 const props = defineProps({
   tab: { type: Object as PropType<Tab>, required: true },

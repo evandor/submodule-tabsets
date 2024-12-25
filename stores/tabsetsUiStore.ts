@@ -1,11 +1,11 @@
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
-import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
-import { TabAndTabsetId } from 'src/tabsets/models/TabAndTabsetId'
-import { LocalStorageTabsetsPersistence } from 'src/tabsets/persistence/LocalStorageTabsetsPersistence'
-import { useSpacesStore } from 'src/spaces/stores/spacesStore'
-import { Tabset, TabsetStatus } from 'src/tabsets/models/Tabset'
 import _ from 'lodash'
+import { defineStore } from 'pinia'
+import { useSpacesStore } from 'src/spaces/stores/spacesStore'
+import { TabAndTabsetId } from 'src/tabsets/models/TabAndTabsetId'
+import { Tabset, TabsetStatus } from 'src/tabsets/models/Tabset'
+import { LocalStorageTabsetsPersistence } from 'src/tabsets/persistence/LocalStorageTabsetsPersistence'
+import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+import { ref } from 'vue'
 
 export const useTabsetsUiStore = defineStore('tabsetsUi', () => {
   const lastUpdate = ref(0)

@@ -1,6 +1,6 @@
 import { IDBPDatabase, openDB } from 'idb'
-import TabsetsPersistence from 'src/tabsets/persistence/TabsetsPersistence'
 import { Tabset, TabsetSharing } from 'src/tabsets/models/Tabset'
+import TabsetsPersistence from 'src/tabsets/persistence/TabsetsPersistence'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 
 class IndexedDbTabsetsPersistence implements TabsetsPersistence {

@@ -29,11 +29,11 @@
 </template>
 
 <script lang="ts" setup>
-import { PropType, ref } from 'vue'
 import { useUtils } from 'src/core/services/Utils'
 import { Tab } from 'src/tabsets/models/Tab'
-import { DrawerTabs, useUiStore } from 'src/ui/stores/uiStore'
 import PanelTabListElementWidget from 'src/tabsets/widgets/PanelTabListElementWidget.vue'
+import { DrawerTabs, useUiStore } from 'src/ui/stores/uiStore'
+import { PropType, ref } from 'vue'
 
 const props = defineProps({
   tabs: { type: Array as PropType<Tab[]>, required: true },

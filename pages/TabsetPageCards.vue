@@ -46,16 +46,16 @@
 </template>
 
 <script lang="ts" setup>
+import TabGrid from 'components/layouts/TabGrid.vue'
 import TabGroups from 'components/layouts/TabGroups.vue'
 import TabsExporter from 'components/layouts/TabsExporter.vue'
-import TabGrid from 'components/layouts/TabGrid.vue'
-import { PropType, ref, watchEffect } from 'vue'
 import _ from 'lodash'
-import { useRoute } from 'vue-router'
-import { useUiStore } from 'src/ui/stores/uiStore'
 import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset } from 'src/tabsets/models/Tabset'
 import TabList from 'src/tabsets/pages/pwa/TabList.vue'
+import { useUiStore } from 'src/ui/stores/uiStore'
+import { PropType, ref, watchEffect } from 'vue'
+import { useRoute } from 'vue-router'
 
 const route = useRoute()
 

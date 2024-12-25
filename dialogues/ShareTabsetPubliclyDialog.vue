@@ -44,11 +44,11 @@
 
 <script lang="ts" setup>
 import { LocalStorage, useDialogPluginComponent, useQuasar } from 'quasar'
+import { SHARING_AUTHOR_IDENT } from 'src/boot/constants'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import { ShareTabsetCommand } from 'src/tabsets/commands/ShareTabsetCommand'
 import { TabsetSharing } from 'src/tabsets/models/Tabset'
 import { ref } from 'vue'
-import { SHARING_AUTHOR_IDENT } from 'src/boot/constants'
 
 defineEmits([...useDialogPluginComponent.emits])
 

@@ -48,12 +48,12 @@
 </template>
 
 <script setup lang="ts">
-import { Tab } from 'src/tabsets/models/Tab'
-import { onMounted, PropType, ref, watchEffect } from 'vue'
 import NavigationService from 'src/services/NavigationService'
-import TabFaviconWidget from 'src/tabsets/widgets/TabFaviconWidget.vue'
+import { Tab } from 'src/tabsets/models/Tab'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
+import TabFaviconWidget from 'src/tabsets/widgets/TabFaviconWidget.vue'
 import { useThumbnailsService } from 'src/thumbnails/services/ThumbnailsService'
+import { onMounted, PropType, ref, watchEffect } from 'vue'
 
 const props = defineProps({
   tab: { type: Object as PropType<Tab>, required: true },

@@ -10,12 +10,12 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, watchEffect } from 'vue'
-import { Tab } from 'src/tabsets/models/Tab'
-import Analytics from 'src/core/utils/google-analytics'
 import _ from 'lodash'
+import Analytics from 'src/core/utils/google-analytics'
+import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset, TabsetStatus } from 'src/tabsets/models/Tabset'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+import { onMounted, ref, watchEffect } from 'vue'
 
 const emit = defineEmits(['domainSelected'])
 

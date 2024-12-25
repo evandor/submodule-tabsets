@@ -1,16 +1,16 @@
-import { Tabset } from 'src/tabsets/models/Tabset'
-import { Tab } from 'src/tabsets/models/Tab'
-import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { DialogChainObject, QVueGlobals, uid } from 'quasar'
+import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
-import { AddTabToTabsetCommand } from 'src/tabsets/commands/AddTabToTabsetCommand'
 import {
   AddUrlToTabsetHandler,
   ButtonActions,
 } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
-import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
 import { ExcalidrawStorage } from 'src/tabsets/actionHandling/model/ExcalidrawStorage'
+import { AddTabToTabsetCommand } from 'src/tabsets/commands/AddTabToTabsetCommand'
+import { Tab } from 'src/tabsets/models/Tab'
+import { Tabset } from 'src/tabsets/models/Tabset'
+import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 
 /**
  * does not work as intended; cannot overwrite local storage of excalidraw.com

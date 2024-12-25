@@ -448,7 +448,29 @@
 </template>
 
 <script setup lang="ts">
+import { formatDistance } from 'date-fns'
+import _ from 'lodash'
+import { useQuasar } from 'quasar'
+import BrowserApi from 'src/app/BrowserApi'
+import TabListIconIndicatorsHook from 'src/app/hooks/tabsets/TabListIconIndicatorsHook.vue'
+import { FeatureIdent } from 'src/app/models/FeatureIdent'
+import { TabReference, TabReferenceType } from 'src/content/models/TabReference'
+import { useCommandExecutor } from 'src/core/services/CommandExecutor'
+import { useNavigationService } from 'src/core/services/NavigationService'
+import { useUtils } from 'src/core/services/Utils'
+import ShortUrl from 'src/core/utils/ShortUrl.vue'
+import { useFeaturesStore } from 'src/features/stores/featuresStore'
 import NavigationService from 'src/services/NavigationService'
+import TabService from 'src/services/TabService'
+import { SavedBlob } from 'src/snapshots/models/SavedBlob'
+import { Suggestion, SuggestionState } from 'src/suggestions/models/Suggestion'
+import { useSuggestionsStore } from 'src/suggestions/stores/suggestionsStore'
+import { DeleteChromeGroupCommand } from 'src/tabsets/commands/DeleteChromeGroupCommand'
+import { DeleteCommentCommand } from 'src/tabsets/commands/DeleteCommentCommand'
+import { DeleteTabCommand } from 'src/tabsets/commands/DeleteTabCommand'
+import { OpenTabCommand } from 'src/tabsets/commands/OpenTabCommand'
+import CommentDialog from 'src/tabsets/dialogues/CommentDialog.vue'
+import { PlaceholdersType } from 'src/tabsets/models/Placeholders'
 import {
   HTMLSelection,
   HTMLSelectionComment,
@@ -457,41 +479,19 @@ import {
   TabFavorite,
   TabPreview,
   TabSorting,
-  UrlExtension
+  UrlExtension,
 } from 'src/tabsets/models/Tab'
-import TabsetService from 'src/tabsets/services/TabsetService'
-import { onMounted, PropType, ref, watchEffect } from 'vue'
-import { useCommandExecutor } from 'src/core/services/CommandExecutor'
-import { ListDetailLevel, useUiStore } from 'src/ui/stores/uiStore'
-import TabFaviconWidget from 'src/tabsets/widgets/TabFaviconWidget.vue'
-import { useTabsetService } from 'src/tabsets/services/TabsetService2'
-import ShortUrl from 'src/core/utils/ShortUrl.vue'
-import PanelTabListContextMenu from 'src/tabsets/widgets/PanelTabListContextMenu.vue'
-import _ from 'lodash'
-import { formatDistance } from 'date-fns'
 import { Tabset, TabsetType } from 'src/tabsets/models/Tabset'
-import { FeatureIdent } from 'src/app/models/FeatureIdent'
-import { useUtils } from 'src/core/services/Utils'
-import { useRouter } from 'vue-router'
+import TabsetService from 'src/tabsets/services/TabsetService'
+import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useGroupsStore } from 'src/tabsets/stores/groupsStore'
-import { DeleteChromeGroupCommand } from 'src/tabsets/commands/DeleteChromeGroupCommand'
-import { PlaceholdersType } from 'src/tabsets/models/Placeholders'
-import { useQuasar } from 'quasar'
-import { useSuggestionsStore } from 'src/suggestions/stores/suggestionsStore'
-import { Suggestion, SuggestionState } from 'src/suggestions/models/Suggestion'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
-import { useFeaturesStore } from 'src/features/stores/featuresStore'
-import { DeleteCommentCommand } from 'src/tabsets/commands/DeleteCommentCommand'
-import { SavedBlob } from 'src/snapshots/models/SavedBlob'
+import PanelTabListContextMenu from 'src/tabsets/widgets/PanelTabListContextMenu.vue'
+import TabFaviconWidget from 'src/tabsets/widgets/TabFaviconWidget.vue'
 import { useThumbnailsService } from 'src/thumbnails/services/ThumbnailsService'
-import CommentDialog from 'src/tabsets/dialogues/CommentDialog.vue'
-import TabListIconIndicatorsHook from 'src/app/hooks/tabsets/TabListIconIndicatorsHook.vue'
-import { OpenTabCommand } from 'src/tabsets/commands/OpenTabCommand'
-import { useNavigationService } from 'src/core/services/NavigationService'
-import { TabReference, TabReferenceType } from 'src/content/models/TabReference'
-import BrowserApi from 'src/app/BrowserApi'
-import { DeleteTabCommand } from 'src/tabsets/commands/DeleteTabCommand'
-import TabService from 'src/services/TabService'
+import { ListDetailLevel, useUiStore } from 'src/ui/stores/uiStore'
+import { onMounted, PropType, ref, watchEffect } from 'vue'
+import { useRouter } from 'vue-router'
 
 const { inBexMode } = useUtils()
 

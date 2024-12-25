@@ -43,13 +43,13 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watchEffect } from 'vue'
-import { useRoute } from 'vue-router'
 import _ from 'lodash'
+import Analytics from 'src/core/utils/google-analytics'
 import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset, TabsetStatus } from 'src/tabsets/models/Tabset'
-import Analytics from 'src/core/utils/google-analytics'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+import { onMounted, ref, watchEffect } from 'vue'
+import { useRoute } from 'vue-router'
 
 const route = useRoute()
 

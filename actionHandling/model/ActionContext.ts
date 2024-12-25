@@ -1,5 +1,5 @@
-import { Tabset } from 'src/tabsets/models/Tabset'
 import { ButtonActions } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
+import { Tabset } from 'src/tabsets/models/Tabset'
 
 export class ActionContext {
   constructor(

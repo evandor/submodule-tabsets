@@ -36,17 +36,17 @@
 </template>
 
 <script setup lang="ts">
-import { PropType } from 'vue'
-import { VueDraggableNext } from 'vue-draggable-next'
 import _ from 'lodash'
 import { useQuasar } from 'quasar'
-import { useTabsStore2 } from 'src/tabsets/stores/tabsStore2'
-import { Tab, TabSorting } from 'src/tabsets/models/Tab'
-import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import { CreateTabFromOpenTabsCommand } from 'src/tabsets/commands/CreateTabFromOpenTabs'
+import { Tab, TabSorting } from 'src/tabsets/models/Tab'
 import TabListHelper from 'src/tabsets/pages/pwa/TabListHelper.vue'
+import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+import { useTabsStore2 } from 'src/tabsets/stores/tabsStore2'
 import InfoMessageWidget from 'src/ui/widgets/InfoMessageWidget.vue'
+import { PropType } from 'vue'
+import { VueDraggableNext } from 'vue-draggable-next'
 
 const $q = useQuasar()
 const tabsStore = useTabsStore2()

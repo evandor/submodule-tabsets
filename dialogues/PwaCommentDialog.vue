@@ -43,13 +43,13 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watchEffect } from 'vue'
 import { LocalStorage, useDialogPluginComponent } from 'quasar'
+import { SHARING_AUTHOR_IDENT } from 'src/boot/constants'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import { AddCommentCommand } from 'src/tabsets/commands/AddCommentCommand'
-import { useUiStore } from 'src/ui/stores/uiStore'
-import { SHARING_AUTHOR_IDENT } from 'src/boot/constants'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+import { useUiStore } from 'src/ui/stores/uiStore'
+import { ref, watchEffect } from 'vue'
 
 defineEmits([...useDialogPluginComponent.emits])
 

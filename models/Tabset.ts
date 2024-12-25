@@ -1,6 +1,6 @@
+import { STRIP_CHARS_IN_USER_INPUT } from 'src/boot/constants'
 import { Tab } from 'src/tabsets/models/Tab'
 import { TabsetColumn } from 'src/tabsets/models/TabsetColumn'
-import { STRIP_CHARS_IN_USER_INPUT } from 'src/boot/constants'
 import { ListDetailLevel } from 'src/ui/stores/uiStore'
 
 export enum TabsetStatus {

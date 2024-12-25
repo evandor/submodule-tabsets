@@ -23,13 +23,13 @@
 </template>
 
 <script setup lang="ts">
-import { Tab, TabSorting } from 'src/tabsets/models/Tab'
-import { Tabset } from 'src/tabsets/models/Tabset'
-import { useUiStore } from 'src/ui/stores/uiStore'
-import { PropType } from 'vue'
-import PanelTabListElementWidget from 'src/tabsets/widgets/PanelTabListElementWidget.vue'
 import { FeatureIdent } from 'src/app/models/FeatureIdent'
 import { useFeaturesStore } from 'src/features/stores/featuresStore'
+import { Tab, TabSorting } from 'src/tabsets/models/Tab'
+import { Tabset } from 'src/tabsets/models/Tabset'
+import PanelTabListElementWidget from 'src/tabsets/widgets/PanelTabListElementWidget.vue'
+import { useUiStore } from 'src/ui/stores/uiStore'
+import { PropType } from 'vue'
 
 const props = defineProps({
   tab: { type: Object as PropType<Tab>, required: true },

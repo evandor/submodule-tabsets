@@ -1,10 +1,10 @@
 import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
-import { useTabsetService } from 'src/tabsets/services/TabsetService2'
-import { Tabset, TabsetType } from 'src/tabsets/models/Tabset'
-import { Tab } from 'src/tabsets/models/Tab'
-import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { useLogger } from 'src/services/Logger'
+import { Tab } from 'src/tabsets/models/Tab'
+import { Tabset, TabsetType } from 'src/tabsets/models/Tabset'
+import { useTabsetService } from 'src/tabsets/services/TabsetService2'
+import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 
 const { info } = useLogger()
 

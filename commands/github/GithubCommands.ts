@@ -1,5 +1,3 @@
-import Command from 'src/core/domain/Command'
-import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { LocalStorage } from 'quasar'
 import {
   GITHUB_PATH,
@@ -8,6 +6,8 @@ import {
   GITHUB_USERNAME,
   STRIP_CHARS_IN_USER_INPUT,
 } from 'src/boot/constants'
+import Command from 'src/core/domain/Command'
+import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 
 export abstract class GithubCommands<T> implements Command<T> {
   abstract execute(): Promise<ExecutionResult<T>>

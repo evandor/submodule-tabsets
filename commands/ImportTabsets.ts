@@ -1,7 +1,8 @@
 import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
-import TabsetService from 'src/tabsets/services/TabsetService'
 import { useLogger } from 'src/services/Logger'
+import TabsetService from 'src/tabsets/services/TabsetService'
+
 const { info } = useLogger()
 
 export class ImportTabsetsCommand implements Command<string> {

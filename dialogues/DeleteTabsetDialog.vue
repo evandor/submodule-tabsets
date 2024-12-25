@@ -37,10 +37,10 @@
 
 <script lang="ts" setup>
 import { useDialogPluginComponent } from 'quasar'
-import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import DialogButton from 'src/core/dialog/buttons/DialogButton.vue'
-import { ref } from 'vue'
+import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import { DeleteTabsetCommand } from 'src/tabsets/commands/DeleteTabsetCommand'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 defineEmits([...useDialogPluginComponent.emits])

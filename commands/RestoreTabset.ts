@@ -1,6 +1,6 @@
+import ChromeApi from 'src/app/BrowserApi'
 import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
-import ChromeApi from 'src/app/BrowserApi'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 
 export class RestoreTabsetCommand implements Command<string> {

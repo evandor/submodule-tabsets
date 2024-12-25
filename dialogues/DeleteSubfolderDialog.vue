@@ -28,13 +28,13 @@
 
 <script lang="ts" setup>
 import { useDialogPluginComponent } from 'quasar'
-import { useCommandExecutor } from 'src/core/services/CommandExecutor'
-import { useUiStore } from 'src/ui/stores/uiStore'
-import DialogButton from 'src/core/dialog/buttons/DialogButton.vue'
-import { PropType } from 'vue'
-import { Tabset } from 'src/tabsets/models/Tabset'
-import { DeleteTabsetFolderCommand } from 'src/tabsets/commands/DeleteTabsetFolderCommand'
 import { SidePanelViews } from 'src/app/models/SidePanelViews'
+import DialogButton from 'src/core/dialog/buttons/DialogButton.vue'
+import { useCommandExecutor } from 'src/core/services/CommandExecutor'
+import { DeleteTabsetFolderCommand } from 'src/tabsets/commands/DeleteTabsetFolderCommand'
+import { Tabset } from 'src/tabsets/models/Tabset'
+import { useUiStore } from 'src/ui/stores/uiStore'
+import { PropType } from 'vue'
 
 defineEmits([...useDialogPluginComponent.emits])
 

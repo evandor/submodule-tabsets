@@ -1,14 +1,14 @@
 import { DialogChainObject, QVueGlobals, uid } from 'quasar'
-import { Tabset } from 'src/tabsets/models/Tabset'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
-import { Tab } from 'src/tabsets/models/Tab'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
-import { AddTabToTabsetCommand } from 'src/tabsets/commands/AddTabToTabsetCommand'
 import {
   AddUrlToTabsetHandler,
   ButtonActions,
 } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
+import { AddTabToTabsetCommand } from 'src/tabsets/commands/AddTabToTabsetCommand'
+import { Tab } from 'src/tabsets/models/Tab'
+import { Tabset } from 'src/tabsets/models/Tabset'
 
 export class DynamicUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   constructor(public $q: QVueGlobals | undefined) {}
