@@ -457,7 +457,7 @@ import {
   TabFavorite,
   TabPreview,
   TabSorting,
-  UrlExtension,
+  UrlExtension
 } from 'src/tabsets/models/Tab'
 import TabsetService from 'src/tabsets/services/TabsetService'
 import { onMounted, PropType, ref, watchEffect } from 'vue'
@@ -481,7 +481,7 @@ import { useSuggestionsStore } from 'src/suggestions/stores/suggestionsStore'
 import { Suggestion, SuggestionState } from 'src/suggestions/models/Suggestion'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { useFeaturesStore } from 'src/features/stores/featuresStore'
-import { DeleteCommentCommand } from 'src/domain/tabs/DeleteCommentCommand'
+import { DeleteCommentCommand } from 'src/tabsets/commands/DeleteCommentCommand'
 import { SavedBlob } from 'src/snapshots/models/SavedBlob'
 import { useThumbnailsService } from 'src/thumbnails/services/ThumbnailsService'
 import CommentDialog from 'src/tabsets/dialogues/CommentDialog.vue'

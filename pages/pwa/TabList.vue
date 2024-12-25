@@ -36,15 +36,15 @@
 </template>
 
 <script setup lang="ts">
-import {PropType} from 'vue'
-import {VueDraggableNext} from 'vue-draggable-next'
+import { PropType } from 'vue'
+import { VueDraggableNext } from 'vue-draggable-next'
 import _ from 'lodash'
-import {useQuasar} from 'quasar'
-import {useTabsStore2} from 'src/tabsets/stores/tabsStore2'
-import {Tab, TabSorting} from 'src/tabsets/models/Tab'
-import {useTabsetsStore} from 'src/tabsets/stores/tabsetsStore'
-import {useCommandExecutor} from 'src/core/services/CommandExecutor'
-import {CreateTabFromOpenTabsCommand} from 'src/tabsets/commands/CreateTabFromOpenTabs'
+import { useQuasar } from 'quasar'
+import { useTabsStore2 } from 'src/tabsets/stores/tabsStore2'
+import { Tab, TabSorting } from 'src/tabsets/models/Tab'
+import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+import { useCommandExecutor } from 'src/core/services/CommandExecutor'
+import { CreateTabFromOpenTabsCommand } from 'src/tabsets/commands/CreateTabFromOpenTabs'
 import TabListHelper from 'src/tabsets/pages/pwa/TabListHelper.vue'
 import InfoMessageWidget from 'src/ui/widgets/InfoMessageWidget.vue'
 
