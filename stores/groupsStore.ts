@@ -1,11 +1,11 @@
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
-import { useUtils } from 'src/core/services/Utils'
 import _ from 'lodash'
-import { useTabsetService } from 'src/tabsets/services/TabsetService2'
-import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+import { defineStore } from 'pinia'
+import { useUtils } from 'src/core/services/Utils'
 import { Tabset } from 'src/tabsets/models/Tabset'
 import TabsetsGroupsPersistence from 'src/tabsets/persistence/TabsetsGroupsPersistence'
+import { useTabsetService } from 'src/tabsets/services/TabsetService2'
+import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+import { ref } from 'vue'
 
 /**
  * a pinia store for chrome groups.

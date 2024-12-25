@@ -1,9 +1,9 @@
 import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
-import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useLogger } from 'src/services/Logger'
-import { useTabsetsUiStore } from 'src/tabsets/stores/tabsetsUiStore'
 import { useSpacesStore } from 'src/spaces/stores/spacesStore'
+import { useTabsetService } from 'src/tabsets/services/TabsetService2'
+import { useTabsetsUiStore } from 'src/tabsets/stores/tabsetsUiStore'
 
 const { info } = useLogger()
 

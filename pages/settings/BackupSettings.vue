@@ -77,9 +77,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watchEffect } from 'vue'
 import { LocalStorage } from 'quasar'
-import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import {
   GITHUB_AUTO_BACKUP,
   GITHUB_LOG,
@@ -88,10 +86,12 @@ import {
   GITHUB_TOKEN,
   GITHUB_USERNAME,
 } from 'src/boot/constants'
-import { GithubBackupCommand } from 'src/tabsets/commands/github/GithubBackupCommand'
+import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import { NotificationType } from 'src/core/services/ErrorHandler'
-import { useUiStore } from 'src/ui/stores/uiStore'
 import { useNavigationService } from 'src/core/services/NavigationService'
+import { GithubBackupCommand } from 'src/tabsets/commands/github/GithubBackupCommand'
+import { useUiStore } from 'src/ui/stores/uiStore'
+import { ref, watchEffect } from 'vue'
 
 const username = ref<string>(LocalStorage.getItem(GITHUB_USERNAME) as string)
 const reponame = ref<string>(LocalStorage.getItem(GITHUB_REPONAME) as string)

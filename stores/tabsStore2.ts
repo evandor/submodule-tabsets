@@ -1,8 +1,8 @@
-import { defineStore } from 'pinia'
 import _ from 'lodash'
-import { computed, ref } from 'vue'
-import { Tabset } from 'src/tabsets/models/Tabset'
+import { defineStore } from 'pinia'
 import { Tab } from 'src/tabsets/models/Tab'
+import { Tabset } from 'src/tabsets/models/Tabset'
+import { computed, ref } from 'vue'
 
 async function queryTabs(): Promise<chrome.tabs.Tab[]> {
   return await chrome.tabs.query({ currentWindow: true })

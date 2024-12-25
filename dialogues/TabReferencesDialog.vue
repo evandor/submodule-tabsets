@@ -27,14 +27,14 @@
 </template>
 
 <script lang="ts" setup>
-import { PropType, ref, watchEffect } from 'vue'
 import { useDialogPluginComponent } from 'quasar'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
+import { useNavigationService } from 'src/core/services/NavigationService'
 import { AddCommentCommand } from 'src/tabsets/commands/AddCommentCommand'
-import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset } from 'src/tabsets/models/Tabset'
-import { useNavigationService } from 'src/core/services/NavigationService'
+import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+import { PropType, ref, watchEffect } from 'vue'
 
 defineEmits([...useDialogPluginComponent.emits])
 

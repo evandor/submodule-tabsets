@@ -36,14 +36,14 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watchEffect } from 'vue'
-import TabsetService from 'src/tabsets/services/TabsetService'
 import { uid, useDialogPluginComponent } from 'quasar'
-import { Tab } from 'src/tabsets/models/Tab'
 import ChromeApi from 'src/app/BrowserApi'
 import { useUtils } from 'src/core/services/Utils'
+import { Tab } from 'src/tabsets/models/Tab'
+import TabsetService from 'src/tabsets/services/TabsetService'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+import { ref, watchEffect } from 'vue'
 
 defineEmits([...useDialogPluginComponent.emits])
 

@@ -1,8 +1,8 @@
+import { FeatureIdent } from 'src/app/models/FeatureIdent'
 import Command from 'src/core/domain/Command'
-import { TabFavorite } from 'src/tabsets/models/Tab'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { useFeaturesStore } from 'src/features/stores/featuresStore'
-import { FeatureIdent } from 'src/app/models/FeatureIdent'
+import { TabFavorite } from 'src/tabsets/models/Tab'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 
 export class ToggleTabFavoriteCommand implements Command<any> {

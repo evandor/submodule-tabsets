@@ -1,10 +1,10 @@
 import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
+import { useUtils } from 'src/core/services/Utils'
+import { useLogger } from 'src/services/Logger'
 import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset, TabsetSharing } from 'src/tabsets/models/Tabset'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
-import { useUtils } from 'src/core/services/Utils'
-import { useLogger } from 'src/services/Logger'
 
 const { addToTabset, deleteTab } = useTabsetService()
 const { sendMsg } = useUtils()

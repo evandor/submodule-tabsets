@@ -1,8 +1,8 @@
-import { Tabset } from 'src/tabsets/models/Tabset'
 import { DialogChainObject } from 'quasar'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
-import { Tab } from 'src/tabsets/models/Tab'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
+import { Tab } from 'src/tabsets/models/Tab'
+import { Tabset } from 'src/tabsets/models/Tabset'
 
 export enum ButtonActions {
   AddTab = 'AddTab',

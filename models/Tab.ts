@@ -1,10 +1,10 @@
+import _ from 'lodash'
 import { uid } from 'quasar'
 import { STRIP_CHARS_IN_USER_INPUT } from 'src/boot/constants'
-import _ from 'lodash'
-import { Placeholders } from 'src/tabsets/models/Placeholders'
 import { TabReference, TabReferenceType } from 'src/content/models/TabReference'
-import { ExcalidrawStorage } from 'src/tabsets/actionHandling/model/ExcalidrawStorage'
 import { useUtils } from 'src/core/services/Utils'
+import { ExcalidrawStorage } from 'src/tabsets/actionHandling/model/ExcalidrawStorage'
+import { Placeholders } from 'src/tabsets/models/Placeholders'
 
 const { sanitizeAsText, sanitizeAsHtml } = useUtils()
 

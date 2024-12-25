@@ -86,17 +86,17 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, watchEffect } from 'vue'
 import { useDialogPluginComponent } from 'quasar'
-import { STRIP_CHARS_IN_USER_INPUT } from 'src/boot/constants'
-import { RenameTabsetCommand } from 'src/tabsets/commands/RenameTabset'
-import { useCommandExecutor } from 'src/core/services/CommandExecutor'
-import ColorSelector from 'src/core/dialog/ColorSelector.vue'
 import { FeatureIdent } from 'src/app/models/FeatureIdent'
-import { useWindowsStore } from 'src/windows/stores/windowsStore'
-import { ListDetailLevel, useUiStore } from 'src/ui/stores/uiStore'
-import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+import { STRIP_CHARS_IN_USER_INPUT } from 'src/boot/constants'
+import ColorSelector from 'src/core/dialog/ColorSelector.vue'
+import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import { useFeaturesStore } from 'src/features/stores/featuresStore'
+import { RenameTabsetCommand } from 'src/tabsets/commands/RenameTabset'
+import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+import { ListDetailLevel, useUiStore } from 'src/ui/stores/uiStore'
+import { useWindowsStore } from 'src/windows/stores/windowsStore'
+import { computed, ref, watchEffect } from 'vue'
 
 defineEmits([...useDialogPluginComponent.emits])
 

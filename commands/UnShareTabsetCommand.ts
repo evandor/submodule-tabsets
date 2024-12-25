@@ -1,8 +1,8 @@
 import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
-import TabsetService from 'src/tabsets/services/TabsetService'
-import { TabsetSharing } from 'src/tabsets/models/Tabset'
 import { useLogger } from 'src/services/Logger'
+import { TabsetSharing } from 'src/tabsets/models/Tabset'
+import TabsetService from 'src/tabsets/services/TabsetService'
 
 const { info } = useLogger()
 

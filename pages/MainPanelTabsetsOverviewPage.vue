@@ -70,16 +70,16 @@
 </template>
 
 <script setup lang="ts">
+import _ from 'lodash'
+import { uid } from 'quasar'
+import Analytics from 'src/core/utils/google-analytics'
+import TabGrid2 from 'src/tabsets/layouts/TabGrid2.vue'
+import { Tab, TabFavorite } from 'src/tabsets/models/Tab'
+import { Tabset } from 'src/tabsets/models/Tabset'
+import TabsetService from 'src/tabsets/services/TabsetService'
+import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { onMounted, ref, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
-import { uid } from 'quasar'
-import TabsetService from 'src/tabsets/services/TabsetService'
-import { Tabset } from 'src/tabsets/models/Tabset'
-import Analytics from 'src/core/utils/google-analytics'
-import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
-import _ from 'lodash'
-import { Tab, TabFavorite } from 'src/tabsets/models/Tab'
-import TabGrid2 from 'src/tabsets/layouts/TabGrid2.vue'
 
 const route = useRoute()
 

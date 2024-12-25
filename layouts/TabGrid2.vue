@@ -53,19 +53,18 @@
 </template>
 
 <script setup lang="ts">
-import { GridItem, GridLayout } from 'vue-grid-layout-v3'
-
-import { onMounted, onUnmounted, PropType, reactive, ref, watch, watchEffect } from 'vue'
-import { Tab, TabCoordinate, TabFavorite } from 'src/tabsets/models/Tab'
-import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import _ from 'lodash'
-import { Tabset } from 'src/tabsets/models/Tabset'
-import { useThumbnailsService } from 'src/thumbnails/services/ThumbnailsService'
-import { useTabsStore2 } from 'src/tabsets/stores/tabsStore2'
 import AppEventDispatcher from 'src/app/AppEventDispatcher'
-import { TabsetColumn } from 'src/tabsets/models/TabsetColumn'
-import TabGridWidget from 'src/tabsets/widgets/TabGridWidget.vue'
 import { useUtils } from 'src/core/services/Utils'
+import { Tab, TabCoordinate, TabFavorite } from 'src/tabsets/models/Tab'
+import { Tabset } from 'src/tabsets/models/Tabset'
+import { TabsetColumn } from 'src/tabsets/models/TabsetColumn'
+import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+import { useTabsStore2 } from 'src/tabsets/stores/tabsStore2'
+import TabGridWidget from 'src/tabsets/widgets/TabGridWidget.vue'
+import { useThumbnailsService } from 'src/thumbnails/services/ThumbnailsService'
+import { onMounted, onUnmounted, PropType, reactive, ref, watch, watchEffect } from 'vue'
+import { GridItem, GridLayout } from 'vue-grid-layout-v3'
 
 type LayoutType = {
   tab: Tab

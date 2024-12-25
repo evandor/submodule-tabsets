@@ -1,9 +1,9 @@
 import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
-import TabsetService from 'src/tabsets/services/TabsetService'
 import { useUtils } from 'src/core/services/Utils'
-import { ListDetailLevel } from 'src/ui/stores/uiStore'
 import { useLogger } from 'src/services/Logger'
+import TabsetService from 'src/tabsets/services/TabsetService'
+import { ListDetailLevel } from 'src/ui/stores/uiStore'
 
 const { sendMsg } = useUtils()
 const { info } = useLogger()

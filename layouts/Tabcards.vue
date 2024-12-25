@@ -23,17 +23,17 @@
 </template>
 
 <script setup lang="ts">
-import { Tab } from 'src/tabsets/models/Tab'
-import TabsetService from 'src/tabsets/services/TabsetService'
-import { PropType } from 'vue'
-import { VueDraggableNext } from 'vue-draggable-next'
-import TabCardWidget from 'src/components/widgets/TabCardWidget.vue'
 import _ from 'lodash'
+import TabCardWidget from 'src/components/widgets/TabCardWidget.vue'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import { CreateTabFromOpenTabsCommand } from 'src/tabsets/commands/CreateTabFromOpenTabs'
-import { useUiStore } from 'src/ui/stores/uiStore'
-import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+import { Tab } from 'src/tabsets/models/Tab'
 import { TabsetColumn } from 'src/tabsets/models/TabsetColumn'
+import TabsetService from 'src/tabsets/services/TabsetService'
+import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+import { useUiStore } from 'src/ui/stores/uiStore'
+import { PropType } from 'vue'
+import { VueDraggableNext } from 'vue-draggable-next'
 
 const props = defineProps({
   tabs: {

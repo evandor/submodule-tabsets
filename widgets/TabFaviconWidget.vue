@@ -21,10 +21,10 @@
 </template>
 
 <script lang="ts" setup>
-import { Tab, UrlExtension } from 'src/tabsets/models/Tab'
-import { useSettingsStore } from 'src/stores/settingsStore'
-import { PropType } from 'vue'
 import { useUtils } from 'src/core/services/Utils'
+import { useSettingsStore } from 'src/stores/settingsStore'
+import { Tab, UrlExtension } from 'src/tabsets/models/Tab'
+import { PropType } from 'vue'
 
 const { favIconFromUrl } = useUtils()
 

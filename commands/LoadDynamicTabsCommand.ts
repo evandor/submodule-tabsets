@@ -1,15 +1,15 @@
-import Command from 'src/core/domain/Command'
-import { Tabset } from 'src/tabsets/models/Tabset'
-import { ExecutionFailureResult, ExecutionResult } from 'src/core/domain/ExecutionResult'
+import * as cheerio from 'cheerio'
+import { Parent, Root, RootContent, Text } from 'mdast'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { uid } from 'quasar'
-import * as cheerio from 'cheerio'
+import BrowserApi from 'src/app/BrowserApi'
+import { TabReference, TabReferenceType } from 'src/content/models/TabReference'
+import Command from 'src/core/domain/Command'
+import { ExecutionFailureResult, ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import { CreateFolderCommand } from 'src/tabsets/commands/CreateFolderCommand'
-import { Parent, Root, RootContent, Text } from 'mdast'
-import BrowserApi from 'src/app/BrowserApi'
 import { Tab } from 'src/tabsets/models/Tab'
-import { TabReference, TabReferenceType } from 'src/content/models/TabReference'
+import { Tabset } from 'src/tabsets/models/Tabset'
 
 class TabNode {
   constructor(

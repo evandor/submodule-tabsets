@@ -49,16 +49,16 @@
 </template>
 
 <script setup lang="ts">
+import { uid } from 'quasar'
+import Analytics from 'src/core/utils/google-analytics'
+import { Tabset } from 'src/tabsets/models/Tabset'
+import TabList from 'src/tabsets/pages/pwa/TabList.vue'
+import TabsetPageCards from 'src/tabsets/pages/pwa/TabsetPageCards.vue'
+import TabsetService from 'src/tabsets/services/TabsetService'
+import { useTabsetService } from 'src/tabsets/services/TabsetService2'
+import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { onMounted, onUnmounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { uid } from 'quasar'
-import TabsetService from 'src/tabsets/services/TabsetService'
-import { Tabset } from 'src/tabsets/models/Tabset'
-import Analytics from 'src/core/utils/google-analytics'
-import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
-import TabsetPageCards from 'src/tabsets/pages/pwa/TabsetPageCards.vue'
-import TabList from 'src/tabsets/pages/pwa/TabList.vue'
-import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 
 const route = useRoute()
 

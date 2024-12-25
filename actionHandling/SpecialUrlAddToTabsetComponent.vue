@@ -78,21 +78,21 @@
 </template>
 
 <script lang="ts" setup>
-import { PropType, ref, watchEffect } from 'vue'
-import { useTabsetService } from 'src/tabsets/services/TabsetService2'
-import { Tabset } from '../models/Tabset'
 import _ from 'lodash'
-import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
-import TabsetService from 'src/tabsets/services/TabsetService'
+import { useQuasar } from 'quasar'
 import { useActionHandlers } from 'src/tabsets/actionHandling/ActionHandlers'
 import {
   AddUrlToTabsetHandler,
   ButtonActions,
 } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
-import { useQuasar } from 'quasar'
 import { NoopAddUrlToTabsetHandler } from 'src/tabsets/actionHandling/handler/NoopAddUrlToTabsetHandler'
 import { ActionHandlerButtonClickedHolder } from 'src/tabsets/actionHandling/model/ActionHandlerButtonClickedHolder'
+import TabsetService from 'src/tabsets/services/TabsetService'
+import { useTabsetService } from 'src/tabsets/services/TabsetService2'
+import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { useUiStore } from 'src/ui/stores/uiStore'
+import { PropType, ref, watchEffect } from 'vue'
+import { Tabset } from '../models/Tabset'
 
 const props = defineProps({
   currentChromeTab: { type: Object as PropType<chrome.tabs.Tab>, required: true },

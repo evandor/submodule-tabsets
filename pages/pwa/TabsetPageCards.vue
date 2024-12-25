@@ -17,15 +17,15 @@
 </template>
 
 <script lang="ts" setup>
-import { PropType, ref, watchEffect } from 'vue'
 import _ from 'lodash'
-import { useRoute } from 'vue-router'
+import { uid } from 'quasar'
+import TabGrid2 from 'src/tabsets/layouts/TabGrid2.vue'
+import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset } from 'src/tabsets/models/Tabset'
 import { useUiStore } from 'src/ui/stores/uiStore'
-import { Tab } from 'src/tabsets/models/Tab'
-import TabGrid2 from 'src/tabsets/layouts/TabGrid2.vue'
-import { uid } from 'quasar'
 import InfoMessageWidget from 'src/ui/widgets/InfoMessageWidget.vue'
+import { PropType, ref, watchEffect } from 'vue'
+import { useRoute } from 'vue-router'
 
 const route = useRoute()
 

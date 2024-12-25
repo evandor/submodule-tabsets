@@ -44,9 +44,9 @@
 
 <script lang="ts" setup>
 import { useDialogPluginComponent } from 'quasar'
+import { STRIP_CHARS_IN_USER_INPUT } from 'src/boot/constants'
 import DialogButton from 'src/core/dialog/buttons/DialogButton.vue'
 import { ref, watchEffect } from 'vue'
-import { STRIP_CHARS_IN_USER_INPUT } from 'src/boot/constants'
 
 defineEmits([...useDialogPluginComponent.emits])
 

@@ -1,15 +1,15 @@
 import { DialogChainObject, uid } from 'quasar'
-import { Tabset } from 'src/tabsets/models/Tabset'
+import { useContentStore } from 'src/content/stores/contentStore'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
-import { Tab } from 'src/tabsets/models/Tab'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
-import { AddTabToTabsetCommand } from 'src/tabsets/commands/AddTabToTabsetCommand'
 import {
   AddUrlToTabsetHandler,
   ButtonActions,
 } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
-import { useContentStore } from 'src/content/stores/contentStore'
+import { AddTabToTabsetCommand } from 'src/tabsets/commands/AddTabToTabsetCommand'
+import { Tab } from 'src/tabsets/models/Tab'
+import { Tabset } from 'src/tabsets/models/Tabset'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 

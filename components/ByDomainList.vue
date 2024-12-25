@@ -15,9 +15,9 @@
 </template>
 
 <script lang="ts" setup>
-import { useRouter } from 'vue-router'
-import InfoMessageWidget from 'src/ui/widgets/InfoMessageWidget.vue'
 import ByDomainListWidget from 'src/tabsets/widgets/ByDomainListWidget.vue'
+import InfoMessageWidget from 'src/ui/widgets/InfoMessageWidget.vue'
+import { useRouter } from 'vue-router'
 
 const router = useRouter()
 

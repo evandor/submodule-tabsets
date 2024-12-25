@@ -1,8 +1,8 @@
 import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
-import { useTabsetService } from 'src/tabsets/services/TabsetService2'
-import { Tab } from 'src/tabsets/models/Tab'
 import { TabPredicate } from 'src/domain/Types'
+import { Tab } from 'src/tabsets/models/Tab'
+import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 
 export class DeleteTabsFromTabsetCommand implements Command<any> {
   constructor(

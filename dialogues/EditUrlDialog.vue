@@ -73,16 +73,15 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, PropType, ref, watchEffect } from 'vue'
-
 import { useDialogPluginComponent } from 'quasar'
+import { FeatureIdent } from 'src/app/models/FeatureIdent'
 import DialogButton from 'src/core/dialog/buttons/DialogButton.vue'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
+import { useFeaturesStore } from 'src/features/stores/featuresStore'
+import { UpdateTabCommand } from 'src/tabsets/commands/UpdateTabCommand'
 import { Tab, UrlExtension } from 'src/tabsets/models/Tab'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
-import { useFeaturesStore } from 'src/features/stores/featuresStore'
-import { FeatureIdent } from 'src/app/models/FeatureIdent'
-import { UpdateTabCommand } from 'src/tabsets/commands/UpdateTabCommand'
+import { computed, PropType, ref, watchEffect } from 'vue'
 
 defineEmits([...useDialogPluginComponent.emits])
 
