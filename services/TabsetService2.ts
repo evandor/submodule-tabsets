@@ -5,8 +5,8 @@ import ChromeApi from 'src/app/BrowserApi'
 import { STRIP_CHARS_IN_COLOR_INPUT, STRIP_CHARS_IN_USER_INPUT } from 'src/boot/constants'
 import { ContentItem } from 'src/content/models/ContentItem'
 import { useContentService } from 'src/content/services/ContentService'
+import { TabPredicate } from 'src/core/domain/Types'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
-import { TabPredicate } from 'src/domain/Types'
 import { useSpacesStore } from 'src/spaces/stores/spacesStore'
 import { useSettingsStore } from 'src/stores/settingsStore'
 import { GithubLogCommand } from 'src/tabsets/commands/github/GithubLogCommand'
@@ -139,13 +139,6 @@ export function useTabsetService() {
     } catch (err: any) {
       return Promise.reject('problem copying tabset: ' + err.toString())
     }
-  }
-
-  // @ts-expect-error TODO
-  const getOrCreateSpecialTabset = async (ident: SpecialTabsetIdent, type: TabsetType): Tabset => {
-    // const result: Tabset = await useTabsStore().getOrCreateSpecialTabset(ident, type)
-    // await saveTabset(result)
-    return null as unknown as Tabset // result
   }
 
   /**
@@ -953,7 +946,6 @@ export function useTabsetService() {
     deleteTab,
     urlExistsInATabset,
     urlExistsInCurrentTabset,
-    getOrCreateSpecialTabset,
     saveBlob,
     getBlob,
     reloadTabset,

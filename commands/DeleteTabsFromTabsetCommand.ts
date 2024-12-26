@@ -1,6 +1,6 @@
 import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
-import { TabPredicate } from 'src/domain/Types'
+import { TabPredicate } from 'src/core/domain/Types'
 import { Tab } from 'src/tabsets/models/Tab'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 
