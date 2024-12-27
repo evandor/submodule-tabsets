@@ -16,6 +16,18 @@ export enum ButtonActions {
   AddRssFeed = 'AddRssFeed',
   LoadRssFeed = 'LoadRssFeed',
   ClearCanvas = 'ClearCanvas',
+  ImportChromeBookmarks = 'ImportChromeBookmarks',
+}
+
+export type AddUrlToTabsetHandlerAdditionalData = {
+  action?: {
+    identifier: ButtonActions
+    label: string
+  }
+  useForLinks?: boolean
+  recursive?: boolean
+  filename?: string
+  data?: object
 }
 
 export interface AddUrlToTabsetHandler {
@@ -31,13 +43,13 @@ export interface AddUrlToTabsetHandler {
     browserTab: chrome.tabs.Tab,
     ts: Tabset,
     folder?: Tabset,
-    additionalData?: object,
+    additionalData?: AddUrlToTabsetHandlerAdditionalData,
   ) => Promise<ExecutionResult<any>>
 
   updateInTabset: (
     browserTab: chrome.tabs.Tab,
     ts: Tabset,
-    additionalData: object,
+    additionalData: AddUrlToTabsetHandlerAdditionalData,
   ) => Promise<ExecutionResult<any>>
 
   handleOpenedTab: (browserTab: chrome.tabs.Tab, tab: Tab) => void

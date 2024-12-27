@@ -77,15 +77,34 @@ export function useActionHandlers($q: QVueGlobals | undefined) {
           .withDialog(args.actionContext?.identifier)
           ?.onOk((data: { b: boolean; s: string }) => {
             console.log('in', data)
-            handler.clicked(chromeTab, tabset, undefined, data)
+            handler.clicked(chromeTab, tabset, undefined, { data })
           })
         break
       case ButtonActions.LoadRssFeed:
-        await handler.clicked(chromeTab, tabset, folder, {})
+        await handler.clicked(chromeTab, tabset, folder)
         break
       // case ButtonActions.ClearCanvas:
       //   await handler.clicked(chromeTab, tabset, folder, {})
       //   break;
+      case ButtonActions.ImportChromeBookmarks:
+        console.log('===>', args.actionContext)
+        // handler
+        //   .withDialog(args.actionContext?.identifier)
+        //   ?.onOk((data: { b: boolean; s: string }) => {
+        //     console.log('in', data)
+        //     handler.clicked(chromeTab, tabset, undefined, { data })
+        //   })
+        handler.withDialog(args.actionContext?.identifier)?.onOk((data: string[]) => {
+          console.log('data', data)
+          handler.clicked(chromeTab, tabset, undefined, {
+            action: {
+              identifier: ButtonActions.ImportChromeBookmarks,
+              label: 'Import',
+            },
+            recursive: data.indexOf('recursive') >= 0,
+          })
+        })
+        break
       default:
         console.log('no action defined for ', args.actionContext?.identifier)
     }
