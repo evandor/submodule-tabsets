@@ -1,6 +1,6 @@
 <template>
   <!--  @click.stop="saveInTabset(props.tabset.id, props.tabset.folderActive)" -->
-  <template v-if="handler.actions().length === 0"> --- </template>
+  <template v-if="handler.actions().length === 0"> ---</template>
   <template v-else-if="handler.actions().length === 1">
     <q-btn
       outline
@@ -14,8 +14,7 @@
       :class="{ shake: animateAddtabButton, 'cursor-pointer': !alreadyInTabset() }"
       :color="alreadyInTabset() ? 'grey-5' : tsBadges.length > 0 ? 'positive' : 'primary'"
       size="xs"
-      data-testid="saveInTabsetBtn"
-    >
+      data-testid="saveInTabsetBtn">
       <div>{{ handler.actions()[0]!.label }}</div>
       <!--                  <q-icon right class="q-ma-none q-pa-none" size="2em" name="o_south" />-->
     </q-btn>
@@ -31,8 +30,10 @@
   </template>
 
   <template v-else-if="handler.actions().length > 1">
+    <!-- :disable="!handler.actions()[0]!.active(props.currentChromeTab)"-->
     <q-btn-dropdown
       :label="handler.actions()[0]!.label"
+      v-close-popup
       @click.stop="
         emits(
           'buttonClicked',
@@ -42,25 +43,27 @@
         )
       "
       class="q-ma-none q-px-none q-py-none"
-      :color="alreadyInTabset() ? 'grey-5' : tsBadges.length > 0 ? 'positive' : 'primary'"
+      :color="color(handler.actions()[0]!)"
       size="xs"
       split
-      outline
-    >
+      outline>
       <q-list dense>
         <q-item
           v-for="l in handler.actions().slice(1)"
-          clickable
+          :clickable="isActive(l)"
           dense
           @click.stop="
             emits(
               'buttonClicked',
               new ActionHandlerButtonClickedHolder(handler, ButtonActions.Save, l, {}),
             )
-          "
-        >
+          ">
           <q-item-section>
-            <q-item-label style="font-size: smaller">{{ l.label }}</q-item-label>
+            <q-item-label
+              style="font-size: smaller"
+              :class="isActive(l) ? 'text-primary' : 'text-grey-5'"
+              >{{ l.label }}</q-item-label
+            >
           </q-item-section>
         </q-item>
       </q-list>
@@ -70,8 +73,7 @@
       v-if="alreadyInTabset()"
       anchor="center left"
       self="center right"
-      :offset="[10, 10]"
-    >
+      :offset="[10, 10]">
       click the dropdown icon for more options
     </q-tooltip>
   </template>
@@ -86,6 +88,7 @@ import {
   ButtonActions,
 } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { NoopAddUrlToTabsetHandler } from 'src/tabsets/actionHandling/handler/NoopAddUrlToTabsetHandler'
+import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
 import { ActionHandlerButtonClickedHolder } from 'src/tabsets/actionHandling/model/ActionHandlerButtonClickedHolder'
 import TabsetService from 'src/tabsets/services/TabsetService'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
@@ -141,10 +144,7 @@ const activeFolderNameFor = (ts: Tabset, activeFolder: string) => {
 }
 
 const tabsetNameOrChain = (tabset: Tabset) => {
-  if (tabset.folderActive) {
-    return activeFolderNameFor(tabset, tabset.folderActive)
-  }
-  return tabset.name
+  return tabset.folderActive ? activeFolderNameFor(tabset, tabset.folderActive) : tabset.name
 }
 
 const tooltipAlreadyInOtherTabsets = (tabsetName: string) => {
@@ -162,5 +162,16 @@ const tooltipAlreadyInOtherTabsets = (tabsetName: string) => {
     tabsetName +
     "' as well."
   )
+}
+
+const isActive = (ac: ActionContext) => {
+  return ac.active ? ac.active(props.currentChromeTab) : true
+}
+
+const color = (ac: ActionContext) => {
+  if (ac.active) {
+    return ac.active(props.currentChromeTab) ? 'primary' : 'grey-5'
+  }
+  return alreadyInTabset() ? 'grey-5' : tsBadges.value.length > 0 ? 'positive' : 'primary'
 }
 </script>

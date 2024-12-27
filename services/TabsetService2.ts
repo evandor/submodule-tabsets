@@ -73,9 +73,7 @@ export function useTabsetService() {
     spaceId: string | undefined = undefined,
   ): Promise<SaveOrReplaceResult> => {
     const trustedName = name.replace(STRIP_CHARS_IN_USER_INPUT, '').substring(0, 31)
-    const trustedColor = color
-      ? color.replace(STRIP_CHARS_IN_COLOR_INPUT, '').substring(0, 31)
-      : undefined
+    const trustedColor = color ? color.replace(STRIP_CHARS_IN_COLOR_INPUT, '').substring(0, 31) : undefined
     const tabs: Tab[] = _.filter(
       _.map(chromeTabs, (t: chrome.tabs.Tab) => {
         const tab = new Tab(uid(), t)
@@ -91,13 +89,7 @@ export function useTabsetService() {
     )
     try {
       const dynUrl = dynamicSource ? new URL(dynamicSource) : undefined
-      const tabset = await useTabsetsStore().createTabset(
-        trustedName,
-        tabs,
-        trustedColor,
-        dynUrl,
-        spaceId,
-      )
+      const tabset = await useTabsetsStore().createTabset(trustedName, tabs, trustedColor, dynUrl, spaceId)
       await useTabsetsStore().saveTabset(tabset)
 
       selectTabset(tabset.id)
@@ -108,16 +100,11 @@ export function useTabsetService() {
     }
   }
 
-  const copyFromTabset = async (
-    tabset: Tabset,
-    spaceId: string | undefined = undefined,
-  ): Promise<object> => {
+  const copyFromTabset = async (tabset: Tabset, spaceId: string | undefined = undefined): Promise<object> => {
     function nameFrom(name: string): string {
       const nameCandidate = name + ' - Copy'
       const existsAlready = useTabsetsStore().existingInTabset(nameCandidate, spaceId)
-      return existsAlready
-        ? nameFrom(nameCandidate)
-        : nameCandidate.replace(STRIP_CHARS_IN_USER_INPUT, '')
+      return existsAlready ? nameFrom(nameCandidate) : nameCandidate.replace(STRIP_CHARS_IN_USER_INPUT, '')
     }
 
     const copyName = nameFrom(tabset.name)
@@ -157,6 +144,7 @@ export function useTabsetService() {
     merge: boolean = false,
     dryRun = false,
   ): Promise<object> => {
+    const trustedName = name.replace(STRIP_CHARS_IN_USER_INPUT, '').substring(0, 31)
     const now = new Date().getTime()
     const tabs = _.map(
       _.filter(bms, (bm: any) => bm.url !== undefined),
@@ -171,14 +159,29 @@ export function useTabsetService() {
     )
 
     const ignoreDuplicates = dryRun
-    const tabset = await useTabsetsStore().createTabset(
-      name,
-      tabs,
-      undefined,
-      undefined,
-      undefined,
-      ignoreDuplicates,
-    )
+    let tabset: Tabset | undefined = undefined
+    if (merge) {
+      const currentTs = useTabsetsStore().getCurrentTabset
+      if (currentTs && currentTs.name === trustedName) {
+        tabset = currentTs
+        tabs
+          .filter((t: Tab) => {
+            const foundIndex = currentTs!.tabs.map((t: Tab) => t.url).findIndex((url: string) => t.url === url)
+            return foundIndex < 0
+          })
+          .forEach((t: Tab) => tabset!.tabs.push(t))
+      }
+    }
+    if (!tabset) {
+      tabset = await useTabsetsStore().createTabset(
+        trustedName,
+        tabs,
+        undefined,
+        undefined,
+        undefined,
+        ignoreDuplicates,
+      )
+    }
     if (!dryRun) {
       await saveTabset(tabset)
       selectTabset(tabset.id)
@@ -282,9 +285,7 @@ export function useTabsetService() {
         tabset.type = TabsetType.DEFAULT
       }
       const rootTabset = rootTabsetFor(tabset)
-      console.debug(
-        `saving (sub-)tabset '${tabset.name}' with ${tabset.tabs.length} tab(s) at id ${rootTabset?.id}`,
-      )
+      console.debug(`saving (sub-)tabset '${tabset.name}' with ${tabset.tabs.length} tab(s) at id ${rootTabset?.id}`)
       if (rootTabset) {
         return await useTabsetsStore().saveTabset(rootTabset)
       }
@@ -292,11 +293,7 @@ export function useTabsetService() {
     return Promise.reject('tabset id not set')
   }
 
-  const addToTabsetId = async (
-    tsId: string,
-    tab: Tab,
-    useIndex: number | undefined = undefined,
-  ): Promise<Tabset> => {
+  const addToTabsetId = async (tsId: string, tab: Tab, useIndex: number | undefined = undefined): Promise<Tabset> => {
     const ts = useTabsetsStore().getTabset(tsId)
     if (ts) {
       return addToTabset(ts, tab, useIndex)
@@ -644,17 +641,12 @@ export function useTabsetService() {
     const tabWithFolder = findTabInFolder([tabset], tabIdToDrag)
     console.log('found tabWithFolder', tabWithFolder)
     //const newParentFolder = findFolder([tabset], moveToFolderId)
-    const newParentFolder = moveToFolderId
-      ? useTabsetsStore().getActiveFolder(tabset, moveToFolderId)
-      : tabset
+    const newParentFolder = moveToFolderId ? useTabsetsStore().getActiveFolder(tabset, moveToFolderId) : tabset
     if (newParentFolder && tabWithFolder) {
       console.log('newParentFolder', newParentFolder)
       newParentFolder.tabs.push(tabWithFolder.tab)
       saveTabset(tabset).then(() => {
-        tabWithFolder.folder.tabs = _.filter(
-          tabWithFolder.folder.tabs,
-          (t: any) => t.id !== tabIdToDrag,
-        )
+        tabWithFolder.folder.tabs = _.filter(tabWithFolder.folder.tabs, (t: any) => t.id !== tabIdToDrag)
         saveTabset(tabset)
       })
     }
@@ -672,8 +664,7 @@ export function useTabsetService() {
           continue
         }
         //const content = await useContentService().getContent(tab.id)
-        const content =
-          contents.find((item) => item.url === tab.url) || new ContentItem('', '', '', '', [], [])
+        const content = contents.find((item) => item.url === tab.url) || new ContentItem('', '', '', '', [], [])
         const addToIndex = {
           name: tab.name || '',
           title: tab.title || '',
@@ -709,10 +700,8 @@ export function useTabsetService() {
     minimalIndex.forEach((doc: object) => {
       const p = throttleRequests(async () => {
         const progress =
-          Math.round(
-            (100 * (1.1 * ((perInterval * index) / minimalIndex.length) + index++)) /
-              minimalIndex.length,
-          ) / 100
+          Math.round((100 * (1.1 * ((perInterval * index) / minimalIndex.length) + index++)) / minimalIndex.length) /
+          100
         useUiStore().setProgress(progress, 'indexing search...')
         AppEventDispatcher.dispatchEvent('upsert-in-search', doc)
         return Promise.resolve('')
@@ -877,9 +866,7 @@ export function useTabsetService() {
   }
 
   const handleHeadRequests = async (selectedTabset: Tabset, folderId: string | undefined) => {
-    const useTabset = folderId
-      ? useTabsetsStore().getActiveFolder(selectedTabset, folderId)
-      : selectedTabset
+    const useTabset = folderId ? useTabsetsStore().getActiveFolder(selectedTabset, folderId) : selectedTabset
     if (!useTabset) {
       console.log(`could not determine tabset for ${selectedTabset.id}, folder ${folderId}`)
       return
@@ -895,15 +882,11 @@ export function useTabsetService() {
       }
     }
 
-    console.log(
-      `checking current urls using HEAD requests for tabset ${selectedTabset.id}, folder ${folderId}`,
-    )
+    console.log(`checking current urls using HEAD requests for tabset ${selectedTabset.id}, folder ${folderId}`)
     let missed = 0
     for (const t of useTabset.tabs) {
       throttleOne50Millis(async () => {
-        const oldEnough = t.httpCheckedAt
-          ? new Date().getTime() - t.httpCheckedAt > 1000 * 60
-          : true // 1min
+        const oldEnough = t.httpCheckedAt ? new Date().getTime() - t.httpCheckedAt > 1000 * 60 : true // 1min
         if (t.url && !t.url.startsWith('chrome') && oldEnough) {
           var status = await handleResponse(t, 'HEAD', 1500)
           if (status === 0 || status === 404) {

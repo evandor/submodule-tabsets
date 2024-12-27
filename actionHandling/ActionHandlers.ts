@@ -88,12 +88,6 @@ export function useActionHandlers($q: QVueGlobals | undefined) {
       //   break;
       case ButtonActions.ImportChromeBookmarks:
         console.log('===>', args.actionContext)
-        // handler
-        //   .withDialog(args.actionContext?.identifier)
-        //   ?.onOk((data: { b: boolean; s: string }) => {
-        //     console.log('in', data)
-        //     handler.clicked(chromeTab, tabset, undefined, { data })
-        //   })
         handler.withDialog(args.actionContext?.identifier)?.onOk((data: string[]) => {
           console.log('data', data)
           handler.clicked(chromeTab, tabset, undefined, {

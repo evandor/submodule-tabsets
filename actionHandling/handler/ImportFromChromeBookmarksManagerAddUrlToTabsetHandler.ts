@@ -7,14 +7,18 @@ import {
   ButtonActions,
 } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { DefaultAddUrlToTabsetHandler } from 'src/tabsets/actionHandling/handler/DefaultAddUrlToTabsetHandler'
+import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
 import { CreateTabsetFromBookmarksRecursive } from 'src/tabsets/commands/CreateTabsetFromBookmarksRecursive'
 import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset } from 'src/tabsets/models/Tabset'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
+import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 
-export class ImportFromChromeBookmarksManagerAddUrlToTabsetHandler
-  implements AddUrlToTabsetHandler
-{
+function getBmFolderId(chromeTab: chrome.tabs.Tab) {
+  return chromeTab.url?.split('?')[1]?.split('=')[1] || undefined
+}
+
+export class ImportFromChromeBookmarksManagerAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   constructor(public $q: QVueGlobals | undefined) {}
 
   urlMatcher(): RegExp {
@@ -25,10 +29,21 @@ export class ImportFromChromeBookmarksManagerAddUrlToTabsetHandler
     return false
   }
 
-  actions(): { label: string; identifier: ButtonActions }[] {
+  actions(): ActionContext[] {
     return [
-      { label: 'Import Bookmarks', identifier: ButtonActions.ImportChromeBookmarks },
-      { label: 'Add Tab', identifier: ButtonActions.AddTab },
+      {
+        label: 'Import Bookmarks',
+        identifier: ButtonActions.ImportChromeBookmarks,
+        active: (t: chrome.tabs.Tab) => {
+          const folderId = getBmFolderId(t)
+          return !folderId ? false : (useTabsetsStore().getCurrentTabset?.bookmarkId || '') !== folderId
+        },
+      },
+      {
+        label: 'Add Tab',
+        identifier: ButtonActions.AddTab,
+        active: (t: chrome.tabs.Tab) => !useTabsetService().urlExistsInCurrentTabset(t.url),
+      },
     ]
   }
 
@@ -51,45 +66,32 @@ export class ImportFromChromeBookmarksManagerAddUrlToTabsetHandler
   ): Promise<ExecutionResult<any>> {
     console.log('saving...', chromeTab.id, additionalData)
     if (additionalData.action!.identifier === ButtonActions.AddTab) {
-      new DefaultAddUrlToTabsetHandler().clicked(chromeTab, ts, folder, additionalData)
+      await new DefaultAddUrlToTabsetHandler().clicked(chromeTab, ts, folder, additionalData)
+      return Promise.resolve(new ExecutionResult('', 'done'))
     } else {
-      const folderId = chromeTab.url?.split('?')[1]?.split('=')[1] || undefined
-      if (!folderId) {
+      const bmFolderId = getBmFolderId(chromeTab)
+      if (!bmFolderId) {
         return Promise.reject('could not parse bookmarks id from URL')
       }
       try {
-        useCommandExecutor()
-          .execute(new CreateTabsetFromBookmarksRecursive('testimport', folderId))
-          .then(async (res: ExecutionResult<Tabset>) => {
-            const tabset = res.result
-            await useTabsetService().saveTabset(tabset)
-            console.log('imported to tabset', tabset.id)
-          })
-      } catch (e: any) {}
+        const currentTabsetName = useTabsetsStore().getCurrentTabset?.name || 'unknown'
+        const res: ExecutionResult<Tabset> = await useCommandExecutor().execute(
+          new CreateTabsetFromBookmarksRecursive(currentTabsetName, bmFolderId),
+        )
+        const tabset = res.result
+        await useTabsetService().saveTabset(tabset)
+        console.log('imported to tabset', tabset.id)
+        await useTabsetsStore().reloadTabset(tabset.id)
+        return Promise.resolve('', '')
+        //  })
+      } catch (e: any) {
+        console.log('got error', e)
+        return Promise.reject('error importing bookmarks')
+      }
     }
-    // try {
-    //   const useForLinks = additionalData['useForLinks' as keyof object] as boolean
-    //   const newTab = new Tab(uid(), chromeTab)
-    //   await useCommandExecutor().execute(new AddTabToTabsetCommand(newTab, ts, ts.folderActive))
-    //   if (useForLinks) {
-    //     // const res = await useCommandExecutor().executeFromUi(new CreateFolderCommand(uid(),"Extracted Links", [],ts.id,undefined, newTab.url!))
-    //     // await useTabsetService().saveTabset(ts)
-    //     // await useCommandExecutor().execute(new LoadDynamicTabsCommand(ts, res.result as Tabset))
-    //     await useCommandExecutor().execute(new LoadDynamicTabsCommand(ts, newTab.url!))
-    //   }
-    //   return Promise.resolve(new ExecutionResult('', 'done'))
-    // } catch (error: any) {
-    //   console.warn('error', error)
-    //   return Promise.reject('error creating markdown tab')
-    // }
-    return Promise.reject('error creating markdown tab')
   }
 
-  updateInTabset(
-    chromeTab: chrome.tabs.Tab,
-    ts: Tabset,
-    additionalData: object = {},
-  ): Promise<ExecutionResult<any>> {
+  updateInTabset(chromeTab: chrome.tabs.Tab, ts: Tabset, additionalData: object = {}): Promise<ExecutionResult<any>> {
     throw new Error('not implemented K')
   }
 
