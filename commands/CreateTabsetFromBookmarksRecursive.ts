@@ -34,8 +34,8 @@ export class CreateTabsetFromBookmarksRecursive implements Command<Tabset> {
   ) {}
 
   async execute(): Promise<ExecutionResult<any>> {
-    //console.log('creating recursively', this.name, this.bookmarkId)
     const tabset = await createTabsetFrom(this.name, '' + this.bookmarkId)
+    tabset.bookmarkId = this.bookmarkId
     return Promise.resolve(new ExecutionResult(tabset, 'done'))
   }
 }

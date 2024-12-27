@@ -7,5 +7,6 @@ export class ActionContext {
     public identifier: ButtonActions,
     public folder?: Tabset,
     public additionalData?: object,
+    public active?: (t: chrome.tabs.Tab) => boolean,
   ) {}
 }
