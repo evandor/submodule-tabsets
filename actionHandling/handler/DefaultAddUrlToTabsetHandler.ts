@@ -4,6 +4,7 @@ import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import {
   AddUrlToTabsetHandler,
+  AddUrlToTabsetHandlerAdditionalData,
   ButtonActions,
 } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
@@ -49,11 +50,9 @@ export class DefaultAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
     chromeTab: chrome.tabs.Tab,
     ts: Tabset,
     folder?: Tabset,
-    additionalData: object = {},
+    additionalData: AddUrlToTabsetHandlerAdditionalData = {},
   ): Promise<ExecutionResult<any>> {
-    const actionContext: ActionContext | undefined = additionalData['action' as keyof object] as
-      | ActionContext
-      | undefined
+    const actionContext: ActionContext | undefined = additionalData.action
     if (
       actionContext &&
       actionContext.identifier === ButtonActions.OpenTab &&
