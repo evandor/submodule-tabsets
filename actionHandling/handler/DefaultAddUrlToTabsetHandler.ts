@@ -15,7 +15,7 @@ import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 
 export class DefaultAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
-  urlMatcher() {
+  urlMatcher(): RegExp {
     return /.*/
   }
 
@@ -53,25 +53,15 @@ export class DefaultAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
     additionalData: AddUrlToTabsetHandlerAdditionalData = {},
   ): Promise<ExecutionResult<any>> {
     const actionContext: ActionContext | undefined = additionalData.action
-    if (
-      actionContext &&
-      actionContext.identifier === ButtonActions.OpenTab &&
-      actionContext.additionalData
-    ) {
-      useTabsetsStore().selectCurrentTabset(
-        actionContext.additionalData['tabsetId' as keyof object],
-      )
+    if (actionContext && actionContext.identifier === ButtonActions.OpenTab && actionContext.additionalData) {
+      useTabsetsStore().selectCurrentTabset(actionContext.additionalData['tabsetId' as keyof object])
       return Promise.resolve(new ExecutionResult('', ''))
     }
     const newTab: Tab = new Tab(uid(), chromeTab)
     return useCommandExecutor().execute(new AddTabToTabsetCommand(newTab, ts, folder?.id))
   }
 
-  updateInTabset(
-    chromeTab: chrome.tabs.Tab,
-    ts: Tabset,
-    additionalData: object = {},
-  ): Promise<ExecutionResult<any>> {
+  updateInTabset(chromeTab: chrome.tabs.Tab, ts: Tabset, additionalData: object = {}): Promise<ExecutionResult<any>> {
     throw new Error('not implemented I')
   }
 
