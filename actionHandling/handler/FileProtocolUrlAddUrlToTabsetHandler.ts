@@ -2,6 +2,7 @@ import { DialogChainObject, QVueGlobals } from 'quasar'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import {
   AddUrlToTabsetHandler,
+  AddUrlToTabsetHandlerAdditionalData,
   ButtonActions,
 } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
@@ -30,11 +31,11 @@ export class FileProtocolUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandl
     browserTab: chrome.tabs.Tab,
     ts: Tabset,
     folder: Tabset | undefined,
-    additionalData: object | undefined,
+    additionalData?: AddUrlToTabsetHandlerAdditionalData,
   ): Promise<ExecutionResult<any>> {
     console.log('saving...', browserTab.id, additionalData)
     try {
-      const filename = additionalData ? additionalData['filename' as keyof object] : undefined
+      const filename = additionalData ? additionalData.data!['filename' as keyof object] : undefined
       if (!filename) {
         throw new Error('filename is missing')
       }
@@ -79,7 +80,7 @@ export class FileProtocolUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandl
   async updateInTabset(
     browserTab: chrome.tabs.Tab,
     ts: Tabset,
-    additionalData: object,
+    additionalData: AddUrlToTabsetHandlerAdditionalData,
   ): Promise<ExecutionResult<any>> {
     console.log('saving...', browserTab.id, additionalData)
     try {

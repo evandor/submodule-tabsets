@@ -3,6 +3,7 @@ import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import {
   AddUrlToTabsetHandler,
+  AddUrlToTabsetHandlerAdditionalData,
   ButtonActions,
 } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { AddTabToTabsetCommand } from 'src/tabsets/commands/AddTabToTabsetCommand'
@@ -38,11 +39,11 @@ export class MarkdownFileAddUrlToTabsetHandler implements AddUrlToTabsetHandler 
     chromeTab: chrome.tabs.Tab,
     ts: Tabset,
     folder?: Tabset,
-    additionalData: object = {},
+    additionalData: AddUrlToTabsetHandlerAdditionalData = {},
   ): Promise<ExecutionResult<any>> {
     console.log('saving...', chromeTab.id, additionalData)
     try {
-      const useForLinks = additionalData['useForLinks' as keyof object] as boolean
+      const useForLinks = additionalData.data!['useForLinks' as keyof object] as boolean
       const newTab = new Tab(uid(), chromeTab)
       await useCommandExecutor().execute(new AddTabToTabsetCommand(newTab, ts, ts.folderActive))
       if (useForLinks) {
@@ -61,7 +62,7 @@ export class MarkdownFileAddUrlToTabsetHandler implements AddUrlToTabsetHandler 
   updateInTabset(
     chromeTab: chrome.tabs.Tab,
     ts: Tabset,
-    additionalData: object = {},
+    additionalData: AddUrlToTabsetHandlerAdditionalData = {},
   ): Promise<ExecutionResult<any>> {
     throw new Error('not implemented K')
   }

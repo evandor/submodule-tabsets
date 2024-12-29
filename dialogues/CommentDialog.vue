@@ -4,12 +4,9 @@
       <q-card-section>
         <div class="text-h6">Tab Comment</div>
       </q-card-section>
-      <q-card-section>
-        <div class="text-body">Add a comment for this tab</div>
-      </q-card-section>
 
       <q-card-section class="q-pt-none">
-        <div class="q-pa-md q-gutter-sm">
+        <div class="q-pa-none q-ma-none">
           <!--          <q-editor v-model="editor" min-height="5rem" />-->
 
           <q-input v-model="editor" filled type="textarea" />
@@ -20,10 +17,9 @@
         <q-btn flat label="Cancel" @click="onDialogCancel" />
         <q-btn
           flat
-          :label="props.sharedId ? 'Publish Comment' : 'Save Comment'"
+          :label="props.sharedId ? 'Publish Comment' : props.comment ? 'Update Comment' : 'Save Comment'"
           v-close-popup
-          @click="publishComment()"
-        />
+          @click="publishComment()" />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -33,17 +29,20 @@
 import { useDialogPluginComponent } from 'quasar'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import { AddCommentCommand } from 'src/tabsets/commands/AddCommentCommand'
+import { UpdateCommentCommand } from 'src/tabsets/commands/UpdateCommentCommand'
+import { TabComment } from 'src/tabsets/models/Tab'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
-import { ref, watchEffect } from 'vue'
+import { PropType, ref, watchEffect } from 'vue'
 
 defineEmits([...useDialogPluginComponent.emits])
 
 const props = defineProps({
   tabId: { type: String, required: true },
   sharedId: { type: String, required: false },
+  comment: { type: Object as PropType<TabComment>, required: false },
 })
 
-const editor = ref('')
+const editor = ref(props.comment?.comment || '')
 
 const { dialogRef, onDialogHide, onDialogCancel } = useDialogPluginComponent()
 
@@ -55,5 +54,7 @@ watchEffect(() => {
 })
 
 const publishComment = () =>
-  useCommandExecutor().executeFromUi(new AddCommentCommand(props.tabId, editor.value))
+  props.comment
+    ? useCommandExecutor().executeFromUi(new UpdateCommentCommand(props.tabId, props.comment, editor.value))
+    : useCommandExecutor().executeFromUi(new AddCommentCommand(props.tabId, editor.value))
 </script>

@@ -3,6 +3,7 @@ import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import {
   AddUrlToTabsetHandler,
+  AddUrlToTabsetHandlerAdditionalData,
   ButtonActions,
 } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
@@ -38,7 +39,7 @@ export class DynamicUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
     chromeTab: chrome.tabs.Tab,
     ts: Tabset,
     folder?: Tabset,
-    additionalData: object = {},
+    additionalData: AddUrlToTabsetHandlerAdditionalData = {},
   ): Promise<ExecutionResult<any>> {
     const newTab: Tab = new Tab(uid(), chromeTab)
     return useCommandExecutor().execute(new AddTabToTabsetCommand(newTab, ts, ts.folderActive))
@@ -47,7 +48,7 @@ export class DynamicUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   updateInTabset(
     chromeTab: chrome.tabs.Tab,
     ts: Tabset,
-    additionalData: object = {},
+    additionalData: AddUrlToTabsetHandlerAdditionalData = {},
   ): Promise<ExecutionResult<any>> {
     throw new Error('not implemented J')
   }

@@ -166,7 +166,7 @@ export function useTabsetService() {
         tabset = currentTs
         tabs
           .filter((t: Tab) => {
-            const foundIndex = currentTs!.tabs.map((t: Tab) => t.url).findIndex((url: string) => t.url === url)
+            const foundIndex = currentTs!.tabs.map((t: Tab) => t.url || '').findIndex((url: string) => t.url === url)
             return foundIndex < 0
           })
           .forEach((t: Tab) => tabset!.tabs.push(t))

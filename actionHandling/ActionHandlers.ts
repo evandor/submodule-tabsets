@@ -1,10 +1,7 @@
 import { QVueGlobals } from 'quasar'
 import { useContentStore } from 'src/content/stores/contentStore'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
-import {
-  AddUrlToTabsetHandler,
-  ButtonActions,
-} from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
+import { AddUrlToTabsetHandler, ButtonActions } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { AddUrlToTabsetHandlers } from 'src/tabsets/actionHandling/AddUrlToTabsetHandlers'
 import { RssFolderHandler } from 'src/tabsets/actionHandling/handler/RssFolderHandler'
 import { ActionHandlerButtonClickedHolder } from 'src/tabsets/actionHandling/model/ActionHandlerButtonClickedHolder'
@@ -46,13 +43,13 @@ export function useActionHandlers($q: QVueGlobals | undefined) {
         handler.withDialog(args.actionContext?.identifier)?.onOk((data: string[]) => {
           console.log('data', data)
           handler.clicked(chromeTab, tabset, undefined, {
-            useForLinks: data.indexOf('useForLinks') >= 0,
+            data: { useForLinks: data.indexOf('useForLinks') >= 0 },
           })
         })
         break
       case ButtonActions.NewFile:
         handler.withDialog(args.actionContext?.identifier)?.onOk((filename: string) => {
-          handler.clicked(chromeTab, tabset, undefined, { filename })
+          handler.clicked(chromeTab, tabset, undefined, { data: { filename } })
         })
         break
       case ButtonActions.Save:
@@ -60,25 +57,19 @@ export function useActionHandlers($q: QVueGlobals | undefined) {
         break
       case ButtonActions.SaveAs:
         handler.withDialog(args.actionContext?.identifier)?.onOk((filename: string) => {
-          handler.clicked(chromeTab, tabset, undefined, { filename })
+          handler.clicked(chromeTab, tabset, undefined, { data: { filename } })
         })
         break
       case ButtonActions.DynamicLoad:
-        console.log(
-          `loading dynamic data for tabset/folder ${tabset.id}/${args['folder' as keyof object]} `,
-        )
-        await useCommandExecutor().execute(
-          new LoadDynamicTabsCommand(tabset, args['folder' as keyof object]),
-        )
+        console.log(`loading dynamic data for tabset/folder ${tabset.id}/${args['folder' as keyof object]} `)
+        await useCommandExecutor().execute(new LoadDynamicTabsCommand(tabset, args['folder' as keyof object]))
         break
       case ButtonActions.AddRssFeed:
         console.log('===>', args.actionContext)
-        handler
-          .withDialog(args.actionContext?.identifier)
-          ?.onOk((data: { b: boolean; s: string }) => {
-            console.log('in', data)
-            handler.clicked(chromeTab, tabset, undefined, { data })
-          })
+        handler.withDialog(args.actionContext?.identifier)?.onOk((data: { b: boolean; s: string }) => {
+          console.log('in', data)
+          handler.clicked(chromeTab, tabset, undefined, { data: { more: data } })
+        })
         break
       case ButtonActions.LoadRssFeed:
         await handler.clicked(chromeTab, tabset, folder)
@@ -88,14 +79,16 @@ export function useActionHandlers($q: QVueGlobals | undefined) {
       //   break;
       case ButtonActions.ImportChromeBookmarks:
         console.log('===>', args.actionContext)
-        handler.withDialog(args.actionContext?.identifier)?.onOk((data: string[]) => {
-          console.log('data', data)
+        handler.withDialog(args.actionContext?.identifier)?.onOk((input: string[]) => {
+          console.log('data', input)
           handler.clicked(chromeTab, tabset, undefined, {
             action: {
               identifier: ButtonActions.ImportChromeBookmarks,
               label: 'Import',
             },
-            recursive: data.indexOf('recursive') >= 0,
+            data: {
+              recursive: input.indexOf('recursive') >= 0,
+            },
           })
         })
         break

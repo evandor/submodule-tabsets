@@ -24,10 +24,13 @@ export type AddUrlToTabsetHandlerAdditionalData = {
     identifier: ButtonActions
     label: string
   }
-  useForLinks?: boolean
-  recursive?: boolean
-  filename?: string
-  data?: object
+  data?: {
+    useForLinks?: boolean
+    displayFeed?: boolean
+    recursive?: boolean
+    filename?: string
+    more?: object
+  }
 }
 
 export interface AddUrlToTabsetHandler {
