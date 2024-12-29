@@ -1,17 +1,22 @@
 import { parseFeed } from '@rowanmanning/feed-parser'
+import { FeedCategory } from '@rowanmanning/feed-parser/lib/feed/base'
 import * as cheerio from 'cheerio'
 import { DialogChainObject, QVueGlobals, uid } from 'quasar'
 import BrowserApi from 'src/app/BrowserApi'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
+import { useUtils } from 'src/core/services/Utils'
 import {
   AddUrlToTabsetHandler,
+  AddUrlToTabsetHandlerAdditionalData,
   ButtonActions,
 } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
 import { AddTabToTabsetCommand } from 'src/tabsets/commands/AddTabToTabsetCommand'
 import { Tab, UrlExtension } from 'src/tabsets/models/Tab'
 import { Tabset } from 'src/tabsets/models/Tabset'
+
+const { sanitizeAsPlainText } = useUtils()
 
 export class RssFolderHandler implements AddUrlToTabsetHandler {
   constructor(public $q: QVueGlobals | undefined) {}
@@ -36,7 +41,7 @@ export class RssFolderHandler implements AddUrlToTabsetHandler {
     chromeTab: chrome.tabs.Tab,
     ts: Tabset,
     folder?: Tabset,
-    additionalData: object = {},
+    additionalData: AddUrlToTabsetHandlerAdditionalData = {},
   ): Promise<ExecutionResult<any>> {
     console.log('loading...', chromeTab.id, additionalData)
     if (!folder || !folder.dynamicUrl) {
@@ -62,24 +67,20 @@ export class RssFolderHandler implements AddUrlToTabsetHandler {
     //   items: Array.from(items)
     // }
     //console.log("items", items)
-    Array.from(feed.items).forEach((item: any) => {
+    const itemsArray = Array.from(feed.items).splice(0, 20)
+    itemsArray.forEach((item: any) => {
       console.log('item: ', item)
       //const title = additionalData['feedname'] || 'no title' //this.getFromItem(item, "title", "no title")
       const title = item.title
       const url = item.url
 
-      if (!item.content) {
-        console.log('skipping item as content is missing', item)
-        return
-      }
-
-      const desc = item.description || ''
+      const desc = sanitizeAsPlainText(item.description) || ''
       const published = item.published //item.querySelector("pubDate")?.innerHTML || undefined
       //const enclosure: Element | null = item.querySelector("enclosure")
       let img = item.image?.url //enclosure ? enclosure.getAttribute("url") : undefined
       console.log('img', img)
       if (!img) {
-        const snippet = item.content
+        const snippet = item.content || item.description || 'no content'
         console.log('snippet', snippet)
         var $ = cheerio.load(snippet)
         img = $('img').attr('src')
@@ -90,6 +91,7 @@ export class RssFolderHandler implements AddUrlToTabsetHandler {
       newTab.description = desc
       newTab.image = img
       newTab.extension = UrlExtension.RSS
+      newTab.tags = item.categories.map((c: FeedCategory) => c.term)
       if (published) {
         newTab.created = new Date(published).getTime()
       }
@@ -103,7 +105,7 @@ export class RssFolderHandler implements AddUrlToTabsetHandler {
   updateInTabset(
     chromeTab: chrome.tabs.Tab,
     ts: Tabset,
-    additionalData: object = {},
+    additionalData: AddUrlToTabsetHandlerAdditionalData = {},
   ): Promise<ExecutionResult<any>> {
     throw new Error('not implemented L')
   }

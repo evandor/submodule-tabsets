@@ -32,7 +32,7 @@ export class ImportFromChromeBookmarksManagerAddUrlToTabsetHandler implements Ad
   actions(): ActionContext[] {
     return [
       {
-        label: 'Import Bookmarks',
+        label: 'Import...',
         identifier: ButtonActions.ImportChromeBookmarks,
         active: (t: chrome.tabs.Tab) => {
           const folderId = getBmFolderId(t)
@@ -82,7 +82,7 @@ export class ImportFromChromeBookmarksManagerAddUrlToTabsetHandler implements Ad
         await useTabsetService().saveTabset(tabset)
         console.log('imported to tabset', tabset.id)
         await useTabsetsStore().reloadTabset(tabset.id)
-        return Promise.resolve('', '')
+        return Promise.resolve(new ExecutionResult('', ''))
         //  })
       } catch (e: any) {
         console.log('got error', e)

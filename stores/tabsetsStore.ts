@@ -64,7 +64,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
   }
 
   function setTabset(ts: Tabset) {
-    console.log('setting tabset', ts.id, ts)
+    // console.log('setting tabset', ts.id, ts)
     tabsets.value.set(ts.id, ts)
   }
 
@@ -99,9 +99,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     }
 
     const trustedName = tabsetName.replace(STRIP_CHARS_IN_USER_INPUT, '').substring(0, 31)
-    const trustedColor = color
-      ? color.replace(STRIP_CHARS_IN_COLOR_INPUT, '').substring(0, 31)
-      : undefined
+    const trustedColor = color ? color.replace(STRIP_CHARS_IN_COLOR_INPUT, '').substring(0, 31) : undefined
 
     if (!ignoreDuplicates) {
       const tabsetWithSameName: Tabset | undefined = _.find(
@@ -210,12 +208,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     currentTabsetId.value = undefined
   }
 
-  function share(
-    tabset: Tabset,
-    sharing: TabsetSharing,
-    sharedId: string | undefined,
-    sharedBy: string,
-  ) {
+  function share(tabset: Tabset, sharing: TabsetSharing, sharedId: string | undefined, sharedBy: string) {
     return storage.share(tabset, sharing, sharedId, sharedBy)
   }
 
@@ -229,9 +222,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
   })
 
   const getCurrentTabset = computed((): Tabset | undefined => {
-    return currentTabsetId.value
-      ? (tabsets.value.get(currentTabsetId.value) as Tabset | undefined)
-      : undefined
+    return currentTabsetId.value ? (tabsets.value.get(currentTabsetId.value) as Tabset | undefined) : undefined
   })
 
   const currentTabsetName = computed(() => {
@@ -312,9 +303,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
 
     function countAllTabs(ts: Tabset): number {
       const directCount: number = ts.tabs?.length || 0
-      const childrenCount: number = ts.folders
-        ?.map((f: Tabset) => countAllTabs(f))
-        .reduce((a, b) => a + b, 0)
+      const childrenCount: number = ts.folders?.map((f: Tabset) => countAllTabs(f)).reduce((a, b) => a + b, 0)
       return directCount + childrenCount
     }
 

@@ -8,7 +8,7 @@
           <q-item-section style="padding-right: 0; min-width: 25px; max-width: 25px">
             <q-icon size="xs" name="o_info" color="accent" />
           </q-item-section>
-          <q-item-section> Tab Details (dev) </q-item-section>
+          <q-item-section> Tab Details (dev)</q-item-section>
         </q-item>
       </template>
 
@@ -17,7 +17,7 @@
         <q-item-section style="padding-right: 0; min-width: 25px; max-width: 25px">
           <q-icon size="xs" name="o_edit" color="info" />
         </q-item-section>
-        <q-item-section> Edit Tab </q-item-section>
+        <q-item-section> Edit Tab</q-item-section>
       </q-item>
 
       <!--      <q-item clickable v-close-popup @click.stop="toggleFav(props['tab' as keyof object])">-->
@@ -34,18 +34,14 @@
       <!--        <q-item-section v-if="props['tab']?.favorite === TabFavorite.SPACE">Remove as Favorite</q-item-section>-->
       <!--      </q-item>-->
 
-      <!-- for now, revisit comments -->
-      <!--<template v-if="props.tabset?.type.toString() !== TabsetType.DYNAMIC.toString()">
-        <q-item clickable
-                v-close-popup @click.stop="addCommentDialog()">
-          <q-item-section style="padding-right:0;min-width:25px;max-width: 25px;">
-            <q-icon size="xs" name="o_note" color="info"/>
+      <template v-if="props.tabset?.type.toString() !== TabsetType.DYNAMIC.toString()">
+        <q-item clickable v-close-popup @click.stop="addCommentDialog()">
+          <q-item-section style="padding-right: 0; min-width: 25px; max-width: 25px">
+            <q-icon size="xs" name="o_note" color="info" />
           </q-item-section>
-          <q-item-section>
-            Add Comment
-          </q-item-section>
+          <q-item-section>Add Comment</q-item-section>
         </q-item>
-      </template>-->
+      </template>
 
       <template v-if="useFeaturesStore().hasFeature(FeatureIdent.ADVANCED_TAB_MANAGEMENT)">
         <q-separator inset />
@@ -53,7 +49,7 @@
           <q-item-section style="padding-right: 0; min-width: 25px; max-width: 25px">
             <q-icon size="xs" name="o_tab" color="info" />
           </q-item-section>
-          <q-item-section> Tab Assignment </q-item-section>
+          <q-item-section> Tab Assignment</q-item-section>
         </q-item>
       </template>
 
@@ -106,10 +102,11 @@ import { useFeaturesStore } from 'src/features/stores/featuresStore'
 import NavigationService from 'src/services/NavigationService'
 import { DeleteTabCommand } from 'src/tabsets/commands/DeleteTabCommand'
 import { UpdateTabColorCommand } from 'src/tabsets/commands/UpdateTabColor'
+import CommentDialog from 'src/tabsets/dialogues/CommentDialog.vue'
 import EditUrlDialog from 'src/tabsets/dialogues/EditUrlDialog.vue'
 import { PlaceholdersType } from 'src/tabsets/models/Placeholders'
 import { Tab } from 'src/tabsets/models/Tab'
-import { Tabset } from 'src/tabsets/models/Tabset'
+import { Tabset, TabsetType } from 'src/tabsets/models/Tabset'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { PropType, ref } from 'vue'
 import { useRouter } from 'vue-router'
@@ -160,9 +157,7 @@ const showTabDetailsMenuEntry = (tab: Tab) => useFeaturesStore().hasFeature(Feat
 //&& !(tab.placeholders?.type === PlaceholdersType.URL_SUBSTITUTION)
 
 const deleteTabLabel = (tab: Tab) =>
-  tab.placeholders && tab.placeholders.type === PlaceholdersType.URL_SUBSTITUTION
-    ? 'Delete all'
-    : 'Delete Tab'
+  tab.placeholders && tab.placeholders.type === PlaceholdersType.URL_SUBSTITUTION ? 'Delete all' : 'Delete Tab'
 
 const editURL = async (tab: Tab) => {
   let useTab = await tabToUse(tab)
@@ -175,10 +170,13 @@ const editURL = async (tab: Tab) => {
 }
 
 const assignTab = async (tab: Tab) =>
-  await NavigationService.openOrCreateTab([
-    chrome.runtime.getURL('/www/index.html#/mainpanel/tabAssignment/' + tab.id),
-  ])
+  await NavigationService.openOrCreateTab([chrome.runtime.getURL('/www/index.html#/mainpanel/tabAssignment/' + tab.id)])
 
-const setColor = (tab: Tab) =>
-  useCommandExecutor().execute(new UpdateTabColorCommand(tab, theColor.value))
+const setColor = (tab: Tab) => useCommandExecutor().execute(new UpdateTabColorCommand(tab, theColor.value))
+
+const addCommentDialog = () =>
+  $q.dialog({
+    component: CommentDialog,
+    componentProps: { tabId: props.tab.id, sharedId: props.tabset?.sharedId },
+  })
 </script>
