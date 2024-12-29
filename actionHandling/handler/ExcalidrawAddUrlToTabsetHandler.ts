@@ -64,7 +64,7 @@ export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   ): Promise<ExecutionResult<any>> {
     console.log('saving...', chromeTab.id, additionalData)
     try {
-      const filename = additionalData ? additionalData['filename' as keyof object] : undefined
+      const filename = additionalData ? additionalData.data!.more!['filename' as keyof object] : undefined
       if (!filename) {
         throw new Error('filename is missing')
       }
@@ -101,7 +101,7 @@ export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   ): Promise<ExecutionResult<any>> {
     console.log('updating...', chromeTab.id, additionalData)
     try {
-      const filename = additionalData.data!['filename' as keyof object]
+      const filename = additionalData.data!.more!['filename' as keyof object]
       if (!filename) {
         throw new Error('filename is missing')
       }
@@ -155,7 +155,11 @@ export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
       })
   }
 
-  private async queryBrowserTab(chromeTab: chrome.tabs.Tab, tabId: string, filename: string) {
+  private async queryBrowserTab(
+    chromeTab: chrome.tabs.Tab,
+    tabId: string,
+    filename: string,
+  ): Promise<chrome.scripting.InjectionResult[]> {
     console.log(`queryBrowserTab: tabId=${tabId}, filename=${filename}`)
     return await chrome.scripting.executeScript({
       target: { tabId: chromeTab.id || 0 },
