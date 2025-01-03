@@ -6,19 +6,13 @@
           <div class="text-h6">Start new Session...</div>
         </q-card-section>
         <q-card-section>
-          <div class="text-body">
-            You can save and hide your current tabs and start a new session.
-          </div>
+          <div class="text-body">You can save and hide your current tabs and start a new session.</div>
         </q-card-section>
         <q-card-section>
-          <div class="text-body">
-            Your current tabs can later be restored from 'Session {{ oldSessionName }}'.
-          </div>
+          <div class="text-body">Your current tabs can later be restored from 'Session {{ oldSessionName }}'.</div>
         </q-card-section>
         <q-card-section>
-          <div class="text-body">
-            Clicking 'start' will close all open tabs in this window but not the pinned ones.
-          </div>
+          <div class="text-body">Clicking 'start' will close all open tabs in this window but not the pinned ones.</div>
         </q-card-section>
         <q-card-section>
           <div>
@@ -34,8 +28,7 @@
             :autofocus="true"
             @keyup.enter="display()"
             @wasClicked="display()"
-            v-close-popup
-          />
+            v-close-popup />
         </q-card-actions>
       </q-card>
     </div>
@@ -52,9 +45,7 @@ defineEmits([...useDialogPluginComponent.emits])
 
 const { dialogRef, onDialogHide, onDialogOK } = useDialogPluginComponent()
 
-const oldSessionName = ref<string>(
-  new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString(),
-)
+const oldSessionName = ref<string>(new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString())
 const sessionName = ref<string>('')
 
 watchEffect(() => {

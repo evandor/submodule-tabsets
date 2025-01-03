@@ -7,8 +7,7 @@
         :show-tabsets="true"
         :preventDragAndDrop="preventDragAndDrop(sorting)"
         :tabset="tabset! as Tabset"
-        :activeFolder="(tabset! as Tabset).folderActive!"
-      />
+        :activeFolder="(tabset! as Tabset).folderActive!" />
     </div>
 
     <!-- place QPageSticky at end of page -->
@@ -29,8 +28,7 @@
             flat
             class="q-mx-xs q-pa-xs cursor-pointer"
             style="max-width: 20px"
-            size="10px"
-          >
+            size="10px">
             <q-tooltip class="tooltip" v-if="descending">Descending</q-tooltip>
             <q-tooltip class="tooltip" v-else>Ascending</q-tooltip>
           </q-btn>
@@ -42,8 +40,7 @@
             flat
             class="q-mx-xs q-pa-xs cursor-pointer"
             style="max-width: 20px"
-            size="10px"
-          >
+            size="10px">
             <q-tooltip class="tooltip">Toggle Sorting - now: {{ sorting }}</q-tooltip>
           </q-btn>
 
@@ -55,8 +52,7 @@
             class="q-mx-xs q-pa-xs cursor-pointer"
             icon="o_add_circle"
             style="max-width: 20px"
-            size="10px"
-          >
+            size="10px">
             <q-tooltip class="tooltip-small"> Add Note to '{{ tabset?.name }}' </q-tooltip>
           </q-btn>
 
@@ -67,8 +63,7 @@
             :class="alreadyInTabset() ? '' : 'cursor-pointer'"
             :color="alreadyInTabset() ? 'grey-5' : 'warning'"
             style="max-width: 20px"
-            size="10px"
-          >
+            size="10px">
             <q-tooltip class="tooltip-small"> *Add current Tab to '{{ tabset?.name }}' </q-tooltip>
           </q-btn>
         </template>
@@ -133,8 +128,7 @@ watchEffect(() => {
 
 watchEffect(() => {
   const windowId = useWindowsStore().currentChromeWindow?.id || 0
-  currentChromeTab.value =
-    useTabsStore2().getCurrentChromeTab(windowId) || useTabsStore2().currentChromeTab
+  currentChromeTab.value = useTabsStore2().getCurrentChromeTab(windowId) || useTabsStore2().currentChromeTab
 })
 
 if (inBexMode() && chrome) {
@@ -165,8 +159,7 @@ const toggleSorting = () => {
 
 const toggleOrder = () => (descending.value = !descending.value)
 
-const preventDragAndDrop = (sorting: TabSorting) =>
-  $q.platform.is.mobile || sorting !== TabSorting.CUSTOM
+const preventDragAndDrop = (sorting: TabSorting) => $q.platform.is.mobile || sorting !== TabSorting.CUSTOM
 
 const alreadyInTabset = () => {
   if (currentChromeTab.value?.url && useTabsetsStore().getCurrentTabset) {
@@ -181,9 +174,7 @@ const saveInTabset = () => {
   }
   const useTS = useTabsetsStore().getTabset(tabsetId.value)
   if (useTS && currentChromeTab.value) {
-    useCommandExecutor().execute(
-      new AddTabToTabsetCommand(new Tab(uid(), currentChromeTab.value), useTS),
-    )
+    useCommandExecutor().execute(new AddTabToTabsetCommand(new Tab(uid(), currentChromeTab.value), useTS))
   } else {
     console.warn('expected to find tabsetId', tabsetId)
   }

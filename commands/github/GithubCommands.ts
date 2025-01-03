@@ -12,27 +12,11 @@ import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 export abstract class GithubCommands<T> implements Command<T> {
   abstract execute(): Promise<ExecutionResult<T>>
 
-  protected async githubPutContentRequest(
-    filename: string,
-    data: string,
-    sha: string | undefined = undefined,
-  ) {
-    const username = (LocalStorage.getItem(GITHUB_USERNAME) as string).replace(
-      STRIP_CHARS_IN_USER_INPUT,
-      '',
-    )
-    const reponame = (LocalStorage.getItem(GITHUB_REPONAME) as string).replace(
-      STRIP_CHARS_IN_USER_INPUT,
-      '',
-    )
-    const path = (LocalStorage.getItem(GITHUB_PATH) as string).replace(
-      STRIP_CHARS_IN_USER_INPUT,
-      '',
-    )
-    const token = (LocalStorage.getItem(GITHUB_TOKEN) as string).replace(
-      STRIP_CHARS_IN_USER_INPUT,
-      '',
-    )
+  protected async githubPutContentRequest(filename: string, data: string, sha: string | undefined = undefined) {
+    const username = (LocalStorage.getItem(GITHUB_USERNAME) as string).replace(STRIP_CHARS_IN_USER_INPUT, '')
+    const reponame = (LocalStorage.getItem(GITHUB_REPONAME) as string).replace(STRIP_CHARS_IN_USER_INPUT, '')
+    const path = (LocalStorage.getItem(GITHUB_PATH) as string).replace(STRIP_CHARS_IN_USER_INPUT, '')
+    const token = (LocalStorage.getItem(GITHUB_TOKEN) as string).replace(STRIP_CHARS_IN_USER_INPUT, '')
 
     const githubUrl = `https://api.github.com/repos/${username}/${reponame}/contents/${this.usePath(path)}${filename}`
     console.log('put to ', githubUrl)
@@ -51,22 +35,10 @@ export abstract class GithubCommands<T> implements Command<T> {
   }
 
   protected async githubGetContentRequest(filename: string) {
-    const username = (LocalStorage.getItem(GITHUB_USERNAME) as string).replace(
-      STRIP_CHARS_IN_USER_INPUT,
-      '',
-    )
-    const reponame = (LocalStorage.getItem(GITHUB_REPONAME) as string).replace(
-      STRIP_CHARS_IN_USER_INPUT,
-      '',
-    )
-    const path = (LocalStorage.getItem(GITHUB_PATH) as string).replace(
-      STRIP_CHARS_IN_USER_INPUT,
-      '',
-    )
-    const token = (LocalStorage.getItem(GITHUB_TOKEN) as string).replace(
-      STRIP_CHARS_IN_USER_INPUT,
-      '',
-    )
+    const username = (LocalStorage.getItem(GITHUB_USERNAME) as string).replace(STRIP_CHARS_IN_USER_INPUT, '')
+    const reponame = (LocalStorage.getItem(GITHUB_REPONAME) as string).replace(STRIP_CHARS_IN_USER_INPUT, '')
+    const path = (LocalStorage.getItem(GITHUB_PATH) as string).replace(STRIP_CHARS_IN_USER_INPUT, '')
+    const token = (LocalStorage.getItem(GITHUB_TOKEN) as string).replace(STRIP_CHARS_IN_USER_INPUT, '')
 
     return await fetch(
       `https://api.github.com/repos/${username}/${reponame}/contents//${this.usePath(path)}${filename}`,

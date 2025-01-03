@@ -12,21 +12,14 @@
         outline
         @click="useTabsetService().selectTabset(t.id)">
         {{ t.name }}
-        <q-icon
-          :name="t.status === TabsetStatus.FAVORITE ? 'o_star' : 'sym_o_star'"
-          @click.stop="toggleFavorite(t)" />
+        <q-icon :name="t.status === TabsetStatus.FAVORITE ? 'o_star' : 'sym_o_star'" @click.stop="toggleFavorite(t)" />
       </q-badge>
     </div>
     <div class="col">
       <q-icon name="more_vert" size="sm" color="secondary" class="cursor-pointer" />
       <q-menu :offset="[0, 0]" anchor="top right" self="bottom right">
         <q-list dense style="min-width: 180px">
-          <ContextMenuItem
-            v-close-popup
-            :dense="true"
-            icon="close"
-            @click="closeTabsetListWidget()"
-            label="Close" />
+          <ContextMenuItem v-close-popup :dense="true" icon="close" @click="closeTabsetListWidget()" label="Close" />
         </q-list>
       </q-menu>
     </div>

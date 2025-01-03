@@ -2,24 +2,21 @@
   <!-- SidePanelFoldersView -->
   <div
     class="q-ma-none q-pa-sm q-pl-md greyBorderBottom"
-    v-if="props.tabset?.folders?.length > 0 && currentFolderPath().length > 0"
-  >
+    v-if="props.tabset?.folders?.length > 0 && currentFolderPath().length > 0">
     <q-breadcrumbs>
       <q-breadcrumbs-el
         class="cursor-pointer"
         icon="home"
         @click="selectFolder(props.tabset)"
         @dragover="overDrag2($event)"
-        @drop="dropAtBreadcrumb($event)"
-      />
+        @drop="dropAtBreadcrumb($event)" />
       <q-breadcrumbs-el
         v-for="f in currentFolderPath()"
         class="cursor-pointer"
         @dragover="overDrag2($event)"
         @drop="dropAtBreadcrumb($event, f)"
         @click="selectFolder(props.tabset, f)"
-        :label="f['name' as keyof object]"
-      />
+        :label="f['name' as keyof object]" />
     </q-breadcrumbs>
   </div>
 
@@ -35,19 +32,13 @@
       @dragover="overDrag($event, folder)"
       @dragend="endDrag($event, folder)"
       @drop="drop($event, folder)"
-      :key="'panelfolderlist_' + folder.id"
-    >
+      :key="'panelfolderlist_' + folder.id">
       <q-item-section
         @click="selectFolder(tabset, folder as Tabset)"
         class="q-mx-sm"
-        style="justify-content: start; width: 25px; max-width: 25px"
-      >
+        style="justify-content: start; width: 25px; max-width: 25px">
         <div class="q-pa-none q-pl-none">
-          <q-icon
-            :name="folder.type === TabsetType.RSS_FOLDER ? 'o_rss_feed' : 'o_folder'"
-            color="warning"
-            size="sm"
-          />
+          <q-icon :name="folder.type === TabsetType.RSS_FOLDER ? 'o_rss_feed' : 'o_folder'" color="warning" size="sm" />
         </div>
       </q-item-section>
       <q-item-section @click="selectFolder(tabset, folder as Tabset)">
@@ -61,21 +52,14 @@
         </q-item-label>
       </q-item-section>
 
-      <q-item-section
-        side
-        @mouseover="hoveredTabset = tabset?.id"
-        @mouseleave="hoveredTabset = undefined"
-      >
+      <q-item-section side @mouseover="hoveredTabset = tabset?.id" @mouseleave="hoveredTabset = undefined">
         <q-item-label>
           <SpecialUrlAddToTabsetComponent
             v-if="currentChromeTab"
-            @button-clicked="
-              (args: ActionHandlerButtonClickedHolder) => handleButtonClicked(tabset, args, folder)
-            "
+            @button-clicked="(args: ActionHandlerButtonClickedHolder) => handleButtonClicked(tabset, args, folder)"
             :currentChromeTab="currentChromeTab"
             :tabset="tabset"
-            :folder="folder"
-          />
+            :folder="folder" />
 
           <q-icon class="cursor-pointer" name="more_vert" size="16px" />
           <SidePanelSubfolderContextMenu :tabset="tabset" :folder="folder" />
@@ -110,8 +94,7 @@ const hoveredTabset = ref<string | undefined>(undefined)
 
 watchEffect(() => {
   const windowId = useWindowsStore().currentChromeWindow?.id || 0
-  currentChromeTab.value =
-    useTabsStore2().getCurrentChromeTab(windowId) || useTabsStore2().currentChromeTab
+  currentChromeTab.value = useTabsStore2().getCurrentChromeTab(windowId) || useTabsStore2().currentChromeTab
 })
 
 const calcFolders = (tabset: Tabset): Tabset[] => {
@@ -175,9 +158,7 @@ const dropAtBreadcrumb = (evt: any, f?: any) => {
 }
 
 const selectFolder = (tabset: Tabset, folder?: Tabset) => {
-  console.log(
-    `selecting folder '${folder?.id}' (${folder?.name}) in tabset ${tabset.id} (${tabset.name})`,
-  )
+  console.log(`selecting folder '${folder?.id}' (${folder?.name}) in tabset ${tabset.id} (${tabset.name})`)
   tabset.folderActive = folder ? (tabset.id === folder.id ? undefined : folder.id) : undefined
 
   useTabsetService().saveTabset(tabset)
@@ -187,11 +168,7 @@ const selectFolder = (tabset: Tabset, folder?: Tabset) => {
 const folderCaption = (folder: Tabset): string =>
   folder.name !== '..' ? folder.tabs.length + ' tab' + (folder.tabs.length !== 1 ? 's' : '') : ''
 
-const handleButtonClicked = async (
-  tabset: Tabset,
-  args: ActionHandlerButtonClickedHolder,
-  folder?: Tabset,
-) => {
+const handleButtonClicked = async (tabset: Tabset, args: ActionHandlerButtonClickedHolder, folder?: Tabset) => {
   console.log(`button clicked: tsId=${tabset.id}, folderId=${folder?.id}, args=...`)
   await useActionHandlers(undefined).handleClick(tabset, currentChromeTab.value!, args, folder)
 }
@@ -203,11 +180,7 @@ const parentChain = (tabset: Tabset, folder?: Tabset, chain: Tabset[] = []): Tab
     return chain
   }
   // if (!tabset.folderActive || tabset.id === folder?.folderParent) {
-  if (
-    !tabset.folderActive ||
-    tabset.id === folder?.folderParent ||
-    tabset.id === tabset.folderActive
-  ) {
+  if (!tabset.folderActive || tabset.id === folder?.folderParent || tabset.id === tabset.folderActive) {
     //|| tabset.folderActive === folder?.id) {
     // console.log("returning chain...")
     return chain

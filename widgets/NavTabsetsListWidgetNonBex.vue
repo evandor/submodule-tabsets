@@ -8,8 +8,7 @@
           @dragover.prevent
           @dragenter.prevent
           :class="activeTabset === tabset.id ? 'active-list-element' : ''"
-          @click="selectTS(tabset)"
-        >
+          @click="selectTS(tabset)">
           <q-item-label>
             <template v-slot>
               <div class="row">
@@ -18,38 +17,25 @@
                     name="stars"
                     color="warning"
                     class="q-ml-none q-mr-sm"
-                    v-if="tabset.status === TabsetStatus.FAVORITE"
-                  >
+                    v-if="tabset.status === TabsetStatus.FAVORITE">
                     <q-tooltip class="tooltip">This tabset is marked as 'favorite'</q-tooltip>
                   </q-icon>
                   <q-icon
                     name="explore"
                     color="primary"
                     class="q-ml-none q-mr-sm"
-                    v-if="tabset.type === TabsetType.SESSION"
-                  >
-                    <q-tooltip
-                      >This is a 'session' tabset, keeping track of your tabs
-                      automatically</q-tooltip
-                    >
+                    v-if="tabset.type === TabsetType.SESSION">
+                    <q-tooltip>This is a 'session' tabset, keeping track of your tabs automatically</q-tooltip>
                   </q-icon>
-                  <q-icon
-                    name="share"
-                    color="primary"
-                    class="q-ml-none q-mr-sm"
-                    v-if="tabset.sharedBy"
-                  >
+                  <q-icon name="share" color="primary" class="q-ml-none q-mr-sm" v-if="tabset.sharedBy">
                     <q-tooltip>This tabset is shared by {{ tabset.sharedBy }}</q-tooltip>
                   </q-icon>
                   <q-icon
                     name="build_circle"
                     color="primary"
                     class="q-ml-none q-mr-sm"
-                    v-if="tabset.type === TabsetType.DYNAMIC"
-                  >
-                    <q-tooltip class="tooltip"
-                      >The tabs of this tabset have been generated automatically</q-tooltip
-                    >
+                    v-if="tabset.type === TabsetType.DYNAMIC">
+                    <q-tooltip class="tooltip">The tabs of this tabset have been generated automatically</q-tooltip>
                   </q-icon>
                   {{ tabset.name }}
                 </div>
@@ -61,8 +47,7 @@
           class="text-right q-mx-sm cursor-pointer"
           @mouseover="hoveredTab = tabset.id"
           @mouseleave="hoveredTab = undefined"
-          style="max-width: 25px; font-size: 12px; color: #bfbfbf"
-        >
+          style="max-width: 25px; font-size: 12px; color: #bfbfbf">
           <span v-if="hoveredOver(tabset.id)">
             <q-icon name="more_horiz" color="primary" size="16px" />
           </span>
@@ -76,8 +61,7 @@
             :index="index!"
             :hoveredTab="hoveredTab!"
             :in-side-panel="props.fromPanel"
-            @toggleExpand="(index: number) => toggleExpand(index)"
-          />
+            @toggleExpand="(index: number) => toggleExpand(index)" />
         </q-item-section>
       </q-item>
     </q-list>
@@ -140,9 +124,7 @@ const onDrop = (evt: DragEvent, tabsetId: string) => {
   const tabId = useUiStore().droppingTab()
   const currenTabsetId = useTabsetsStore().currentTabsetId
   if (evt.dataTransfer && tabId && currenTabsetId) {
-    useCommandExecutor().executeFromUi(
-      new MoveToTabsetCommand(tabId, tabsetId, currenTabsetId, evt.shiftKey),
-    )
+    useCommandExecutor().executeFromUi(new MoveToTabsetCommand(tabId, tabsetId, currenTabsetId, evt.shiftKey))
   }
 }
 

@@ -4,8 +4,7 @@
     tag="div"
     :list="props.tabs"
     :group="{ name: 'tabs', pull: 'clone' }"
-    @change="handleDragAndDrop"
-  >
+    @change="handleDragAndDrop">
     <div
       clickable
       v-for="tab in props.tabs"
@@ -15,8 +14,7 @@
       @mouseover="showButtons(tab.id, true)"
       @mouseleave="showButtons(tab.id, false)"
       @dragstart="startDrag($event, tab)"
-      :key="props.group + '_' + tab.id"
-    >
+      :key="props.group + '_' + tab.id">
       <TabGridWidget :key="props.group + '__' + tab.id" :tab="tabAsTab(tab)" />
     </div>
   </vue-draggable-next>
@@ -64,13 +62,7 @@ function adjustIndex(element: any, tabs: Tab[]) {
     return _.findIndex(useTabsetsStore().getCurrentTabs, (t: Tab) => t.id === tabs[0]!.id)
   } else {
     //console.log(" 1 - searching for ", tabs[element.newIndex - 1].id)
-    return (
-      1 +
-      _.findIndex(
-        useTabsetsStore().getCurrentTabs,
-        (t: Tab) => t.id === tabs[element.newIndex - 1]!.id,
-      )
-    )
+    return 1 + _.findIndex(useTabsetsStore().getCurrentTabs, (t: Tab) => t.id === tabs[element.newIndex - 1]!.id)
   }
 }
 
@@ -114,9 +106,7 @@ const handleDragAndDrop = (event: any) => {
     TabsetService.moveTo(moved.element.id, useIndex, null as unknown as TabsetColumn)
   }
   if (added) {
-    useCommandExecutor().executeFromUi(
-      new CreateTabFromOpenTabsCommand(added.element, added.newIndex),
-    )
+    useCommandExecutor().executeFromUi(new CreateTabFromOpenTabsCommand(added.element, added.newIndex))
   }
 }
 

@@ -1,11 +1,6 @@
 import { LocalStorage, uid } from 'quasar'
 import BrowserApi from 'src/app/BrowserApi'
-import {
-  GITHUB_PATH,
-  GITHUB_REPONAME,
-  GITHUB_USERNAME,
-  STRIP_CHARS_IN_USER_INPUT,
-} from 'src/boot/constants'
+import { GITHUB_PATH, GITHUB_REPONAME, GITHUB_USERNAME, STRIP_CHARS_IN_USER_INPUT } from 'src/boot/constants'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { GithubCommands } from 'src/tabsets/commands/github/GithubCommands'
 import { OpenTabCommand } from 'src/tabsets/commands/OpenTabCommand'
@@ -31,18 +26,9 @@ export class GithubBackupCommand extends GithubCommands<string> {
         const r = await this.githubPutContentRequest(this.filenames[i]!, data, sha)
         console.log('got', r)
       }
-      const username = (LocalStorage.getItem(GITHUB_USERNAME) as string).replace(
-        STRIP_CHARS_IN_USER_INPUT,
-        '',
-      )
-      const reponame = (LocalStorage.getItem(GITHUB_REPONAME) as string).replace(
-        STRIP_CHARS_IN_USER_INPUT,
-        '',
-      )
-      const path = (LocalStorage.getItem(GITHUB_PATH) as string).replace(
-        STRIP_CHARS_IN_USER_INPUT,
-        '',
-      )
+      const username = (LocalStorage.getItem(GITHUB_USERNAME) as string).replace(STRIP_CHARS_IN_USER_INPUT, '')
+      const reponame = (LocalStorage.getItem(GITHUB_REPONAME) as string).replace(STRIP_CHARS_IN_USER_INPUT, '')
+      const path = (LocalStorage.getItem(GITHUB_PATH) as string).replace(STRIP_CHARS_IN_USER_INPUT, '')
       return Promise.resolve(
         new ExecutionResult(
           '',

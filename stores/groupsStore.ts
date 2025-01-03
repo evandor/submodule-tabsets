@@ -114,19 +114,13 @@ export const useGroupsStore = defineStore('groups', () => {
     if (inBexMode() && chrome && chrome.tabGroups) {
       console.debug(' ...initializing GroupsStore Listeners')
       chrome.tabGroups.onCreated.addListener((group: chrome.tabGroups.TabGroup) => onCreated(group))
-      chrome.tabGroups.onRemoved.addListener((group: chrome.tabGroups.TabGroup) =>
-        init('onRemoved'),
-      )
+      chrome.tabGroups.onRemoved.addListener((group: chrome.tabGroups.TabGroup) => init('onRemoved'))
       chrome.tabGroups.onMoved.addListener((group: chrome.tabGroups.TabGroup) => init('onMoved'))
       chrome.tabGroups.onUpdated.addListener((group: chrome.tabGroups.TabGroup) => onUpdated(group))
     }
   }
 
-  function findGroup(
-    groups: chrome.tabGroups.TabGroup[],
-    groupId: number | undefined,
-    groupName: string | undefined,
-  ) {
+  function findGroup(groups: chrome.tabGroups.TabGroup[], groupId: number | undefined, groupName: string | undefined) {
     if (groupId) {
       for (const g of groups) {
         if (g.id === groupId) {
@@ -146,17 +140,12 @@ export const useGroupsStore = defineStore('groups', () => {
 
   function groupForName(groupTitle: string | undefined): chrome.tabGroups.TabGroup | undefined {
     if (inBexMode() && chrome && chrome.tabGroups && groupTitle) {
-      return _.find(
-        [...tabGroups.value.values()],
-        (g: chrome.tabGroups.TabGroup) => g.title === groupTitle,
-      )
+      return _.find([...tabGroups.value.values()], (g: chrome.tabGroups.TabGroup) => g.title === groupTitle)
     }
     return undefined
   }
 
-  function currentGroupForName(
-    groupName: string | undefined = undefined,
-  ): chrome.tabGroups.TabGroup | undefined {
+  function currentGroupForName(groupName: string | undefined = undefined): chrome.tabGroups.TabGroup | undefined {
     if (inBexMode() && chrome?.tabGroups && groupName) {
       return findGroup(currentTabGroups.value, undefined, groupName)
     }

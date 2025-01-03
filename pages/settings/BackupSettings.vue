@@ -25,9 +25,8 @@
     <div class="row q-pa-md">
       <div class="col-3"><b>GitHub Access Token</b></div>
       <div class="col-3 text-grey-8">
-        Click <a href="https://github.com/settings/tokens" target="_blank">here</a> to create a new
-        classic token (use scope <em>public_repo</em>) or a fine-grained token (with
-        <em>content read/write</em> permissions).
+        Click <a href="https://github.com/settings/tokens" target="_blank">here</a> to create a new classic token (use
+        scope <em>public_repo</em>) or a fine-grained token (with <em>content read/write</em> permissions).
       </div>
       <div class="col-1"></div>
       <div class="col-5">
@@ -59,18 +58,14 @@
           label="Backup now"
           :disabled="!githubToken"
           :loading="useUiStore().commandExecuting"
-          @click="runGithubBackup()"
-        />
+          @click="runGithubBackup()" />
         <q-btn
           class="q-px-md"
           dense
           icon="open_in_new"
           @click="
-            useNavigationService().browserTabFor(
-              `http://github.com/${username}/${reponame}/${githubPath || ''}`,
-            )
-          "
-        />
+            useNavigationService().browserTabFor(`http://github.com/${username}/${reponame}/${githubPath || ''}`)
+          " />
       </div>
     </div>
   </div>

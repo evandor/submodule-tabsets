@@ -20,20 +20,14 @@
     active-color="primary"
     indicator-color="primary"
     align="left"
-    narrow-indicator
-  >
+    narrow-indicator>
     <q-tab name="grid" label="As Grid" @click="setView('grid')" />
     <q-tab name="list" label="As List" @click="setView('list')" />
   </q-tabs>
 
   <q-tab-panels v-model="tab" animated>
     <q-tab-panel class="q-ma-none q-pa-none" name="grid">
-      <TabsetPageCards
-        :tabset="tabset"
-        :tabsetFolder="tabsetFolder"
-        :key="tabsetFolder.id"
-        :simple-ui="false"
-      />
+      <TabsetPageCards :tabset="tabset" :tabsetFolder="tabsetFolder" :key="tabsetFolder.id" :simple-ui="false" />
     </q-tab-panel>
 
     <q-tab-panel class="q-ma-none q-pa-none" name="list">
@@ -42,8 +36,7 @@
         :tabsetId="tabsetFolder.id"
         :tabsetSorting="tabset.sorting"
         :tabsetSharedId="tabset.sharedId!"
-        :tabs="tabsetFolder.tabs"
-      />
+        :tabs="tabsetFolder.tabs" />
     </q-tab-panel>
   </q-tab-panels>
 </template>
@@ -74,10 +67,7 @@ const onMessageListener = (request: any, sender: chrome.runtime.MessageSender, s
 
 onMounted(() => {
   Analytics.firePageViewEvent('MainPanelTabsetPage', document.location.href)
-  console.log(
-    '--- adding/resetting message listener ---',
-    chrome.runtime.onMessage.hasListener(onMessageListener),
-  )
+  console.log('--- adding/resetting message listener ---', chrome.runtime.onMessage.hasListener(onMessageListener))
   //chrome.runtime.onMessage.removeListener(onMessageListener)
   chrome.runtime.onMessage.addListener(onMessageListener)
 
@@ -89,8 +79,7 @@ onMounted(() => {
   tabset.value = useTabsetsStore().getTabset(tabsetId.value) || new Tabset(uid(), 'empty', [])
   tab.value = tabset.value.view || 'grid'
   folderId.value = tabset.value.folderActive
-  tabsetFolder.value =
-    useTabsetsStore().getActiveFolder(tabset.value, folderId.value) || tabset.value
+  tabsetFolder.value = useTabsetsStore().getActiveFolder(tabset.value, folderId.value) || tabset.value
 })
 
 onUnmounted(() => {

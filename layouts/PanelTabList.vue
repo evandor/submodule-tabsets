@@ -6,8 +6,7 @@
       class="q-ma-none"
       :list="props.tabs as Array<Tab>"
       :group="{ name: 'tabs', pull: 'clone' }"
-      @change="handleDragAndDrop"
-    >
+      @change="handleDragAndDrop">
       <SidePanelTabListHelper
         v-for="(tab, index) in props.tabs"
         :tab="tab"
@@ -18,8 +17,7 @@
         :tabsetType="props.tabsetType"
         :tabset="props.tabset!"
         :show-tabsets="props.showTabsets"
-        :hide-menu="props.hideMenu"
-      />
+        :hide-menu="props.hideMenu" />
     </vue-draggable-next>
 
     <!-- no drag & drop on mobile -->
@@ -34,8 +32,7 @@
       :tabsetType="props.tabsetType"
       :tabset="props.tabset!"
       :show-tabsets="props.showTabsets"
-      :hide-menu="props.hideMenu"
-    />
+      :hide-menu="props.hideMenu" />
   </q-list>
 
   <audio id="myAudio">
@@ -74,9 +71,7 @@ const handleDragAndDrop = (event: any) => {
     TabsetService.moveTo(moved.element.id, useIndex, null as unknown as TabsetColumn)
   }
   if (added) {
-    useCommandExecutor().executeFromUi(
-      new CreateTabFromOpenTabsCommand(added.element, added.newIndex),
-    )
+    useCommandExecutor().executeFromUi(new CreateTabFromOpenTabsCommand(added.element, added.newIndex))
   }
 }
 </script>

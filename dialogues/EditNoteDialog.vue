@@ -95,11 +95,7 @@ const parseDate = (str: string): Date => {
 }
 
 const saveNote = () => {
-  TabsetService.saveNote(
-    props.tabId,
-    editor.value,
-    props.schedule ? parseDate(scheduleFor.value) : undefined,
-  )
+  TabsetService.saveNote(props.tabId, editor.value, props.schedule ? parseDate(scheduleFor.value) : undefined)
     .then(() => {
       $q.notify({
         message: props.schedule ? 'The tab has been scheduled' : 'The note has been saved',

@@ -4,20 +4,14 @@
     class="row items-start"
     :list="props.tabs"
     :group="{ name: 'tabs', pull: 'clone' }"
-    @change="handleDragAndDrop"
-  >
+    @change="handleDragAndDrop">
     <div
       v-if="props.tabs.length > 0"
       class="col-xs-12 col-sm-4 col-md-3 col-lg-2 q-pa-xs"
       v-for="tab in props.tabs"
       @dragstart="startDrag($event, tab)"
-      :key="props.group + '_' + tab.id"
-    >
-      <TabCardWidget
-        :key="props.group + '__' + tab.id"
-        :tab="tabAsTab(tab)"
-        :highlightUrl="highlightUrl!"
-      />
+      :key="props.group + '_' + tab.id">
+      <TabCardWidget :key="props.group + '__' + tab.id" :tab="tabAsTab(tab)" :highlightUrl="highlightUrl!" />
     </div>
   </vue-draggable-next>
 </template>
@@ -60,13 +54,7 @@ function adjustIndex(element: any, tabs: Tab[]) {
     return _.findIndex(useTabsetsStore().getCurrentTabs, (t: Tab) => t.id === tabs[0]!.id)
   } else {
     //console.log(" 1 - searching for ", tabs[element.newIndex - 1].id)
-    return (
-      1 +
-      _.findIndex(
-        useTabsetsStore().getCurrentTabs,
-        (t: Tab) => t.id === tabs[element.newIndex - 1]!.id,
-      )
-    )
+    return 1 + _.findIndex(useTabsetsStore().getCurrentTabs, (t: Tab) => t.id === tabs[element.newIndex - 1]!.id)
   }
 }
 
@@ -110,9 +98,7 @@ const handleDragAndDrop = (event: any) => {
     TabsetService.moveTo(moved.element.id, useIndex, null as unknown as TabsetColumn)
   }
   if (added) {
-    useCommandExecutor().executeFromUi(
-      new CreateTabFromOpenTabsCommand(added.element, added.newIndex),
-    )
+    useCommandExecutor().executeFromUi(new CreateTabFromOpenTabsCommand(added.element, added.newIndex))
   }
 }
 

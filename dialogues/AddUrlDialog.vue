@@ -10,13 +10,7 @@
 
       <q-card-section class="q-pt-none">
         <div class="text-body">Url:</div>
-        <q-input
-          dense
-          v-model="url"
-          data-testid="add_url_input"
-          autofocus
-          @keyup.enter="createNewUrl()"
-        />
+        <q-input dense v-model="url" data-testid="add_url_input" autofocus @keyup.enter="createNewUrl()" />
         <!--        <div class="text-body2 text-warning">{{ newUrlDialogWarning() }}</div>-->
       </q-card-section>
 
@@ -28,8 +22,7 @@
           data-testid="add_url_submit"
           :disable="url.trim().length === 0"
           v-close-popup
-          @click="createNewUrl()"
-        />
+          @click="createNewUrl()" />
       </q-card-actions>
     </q-card>
   </q-dialog>

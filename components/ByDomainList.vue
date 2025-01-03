@@ -4,8 +4,7 @@
       <InfoMessageWidget
         :probability="1"
         ident="groupByDomain_atLeastTwo"
-        hint="In this view, you will see your tabs grouped by Domain"
-      />
+        hint="In this view, you will see your tabs grouped by Domain" />
 
       <div class="q-pa-none">
         <ByDomainListWidget @domainSelected="(value: string) => showByDomainPage(value)" />

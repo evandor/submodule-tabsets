@@ -88,15 +88,7 @@ const foundLabel = () => {
   const allTabsCount = useTabsetsStore().allTabsCount
   const tabsetsCount = useTabsetsStore().tabsets.size
   if (spacesCount > 0) {
-    return (
-      'Found ' +
-      allTabsCount +
-      ' tabs in ' +
-      tabsetsCount +
-      ' Tabsets and ' +
-      spacesCount +
-      ' Spaces'
-    )
+    return 'Found ' + allTabsCount + ' tabs in ' + tabsetsCount + ' Tabsets and ' + spacesCount + ' Spaces'
   }
   return 'Found ' + allTabsCount + ' tabs in ' + tabsetsCount + ' Tabsets'
 }

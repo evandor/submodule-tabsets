@@ -9,29 +9,22 @@
         :tabsetSorting="props.tabset.sorting"
         :tabsetSharedId="props.tabset.sharedId!"
         :simpleUi="props.simpleUi"
-        :tabs="currentTabs()"
-      />
+        :tabs="currentTabs()" />
 
       <TabGroups
         v-else-if="props.tabset?.view === 'group'"
         group="otherTabs"
         :highlightUrl="highlightUrl"
         :tabsetId="props.tabset?.id"
-        :tabs="currentTabs()"
-      />
+        :tabs="currentTabs()" />
 
       <TabGrid
         v-else-if="props.tabset?.view === 'grid'"
         group="otherTabs"
         :highlightUrl="highlightUrl"
-        :tabs="currentTabs()"
-      />
+        :tabs="currentTabs()" />
 
-      <TabsExporter
-        v-else-if="props.tabset?.view === 'exporter'"
-        group="otherTabs"
-        :tabs="currentTabs()"
-      />
+      <TabsExporter v-else-if="props.tabset?.view === 'exporter'" group="otherTabs" :tabs="currentTabs()" />
 
       <!-- fallback -->
       <TabList
@@ -39,8 +32,7 @@
         group="otherTabs"
         :highlightUrl="highlightUrl"
         :tabsetId="props.tabset?.id"
-        :tabs="currentTabs()"
-      />
+        :tabs="currentTabs()" />
     </q-card-section>
   </q-card>
 </template>

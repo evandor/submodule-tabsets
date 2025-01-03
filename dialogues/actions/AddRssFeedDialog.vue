@@ -25,8 +25,7 @@
             :autofocus="true"
             @keyup.enter="display()"
             @wasClicked="display()"
-            v-close-popup
-          />
+            v-close-popup />
         </q-card-actions>
       </q-card>
     </div>

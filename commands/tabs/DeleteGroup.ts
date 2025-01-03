@@ -35,15 +35,10 @@ export class DeleteGroupCommand implements Command<any> {
           t.columnId = undefined
         }
       })
-      this.tabset.columns = _.filter(
-        this.tabset.columns,
-        (g: TabsetColumn) => g.id !== this.groupId,
-      )
+      this.tabset.columns = _.filter(this.tabset.columns, (g: TabsetColumn) => g.id !== this.groupId)
       return useTabsetService()
         .saveTabset(this.tabset)
-        .then((res) =>
-          Promise.resolve(new ExecutionResult('done', 'Group was deleted and its tabs unassigned')),
-        )
+        .then((res) => Promise.resolve(new ExecutionResult('done', 'Group was deleted and its tabs unassigned')))
         .catch((err) => Promise.reject('could not delete group'))
     } else {
       return Promise.reject(`Could not find group to delete`)

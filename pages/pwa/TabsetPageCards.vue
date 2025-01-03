@@ -2,8 +2,8 @@
   <!-- TabsetPageCards -->
 
   <InfoMessageWidget :probability="1" ident="tabsetpagecards_taggridinfo">
-    Click the image to move your tabs to your liking; right-click to create or remove favorites and
-    click on the URL to open the page.
+    Click the image to move your tabs to your liking; right-click to create or remove favorites and click on the URL to
+    open the page.
   </InfoMessageWidget>
 
   <TabGrid2
@@ -12,8 +12,7 @@
     coordinates-identifier="grid"
     :tabset="props.tabset"
     :tabsetFolder="props.tabsetFolder"
-    :tabs="currentTabs()"
-  />
+    :tabs="currentTabs()" />
 </template>
 
 <script lang="ts" setup>

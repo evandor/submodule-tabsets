@@ -10,8 +10,7 @@
           autofocus
           counter
           @update:model-value="(val) => setColumn(index, val)"
-          @keyup.enter="scope.set"
-        />
+          @keyup.enter="scope.set" />
       </q-popup-edit>
     </div>
   </div>
@@ -23,8 +22,7 @@
     :is-draggable="state2.draggable"
     :is-resizable="false"
     :vertical-compact="false"
-    :use-css-transforms="true"
-  >
+    :use-css-transforms="true">
     <GridItem
       v-for="(item, index) in state2.layout"
       :key="index"
@@ -38,8 +36,7 @@
       :y="item.y"
       :w="item.w"
       :h="item.h"
-      :i="item.i"
-    >
+      :i="item.i">
       <TabGridWidget :key="item.tab.id" :tab="item.tab" />
       <q-menu touch-position context-menu>
         <q-list dense style="min-width: 100px">
@@ -147,10 +144,7 @@ function getCoordinate(t: Tab, ident: string, def: number) {
   if (!t.coordinates) {
     return def
   }
-  const coordinates = _.find(
-    t.coordinates,
-    (c: TabCoordinate) => c.identifier === props.coordinatesIdentifier,
-  )
+  const coordinates = _.find(t.coordinates, (c: TabCoordinate) => c.identifier === props.coordinatesIdentifier)
   return coordinates && coordinates.val && coordinates.val[ident as keyof object] >= 0
     ? coordinates.val[ident as keyof object]
     : def
@@ -219,10 +213,7 @@ const createThumbnail = async (tab: Tab) => {
   }
   const browserTabs = useTabsStore2().getChromeTabs as chrome.tabs.Tab[]
   console.log('checking for url', tab.url)
-  const openTab: chrome.tabs.Tab | undefined = _.find(
-    browserTabs,
-    (bt: chrome.tabs.Tab) => bt.url === tab.url,
-  )
+  const openTab: chrome.tabs.Tab | undefined = _.find(browserTabs, (bt: chrome.tabs.Tab) => bt.url === tab.url)
   const currentTab = await chrome.tabs.getCurrent()
   if (openTab) {
     console.log('found open tab', openTab.id)

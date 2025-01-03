@@ -13,9 +13,8 @@
         </q-card-section>
         <q-card-section>
           <div class="text-body2">
-            This tabset contains {{ props.tabsCount }}
-            {{ props.tabsCount > 1 ? 'tabs' : 'tab' }} which will be deleted as well, including
-            their comments and snapshots
+            This tabset contains {{ props.tabsCount }} {{ props.tabsCount > 1 ? 'tabs' : 'tab' }} which will be deleted
+            as well, including their comments and snapshots
           </div>
         </q-card-section>
         <q-card-actions align="right">
@@ -27,8 +26,7 @@
             :autofocus="true"
             @keyup.enter="deleteTabset()"
             @wasClicked="deleteTabset()"
-            v-close-popup
-          />
+            v-close-popup />
         </q-card-actions>
       </q-card>
     </div>

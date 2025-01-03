@@ -33,13 +33,7 @@ export class RenameTabsetCommand implements Command<any> {
   ) {}
 
   async execute(): Promise<ExecutionResult<string>> {
-    return TabsetService.rename(
-      this.tabsetId,
-      this.newName,
-      this.newColor,
-      this.window,
-      this.details,
-    )
+    return TabsetService.rename(this.tabsetId, this.newName, this.newColor, this.window, this.details)
       .then((res) => {
         info('renamed tabset')
         sendMsg('tabset-renamed', {
@@ -54,12 +48,7 @@ export class RenameTabsetCommand implements Command<any> {
           new ExecutionResult(
             oldValues.oldName,
             'Tabset was updated',
-            new Map([
-              [
-                'Undo',
-                new UndoRenameTabsetCommand(this.tabsetId, oldValues.oldName, oldValues.oldColor),
-              ],
-            ]),
+            new Map([['Undo', new UndoRenameTabsetCommand(this.tabsetId, oldValues.oldName, oldValues.oldColor)]]),
           ),
         ),
       )

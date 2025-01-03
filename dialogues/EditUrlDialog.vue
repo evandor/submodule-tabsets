@@ -27,8 +27,7 @@
           autofocus
           @keydown.enter="updateTab()"
           error-message="not a valid URL"
-          :error="!newTabUrlIsValid"
-        />
+          :error="!newTabUrlIsValid" />
         <div class="text-body2 text-warning">{{ newTabsetDialogWarning() }}</div>
       </q-card-section>
 
@@ -46,8 +45,7 @@
         <q-input
           dense
           :model-value="modelFor(placeholder)"
-          @update:model-value="(val: any) => updatePlaceholder(placeholder, val)"
-        />
+          @update:model-value="(val: any) => updatePlaceholder(placeholder, val)" />
       </q-card-section>
 
       <template v-if="useFeaturesStore().hasFeature(FeatureIdent.DEV_MODE)">
@@ -59,8 +57,7 @@
             :options="extensionOptions"
             map-options
             emit-value
-            style="width: 250px"
-          />
+            style="width: 250px" />
         </q-card-section>
       </template>
 
@@ -100,9 +97,7 @@ const placeholders = ref<string[]>([])
 const placeholderValues = ref<Map<string, string>>(new Map())
 
 const placeholderReg = /\$\{(.*?)}/gm
-const extensionOption = ref<UrlExtension>(
-  UrlExtension[props.tab.extension as keyof typeof UrlExtension],
-)
+const extensionOption = ref<UrlExtension>(UrlExtension[props.tab.extension as keyof typeof UrlExtension])
 
 const extensionOptions = [
   { label: 'HTML', value: UrlExtension.HTML },
@@ -143,9 +138,7 @@ const updateTab = () =>
   )
 
 const newTabsetDialogWarning = () => {
-  return !hideWarning.value &&
-    newTabUrl.value !== props.tab.name &&
-    useTabsetsStore().existingInTabset(newTabUrl.value)
+  return !hideWarning.value && newTabUrl.value !== props.tab.name && useTabsetsStore().existingInTabset(newTabUrl.value)
     ? 'Tabset already exists'
     : ''
 }

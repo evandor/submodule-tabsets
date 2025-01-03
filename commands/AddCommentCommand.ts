@@ -17,11 +17,7 @@ export class AddCommentCommand implements Command<any> {
     if (tabData && tabData.tab) {
       console.log('retrieved tabData', tabData)
       const tab = tabData.tab
-      const comment = new TabComment(
-        useUiStore().sharingAuthor || '<me>',
-        useUiStore().sharingAvatar,
-        this.comment,
-      )
+      const comment = new TabComment(useUiStore().sharingAuthor || '<me>', useUiStore().sharingAvatar, this.comment)
       if (!tab.comments) {
         tab.comments = []
       }
@@ -40,9 +36,7 @@ export class AddCommentCommand implements Command<any> {
         return Promise.reject('could not find tabset')
       }
     } else {
-      return Promise.reject(
-        'There was a problem adding your comment - could not find data for tabId ' + this.tabId,
-      )
+      return Promise.reject('There was a problem adding your comment - could not find data for tabId ' + this.tabId)
     }
   }
 }

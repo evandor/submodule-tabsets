@@ -18,9 +18,7 @@ export class UnShareTabsetCommand implements Command<any> {
         info('unsharing tabset')
         return res
       })
-      .then((oldSharing: any) =>
-        Promise.resolve(new ExecutionResult(oldSharing, 'The tabset not shared anymore')),
-      )
+      .then((oldSharing: any) => Promise.resolve(new ExecutionResult(oldSharing, 'The tabset not shared anymore')))
       .catch((err: any) => Promise.reject(err))
   }
 }

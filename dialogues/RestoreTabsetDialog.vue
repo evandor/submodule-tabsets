@@ -10,8 +10,7 @@
 
       <q-card-section>
         <div class="text-body">
-          This means opening all the tabset's tabs in a new browser window, restoring the tabset you
-          want to work with.
+          This means opening all the tabset's tabs in a new browser window, restoring the tabset you want to work with.
         </div>
       </q-card-section>
 

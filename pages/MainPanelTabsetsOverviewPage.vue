@@ -13,8 +13,7 @@
           size="8px"
           :flat="tabset?.view !== 'grid'"
           :outline="tabset?.view === 'grid'"
-          icon="grid_on"
-        >
+          icon="grid_on">
           <q-tooltip class="tooltip">Use grid layout to visualize your tabs</q-tooltip>
         </q-btn>
 
@@ -27,8 +26,7 @@
           size="10px"
           :flat="tabset?.view !== 'list'"
           :outline="tabset?.view === 'list'"
-          icon="o_list"
-        >
+          icon="o_list">
           <q-tooltip class="tooltip">Use the list layout to visualize your tabs</q-tooltip>
         </q-btn>
       </div>
@@ -44,19 +42,14 @@
     active-color="primary"
     indicator-color="primary"
     align="left"
-    narrow-indicator
-  >
+    narrow-indicator>
     <q-tab name="tabset" label="Tabs" />
   </q-tabs>
 
   <q-tab-panels v-model="tab" animated>
     <q-tab-panel class="q-ma-none q-pa-none" name="tabset">
       <template v-for="ts in allTabsets">
-        <div
-          v-if="
-            _.filter(ts.tabs, (t: Tab) => t.favorite && t.favorite !== TabFavorite.NONE).length > 0
-          "
-        >
+        <div v-if="_.filter(ts.tabs, (t: Tab) => t.favorite && t.favorite !== TabFavorite.NONE).length > 0">
           <div class="text-subtitle2 q-ma-md">{{ ts.name }}</div>
           <!--  @was-clicked="updateGrids()"-->
           <!--          <TabGrid2-->

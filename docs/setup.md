@@ -8,10 +8,7 @@ In the initCoreSerivces method in the app/AppServices.vue file, make sure to add
 const tabsetsStore = useTabsetsStore()
 // updates the registryStore whenever we have changes on 'tabsets'
 watch(tabsetsStore.tabsets, (newTabsets: Map<string, any>) => {
-  const tsInfo = _.map(
-    [...newTabsets.values()],
-    (ts: any) => new TabsetInfo(ts.id, ts.name, ts.window, ts.tabs.length),
-  )
+  const tsInfo = _.map([...newTabsets.values()], (ts: any) => new TabsetInfo(ts.id, ts.name, ts.window, ts.tabs.length))
   registryStore.tabsetRegistry = tsInfo
 })
 // use the proper db connection (here: indexedDb)

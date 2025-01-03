@@ -3,23 +3,20 @@
     v-if="!preventDragAndDrop() && props.tabs?.length > 1"
     :probability="0.3"
     ident="tablist_dnd"
-    hint="You can select the favicon images and drag and drop the entries to reorder the list to your wishes"
-  />
+    hint="You can select the favicon images and drag and drop the entries to reorder the list to your wishes" />
 
   <q-list separator v-if="!preventDragAndDrop()">
     <vue-draggable-next
       class="dragArea list-group w-full"
       :list="props.tabs as Array<Tab>"
       :group="{ name: 'tabs', pull: 'clone' }"
-      @change="handleDragAndDrop"
-    >
+      @change="handleDragAndDrop">
       <TabListHelper
         :group="group"
         :tabset-id="tabsetId"
         :tabset-shared-id="tabsetSharedId!"
         :simpleUi="props.simpleUi"
-        :tabs="props.tabs"
-      />
+        :tabs="props.tabs" />
     </vue-draggable-next>
   </q-list>
 
@@ -29,8 +26,7 @@
     :tabset-id="tabsetId"
     :tabset-shared-id="tabsetSharedId!"
     :simpleUi="props.simpleUi"
-    :tabs="props.tabs"
-  />
+    :tabs="props.tabs" />
 </template>
 
 <script setup lang="ts">
@@ -68,13 +64,7 @@ function adjustIndex(element: any, tabs: Tab[]) {
     return _.findIndex(useTabsetsStore().getCurrentTabs, (t: Tab) => t.id === tabs[0]!.id)
   } else {
     //console.log(" 1 - searching for ", tabs[element.newIndex - 1].id)
-    return (
-      1 +
-      _.findIndex(
-        useTabsetsStore().getCurrentTabs,
-        (t: Tab) => t.id === tabs[element.newIndex - 1]!.id,
-      )
-    )
+    return 1 + _.findIndex(useTabsetsStore().getCurrentTabs, (t: Tab) => t.id === tabs[element.newIndex - 1]!.id)
   }
 }
 
@@ -118,9 +108,7 @@ const handleDragAndDrop = (event: any) => {
     TabsetService.moveTo(moved.element.id, useIndex, null as unknown as TabsetColumn)
   }
   if (added) {
-    useCommandExecutor().executeFromUi(
-      new CreateTabFromOpenTabsCommand(added.element, added.newIndex),
-    )
+    useCommandExecutor().executeFromUi(new CreateTabFromOpenTabsCommand(added.element, added.newIndex))
   }
 }
 

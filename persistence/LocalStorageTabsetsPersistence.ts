@@ -16,9 +16,7 @@ export class LocalStorageTabsetsPersistence {
   updateLastUsedTabsets(spaceId: string | undefined, list: string[]): void {
     const fromStorage = LocalStorage.getItem('ui.tabsets.lastUsed') as string
     const space = spaceId ? spaceId : 'nospace'
-    var allUsedTabsets: TabsetForSpace[] = fromStorage
-      ? (JSON.parse(fromStorage) as TabsetForSpace[])
-      : []
+    var allUsedTabsets: TabsetForSpace[] = fromStorage ? (JSON.parse(fromStorage) as TabsetForSpace[]) : []
     const foundIndex = allUsedTabsets.findIndex((t) => t.identifier === space)
     if (foundIndex >= 0) {
       allUsedTabsets.splice(foundIndex, 1)
@@ -30,9 +28,7 @@ export class LocalStorageTabsetsPersistence {
   clear(spaceId: string | undefined) {
     const fromStorage = LocalStorage.getItem('ui.tabsets.lastUsed') as string
     const space = spaceId ? spaceId : 'nospace'
-    var allUsedTabsets: TabsetForSpace[] = fromStorage
-      ? (JSON.parse(fromStorage) as TabsetForSpace[])
-      : []
+    var allUsedTabsets: TabsetForSpace[] = fromStorage ? (JSON.parse(fromStorage) as TabsetForSpace[]) : []
     const foundIndex = allUsedTabsets.findIndex((t) => t.identifier === space)
     if (foundIndex >= 0) {
       allUsedTabsets.splice(foundIndex, 1)
