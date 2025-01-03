@@ -21,9 +21,9 @@
         <span
           >using repository<br />
           <em
-            >{{ LocalStorage.getItem(GITHUB_USERNAME) }}/{{
-              LocalStorage.getItem(GITHUB_REPONAME)
-            }}/{{ LocalStorage.getItem(GITHUB_PATH) }}</em
+            >{{ LocalStorage.getItem(GITHUB_USERNAME) }}/{{ LocalStorage.getItem(GITHUB_REPONAME) }}/{{
+              LocalStorage.getItem(GITHUB_PATH)
+            }}</em
           ></span
         >
       </q-card-section>

@@ -43,9 +43,7 @@ export class LoadDynamicTabsCommand implements Command<any> {
     function visitChildren(c: Parent, links: object[]): object[] {
       //console.log("checking", typeof c, c)
       if (c.type === 'heading') {
-        var t = c.children
-          .filter((c: RootContent) => c.type === 'text')
-          .map((c: Text) => c.value || 'no title')
+        var t = c.children.filter((c: RootContent) => c.type === 'text').map((c: Text) => c.value || 'no title')
         if (t.length > 0) {
           //currentHeading = t[0]
           console.log('testing header:', t[0], c['depth' as keyof object])
@@ -85,10 +83,7 @@ export class LoadDynamicTabsCommand implements Command<any> {
       return links
     }
 
-    function createFolderIfNotExisting(
-      headings: string[],
-      headingMapping: Map<string, FolderNode>,
-    ) {
+    function createFolderIfNotExisting(headings: string[], headingMapping: Map<string, FolderNode>) {
       //console.log("createFolderIfNotExisting", headings, headingMapping)
       const parentPath = headings.length > 0 ? headings.slice(0, headings.length - 1) : ['']
       const parent = headingMapping.get(parentPath.join('->')) // assuming always found
@@ -107,9 +102,7 @@ export class LoadDynamicTabsCommand implements Command<any> {
           const tab: Tab = new Tab(uid(), BrowserApi.createChromeTabObject(t.text, t.url))
           tab.description = t.description || ''
           tab.tags = ['markdown import']
-          tab.tabReferences.push(
-            new TabReference(uid(), TabReferenceType.SOURCE, 'original URL', [], t.dynamicUrl),
-          )
+          tab.tabReferences.push(new TabReference(uid(), TabReferenceType.SOURCE, 'original URL', [], t.dynamicUrl))
           return tab
         })
         await useCommandExecutor().executeFromUi(
@@ -157,9 +150,7 @@ export class LoadDynamicTabsCommand implements Command<any> {
         tab.description = e['description' as keyof object]
         //tab.date = new Date().getTime()
         tab.tags = ['markdown import']
-        tab.tabReferences.push(
-          new TabReference(uid(), TabReferenceType.SOURCE, 'original URL', [], this.dynamicUrl),
-        )
+        tab.tabReferences.push(new TabReference(uid(), TabReferenceType.SOURCE, 'original URL', [], this.dynamicUrl))
 
         const headingsPath = (e['headings' as keyof object] as string[]).join('->')
         if (headingMapping.has(headingsPath)) {
@@ -176,14 +167,7 @@ export class LoadDynamicTabsCommand implements Command<any> {
       })
 
       const mainFolderResult: ExecutionResult<Tabset> = await useCommandExecutor().executeFromUi(
-        new CreateFolderCommand(
-          uid(),
-          'Extracted Links',
-          [],
-          this.tabset.id,
-          undefined,
-          this.dynamicUrl,
-        ),
+        new CreateFolderCommand(uid(), 'Extracted Links', [], this.tabset.id, undefined, this.dynamicUrl),
       )
       await createFolders(rootFolder, this.tabset.id, mainFolderResult.result.id)
 
@@ -214,9 +198,7 @@ export class LoadDynamicTabsCommand implements Command<any> {
 
       return Promise.resolve(new ExecutionResult('', 'xxx'))
     } else {
-      return Promise.resolve(
-        new ExecutionFailureResult('', "must be a markdown, rss or a youtube 'watch' link"),
-      )
+      return Promise.resolve(new ExecutionFailureResult('', "must be a markdown, rss or a youtube 'watch' link"))
     }
   }
 }

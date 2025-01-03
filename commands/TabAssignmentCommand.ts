@@ -19,9 +19,7 @@ export class TabAssignmentCommand implements Command<any> {
       .then((ignored) => {
         sendMsg('reload-tabset', { tabsetId: this.tabsetId })
       })
-      .then((ignored) =>
-        Promise.resolve(new ExecutionResult(this.matcher, "Tab's matcher was changed")),
-      )
+      .then((ignored) => Promise.resolve(new ExecutionResult(this.matcher, "Tab's matcher was changed")))
       .catch((err) => Promise.reject(err))
   }
 }

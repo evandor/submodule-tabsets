@@ -16,10 +16,7 @@ export class GithubLogCommand extends GithubCommands<string> {
       return Promise.resolve(new ExecutionResult('done', 'not active'))
     }
     const today = new Date().toISOString().slice(0, 10)
-    const filename = (this.event + '_' + new Date().getTime()).replace(
-      STRIP_CHARS_IN_USER_INPUT,
-      '',
-    )
+    const filename = (this.event + '_' + new Date().getTime()).replace(STRIP_CHARS_IN_USER_INPUT, '')
     try {
       const useData = JSON.stringify(this.entry, null, 2)
       const result = await this.githubPutContentRequest('logs/' + today, filename, useData)

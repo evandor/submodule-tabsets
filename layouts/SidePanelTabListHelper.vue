@@ -7,8 +7,7 @@
     class="q-mt-xs q-mx-xs q-mb-none q-pr-none q-pl-sm q-pb-none q-pt-none darkColors lightColors"
     :style="itemStyle()"
     @dragstart="startDrag($event, tab)"
-    :key="'paneltablist_' + tab.id"
-  >
+    :key="'paneltablist_' + tab.id">
     <PanelTabListElementWidget
       :key="'ptlew__' + tab.id"
       :tab="tab"
@@ -17,8 +16,7 @@
       :show-tabsets="props.showTabsets"
       :preventDragAndDrop="props.preventDragAndDrop"
       :tabset="props.tabset!"
-      :hide-menu="props.hideMenu"
-    />
+      :hide-menu="props.hideMenu" />
   </q-item>
 </template>
 

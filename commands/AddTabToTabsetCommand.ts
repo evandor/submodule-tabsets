@@ -49,9 +49,7 @@ export class AddTabToTabsetCommand implements Command<any> {
   }
 
   async execute(): Promise<ExecutionResult<any>> {
-    console.info(
-      `adding tab '${this.tab.id}' to tabset '${this.tabset!.id}', active folder: ${this.activeFolder}`,
-    )
+    console.info(`adding tab '${this.tab.id}' to tabset '${this.tabset!.id}', active folder: ${this.activeFolder}`)
 
     let tabsetOrFolder = this.tabset!
     if (this.activeFolder) {
@@ -105,12 +103,7 @@ export class AddTabToTabsetCommand implements Command<any> {
         }
       }
 
-      const tabset: Tabset = await useTabsetService().addToTabset(
-        tabsetOrFolder,
-        this.tab,
-        0,
-        this.allowDuplicates,
-      )
+      const tabset: Tabset = await useTabsetService().addToTabset(tabsetOrFolder, this.tab, 0, this.allowDuplicates)
 
       // Analysis
       if (useAuthStore().user.uid && this.tab.url?.startsWith('https://')) {

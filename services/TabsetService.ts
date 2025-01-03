@@ -318,8 +318,7 @@ class TabsetService {
   ): Promise<object> {
     const trustedName = tabsetName.replace(STRIP_CHARS_IN_USER_INPUT, '')
     let trustedColor = newColor ? newColor.replace(STRIP_CHARS_IN_COLOR_INPUT, '') : undefined
-    trustedColor =
-      trustedColor && trustedColor.length > 20 ? trustedColor?.substring(0, 19) : trustedColor
+    trustedColor = trustedColor && trustedColor.length > 20 ? trustedColor?.substring(0, 19) : trustedColor
 
     const tabset = useTabsetsStore().getTabset(tabsetId)
     if (tabset) {
@@ -428,9 +427,7 @@ class TabsetService {
 
   saveNote(tabId: string, note: string, scheduledFor: Date | undefined): Promise<void> {
     // console.log("got", tabId, note)
-    const tab = _.find(useTabsetsStore().getCurrentTabset?.tabs, (t: Tab) => t.id === tabId) as
-      | Tab
-      | undefined
+    const tab = _.find(useTabsetsStore().getCurrentTabset?.tabs, (t: Tab) => t.id === tabId) as Tab | undefined
     if (tab) {
       tab.note = note
       if (scheduledFor) {
@@ -460,11 +457,7 @@ class TabsetService {
   //   return Promise.reject("could not mark as deleted: " + tabsetId)
   // }
 
-  markAs(
-    tabsetId: string,
-    status: TabsetStatus,
-    type: TabsetType = TabsetType.DEFAULT,
-  ): Promise<TabsetStatus> {
+  markAs(tabsetId: string, status: TabsetStatus, type: TabsetType = TabsetType.DEFAULT): Promise<TabsetStatus> {
     console.debug(`marking ${tabsetId} as ${status}`)
     const ts = useTabsetsStore().getTabset(tabsetId)
     if (ts) {

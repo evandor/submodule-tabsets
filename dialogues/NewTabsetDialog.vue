@@ -4,8 +4,7 @@
       :space-id="props.spaceId!"
       :name="props.name"
       :window-id="props.windowId!"
-      :from-panel="props.fromPanel"
-    />
+      :from-panel="props.fromPanel" />
   </q-dialog>
 </template>
 

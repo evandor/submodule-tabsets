@@ -24,19 +24,12 @@
           dense
           autofocus
           type="text"
-          error-message="Please do not use special Characters, maximum length is 32"
-        />
+          error-message="Please do not use special Characters, maximum length is 32" />
       </q-card-section>
 
       <q-card-actions align="right" class="text-primary">
         <q-btn flat label="Cancel" @click="onDialogCancel" />
-        <q-btn
-          flat
-          label="Publish Comment"
-          v-close-popup
-          :disable="!author || !editor"
-          @click="publishComment()"
-        />
+        <q-btn flat label="Publish Comment" v-close-popup :disable="!author || !editor" @click="publishComment()" />
       </q-card-actions>
     </q-card>
   </q-dialog>

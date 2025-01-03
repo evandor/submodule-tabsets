@@ -15,8 +15,7 @@
           autofocus
           @keydown.enter="updateTabset()"
           error-message="Please do not use special Characters, maximum length is 32"
-          :error="!newTabsetNameIsValid"
-        />
+          :error="!newTabsetNameIsValid" />
         <div class="text-body2 text-warning">{{ newTabsetDialogWarning() }}</div>
       </q-card-section>
 
@@ -28,16 +27,11 @@
           :options="detailOptions"
           map-options
           emit-value
-          style="width: 250px"
-        />
+          style="width: 250px" />
       </q-card-section>
 
       <q-card-section>
-        <div
-          classs="text-caption text-blue"
-          style="font-size: smaller"
-          v-if="windowMgtSelectionEdited"
-        >
+        <div classs="text-caption text-blue" style="font-size: smaller" v-if="windowMgtSelectionEdited">
           Press 'Enter' to add the new value
         </div>
         <q-select
@@ -55,18 +49,14 @@
           @new-value="createWindowOption"
           @keydown.enter="enterPressed()"
           @focus="windowMgtSelectionHasFocus = true"
-          @blur="windowMgtSelectionHasFocus = false"
-        />
+          @blur="windowMgtSelectionHasFocus = false" />
       </q-card-section>
 
       <q-card-section v-if="useFeaturesStore().hasFeature(FeatureIdent.COLOR_TAGS)">
         Assign Color (optional)
 
         <div class="row q-pa-xs q-mt-none q-pl-sm q-gutter-sm">
-          <ColorSelector
-            @colorSet="(color: string) => (theColor = color)"
-            :selectedColor="props.tabsetColor!"
-          />
+          <ColorSelector @colorSet="(color: string) => (theColor = color)" :selectedColor="props.tabsetColor!" />
         </div>
       </q-card-section>
 
@@ -78,8 +68,7 @@
           color="warning"
           :disable="disableSubmit()"
           v-close-popup
-          @click="updateTabset()"
-        />
+          @click="updateTabset()" />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -119,9 +108,7 @@ const windowMgtSelectionEdited = ref(false)
 const theColor = ref<string | undefined>(props.tabsetColor || undefined)
 const windowModel = ref<string>(props.window || 'current')
 const windowOptions = ref<string[]>([])
-const detailOption = ref<ListDetailLevel>(
-  ListDetailLevel[props.details as keyof typeof ListDetailLevel],
-)
+const detailOption = ref<ListDetailLevel>(ListDetailLevel[props.details as keyof typeof ListDetailLevel])
 
 const detailOptions = [
   { label: 'Minimal Details', value: ListDetailLevel.MINIMAL },
@@ -153,13 +140,7 @@ watchEffect(() => {
 
 const updateTabset = () =>
   useCommandExecutor().executeFromUi(
-    new RenameTabsetCommand(
-      props.tabsetId,
-      newTabsetName.value,
-      theColor.value,
-      windowModel.value,
-      detailOption.value,
-    ),
+    new RenameTabsetCommand(props.tabsetId, newTabsetName.value, theColor.value, windowModel.value, detailOption.value),
   )
 
 const newTabsetDialogWarning = () => {

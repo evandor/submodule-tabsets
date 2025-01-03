@@ -7,8 +7,7 @@
       </q-card-section>
       <q-card-section>
         <div class="text-body">
-          Would you like to {{ props.republish ? 're-share' : 'share' }} this tabset:
-          {{ props.tabsetName }}?
+          Would you like to {{ props.republish ? 're-share' : 'share' }} this tabset: {{ props.tabsetName }}?
         </div>
       </q-card-section>
       <q-card-section>
@@ -24,8 +23,7 @@
           dense
           autofocus
           type="text"
-          error-message="Please do not use special Characters, maximum length is 32"
-        />
+          error-message="Please do not use special Characters, maximum length is 32" />
       </q-card-section>
       <q-card-actions align="right" class="text-primary">
         <q-btn size="md" color="accent" label="Cancel" @click="onDialogCancel" />
@@ -35,8 +33,7 @@
           :label="props.republish ? 'Republish Tabset' : 'Share Tabset'"
           v-close-popup
           :disable="!author"
-          @click="shareTabset()"
-        />
+          @click="shareTabset()" />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -69,13 +66,7 @@ const shareTabset = () => {
   $q.localStorage.set(SHARING_AUTHOR_IDENT, author.value)
   useCommandExecutor()
     .executeFromUi(
-      new ShareTabsetCommand(
-        props.tabsetId,
-        props.sharedId,
-        TabsetSharing.PUBLIC_LINK,
-        author.value,
-        props.republish,
-      ),
+      new ShareTabsetCommand(props.tabsetId, props.sharedId, TabsetSharing.PUBLIC_LINK, author.value, props.republish),
     )
     .then((res: any) => {
       //useUiStore().sidePanelSetActiveView(SidePanelViews.MAIN)

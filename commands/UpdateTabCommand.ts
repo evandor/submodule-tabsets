@@ -37,13 +37,7 @@ export class UpdateTabCommand implements Command<any> {
   async execute(): Promise<ExecutionResult<string>> {
     const oldUrl = this.tab.url || ''
     await TabsetService.setCustomTitle(this.tab, this.newName, this.newDesc)
-    return TabsetService.setUrl(
-      this.tab,
-      this.newUrl,
-      this.placeholders,
-      this.placeholderValues,
-      this.extension,
-    )
+    return TabsetService.setUrl(this.tab, this.newUrl, this.placeholders, this.placeholderValues, this.extension)
       .then((ignored) => {
         if (this.tab.url) {
           useSearchStore().update(this.tab.url, 'url', this.newUrl)
@@ -51,11 +45,7 @@ export class UpdateTabCommand implements Command<any> {
       })
       .then((ignored) =>
         Promise.resolve(
-          new ExecutionResult(
-            this.newUrl,
-            'Tab updated',
-            new Map([['Undo', new UndoCommand(this.tab, oldUrl)]]),
-          ),
+          new ExecutionResult(this.newUrl, 'Tab updated', new Map([['Undo', new UndoCommand(this.tab, oldUrl)]])),
         ),
       )
       .catch((err) => Promise.reject(err))

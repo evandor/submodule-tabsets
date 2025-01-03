@@ -7,6 +7,7 @@ import { ContentItem } from 'src/content/models/ContentItem'
 import { useContentService } from 'src/content/services/ContentService'
 import { TabPredicate } from 'src/core/domain/Types'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
+import NavigationService from 'src/services/NavigationService'
 import { useSpacesStore } from 'src/spaces/stores/spacesStore'
 import { useSettingsStore } from 'src/stores/settingsStore'
 import { GithubLogCommand } from 'src/tabsets/commands/github/GithubLogCommand'
@@ -18,6 +19,7 @@ import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { useTabsStore2 } from 'src/tabsets/stores/tabsStore2'
 import { useUiStore } from 'src/ui/stores/uiStore'
 import JsUtils from 'src/utils/JsUtils'
+import { useAuthStore } from 'stores/authStore'
 import throttledQueue from 'throttled-queue'
 import { v5 as uuidv5 } from 'uuid'
 
@@ -449,6 +451,16 @@ export function useTabsetService() {
     allowDuplicates = false,
   ): Promise<Tabset> => {
     if (tab.url) {
+      const exceedInfo = useAuthStore().limitExceeded('TABS', useTabsetsStore().allTabsCount)
+      if (exceedInfo.exceeded) {
+        await NavigationService.openOrCreateTab([
+          chrome.runtime.getURL(
+            `/www/index.html#/mainpanel/settings?tab=account&exceeded=tabs&limit=${exceedInfo.limit}`,
+          ),
+        ])
+        return Promise.reject('Tabs Limit was Exceeded')
+      }
+
       if (!allowDuplicates) {
         const indexInTabset = _.findIndex(ts.tabs, (t: any) => t.url === tab.url)
         if (indexInTabset >= 0 && !tab.image) {

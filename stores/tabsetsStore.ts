@@ -4,7 +4,7 @@ import { uid } from 'quasar'
 import { STRIP_CHARS_IN_COLOR_INPUT, STRIP_CHARS_IN_USER_INPUT } from 'src/boot/constants'
 import { useUtils } from 'src/core/services/Utils'
 import NavigationService from 'src/services/NavigationService'
-import { AccessItem, useAuthStore } from 'src/stores/authStore'
+import { useAuthStore } from 'src/stores/authStore'
 import { Tab, TabComment } from 'src/tabsets/models/Tab'
 import { TabAndTabsetId } from 'src/tabsets/models/TabAndTabsetId'
 import { Tabset, TabsetSharing, TabsetStatus } from 'src/tabsets/models/Tabset'
@@ -90,10 +90,12 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     spaceId: string | undefined = undefined,
     ignoreDuplicates: boolean = false,
   ): Promise<Tabset> {
-    const currentTabsetsCount = tabsets.value.size
-    if (useAuthStore().limitExceeded(AccessItem.TABSETS, currentTabsetsCount)) {
+    const exceedInfo = useAuthStore().limitExceeded('TABSETS', tabsets.value.size)
+    if (exceedInfo.exceeded) {
       await NavigationService.openOrCreateTab([
-        chrome.runtime.getURL('/www/index.html#/mainpanel/settings?tab=account'),
+        chrome.runtime.getURL(
+          `/www/index.html#/mainpanel/settings?tab=account&exceeded=tabsets&limit=${exceedInfo.limit}`,
+        ),
       ])
       return Promise.reject('tabsetLimitExceeded')
     }

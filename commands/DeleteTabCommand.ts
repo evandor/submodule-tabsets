@@ -47,11 +47,7 @@ export class DeleteTabCommand implements Command<Tabset> {
       })
       .then((tabset) =>
         Promise.resolve(
-          new ExecutionResult(
-            tabset,
-            'Tab was deleted',
-            new Map([['Undo', new UndoCommand(tabset, this.tab)]]),
-          ),
+          new ExecutionResult(tabset, 'Tab was deleted', new Map([['Undo', new UndoCommand(tabset, this.tab)]])),
         ),
       )
       .then((res) => {

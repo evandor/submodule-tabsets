@@ -108,11 +108,7 @@ export const useTabsStore2 = defineStore('browsertabs', () => {
 
   function tabHistoryForward() {
     if (chromeTabsHistoryPosition.value < chromeTabsHistory.value.length - 1) {
-      console.log(
-        'called tabHistoryForward with',
-        chromeTabsHistoryPosition.value,
-        chromeTabsHistory.value.length,
-      )
+      console.log('called tabHistoryForward with', chromeTabsHistoryPosition.value, chromeTabsHistory.value.length)
       chromeTabsHistoryPosition.value += 1
       chromeTabsHistoryNavigating.value = true
     }

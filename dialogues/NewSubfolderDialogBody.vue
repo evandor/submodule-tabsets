@@ -15,14 +15,11 @@
             autofocus
             @update:model-value="(val: string | number | null) => checkIsValid()"
             :rules="[
-              (val: string) =>
-                (val.trim() !== '.' && val.trim() !== '..') || 'This is a reserved name',
-              (val: string) =>
-                Tabset.newTabsetNameIsValid(val) || 'Please do not use special Characters',
+              (val: string) => (val.trim() !== '.' && val.trim() !== '..') || 'This is a reserved name',
+              (val: string) => Tabset.newTabsetNameIsValid(val) || 'Please do not use special Characters',
               (val: string) => Tabset.newTabsetNameIsShortEnough(val) || 'the maximum length is 32',
               (val: string) => doesNotExistYet(val) || 'Folder already exists...',
-            ]"
-          >
+            ]">
             <template v-slot:hint>
               <span class="text-negative"></span>
             </template>
@@ -34,10 +31,7 @@
             </q-checkbox>
             &nbsp;
             <q-icon name="help" color="primary" size="1em">
-              <q-tooltip
-                >If you select this option, all currently open tabs will be added to the new
-                folder</q-tooltip
-              >
+              <q-tooltip>If you select this option, all currently open tabs will be added to the new folder</q-tooltip>
             </q-icon>
           </template>
         </q-card-section>

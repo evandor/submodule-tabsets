@@ -20,12 +20,7 @@
 
   {{ groupedTabs }}
   <!-- rest: neither pinned, grouped, or pending -->
-  <q-expansion-item
-    icon="tabs"
-    default-opened
-    data-testid="expansion_item_unpinnedNoGroup"
-    expand-separator
-  >
+  <q-expansion-item icon="tabs" default-opened data-testid="expansion_item_unpinnedNoGroup" expand-separator>
     <template v-slot:header>
       <q-item-section>
         <div>

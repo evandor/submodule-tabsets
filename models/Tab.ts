@@ -254,11 +254,7 @@ export class Tab {
           ext = UrlExtension.RSS
         } else if (urlToCheck.endsWith('.xml')) {
           ext = UrlExtension.RSS
-        } else if (
-          urlToCheck.endsWith('.png') ||
-          urlToCheck.endsWith('.jpg') ||
-          urlToCheck.endsWith('.jpeg')
-        ) {
+        } else if (urlToCheck.endsWith('.png') || urlToCheck.endsWith('.jpg') || urlToCheck.endsWith('.jpeg')) {
           ext = UrlExtension.IMAGE
         }
       } catch (err) {

@@ -18,8 +18,7 @@
             :autofocus="true"
             @keyup.enter="deleteFolder()"
             @wasClicked="deleteFolder()"
-            v-close-popup
-          />
+            v-close-popup />
         </q-card-actions>
       </q-card>
     </div>

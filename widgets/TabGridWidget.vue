@@ -1,46 +1,34 @@
 <template>
   <q-card flat bordered style="border: 0px solid green">
-    <q-card-section
-      class="q-ma-none q-pa-xs cursor-pointer bg-primary text-white"
-      style="width: 100%"
-    >
+    <q-card-section class="q-ma-none q-pa-xs cursor-pointer bg-primary text-white" style="width: 100%">
       <div class="row items-baseline">
         <q-img
           v-if="thumbnail"
           style="border: 0 dotted white; border-radius: 3px; cursor: move"
           :ratio="16 / 9"
-          :src="thumbnail"
-        >
+          :src="thumbnail">
         </q-img>
         <q-img
           v-else-if="props.tab.image && props.tab.image.startsWith('blob://')"
           style="border: 0 dotted white; border-radius: 5px"
-          :src="imgFromBlob"
-        >
+          :src="imgFromBlob">
           <q-tooltip class="tooltip">Custom Screenshot</q-tooltip>
         </q-img>
-        <q-img
-          v-else-if="props.tab.image"
-          style="border: 0 dotted white; border-radius: 5px"
-          :src="props.tab.image"
-        >
+        <q-img v-else-if="props.tab.image" style="border: 0 dotted white; border-radius: 5px" :src="props.tab.image">
           <q-tooltip class="tooltip">Custom Screenshot</q-tooltip>
         </q-img>
         <q-img
           v-else
           style="border: 0 dotted white; border-radius: 3px; cursor: move"
           :ratio="16 / 9"
-          src="https://placehold.co/600x400?text=no+thumbnail"
-        />
+          src="https://placehold.co/600x400?text=no+thumbnail" />
       </div>
     </q-card-section>
     <q-card-section class="q-ma-none q-pa-xs bg-primary text-white">
       <div class="row fit">
         <div class="col-12 cursor-pointer ellipsis">
           <TabFaviconWidget :tab="tab" width="16px" height="16px" class="q-mr-sm" />
-          <span @click="NavigationService.openOrCreateTab([props.tab.url || ''])">{{
-            shortUrl()
-          }}</span>
+          <span @click="NavigationService.openOrCreateTab([props.tab.url || ''])">{{ shortUrl() }}</span>
         </div>
       </div>
     </q-card-section>

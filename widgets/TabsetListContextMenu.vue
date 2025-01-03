@@ -18,18 +18,8 @@
       <!--        Open in sidePanel-->
       <!--      </q-item>-->
 
-      <q-item
-        v-if="!props.inSidePanel"
-        clickable
-        v-close-popup
-        @click="showDetails(props.tabset.id)"
-      >
-        <q-icon
-          name="o_info"
-          class="q-my-xs q-mr-xs"
-          color="grey-5"
-          style="position: relative; top: -1px"
-        />
+      <q-item v-if="!props.inSidePanel" clickable v-close-popup @click="showDetails(props.tabset.id)">
+        <q-icon name="o_info" class="q-my-xs q-mr-xs" color="grey-5" style="position: relative; top: -1px" />
         Tabset Details...
       </q-item>
       <!--      <q-item v-if="props.tabset?.status === TabsetStatus.DEFAULT && props.tabset?.type !== TabsetType.SPECIAL"-->
@@ -47,19 +37,15 @@
         v-if="tabset.type === TabsetType.SESSION && tabset.status !== TabsetStatus.DELETED"
         clickable
         v-close-popup
-        @click="stopSession(props.tabset.id)"
-      >
+        @click="stopSession(props.tabset.id)">
         Stop active Session
       </q-item>
 
       <q-item
-        v-if="
-          props.tabset.type === TabsetType.DEFAULT && props.tabset.status !== TabsetStatus.DELETED
-        "
+        v-if="props.tabset.type === TabsetType.DEFAULT && props.tabset.status !== TabsetStatus.DELETED"
         clickable
         v-close-popup
-        @click="archiveTabset(props.tabset.id)"
-      >
+        @click="archiveTabset(props.tabset.id)">
         Archive Tabset
       </q-item>
 
@@ -76,32 +62,28 @@
               v-if="props.tabset.sharing === TabsetSharing.UNSHARED || !props.tabset.sharing"
               clickable
               v-close-popup
-              @click="sharePublicly(props.tabset.id)"
-            >
+              @click="sharePublicly(props.tabset.id)">
               <q-item-section>Share publicly</q-item-section>
             </q-item>
             <q-item
               v-if="props.tabset.sharing === TabsetSharing.PUBLIC_LINK"
               @click="openPublicShare(props.tabset.id)"
               clickable
-              v-close-popup
-            >
+              v-close-popup>
               <q-item-section>Open public page</q-item-section>
             </q-item>
             <q-item
               v-if="props.tabset.sharing === TabsetSharing.PUBLIC_LINK"
               @click="copyPublicShareToClipboard(props.tabset.id)"
               clickable
-              v-close-popup
-            >
+              v-close-popup>
               <q-item-section>Copy public page link</q-item-section>
             </q-item>
             <q-item
               v-if="props.tabset.sharing === TabsetSharing.PUBLIC_LINK"
               clickable
               v-close-popup
-              @click="removePublicShare(props.tabset.id)"
-            >
+              @click="removePublicShare(props.tabset.id)">
               <q-item-section>Remove public share</q-item-section>
             </q-item>
           </q-list>
@@ -124,8 +106,7 @@
               :key="space['spaceId' as keyof object]"
               dense
               @click="addToSpace(tabset, space['spaceId' as keyof object])"
-              clickable
-            >
+              clickable>
               <q-item-section
                 ><i>{{ space['spaceName' as keyof object] }}</i></q-item-section
               >
@@ -140,8 +121,7 @@
               :key="space['spaceId' as keyof object]"
               dense
               @click="removeFromSpace(tabset, space['spaceId' as keyof object])"
-              clickable
-            >
+              clickable>
               <q-item-section
                 ><i>{{ space['spaceName' as keyof object] }}</i></q-item-section
               >
@@ -171,22 +151,12 @@
 
       <q-separator />
       <q-item clickable v-close-popup @click.stop="copyTabset(tabset)">
-        <q-icon
-          name="o_folder_copy"
-          class="q-my-xs q-mr-xs"
-          color="grey-5"
-          style="position: relative; top: -1px"
-        />
+        <q-icon name="o_folder_copy" class="q-my-xs q-mr-xs" color="grey-5" style="position: relative; top: -1px" />
         Copy tabset...
       </q-item>
       <q-separator />
       <q-item clickable v-close-popup @click.stop="deleteDialog(tabset)">
-        <q-icon
-          name="o_delete"
-          class="q-my-xs q-mr-xs"
-          color="red"
-          style="position: relative; top: -1px"
-        />
+        <q-icon name="o_delete" class="q-my-xs q-mr-xs" color="red" style="position: relative; top: -1px" />
         Delete tabset...
       </q-item>
     </q-list>
@@ -232,8 +202,7 @@ const $q = useQuasar()
 const archiveTabset = (tabsetId: string) =>
   useCommandExecutor().executeFromUi(new MarkTabsetAsArchivedCommand(tabsetId))
 
-const showDetails = (tabsetId: string) =>
-  useUiStore().rightDrawerSetActiveTab(DrawerTabs.TABSET_DETAILS)
+const showDetails = (tabsetId: string) => useUiStore().rightDrawerSetActiveTab(DrawerTabs.TABSET_DETAILS)
 
 const stopSession = (tabsetId: string) => {
   const tabset = useTabsetsStore().getTabset(tabsetId)

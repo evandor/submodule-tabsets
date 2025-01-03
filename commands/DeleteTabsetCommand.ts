@@ -15,10 +15,7 @@ export class DeleteTabsetCommand implements Command<string> {
       .deleteTabset(this.tabsetId)
       .then((res) => {
         //sendMsg('tabset-deleted', {tabsetId: this.tabsetId})
-        useTabsetsUiStore().clearFromLastUsedTabsets(
-          useSpacesStore().space?.id || undefined,
-          this.tabsetId,
-        )
+        useTabsetsUiStore().clearFromLastUsedTabsets(useSpacesStore().space?.id || undefined, this.tabsetId)
         info('tabset deleted')
         return res
       })

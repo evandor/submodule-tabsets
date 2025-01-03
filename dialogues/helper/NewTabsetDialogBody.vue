@@ -16,13 +16,11 @@
             autofocus
             @update:model-value="(val: string | number | null) => checkIsValid()"
             :rules="[
-              (val: string) =>
-                Tabset.newTabsetNameIsValid(val) || 'Please do not use special Characters',
+              (val: string) => Tabset.newTabsetNameIsValid(val) || 'Please do not use special Characters',
               (val: string) => Tabset.newTabsetNameIsShortEnough(val) || 'the maximum length is 32',
               (val: string) => doesNotExistYet(val) || 'Tabset already exists...',
             ]"
-            data-testid="newTabsetName"
-          >
+            data-testid="newTabsetName">
             <template v-slot:hint>
               <span class="text-negative">{{
                 isNotArchived(newTabsetName) ? '' : 'Tabset already exists and is archived'
@@ -35,28 +33,17 @@
               :style="isNotArchived(newTabsetName) ? '' : 'opacity: 0.2'"
               :disable="!isNotArchived(newTabsetName)"
               data-testid="newTabsetAutoAdd"
-              v-model="addAllOpenTabs"
-            >
-              <slot
-                ><span :style="isNotArchived(newTabsetName) ? '' : 'opacity: 0.2'"
-                  >Add all open tabs</span
-                ></slot
-              >
+              v-model="addAllOpenTabs">
+              <slot><span :style="isNotArchived(newTabsetName) ? '' : 'opacity: 0.2'">Add all open tabs</span></slot>
             </q-checkbox>
             &nbsp;
             <q-icon v-if="!props.windowId" name="help" color="primary" size="1em">
-              <q-tooltip
-                >If you select this option, all currently open tabs will be added to your new
-                tabset</q-tooltip
-              >
+              <q-tooltip>If you select this option, all currently open tabs will be added to your new tabset</q-tooltip>
             </q-icon>
           </template>
         </q-card-section>
 
-        <q-card-section
-          v-if="!props.windowId"
-          :style="isNotArchived(newTabsetName) ? '' : 'opacity: 0.2'"
-        >
+        <q-card-section v-if="!props.windowId" :style="isNotArchived(newTabsetName) ? '' : 'opacity: 0.2'">
           <q-select
             dense
             options-dense
@@ -70,14 +57,12 @@
             :options="windowOptions"
             input-debounce="0"
             @new-value="createWindowOption"
-            :disable="!isNotArchived(newTabsetName)"
-          />
+            :disable="!isNotArchived(newTabsetName)" />
         </q-card-section>
 
         <q-card-section
           v-if="useFeaturesStore().hasFeature(FeatureIdent.COLOR_TAGS)"
-          :style="isNotArchived(newTabsetName) ? '' : 'opacity: 0.2'"
-        >
+          :style="isNotArchived(newTabsetName) ? '' : 'opacity: 0.2'">
           Assign Color (optional)
           <div class="row q-pa-xs q-mt-none q-pl-sm q-gutter-sm">
             <ColorSelector @colorSet="(color: string) => (theColor = color)" />
@@ -98,8 +83,7 @@
             type="submit"
             data-testid="newTabsetNameSubmit"
             :disable="!isValid"
-            v-close-popup
-          />
+            v-close-popup />
         </q-card-actions>
       </q-card>
     </q-form>

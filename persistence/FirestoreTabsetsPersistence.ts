@@ -1,5 +1,5 @@
 import { APP_INSTALLATION_ID } from 'boot/constants'
-import { collection, deleteDoc, doc, Firestore, getDocs, setDoc } from 'firebase/firestore'
+import { collection, deleteDoc, doc, Firestore, getDoc, getDocs, setDoc } from 'firebase/firestore'
 import { sha256 } from 'js-sha256'
 import { LocalStorage, uid } from 'quasar'
 import { useNotesStore } from 'src/notes/stores/NotesStore'
@@ -16,13 +16,7 @@ const STORE_IDENT = 'tabsets'
 const installationId = (LocalStorage.getItem(APP_INSTALLATION_ID) as string) || '---'
 
 function tabsetDoc(tabsetId: string) {
-  return doc(
-    FirebaseServices.getFirestore(),
-    'users',
-    useAuthStore().user.uid,
-    STORE_IDENT,
-    tabsetId,
-  )
+  return doc(FirebaseServices.getFirestore(), 'users', useAuthStore().user.uid, STORE_IDENT, tabsetId)
 }
 
 function tabsetsCollection() {
@@ -92,9 +86,7 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
     sharedId: string | undefined,
     sharedBy: string | undefined,
   ): Promise<TabsetSharing | void> {
-    console.log(
-      `setting property 'sharing' to ${sharing} for tabset  ${ts.id} with sharedId ${sharedId}`,
-    )
+    console.log(`setting property 'sharing' to ${sharing} for tabset  ${ts.id} with sharedId ${sharedId}`)
     // const ts = getTabset(tabsetId) ?? throwIdNotFound("tabset", tabsetId)
 
     const firestore: Firestore = FirebaseServices.getFirestore()
@@ -180,8 +172,10 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
     }
   }
 
-  reloadTabset(): Promise<Tabset> {
-    throw new Error('reload tabset not yet implemented')
+  async reloadTabset(tabsetId: string): Promise<Tabset> {
+    console.debug('reloading tabset', tabsetId)
+    const res = await getDoc(tabsetDoc(tabsetId))
+    return res.data() as Tabset
   }
 }
 

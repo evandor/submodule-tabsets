@@ -75,11 +75,7 @@ export class CreateTabFromOpenTabsCommand implements Command<any> {
             return TabsetService.getContentFor(tab).then((content) => {
               if (content) {
                 return useTabsetService()
-                  .saveText(
-                    tab,
-                    content['content' as keyof object],
-                    content['metas' as keyof object],
-                  )
+                  .saveText(tab, content['content' as keyof object], content['metas' as keyof object])
                   .then((res) => {
                     return new ExecutionResult(
                       'result',

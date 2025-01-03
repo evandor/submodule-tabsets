@@ -4,12 +4,7 @@
   <template v-else-if="handler.actions().length === 1">
     <q-btn
       outline
-      @click.stop="
-        emits(
-          'buttonClicked',
-          new ActionHandlerButtonClickedHolder(handler, '', handler.actions()[0]),
-        )
-      "
+      @click.stop="emits('buttonClicked', new ActionHandlerButtonClickedHolder(handler, '', handler.actions()[0]))"
       class="q-ma-none q-px-sm q-py-none"
       :class="{ shake: animateAddtabButton, 'cursor-pointer': !alreadyInTabset() }"
       :color="alreadyInTabset() ? 'grey-5' : tsBadges.length > 0 ? 'positive' : 'primary'"
@@ -53,17 +48,12 @@
           :clickable="isActive(l)"
           dense
           @click.stop="
-            emits(
-              'buttonClicked',
-              new ActionHandlerButtonClickedHolder(handler, ButtonActions.Save, l, {}),
-            )
+            emits('buttonClicked', new ActionHandlerButtonClickedHolder(handler, ButtonActions.Save, l, {}))
           ">
           <q-item-section>
-            <q-item-label
-              style="font-size: smaller"
-              :class="isActive(l) ? 'text-primary' : 'text-grey-5'"
-              >{{ l.label }}</q-item-label
-            >
+            <q-item-label style="font-size: smaller" :class="isActive(l) ? 'text-primary' : 'text-grey-5'">{{
+              l.label
+            }}</q-item-label>
           </q-item-section>
         </q-item>
       </q-list>
@@ -83,10 +73,7 @@
 import _ from 'lodash'
 import { useQuasar } from 'quasar'
 import { useActionHandlers } from 'src/tabsets/actionHandling/ActionHandlers'
-import {
-  AddUrlToTabsetHandler,
-  ButtonActions,
-} from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
+import { AddUrlToTabsetHandler, ButtonActions } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { NoopAddUrlToTabsetHandler } from 'src/tabsets/actionHandling/handler/NoopAddUrlToTabsetHandler'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
 import { ActionHandlerButtonClickedHolder } from 'src/tabsets/actionHandling/model/ActionHandlerButtonClickedHolder'

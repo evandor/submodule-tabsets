@@ -82,13 +82,7 @@ export class Tabset {
   // can be set (to the installtion.id) when saving the tabset in order to omit triggering an update
   origin: string = ''
 
-  constructor(
-    id: string,
-    name: string,
-    tabs: Tab[] = [],
-    columns: TabsetColumn[] = [],
-    spaces: string[] = [],
-  ) {
+  constructor(id: string, name: string, tabs: Tab[] = [], columns: TabsetColumn[] = [], spaces: string[] = []) {
     // some guards
     if (!Tabset.newTabsetNameIsValid(name)) {
       throw new Error(`Tabset name '${name}' is not valid`)
@@ -118,6 +112,5 @@ export class Tabset {
     return !STRIP_CHARS_IN_USER_INPUT.test(val)
   }
 
-  static newTabsetNameIsShortEnough = (val: string) =>
-    val ? val.length <= TABSET_NAME_MAX_LENGTH : true
+  static newTabsetNameIsShortEnough = (val: string) => (val ? val.length <= TABSET_NAME_MAX_LENGTH : true)
 }

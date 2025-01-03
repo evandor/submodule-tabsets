@@ -11,9 +11,7 @@
       <q-card-section class="q-pt-none">
         <div class="q-pa-md q-gutter-sm">
           <div class="row" v-for="ref in props.tab.tabReferences" :key="ref.id">
-            <span @click="useNavigationService().browserTabFor(ref.href || '')">{{
-              ref.title
-            }}</span>
+            <span @click="useNavigationService().browserTabFor(ref.href || '')">{{ ref.title }}</span>
           </div>
         </div>
       </q-card-section>
@@ -54,6 +52,5 @@ watchEffect(() => {
   newTabsetNameExists.value = !!useTabsetsStore().existingInTabset(newTabsetName.value)
 })
 
-const publishComment = () =>
-  useCommandExecutor().executeFromUi(new AddCommentCommand(props.tab.id, editor.value))
+const publishComment = () => useCommandExecutor().executeFromUi(new AddCommentCommand(props.tab.id, editor.value))
 </script>

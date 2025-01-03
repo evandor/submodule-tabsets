@@ -15,8 +15,7 @@
           autofocus
           @keydown.enter="updateSubfolder()"
           error-message="Please do not use special Characters, maximum length is 32"
-          :error="!newSubfolderNameIsValid"
-        />
+          :error="!newSubfolderNameIsValid" />
       </q-card-section>
 
       <q-card-actions align="right" class="text-primary">
@@ -27,8 +26,7 @@
           color="warning"
           :disable="disableSubmit()"
           v-close-popup
-          @click="updateSubfolder()"
-        />
+          @click="updateSubfolder()" />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -61,16 +59,13 @@ watchEffect(() => {
 })
 
 const updateSubfolder = () =>
-  useCommandExecutor().executeFromUi(
-    new RenameFolderCommand(props.tabset, props.folder, newSubfolderName.value),
-  )
+  useCommandExecutor().executeFromUi(new RenameFolderCommand(props.tabset, props.folder, newSubfolderName.value))
 // .then((result: ExecutionResult<string>) => {
 //   onDialogOK({ name: newSubfolderName.value })
 // })
 
 const newSubfolderNameIsValid = computed(
-  () =>
-    newSubfolderName.value?.length <= 32 && !STRIP_CHARS_IN_USER_INPUT.test(newSubfolderName.value),
+  () => newSubfolderName.value?.length <= 32 && !STRIP_CHARS_IN_USER_INPUT.test(newSubfolderName.value),
 )
 
 const disableSubmit = (): boolean => {
