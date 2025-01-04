@@ -120,7 +120,7 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
 
     console.log('setting thumbnails as images')
     for (const tab of ts.tabs) {
-      const thumb = await useThumbnailsService().getThumbnailFor(tab.url)
+      const thumb = await useThumbnailsService().getThumbnailFor(tab.id)
       if (thumb) {
         if (thumb && thumb['thumbnail' as keyof object]) {
           tab.image = thumb['thumbnail' as keyof object]!
