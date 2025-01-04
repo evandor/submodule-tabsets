@@ -11,20 +11,20 @@
         :simpleUi="props.simpleUi"
         :tabs="currentTabs()" />
 
-      <TabGroups
-        v-else-if="props.tabset?.view === 'group'"
-        group="otherTabs"
-        :highlightUrl="highlightUrl"
-        :tabsetId="props.tabset?.id"
-        :tabs="currentTabs()" />
+      <!--      <TabGroups-->
+      <!--        v-else-if="props.tabset?.view === 'group'"-->
+      <!--        group="otherTabs"-->
+      <!--        :highlightUrl="highlightUrl"-->
+      <!--        :tabsetId="props.tabset?.id"-->
+      <!--        :tabs="currentTabs()" />-->
 
-      <TabGrid
-        v-else-if="props.tabset?.view === 'grid'"
-        group="otherTabs"
-        :highlightUrl="highlightUrl"
-        :tabs="currentTabs()" />
+      <!--      <TabGrid-->
+      <!--        v-else-if="props.tabset?.view === 'grid'"-->
+      <!--        group="otherTabs"-->
+      <!--        :highlightUrl="highlightUrl"-->
+      <!--        :tabs="currentTabs()" />-->
 
-      <TabsExporter v-else-if="props.tabset?.view === 'exporter'" group="otherTabs" :tabs="currentTabs()" />
+      <!--      <TabsExporter v-else-if="props.tabset?.view === 'exporter'" group="otherTabs" :tabs="currentTabs()" />-->
 
       <!-- fallback -->
       <TabList
@@ -38,9 +38,6 @@
 </template>
 
 <script lang="ts" setup>
-import TabGrid from 'components/layouts/TabGrid.vue'
-import TabGroups from 'components/layouts/TabGroups.vue'
-import TabsExporter from 'components/layouts/TabsExporter.vue'
 import _ from 'lodash'
 import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset } from 'src/tabsets/models/Tabset'

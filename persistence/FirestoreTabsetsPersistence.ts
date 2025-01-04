@@ -19,6 +19,10 @@ function tabsetDoc(tabsetId: string) {
   return doc(FirebaseServices.getFirestore(), 'users', useAuthStore().user.uid, STORE_IDENT, tabsetId)
 }
 
+function publicTabsetDoc(sharedId: string) {
+  return doc(FirebaseServices.getFirestore(), 'public-tabsets', sharedId)
+}
+
 function tabsetsCollection() {
   return collection(FirebaseServices.getFirestore(), 'users', useAuthStore().user.uid, STORE_IDENT)
 }
@@ -39,6 +43,9 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
   }
 
   async loadTabsets(): Promise<any> {
+    // if (!useAuthStore().user) {
+    //   return Promise.resolve([]) // user not authenticated
+    // }
     console.log(' ...loading tabsets', this.getServiceName())
     // useUiStore().syncing = true
     const docs = await getDocs(tabsetsCollection())
@@ -170,6 +177,11 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
     } catch (e) {
       console.error('Error adding document: ', e)
     }
+  }
+
+  async loadPublicTabset(sharedId: string): Promise<Tabset> {
+    const res = await getDoc(publicTabsetDoc(sharedId))
+    return res.data() as Tabset
   }
 
   async reloadTabset(tabsetId: string): Promise<Tabset> {

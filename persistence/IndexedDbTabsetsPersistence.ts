@@ -1,4 +1,5 @@
 import { IDBPDatabase, openDB } from 'idb'
+import { useDB } from 'src/services/usePersistenceService'
 import { Tabset, TabsetSharing } from 'src/tabsets/models/Tabset'
 import TabsetsPersistence from 'src/tabsets/persistence/TabsetsPersistence'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
@@ -89,6 +90,12 @@ class IndexedDbTabsetsPersistence implements TabsetsPersistence {
     sharedBy: string | undefined,
   ): Promise<TabsetSharing | void> {
     return Promise.reject('sharing not possible in local mode')
+  }
+
+  loadPublicTabset(sharedId: string): Promise<Tabset> {
+    const useDb = useDB().tabsetsDb
+    // delegate to cloud db
+    return useDb.loadPublicTabset(sharedId)
   }
 }
 

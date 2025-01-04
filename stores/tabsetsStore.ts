@@ -363,6 +363,8 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     return undefined
   }
 
+  const loadPublicTabset = (sharedId: string) => storage.loadPublicTabset(sharedId)
+
   return {
     initialize,
     tabsets,
@@ -390,6 +392,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     loadTabsets,
     getActiveFolder,
     share,
+    loadPublicTabset,
     reloadTabset,
   }
 })
