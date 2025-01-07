@@ -381,8 +381,9 @@ import { useQuasar } from 'quasar'
 import BrowserApi from 'src/app/BrowserApi'
 import TabListIconIndicatorsHook from 'src/app/hooks/tabsets/TabListIconIndicatorsHook.vue'
 import { FeatureIdent } from 'src/app/models/FeatureIdent'
-import { TabReference, TabReferenceStatus, TabReferenceType } from 'src/content/models/TabReference'
+import { TabReference, TabReferenceType } from 'src/content/models/TabReference'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
+import { NotificationType, useNotificationHandler } from 'src/core/services/ErrorHandler'
 import { useNavigationService } from 'src/core/services/NavigationService'
 import { useUtils } from 'src/core/services/Utils'
 import ShortUrl from 'src/core/utils/ShortUrl.vue'
@@ -420,6 +421,7 @@ import { ListDetailLevel, useUiStore } from 'src/ui/stores/uiStore'
 import { onMounted, PropType, ref, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 
+const { handleError } = useNotificationHandler()
 const { inBexMode } = useUtils()
 
 const props = defineProps({
@@ -729,12 +731,22 @@ const showRssReferencesInfo = () => {
 }
 
 const openSearch = () => {
-  const ref: object[] = props.tab!.tabReferences.filter((ref) => ref.type === TabReferenceType.OPEN_SEARCH)[0]!.data
-  const parser = new DOMParser()
-  const xml = ref[0]!['xml' as keyof object]
-  const doc = parser.parseFromString(xml, 'application/xml')
-  const templateURL: string = doc.getElementsByTagName('Url')[0]!.getAttribute('template') || ''
-  useNavigationService().browserTabFor(templateURL.replace('{searchTerms}', opensearchterm.value || ''))
+  console.log('openSearch clicked')
+  try {
+    const ref: object[] = props.tab!.tabReferences.filter((ref) => ref.type === TabReferenceType.OPEN_SEARCH)[0]!.data
+    const parser = new DOMParser()
+    const xml = ref[0]!['xml' as keyof object]
+    console.log('using xml', xml)
+    const doc = parser.parseFromString(xml, 'application/xml')
+    let urlTag = doc.getElementsByTagName('Url')[0]
+    if (!urlTag) {
+      urlTag = doc.getElementsByTagName('url')[0]
+    }
+    const templateURL: string = urlTag!.getAttribute('template') || ''
+    useNavigationService().browserTabFor(templateURL.replace('{searchTerms}', opensearchterm.value || ''))
+  } catch (err: any) {
+    handleError(err, NotificationType.NOTIFY)
+  }
 }
 
 const openRssLink = (rss: TabReference) => useNavigationService().browserTabFor(rss.href!)
