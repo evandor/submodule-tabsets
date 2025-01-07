@@ -105,7 +105,7 @@ export class AddTabToTabsetCommand implements Command<any> {
 
       const tabset: Tabset = await useTabsetService().addToTabset(tabsetOrFolder, this.tab, 0, this.allowDuplicates)
 
-      // Analysis
+      // Analysis not needed, remove
       if (useAuthStore().user.uid && this.tab.url?.startsWith('https://')) {
         const userId = useAuthStore().user.uid
         setDoc(doc(FirebaseServices.getFirestore(), 'users', userId, 'queue', uid()), {

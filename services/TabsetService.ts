@@ -473,6 +473,11 @@ class TabsetService {
     const tabset = useTabsetsStore().getTabset(tabsetId)!
     return useTabsetsStore().share(tabset, sharing, sharedId, sharedBy)
   }
+
+  shareWith(tabsetId: string, sharing: TabsetSharing, sharedId: string | undefined, email: string, sharedBy: string) {
+    const tabset = useTabsetsStore().getTabset(tabsetId)!
+    return useTabsetsStore().shareWith(tabset, sharing, sharedId, email, sharedBy)
+  }
 }
 
 export default new TabsetService()

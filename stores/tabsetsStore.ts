@@ -214,6 +214,16 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     return storage.share(tabset, sharing, sharedId, sharedBy)
   }
 
+  function shareWith(
+    tabset: Tabset,
+    sharing: TabsetSharing,
+    sharedId: string | undefined,
+    email: string,
+    sharedBy: string,
+  ) {
+    return storage.shareWith(tabset, sharing, sharedId, email, sharedBy)
+  }
+
   // *** getters ***
 
   const getCurrentTabs = computed((): Tab[] => {
@@ -392,6 +402,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     loadTabsets,
     getActiveFolder,
     share,
+    shareWith,
     loadPublicTabset,
     reloadTabset,
   }
