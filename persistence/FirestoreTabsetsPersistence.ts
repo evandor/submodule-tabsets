@@ -5,6 +5,7 @@ import { LocalStorage, uid } from 'quasar'
 import { useNotificationHandler } from 'src/core/services/ErrorHandler'
 import { useNotesStore } from 'src/notes/stores/NotesStore'
 import FirebaseServices from 'src/services/firebase/FirebaseServices'
+import { useEmailTemplates } from 'src/tabsets/emails/EmailTemplates'
 import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset, TabsetSharing } from 'src/tabsets/models/Tabset'
 import TabsetsPersistence from 'src/tabsets/persistence/TabsetsPersistence'
@@ -47,17 +48,24 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
   }
 
   async loadTabsets(): Promise<any> {
-    // if (!useAuthStore().user) {
-    //   return Promise.resolve([]) // user not authenticated
-    // }
     console.log(' ...loading tabsets', this.getServiceName())
-    // useUiStore().syncing = true
     const docs = await getDocs(tabsetsCollection())
-    docs.forEach((doc: any) => {
-      let newItem = doc.data() as Tabset
+    for (const doc of docs.docs) {
+      let newItem = doc.data()
       newItem.id = doc.id
-      useTabsetsStore().setTabset(newItem)
-    })
+      if (newItem['reference']) {
+        console.warn('found ref', newItem['reference'])
+        const r = newItem['reference']
+        console.log('r', r.path)
+        const refDoc = await getDoc(newItem['reference' as keyof object])
+        const referencedTabset = refDoc.data() as Tabset
+        referencedTabset.shareReference = r.path
+        console.log('referencedTabset', referencedTabset)
+        useTabsetsStore().setTabset(referencedTabset)
+      } else {
+        useTabsetsStore().setTabset(newItem as Tabset)
+      }
+    }
     console.log('loading tabsets, found ', useTabsetsStore().tabsets.size)
     // useUiStore().syncing = false
     return Promise.resolve(undefined)
@@ -183,13 +191,7 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
     }
   }
 
-  async shareWith(
-    ts: Tabset,
-    sharing: TabsetSharing,
-    sharedId: string | undefined,
-    email: string,
-    sharedBy: string | undefined,
-  ): Promise<TabsetSharing | void> {
+  async shareWith(ts: Tabset, email: string, sharedBy: string | undefined): Promise<TabsetSharing | void> {
     // https://thedailywtf.com/articles/Validating_Email_Addresses and
     // https://stackoverflow.com/questions/201323/how-can-i-validate-an-email-address-using-a-regular-expression
     const emailRegex =
@@ -198,94 +200,34 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
       // handleError()
       return Promise.reject('this email address does not seem valid')
     }
+
     const firestore: Firestore = FirebaseServices.getFirestore()
-    const shared = {
+    const sharedTsRef = doc(firestore, 'users', useAuthStore().user.uid, 'tabset-shares', ts.id)
+    // await updateDoc(sharedTsRef, JSON.parse(JSON.stringify(shared)))
+
+    const key = btoa(email)
+    const data: { [k: string]: any } = {}
+    data[key] = {
       tabsetId: ts.id,
+      tabsetName: ts.name,
       email: email,
       sharedBy: sharedBy,
+      sharedById: useAuthStore().user.uid,
+      status: 'pending',
       created: new Date().getTime(),
     }
-    await setDoc(
-      doc(firestore, 'users', useAuthStore().user.uid, 'shares', ts.id, 'pending', email),
-      JSON.parse(JSON.stringify(shared)),
-    )
+
+    await setDoc(sharedTsRef, data, { merge: true })
 
     const tabsToShare: object[] = ts.tabs.map((t: Tab) => {
       return { url: t.url || '' }
     })
 
-    const invitationEmail = {
-      from: [
-        {
-          email: 'carsten@skysail.io',
-          name: 'Sender name',
-        },
-      ],
-      to: [
-        {
-          email: email,
-          name: email,
-        },
-      ],
-      // message: {
-      subject: 'Hello from Tabsets!',
-      template_id: 'neqvygm5zj540p7w',
-      // text: 'This is an TEXT email body.',
-      //html: 'This is an <code>HTML</code> email body.',
-      variables: [
-        {
-          email: email,
-          substitutions: [
-            {
-              var: 'name',
-              value: email,
-            },
-            {
-              var: 'tabsetName',
-              value: ts.name,
-            },
-            {
-              var: 'help_url',
-              value: 'help_url',
-            },
-            {
-              var: 'action_url',
-              value: process.env.PWA_BACKEND_URL + '/#/invitation?email=' + email,
-            },
-            {
-              var: 'account.name',
-              value: 'accountname',
-            },
-            {
-              var: 'live_chat_url',
-              value: '',
-            },
-            {
-              var: 'support_email',
-              value: 'carsten@skysail.io',
-            },
-            {
-              var: 'invite_sender_name',
-              value: sharedBy,
-            },
-            {
-              var: 'invite_sender_organization_name',
-              value: 'Skysail',
-            },
-          ],
-        },
-      ],
-      // https://developers.mailersend.com/api/v1/features.html#personalization
-      personalization: [
-        {
-          email: email,
-          data: {
-            tabs: tabsToShare,
-          },
-        },
-      ],
-    }
+    const invitationEmail = useEmailTemplates().invitationSetup(email, ts.name, sharedBy || 'unknown', tabsToShare)
+    console.log('about to add', invitationEmail)
     await addDoc(collection(firestore, 'emails'), JSON.parse(JSON.stringify(invitationEmail)))
+    ts.sharing = TabsetSharing.USER
+    await useTabsetsStore().saveTabset(ts)
   }
 
   async loadPublicTabset(sharedId: string): Promise<Tabset> {

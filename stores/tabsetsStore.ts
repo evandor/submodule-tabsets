@@ -64,7 +64,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
   }
 
   function setTabset(ts: Tabset) {
-    // console.log('setting tabset', ts.id, ts)
+    console.log('setting tabset', ts.id, ts)
     tabsets.value.set(ts.id, ts)
   }
 
@@ -214,14 +214,8 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     return storage.share(tabset, sharing, sharedId, sharedBy)
   }
 
-  function shareWith(
-    tabset: Tabset,
-    sharing: TabsetSharing,
-    sharedId: string | undefined,
-    email: string,
-    sharedBy: string,
-  ) {
-    return storage.shareWith(tabset, sharing, sharedId, email, sharedBy)
+  function shareWith(tabset: Tabset, email: string, sharedBy: string) {
+    return storage.shareWith(tabset, email, sharedBy)
   }
 
   // *** getters ***

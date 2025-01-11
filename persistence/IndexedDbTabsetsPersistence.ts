@@ -98,13 +98,7 @@ class IndexedDbTabsetsPersistence implements TabsetsPersistence {
     return useDb.loadPublicTabset(sharedId)
   }
 
-  shareWith(
-    tabset: Tabset,
-    sharing: TabsetSharing,
-    sharedId: string | undefined,
-    email: string,
-    sharedBy: string | undefined,
-  ): Promise<TabsetSharing | void> {
+  shareWith(tabset: Tabset, email: string, sharedBy: string | undefined): Promise<TabsetSharing | void> {
     return Promise.resolve(undefined)
   }
 }

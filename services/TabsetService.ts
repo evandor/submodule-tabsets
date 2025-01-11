@@ -474,9 +474,9 @@ class TabsetService {
     return useTabsetsStore().share(tabset, sharing, sharedId, sharedBy)
   }
 
-  shareWith(tabsetId: string, sharing: TabsetSharing, sharedId: string | undefined, email: string, sharedBy: string) {
+  shareWith(tabsetId: string, email: string, sharedBy: string) {
     const tabset = useTabsetsStore().getTabset(tabsetId)!
-    return useTabsetsStore().shareWith(tabset, sharing, sharedId, email, sharedBy)
+    return useTabsetsStore().shareWith(tabset, email, sharedBy)
   }
 }
 
