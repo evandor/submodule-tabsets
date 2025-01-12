@@ -64,7 +64,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
   }
 
   function setTabset(ts: Tabset) {
-    // console.log('setting tabset', ts.id, ts)
+    console.log('setting tabset', ts.id, ts)
     tabsets.value.set(ts.id, ts)
   }
 
@@ -90,10 +90,12 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     spaceId: string | undefined = undefined,
     ignoreDuplicates: boolean = false,
   ): Promise<Tabset> {
-    const currentTabsetsCount = tabsets.value.size
-    if (useAuthStore().limitExceeded(AccessItem.TABSETS, currentTabsetsCount)) {
+    const exceedInfo = useAuthStore().limitExceeded('TABSETS', tabsets.value.size)
+    if (exceedInfo.exceeded) {
       await NavigationService.openOrCreateTab([
-        chrome.runtime.getURL('/www/index.html#/mainpanel/settings?tab=account'),
+        chrome.runtime.getURL(
+          `/www/index.html#/mainpanel/settings?tab=account&exceeded=tabsets&limit=${exceedInfo.limit}`,
+        ),
       ])
       return Promise.reject('tabsetLimitExceeded')
     }

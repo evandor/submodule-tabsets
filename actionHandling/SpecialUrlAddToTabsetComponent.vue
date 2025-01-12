@@ -7,7 +7,7 @@
       @click.stop="emits('buttonClicked', new ActionHandlerButtonClickedHolder(handler, '', handler.actions()[0]))"
       class="q-ma-none q-px-sm q-py-none"
       :class="{ shake: animateAddtabButton, 'cursor-pointer': !alreadyInTabset() }"
-      :color="alreadyInTabset() ? 'grey-5' : tsBadges.length > 0 ? 'positive' : 'primary'"
+      :color="alreadyInTabset() ? 'grey-5' : tsBadges.length > 0 ? 'positive' : ''"
       size="xs"
       data-testid="saveInTabsetBtn">
       <div>{{ handler.actions()[0]!.label }}</div>
