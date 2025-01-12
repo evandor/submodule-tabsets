@@ -8,6 +8,7 @@ import { useAuthStore } from 'src/stores/authStore'
 import { Tab, TabComment } from 'src/tabsets/models/Tab'
 import { TabAndTabsetId } from 'src/tabsets/models/TabAndTabsetId'
 import { Tabset, TabsetSharing, TabsetStatus } from 'src/tabsets/models/Tabset'
+import { TabsetLog } from 'src/tabsets/models/TabsetLog'
 import TabsetsPersistence from 'src/tabsets/persistence/TabsetsPersistence'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useWindowsStore } from 'src/windows/stores/windowsStore'
@@ -162,12 +163,18 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     // TODO markDuplicates(ts)
   }
 
-  async function saveTabset(ts: Tabset) {
+  async function saveTabset(ts: Tabset, logMsg?: string) {
     if (ts.id === currentTabsetId.value) {
       console.debug('setting folderactive', ts.folderActive)
       currentTabsetFolderId.value = ts.folderActive
     }
     //console.log("--- storing tabset ---", ts.tabs.map((t: Tab) => JSON.stringify(t.coordinates[0]?.val)), ts)
+    if (logMsg) {
+      if (!ts.log) {
+        ts.log = []
+      }
+      ts.log.push(new TabsetLog(logMsg))
+    }
     return await storage.saveTabset(JSON.parse(JSON.stringify(ts)))
   }
 

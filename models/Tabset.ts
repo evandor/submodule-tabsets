@@ -1,6 +1,7 @@
 import { STRIP_CHARS_IN_USER_INPUT } from 'src/boot/constants'
 import { Tab } from 'src/tabsets/models/Tab'
 import { TabsetColumn } from 'src/tabsets/models/TabsetColumn'
+import { TabsetLog } from 'src/tabsets/models/TabsetLog'
 import { ListDetailLevel } from 'src/ui/stores/uiStore'
 
 export enum TabsetStatus {
@@ -82,6 +83,11 @@ export class Tabset {
 
   // can be set (to the installtion.id) when saving the tabset in order to omit triggering an update
   origin: string = ''
+
+  log: TabsetLog[] = []
+
+  loaded: number = 0 // will always be set when the tabset is loaded
+  lastChangeBy: string = '' // set for tabsets with sharedReference
 
   constructor(id: string, name: string, tabs: Tab[] = [], columns: TabsetColumn[] = [], spaces: string[] = []) {
     // some guards

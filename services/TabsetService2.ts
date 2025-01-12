@@ -279,7 +279,7 @@ export function useTabsetService() {
     return ts
   }
 
-  const saveTabset = async (tabset: Tabset): Promise<any> => {
+  const saveTabset = async (tabset: Tabset, logMsg?: string): Promise<any> => {
     if (tabset.id) {
       tabset.updated = new Date().getTime()
       // seems necessary !?
@@ -289,7 +289,7 @@ export function useTabsetService() {
       const rootTabset = rootTabsetFor(tabset)
       console.debug(`saving (sub-)tabset '${tabset.name}' with ${tabset.tabs.length} tab(s) at id ${rootTabset?.id}`)
       if (rootTabset) {
-        return await useTabsetsStore().saveTabset(rootTabset)
+        return await useTabsetsStore().saveTabset(rootTabset, logMsg)
       }
     }
     return Promise.reject('tabset id not set')

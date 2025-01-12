@@ -53,6 +53,7 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
     for (const doc of docs.docs) {
       let newItem = doc.data()
       newItem.id = doc.id
+
       if (newItem['reference']) {
         console.warn('found ref', newItem['reference'])
         const r = newItem['reference']
@@ -60,9 +61,11 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
         const refDoc = await getDoc(newItem['reference' as keyof object])
         const referencedTabset = refDoc.data() as Tabset
         referencedTabset.shareReference = r.path
+        referencedTabset.loaded = new Date().getTime()
         console.log('referencedTabset', referencedTabset)
         useTabsetsStore().setTabset(referencedTabset)
       } else {
+        newItem.loaded = new Date().getTime()
         useTabsetsStore().setTabset(newItem as Tabset)
       }
     }
@@ -86,9 +89,13 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
   async saveTabset(tabset: Tabset): Promise<any> {
     //useUiStore().syncing = true
     tabset.origin = installationId
-    console.log(`saving tabset ${tabset.id} in installation ${installationId}`)
-    await setDoc(tabsetDoc(tabset.id), JSON.parse(JSON.stringify(tabset)))
-    //useUiStore().syncing = false
+    console.log(`saving tabset ${tabset.id} in installation ${installationId}, ref:${tabset.shareReference}`)
+    if (tabset.shareReference) {
+      tabset.lastChangeBy = useAuthStore().user.uid
+      await setDoc(doc(FirebaseServices.getFirestore(), tabset.shareReference), JSON.parse(JSON.stringify(tabset)))
+    } else {
+      await setDoc(tabsetDoc(tabset.id), JSON.parse(JSON.stringify(tabset)))
+    }
   }
 
   async deleteTabset(tabsetId: string): Promise<any> {

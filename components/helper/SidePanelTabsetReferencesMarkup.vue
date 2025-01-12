@@ -18,7 +18,7 @@
     </div>
     <div v-if="showDetails" class="col-12 text-body2 ellipsis">Collection shared with {{ sharedWith }}:</div>
     <template v-if="showDetails" v-for="share in shared">
-      <div class="col-11 q-pl-sm text-body2 ellipse text-grey-9">
+      <div class="col-11 q-pl-sm text-body2 ellipse">
         {{ share['email' as keyof object] }} ({{ share['status' as keyof object] }})
       </div>
       <div class="col-1 text-body2">
@@ -55,24 +55,26 @@ const updateSharedInfo = async () => {
     const sharedInfo: DocumentSnapshot = await getDoc(
       doc(FirebaseServices.getFirestore(), 'users', useAuthStore().user.uid, 'tabset-shares', currentTabsetId),
     )
-    const data = sharedInfo.data() as object
+    if (sharedInfo.data()) {
+      const data = sharedInfo.data() as object
+      console.log('data', data)
+      shared.value = Object.values(data)
+        .filter((val: object) => val['status' as keyof object] !== 'deleted')
+        .map((val: object) => {
+          //const val = data[key as keyof object]
+          return {
+            email: val['email' as keyof object],
+            status: val['status' as keyof object],
+          }
+        })
 
-    shared.value = Object.values(data)
-      .filter((val: object) => val['status' as keyof object] !== 'deleted')
-      .map((val: object) => {
-        //const val = data[key as keyof object]
-        return {
-          email: val['email' as keyof object],
-          status: val['status' as keyof object],
-        }
-      })
-
-    // shared.value = sharedInfo.data()
-    if (data) {
-      let info = Object.keys(data).length + ' user(s)'
-      sharedWith.value = info
-    } else {
-      sharedWith.value = '???'
+      // shared.value = sharedInfo.data()
+      if (data) {
+        let info = Object.keys(data).length + ' user(s)'
+        sharedWith.value = info
+      } else {
+        sharedWith.value = '???'
+      }
     }
   }
 }
@@ -108,6 +110,8 @@ const removeShare = async (email: string) => {
       | undefined
     if (dataForEmail) {
       dataForEmail['status' as keyof object] = 'deleted'
+      dataForEmail['changed' as keyof object] = new Date().getTime()
+      dataForEmail['sharedWithId'] = ''
     }
     await setDoc(docRef, data)
   }

@@ -106,7 +106,7 @@ onMounted(async () => {
         console.log('got doc', d)
         if (d['status'] === 'pending') {
           pendingInvitations.value.push(d)
-        } else {
+        } else if (d['status'] !== 'deleted') {
           activeInvitations.value.push(d)
         }
         sharedWithEmails.push(d['email'])

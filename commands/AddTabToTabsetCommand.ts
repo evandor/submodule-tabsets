@@ -146,7 +146,7 @@ export class AddTabToTabsetCommand implements Command<any> {
         }
 
         //res = new ExecutionResult("result", "Link was added")
-        const res2 = await useTabsetService().saveTabset(this.tabset!)
+        const res2 = await useTabsetService().saveTabset(this.tabset!, `tab ${this.tab.url} was added`)
         res = new ExecutionResult(res2, 'Link was added')
 
         // saving thumbnail
