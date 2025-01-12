@@ -55,15 +55,7 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
       newItem.id = doc.id
 
       if (newItem['reference']) {
-        console.warn('found ref', newItem['reference'])
-        const r = newItem['reference']
-        console.log('r', r.path)
-        const refDoc = await getDoc(newItem['reference' as keyof object])
-        const referencedTabset = refDoc.data() as Tabset
-        referencedTabset.shareReference = r.path
-        referencedTabset.loaded = new Date().getTime()
-        console.log('referencedTabset', referencedTabset)
-        useTabsetsStore().setTabset(referencedTabset)
+        await this.loadFromReference(newItem['reference'])
       } else {
         newItem.loaded = new Date().getTime()
         useTabsetsStore().setTabset(newItem as Tabset)
@@ -234,6 +226,7 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
     console.log('about to add', invitationEmail)
     await addDoc(collection(firestore, 'emails'), JSON.parse(JSON.stringify(invitationEmail)))
     ts.sharing = TabsetSharing.USER
+    ts.sharedBy = useAuthStore().user.email || undefined
     await useTabsetsStore().saveTabset(ts)
   }
 
@@ -245,7 +238,22 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
   async reloadTabset(tabsetId: string): Promise<Tabset> {
     console.debug('reloading tabset', tabsetId)
     const res = await getDoc(tabsetDoc(tabsetId))
+    if (res.data() && res.data()!['reference']) {
+      return this.loadFromReference(res.data()!['reference'])
+    }
     return res.data() as Tabset
+  }
+
+  private async loadFromReference(r: any) {
+    console.warn('found ref', r)
+    console.log('r', r.path)
+    const refDoc = await getDoc(r)
+    const referencedTabset = refDoc.data() as Tabset
+    referencedTabset.shareReference = r.path
+    referencedTabset.loaded = new Date().getTime()
+    console.log('referencedTabset', referencedTabset)
+    useTabsetsStore().setTabset(referencedTabset)
+    return referencedTabset
   }
 }
 

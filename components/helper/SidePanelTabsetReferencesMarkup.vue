@@ -1,37 +1,48 @@
 <template>
-  <div class="row q-py-xs darkColors lightColors" v-if="tabset?.shareReference">
-    <div class="col-11 darkColors lightColors">Shared Tabset</div>
-    <div class="col-1 text-primary">
-      <q-icon name="keyboard_arrow_down" />
-    </div>
-  </div>
-  <div class="row q-py-xs darkColors lightColors" v-else-if="shared.length > 0">
-    <div class="col-11 text-primary">
-      <q-icon name="ios_share" size="xs" class="q-pr-xs q-mb-xs" />
-      This collection is being shared
-    </div>
-    <div class="col-1 text-primary">
-      <q-icon
-        class="cursor-pointer"
-        :name="showDetails ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"
-        @click="toggleShowDetails()" />
-    </div>
-    <div v-if="showDetails" class="col-12 text-body2 ellipsis">Collection shared with {{ sharedWith }}:</div>
-    <template v-if="showDetails" v-for="share in shared">
-      <div class="col-11 q-pl-sm text-body2 ellipse">
-        {{ share['email' as keyof object] }} ({{ share['status' as keyof object] }})
+  <template v-if="tabset?.shareReference">
+    <div class="row q-py-xs darkColors lightColors">
+      <div class="col-11">
+        <q-icon name="ios_share" size="xs" class="q-pr-xs q-mb-xs" />
+        Shared Collection
       </div>
-      <div class="col-1 text-body2">
+      <div class="col-1">
         <q-icon
-          name="o_delete"
-          color="negative"
           class="cursor-pointer"
-          @click="removeShare(share['email' as keyof object])">
-          <q-tooltip class="tooltip-small">Remove the invitation</q-tooltip>
-        </q-icon>
+          :name="showDetails ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"
+          @click="toggleShowDetails()" />
       </div>
-    </template>
-  </div>
+    </div>
+    <div v-if="showDetails" class="col-12 text-body2 ellipsis">Collection shared by {{ sharedBy }}</div>
+  </template>
+  <template v-else-if="shared.length > 0">
+    <div class="row q-py-xs darkColors lightColors">
+      <div class="col-11">
+        <q-icon name="ios_share" size="xs" class="q-pr-xs q-mb-xs" />
+        This collection is being shared
+      </div>
+      <div class="col-1">
+        <q-icon
+          class="cursor-pointer"
+          :name="showDetails ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"
+          @click="toggleShowDetails()" />
+      </div>
+      <div v-if="showDetails" class="col-12 text-body2 ellipsis">Collection shared with {{ sharedWith }}:</div>
+      <template v-if="showDetails" v-for="share in shared">
+        <div class="col-11 q-pl-sm text-body2 ellipse">
+          {{ share['email' as keyof object] }} ({{ share['status' as keyof object] }})
+        </div>
+        <div class="col-1 text-body2">
+          <q-icon
+            name="o_delete"
+            color="negative"
+            class="cursor-pointer"
+            @click="removeShare(share['email' as keyof object])">
+            <q-tooltip class="tooltip-small">Remove the invitation</q-tooltip>
+          </q-icon>
+        </div>
+      </template>
+    </div>
+  </template>
 </template>
 
 <script lang="ts" setup>
@@ -44,6 +55,7 @@ import { useAuthStore } from 'stores/authStore'
 import { ref, watchEffect } from 'vue'
 
 const tabset = ref<Tabset | undefined>(undefined)
+const sharedBy = ref<string>('')
 const sharedWith = ref<string>('')
 const showDetails = ref(true)
 const shared = ref<object[]>([])
@@ -51,6 +63,8 @@ const shared = ref<object[]>([])
 const updateSharedInfo = async () => {
   const currentTabsetId = useTabsetsStore().currentTabsetId
   if (currentTabsetId) {
+    tabset.value = useTabsetsStore().getCurrentTabset
+    sharedBy.value = tabset.value?.sharedBy || ''
     console.log('updating shared info')
     const sharedInfo: DocumentSnapshot = await getDoc(
       doc(FirebaseServices.getFirestore(), 'users', useAuthStore().user.uid, 'tabset-shares', currentTabsetId),
