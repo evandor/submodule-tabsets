@@ -84,6 +84,8 @@ export class Tabset {
   // can be set (to the installtion.id) when saving the tabset in order to omit triggering an update
   origin: string = ''
 
+  size: number = 0
+
   log: TabsetLog[] = []
 
   loaded: number = 0 // will always be set when the tabset is loaded

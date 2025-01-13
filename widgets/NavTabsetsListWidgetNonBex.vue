@@ -47,7 +47,7 @@
           class="text-right q-mx-sm cursor-pointer"
           @mouseover="hoveredTab = tabset.id"
           @mouseleave="hoveredTab = undefined"
-          style="max-width: 25px; font-size: 12px; color: #bfbfbf">
+          style="max-width: 25px; font-size: 12px">
           <span v-if="hoveredOver(tabset.id)">
             <q-icon name="more_horiz" color="primary" size="16px" />
           </span>
@@ -137,7 +137,7 @@ const toggleExpand = (index: any) => {
 
 <style>
 .q-expansion-item__content {
-  border: 1px solid #f5f5f5;
+  border: 0 solid #f5f5f5;
 }
 
 .darken-on-hover:hover {

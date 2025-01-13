@@ -65,7 +65,8 @@ export const useTabsetsStore = defineStore('tabsets', () => {
   }
 
   function setTabset(ts: Tabset) {
-    console.log('setting tabset', ts.id, ts)
+    //console.log('setting tabset', ts.id, ts)
+    ts.size = JSON.stringify(ts).length
     tabsets.value.set(ts.id, ts)
   }
 

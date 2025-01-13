@@ -182,6 +182,7 @@
     narrow-indicator>
     <q-tab name="grid" label="As Grid" />
     <q-tab name="list" label="As List" />
+    <q-tab name="export" label="Export" />
   </q-tabs>
 
   <q-tab-panels v-model="tab" animated>
@@ -232,6 +233,15 @@ a tab's url starts with one of the urls of this tabset, it will be ignored and n
         :tabsetSharedId="tabset.sharedId!"
         :tabs="tabset.tabs" />
     </q-tab-panel>
+
+    <q-tab-panel class="q-ma-none q-pa-none" name="export">
+      <div class="q-ma-md">
+        <q-btn class="q-mb-md" label="export as file" :disable="true">
+          <q-tooltip class="tooltip">not implemented yet</q-tooltip>
+        </q-btn>
+        <TabExportList :tabs="tabset.tabs" />
+      </div>
+    </q-tab-panel>
   </q-tab-panels>
 </template>
 
@@ -244,6 +254,7 @@ import { RenameTabsetCommand } from 'src/tabsets/commands/RenameTabset'
 import { ToggleSortingCommand } from 'src/tabsets/commands/ToggleSorting'
 import AddUrlDialog from 'src/tabsets/dialogues/AddUrlDialog.vue'
 import { Tabset, TabsetType } from 'src/tabsets/models/Tabset'
+import TabExportList from 'src/tabsets/pages/pwa/TabExportList.vue'
 import TabList from 'src/tabsets/pages/pwa/TabList.vue'
 import TabsetPageCards from 'src/tabsets/pages/pwa/TabsetPageCards.vue'
 import TabsetService from 'src/tabsets/services/TabsetService'
