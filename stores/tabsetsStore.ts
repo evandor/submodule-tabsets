@@ -4,7 +4,7 @@ import { uid } from 'quasar'
 import { STRIP_CHARS_IN_COLOR_INPUT, STRIP_CHARS_IN_USER_INPUT } from 'src/boot/constants'
 import { useUtils } from 'src/core/services/Utils'
 import NavigationService from 'src/services/NavigationService'
-import { AccessItem, useAuthStore } from 'src/stores/authStore'
+import { useAuthStore } from 'src/stores/authStore'
 import { Tab, TabComment } from 'src/tabsets/models/Tab'
 import { TabAndTabsetId } from 'src/tabsets/models/TabAndTabsetId'
 import { Tabset, TabsetSharing, TabsetStatus } from 'src/tabsets/models/Tabset'
@@ -64,7 +64,8 @@ export const useTabsetsStore = defineStore('tabsets', () => {
   }
 
   function setTabset(ts: Tabset) {
-    console.log('setting tabset', ts.id, ts)
+    //console.log('setting tabset', ts.id, ts)
+    ts.size = JSON.stringify(ts).length
     tabsets.value.set(ts.id, ts)
   }
 

@@ -82,6 +82,8 @@ export class Tabset {
   // can be set (to the installtion.id) when saving the tabset in order to omit triggering an update
   origin: string = ''
 
+  size: number = 0
+
   constructor(id: string, name: string, tabs: Tab[] = [], columns: TabsetColumn[] = [], spaces: string[] = []) {
     // some guards
     if (!Tabset.newTabsetNameIsValid(name)) {
