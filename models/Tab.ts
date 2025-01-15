@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import { uid } from 'quasar'
 import { STRIP_CHARS_IN_USER_INPUT } from 'src/boot/constants'
 import { TabReference, TabReferenceType } from 'src/content/models/TabReference'
@@ -210,12 +209,7 @@ export class Tab {
 
     this.preview = TabPreview.FAVICON
 
-    this.tags = _.uniq(
-      _.filter(
-        _.map(this.tags, (t: string) => t.replace(STRIP_CHARS_IN_USER_INPUT, '')),
-        (e: string) => e.trim() !== '',
-      ),
-    )
+    this.tags = []
 
     if (!Tab.titleIsValid) {
       throw new Error(`Tab's title '${this.title}' is not valid`)
@@ -266,6 +260,14 @@ export class Tab {
 
   hasTabReference(type: TabReferenceType): boolean {
     return this.tabReferences.findIndex((ref: TabReference) => ref.type === type) >= 0
+  }
+
+  setTags(tags: string[]) {
+    this.tags = [...new Set(tags.map((tag: string) => tag.trim()))]
+  }
+
+  addTags(tags: string[]) {
+    this.setTags(this.tags.concat(tags))
   }
 }
 

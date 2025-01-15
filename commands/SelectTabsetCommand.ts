@@ -24,6 +24,7 @@ export class SelectTabsetCommand implements Command<Tabset | undefined> {
     if (tabset && this.folderId) {
       tabset.folderActive = this.folderId
       await useTabsetsStore().saveTabset(tabset)
+      useTabsetsUiStore().updateExtensionIcon()
     }
 
     if (inBexMode()) {
