@@ -10,12 +10,13 @@ export class ShareWithTabsetCommand implements Command<any> {
     public tabsetId: string,
     public author: string,
     public email: string,
+    public readonly: boolean = false,
     public republish: boolean = false,
   ) {}
 
   async execute(): Promise<ExecutionResult<any>> {
     const sharedBy = this.author
-    return TabsetService.shareWith(this.tabsetId, this.email, sharedBy || 'unknown')
+    return TabsetService.shareWith(this.tabsetId, this.email, this.readonly, sharedBy || 'unknown')
       .then((res: any) => {
         info('sharing tabset')
         return res

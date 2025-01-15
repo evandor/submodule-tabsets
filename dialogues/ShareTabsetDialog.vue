@@ -29,6 +29,7 @@
           autofocus
           type="email"
           error-message="Please provide a valid email address" />
+        <q-checkbox v-model="readonly" label="readonly" />
       </q-card-section>
       <q-card-section v-if="pendingInvitations.length > 0">
         <div class="text-body">Pending Invitations:</div>
@@ -84,6 +85,7 @@ const props = defineProps({
 const { dialogRef, onDialogHide, onDialogCancel } = useDialogPluginComponent()
 
 const author = ref<string>(LocalStorage.getItem(SHARING_AUTHOR_IDENT) || '')
+const readonly = ref(false)
 const shareWithEmail = ref<string>('')
 const activeInvitations = ref<object[]>([])
 const pendingInvitations = ref<object[]>([])
@@ -118,7 +120,9 @@ onMounted(async () => {
 const shareTabset = () => {
   $q.localStorage.set(SHARING_AUTHOR_IDENT, author.value)
   useCommandExecutor()
-    .executeFromUi(new ShareWithTabsetCommand(props.tabsetId, author.value, shareWithEmail.value, props.republish))
+    .executeFromUi(
+      new ShareWithTabsetCommand(props.tabsetId, author.value, shareWithEmail.value, readonly.value, props.republish),
+    )
     .then((res: any) => {
       //useUiStore().sidePanelSetActiveView(SidePanelViews.MAIN)
     })

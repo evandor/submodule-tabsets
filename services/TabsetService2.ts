@@ -36,11 +36,11 @@ export function useTabsetService() {
       }
     }
 
-    console.debug(' ...initializing tabsetService2 as (TODO)')
+    // console.debug(' ...initializing tabsetService2 as (TODO)')
     await useTabsetsStore().loadTabsets()
     const selectedTabsetId = localStorage.getItem('selectedTabset')
     if (selectedTabsetId) {
-      console.debug(` ...config: setting selected tabset from storage: ${selectedTabsetId}`)
+      //console.debug(` ...config: setting selected tabset from storage: ${selectedTabsetId}`)
       const selectedTabset = useTabsetsStore().selectCurrentTabset(selectedTabsetId)
       if (!selectedTabset) {
         selectFirstAvailableTabset()
@@ -704,7 +704,7 @@ export function useTabsetService() {
       await pushToIndex(tabset)
     }
 
-    console.debug(` ...populating search index from tabsets with ${minimalIndex.length} entries`)
+    //console.debug(` ...populating search index from tabsets with ${minimalIndex.length} entries`)
     const perInterval = 250
     const throttleRequests = throttledQueue(perInterval, 1000, true)
 

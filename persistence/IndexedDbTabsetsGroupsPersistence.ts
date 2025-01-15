@@ -6,7 +6,7 @@ class IndexedDbTabsetsGroupsPersistence implements TabsetsGroupsPersistence {
   }
 
   async init() {
-    console.debug(' ...initializing tabsets (IndexedDbSpacesStorage)')
+    // console.debug(' ...initializing tabsets (IndexedDbSpacesStorage)')
     //this.db = await this.initDatabase()
     return Promise.resolve()
   }

@@ -18,7 +18,7 @@ export const useTabsetsUiStore = defineStore('tabsetsUi', () => {
   let storage = null as unknown as LocalStorageTabsetsPersistence
 
   async function initialize(persistence: LocalStorageTabsetsPersistence) {
-    console.debug(` ...initializing tabsetsUiStore})`)
+    // console.debug(` ...initializing tabsetsUiStore})`)
     storage = persistence
     load()
     lastUpdate.value = new Date().getTime()

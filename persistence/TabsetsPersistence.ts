@@ -27,7 +27,12 @@ interface TabsetsPersistence {
     sharedBy: string | undefined,
   ): Promise<TabsetSharing | void>
 
-  shareWith(tabset: Tabset, email: string, sharedBy: string | undefined): Promise<TabsetSharing | void>
+  shareWith(
+    tabset: Tabset,
+    email: string,
+    readonly: boolean,
+    sharedBy: string | undefined,
+  ): Promise<TabsetSharing | void>
 
   loadPublicTabset(sharedId: string): Promise<Tabset>
 

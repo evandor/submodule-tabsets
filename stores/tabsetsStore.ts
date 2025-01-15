@@ -61,7 +61,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     // TODO remove after version 0.5.0
     await storage.migrate()
 
-    console.debug(' ...initialized tabsets: Store', '✅')
+    // console.debug(' ...initialized tabsets: Store', '✅')
     await storage.loadTabsets()
   }
 
@@ -167,7 +167,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
 
   async function saveTabset(ts: Tabset, logMsg?: string) {
     if (ts.id === currentTabsetId.value) {
-      console.debug('setting folderactive', ts.folderActive)
+      //console.debug('setting folderactive', ts.folderActive)
       currentTabsetFolderId.value = ts.folderActive
     }
     //console.log("--- storing tabset ---", ts.tabs.map((t: Tab) => JSON.stringify(t.coordinates[0]?.val)), ts)
@@ -223,8 +223,8 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     return storage.share(tabset, sharing, sharedId, sharedBy)
   }
 
-  function shareWith(tabset: Tabset, email: string, sharedBy: string) {
-    return storage.shareWith(tabset, email, sharedBy)
+  function shareWith(tabset: Tabset, email: string, readonly: boolean, sharedBy: string) {
+    return storage.shareWith(tabset, email, readonly, sharedBy)
   }
 
   // *** getters ***

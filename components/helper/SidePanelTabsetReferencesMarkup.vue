@@ -18,7 +18,7 @@
     <div class="row q-py-xs darkColors lightColors">
       <div class="col-11">
         <q-icon name="ios_share" size="xs" class="q-pr-xs q-mb-xs" />
-        This collection is being shared
+        This collection is being shared {{ showDetails ? 'with' : '' }}
       </div>
       <div class="col-1">
         <q-icon
@@ -26,18 +26,20 @@
           :name="showDetails ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"
           @click="toggleShowDetails()" />
       </div>
-      <div v-if="showDetails" class="col-12 text-body2 ellipsis">Collection shared with {{ sharedWith }}:</div>
+      <!--      <div v-if="showDetails" class="col-12 text-body2 ellipsis">Collection shared with {{ sharedWith }}:</div>-->
       <template v-if="showDetails" v-for="share in shared">
         <div class="col-11 q-pl-sm text-body2 ellipse">
           {{ share['email' as keyof object] }} ({{ share['status' as keyof object] }})
         </div>
         <div class="col-1 text-body2">
           <q-icon
-            name="o_delete"
+            name="sym_o_file_copy_off"
             color="negative"
             class="cursor-pointer"
             @click="removeShare(share['email' as keyof object])">
-            <q-tooltip class="tooltip-small">Remove the invitation</q-tooltip>
+            <q-tooltip class="tooltip-small" anchor="top left" self="center middle"
+              >Stop sharing this collection</q-tooltip
+            >
           </q-icon>
         </div>
       </template>
@@ -65,13 +67,13 @@ const updateSharedInfo = async () => {
   if (currentTabsetId) {
     tabset.value = useTabsetsStore().getCurrentTabset
     sharedBy.value = tabset.value?.sharedBy || ''
-    console.log('updating shared info')
+    //console.log('updating shared info')
     const sharedInfo: DocumentSnapshot = await getDoc(
       doc(FirebaseServices.getFirestore(), 'users', useAuthStore().user.uid, 'tabset-shares', currentTabsetId),
     )
     if (sharedInfo.data()) {
       const data = sharedInfo.data() as object
-      console.log('data', data)
+      // console.log('data', data)
       shared.value = Object.values(data)
         .filter((val: object) => val['status' as keyof object] !== 'deleted')
         .map((val: object) => {
@@ -98,10 +100,11 @@ watchEffect(async () => {
 })
 
 watchEffect(() => {
-  const msgs = useMessagesStore().getUnreadMessages
-  console.log('got msgs', msgs)
-  // changing messages means potential updates of shared info
-  updateSharedInfo()
+  if (useMessagesStore().getUnreadMessages.length > 0) {
+    //console.debug('got msgs', msgs.length) // needed for side effect?
+    // changing messages means potential updates of shared info
+    updateSharedInfo()
+  }
 })
 
 const removeShare = async (email: string) => {

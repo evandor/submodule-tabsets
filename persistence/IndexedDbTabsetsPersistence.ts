@@ -16,7 +16,7 @@ class IndexedDbTabsetsPersistence implements TabsetsPersistence {
 
   async init() {
     this.db = await this.initDatabase()
-    console.debug(` ...initialized tabsets: ${this.getServiceName()}`, '✅')
+    // console.debug(` ...initialized tabsets: ${this.getServiceName()}`, '✅')
     return Promise.resolve()
   }
 
@@ -99,7 +99,12 @@ class IndexedDbTabsetsPersistence implements TabsetsPersistence {
     return useDb.loadPublicTabset(sharedId)
   }
 
-  shareWith(tabset: Tabset, email: string, sharedBy: string | undefined): Promise<TabsetSharing | void> {
+  shareWith(
+    tabset: Tabset,
+    email: string,
+    readonly: boolean,
+    sharedBy: string | undefined,
+  ): Promise<TabsetSharing | void> {
     return Promise.resolve(undefined)
   }
 }

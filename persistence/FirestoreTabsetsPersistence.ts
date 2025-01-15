@@ -38,7 +38,7 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
   }
 
   async init() {
-    console.debug(` ...initialized Tabsets: ${this.getServiceName()}`, '✅')
+    // console.debug(` ...initialized Tabsets: ${this.getServiceName()}`, '✅')
     //this.indexedDB = useDB(undefined).db as typeof IndexedDbPersistenceService
     return Promise.resolve('')
   }
@@ -48,7 +48,7 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
   }
 
   async loadTabsets(): Promise<any> {
-    console.log(' ...loading tabsets', this.getServiceName())
+    //console.log(' ...loading tabsets', this.getServiceName())
     const docs = await getDocs(tabsetsCollection())
     for (const doc of docs.docs) {
       let newItem = doc.data()
@@ -61,7 +61,7 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
         useTabsetsStore().setTabset(newItem as Tabset)
       }
     }
-    console.log('loading tabsets, found ', useTabsetsStore().tabsets.size)
+    //console.log('loading tabsets, found ', useTabsetsStore().tabsets.size)
     // useUiStore().syncing = false
     return Promise.resolve(undefined)
   }
@@ -190,7 +190,12 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
     }
   }
 
-  async shareWith(ts: Tabset, email: string, sharedBy: string | undefined): Promise<TabsetSharing | void> {
+  async shareWith(
+    ts: Tabset,
+    email: string,
+    readonly: boolean,
+    sharedBy: string | undefined,
+  ): Promise<TabsetSharing | void> {
     // https://thedailywtf.com/articles/Validating_Email_Addresses and
     // https://stackoverflow.com/questions/201323/how-can-i-validate-an-email-address-using-a-regular-expression
     const emailRegex =
@@ -213,6 +218,7 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
       sharedBy: sharedBy,
       sharedById: useAuthStore().user.uid,
       status: 'pending',
+      readonly: readonly,
       created: new Date().getTime(),
     }
 
@@ -223,7 +229,7 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
     })
 
     const invitationEmail = useEmailTemplates().invitationSetup(email, ts.name, sharedBy || 'unknown', tabsToShare)
-    console.log('about to add', invitationEmail)
+    //console.log('about to add', invitationEmail)
     await addDoc(collection(firestore, 'emails'), JSON.parse(JSON.stringify(invitationEmail)))
     ts.sharing = TabsetSharing.USER
     ts.sharedBy = useAuthStore().user.email || undefined
@@ -245,13 +251,13 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
   }
 
   private async loadFromReference(r: any) {
-    console.warn('found ref', r)
-    console.log('r', r.path)
+    //console.warn('found ref', r)
+    //console.log('r', r.path)
     const refDoc = await getDoc(r)
     const referencedTabset = refDoc.data() as Tabset
     referencedTabset.shareReference = r.path
     referencedTabset.loaded = new Date().getTime()
-    console.log('referencedTabset', referencedTabset)
+    console.log('referencedTabset:', referencedTabset.shareReference)
     useTabsetsStore().setTabset(referencedTabset)
     return referencedTabset
   }

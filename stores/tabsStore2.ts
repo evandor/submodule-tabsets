@@ -37,7 +37,7 @@ export const useTabsStore2 = defineStore('browsertabs', () => {
    * @param ps a persistence storage
    */
   async function initialize() {
-    console.debug(' ...initializing tabsStore2')
+    // console.debug(' ...initializing tabsStore2')
     // storage = ps
     // await storage.init()
     // // TODO remove after version 0.4.12
