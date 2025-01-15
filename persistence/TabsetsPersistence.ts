@@ -1,3 +1,4 @@
+// 2 expected diffs to localstorage
 import { Tabset, TabsetSharing } from 'src/tabsets/models/Tabset'
 
 interface TabsetsPersistence {

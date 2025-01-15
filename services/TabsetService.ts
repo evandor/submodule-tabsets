@@ -1,3 +1,4 @@
+// 2 expected diffs to localstorage
 import _ from 'lodash'
 import { uid } from 'quasar'
 import AppEventDispatcher from 'src/app/AppEventDispatcher'

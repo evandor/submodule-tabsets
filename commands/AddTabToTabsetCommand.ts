@@ -1,3 +1,4 @@
+// 6 expected diffs to localstorage
 import { doc, setDoc } from 'firebase/firestore'
 import _ from 'lodash'
 import { uid } from 'quasar'

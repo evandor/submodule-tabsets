@@ -1,3 +1,4 @@
+// 4 expected diffs to localstorage
 import { STRIP_CHARS_IN_USER_INPUT } from 'src/boot/constants'
 import { Tab } from 'src/tabsets/models/Tab'
 import { TabsetColumn } from 'src/tabsets/models/TabsetColumn'
