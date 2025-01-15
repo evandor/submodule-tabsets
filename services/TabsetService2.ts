@@ -79,7 +79,7 @@ export function useTabsetService() {
     const tabs: Tab[] = _.filter(
       _.map(chromeTabs, (t: chrome.tabs.Tab) => {
         const tab = new Tab(uid(), t)
-        tab.tags.push(name)
+        tab.addTags([name])
         return tab
       }),
       (t: Tab) => {
@@ -362,14 +362,15 @@ export function useTabsetService() {
                 if (!t.tags) {
                   t.tags = []
                 }
-                t.tags = t.tags.concat(
-                  _.union(
-                    _.filter(
-                      _.map(splits, (split: any) => split.trim()),
-                      (split: string) => split.length > 0,
-                    ),
-                  ),
-                )
+                t.addTags(splits)
+                // t.tags = t.tags.concat(
+                //   _.union(
+                //     _.filter(
+                //       _.map(splits, (split: any) => split.trim()),
+                //       (split: string) => split.length > 0,
+                //     ),
+                //   ),
+                // )
               }
             }
             const author = getIfAvailable(metas, 'author')
@@ -469,9 +470,9 @@ export function useTabsetService() {
       }
 
       // add tabset's name to tab's tags
-      tab.tags.push(ts.name)
+      tab.addTags([ts.name])
       try {
-        tab.tags.push(new URL(tab.url).hostname.replace('www.', ''))
+        tab.addTags([new URL(tab.url).hostname.replace('www.', '')])
       } catch (err) {
         // ignore
       }

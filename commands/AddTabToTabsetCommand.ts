@@ -2,7 +2,6 @@ import { doc, setDoc } from 'firebase/firestore'
 import _ from 'lodash'
 import { uid } from 'quasar'
 import AppEventDispatcher from 'src/app/AppEventDispatcher'
-import BrowserApi from 'src/app/BrowserApi'
 import { FeatureIdent } from 'src/app/models/FeatureIdent'
 import { TabReference, TabReferenceType } from 'src/content/models/TabReference'
 import { useContentStore } from 'src/content/stores/contentStore'
@@ -154,11 +153,6 @@ export class AddTabToTabsetCommand implements Command<any> {
       } else {
         const res2 = await useTabsetService().saveTabset(this.tabset!)
         res = new ExecutionResult(res2, 'Link was added')
-      }
-
-      // add indicator icon
-      if (this.tab.chromeTabId && this.tab.url) {
-        BrowserApi.addIndicatorIcon(this.tab.chromeTabId, this.tab.url)
       }
 
       // add to search index via App Dispatcher

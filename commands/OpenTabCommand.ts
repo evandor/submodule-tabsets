@@ -4,6 +4,7 @@ import { useNavigationService } from 'src/core/services/NavigationService'
 import { useActionHandlers } from 'src/tabsets/actionHandling/ActionHandlers'
 import { AddUrlToTabsetHandler } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { Tab } from 'src/tabsets/models/Tab'
+import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { ref } from 'vue'
 
 export class OpenTabCommand implements Command<string> {
@@ -18,6 +19,15 @@ export class OpenTabCommand implements Command<string> {
       handler.value.handleOpenedTab(browserTab, this.tab)
       //useContentStore().currentTabId = this.tab.id
       await chrome.tabs.highlight({ tabs: browserTab.index })
+      if (this.tab.httpInfo && this.tab.httpInfo === 'UPDATED' && this.tab.url) {
+        this.tab.httpInfo = ''
+        if (useTabsetsStore().getCurrentTabset) {
+          await useTabsetsStore().saveTabset(useTabsetsStore().getCurrentTabset!)
+        }
+      }
+      if (this.tab.httpStatus === 0) {
+        this.tab.httpStatus = 200 // ok "for now"
+      }
       return Promise.resolve(new ExecutionResult('', 'opened'))
     } catch (err: any) {
       return Promise.reject(err)

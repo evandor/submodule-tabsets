@@ -3,7 +3,7 @@
     <div>
       <q-card class="q-dialog-plugin" style="max-width: 100%">
         <q-card-section>
-          <div class="text-h6">Start new Session...</div>
+          <div class="text-h6">Sessions</div>
         </q-card-section>
         <q-card-section>
           <div class="text-body">You can save and hide your current tabs and start a new session.</div>
@@ -16,7 +16,7 @@
         </q-card-section>
         <q-card-section>
           <div>
-            <q-input class="q-ml-md" v-model="sessionName" label="Start new Collection" />
+            <q-select class="q-ml-md" v-model="collection" :options="collections" label="Open Collection" />
           </div>
         </q-card-section>
         <q-card-actions align="right">
@@ -24,7 +24,6 @@
           <DialogButton
             label="Start"
             type="submit"
-            :disable="sessionName.length === 0"
             :autofocus="true"
             @keyup.enter="display()"
             @wasClicked="display()"
@@ -39,7 +38,9 @@
 import { useDialogPluginComponent } from 'quasar'
 import { STRIP_CHARS_IN_USER_INPUT } from 'src/boot/constants'
 import DialogButton from 'src/core/dialog/buttons/DialogButton.vue'
-import { ref, watchEffect } from 'vue'
+import { Tabset } from 'src/tabsets/models/Tabset'
+import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+import { onMounted, ref, watchEffect } from 'vue'
 
 defineEmits([...useDialogPluginComponent.emits])
 
@@ -47,6 +48,8 @@ const { dialogRef, onDialogHide, onDialogOK } = useDialogPluginComponent()
 
 const oldSessionName = ref<string>(new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString())
 const sessionName = ref<string>('')
+const collection = ref(null)
+const collections = ref<object[]>([])
 
 watchEffect(() => {
   if (sessionName.value) {
@@ -57,7 +60,16 @@ watchEffect(() => {
   }
 })
 
+onMounted(() => {
+  collections.value = [...useTabsetsStore().tabsets.values()].map((ts: Tabset) => {
+    return {
+      label: ts.name,
+      value: ts.id,
+    }
+  })
+})
+
 const display = () => {
-  onDialogOK({ sessionName: sessionName.value, oldSessionName: oldSessionName.value })
+  onDialogOK({ sessionName: sessionName.value, oldSessionName: oldSessionName.value, collection: collection.value })
 }
 </script>
