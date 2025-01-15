@@ -1,4 +1,5 @@
 import { IDBPDatabase, openDB } from 'idb'
+import { useDB } from 'src/services/usePersistenceService'
 import { Tabset, TabsetSharing } from 'src/tabsets/models/Tabset'
 import TabsetsPersistence from 'src/tabsets/persistence/TabsetsPersistence'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
@@ -14,7 +15,7 @@ class IndexedDbTabsetsPersistence implements TabsetsPersistence {
 
   async init() {
     this.db = await this.initDatabase()
-    console.debug(` ...initialized tabsets: ${this.getServiceName()}`, '✅')
+    // console.debug(` ...initialized tabsets: ${this.getServiceName()}`, '✅')
     return Promise.resolve()
   }
 

@@ -59,7 +59,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     // TODO remove after version 0.5.0
     await storage.migrate()
 
-    console.debug(' ...initialized tabsets: Store', '✅')
+    // console.debug(' ...initialized tabsets: Store', '✅')
     await storage.loadTabsets()
   }
 
