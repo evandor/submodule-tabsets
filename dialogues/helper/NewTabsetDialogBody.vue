@@ -181,7 +181,7 @@ const submit = () => {
     if (props.windowId) {
       console.log('windowsStore', windowsStore)
       // TODO ignoring props.windowId !?!
-      const window: chrome.windows.Window | undefined = windowsStore.currentChromeWindow
+      const window: chrome.windows.Window | undefined = windowsStore.currentBrowserWindow
       if (window) {
         tabsToUse = window.tabs as chrome.tabs.Tab[]
         windowModel.value = newTabsetName.value

@@ -285,7 +285,7 @@ export function useTabsetService() {
         tabset.type = TabsetType.DEFAULT
       }
       const rootTabset = rootTabsetFor(tabset)
-      console.debug(`saving (sub-)tabset '${tabset.name}' with ${tabset.tabs.length} tab(s) at id ${rootTabset?.id}`)
+      //console.debug(`saving (sub-)tabset '${tabset.name}' with ${tabset.tabs.length} tab(s) at id ${rootTabset?.id}`)
       if (rootTabset) {
         return await useTabsetsStore().saveTabset(rootTabset)
       }
@@ -574,8 +574,8 @@ export function useTabsetService() {
           hit = true
         })
         if (hit) {
-          console.debug('saving tabset on activated', ts.name)
-          saveTabset(ts as Tabset)
+          //console.debug('saving tabset on activated', ts.name)
+          saveTabset(ts as Tabset).catch((err: any) => console.warn(err))
         }
       }
     })

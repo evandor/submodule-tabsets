@@ -165,7 +165,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
 
   async function saveTabset(ts: Tabset) {
     if (ts.id === currentTabsetId.value) {
-      console.debug('setting folderactive', ts.folderActive)
+      //console.debug('setting folderactive', ts.folderActive)
       currentTabsetFolderId.value = ts.folderActive
     }
     //console.log("--- storing tabset ---", ts.tabs.map((t: Tab) => JSON.stringify(t.coordinates[0]?.val)), ts)
