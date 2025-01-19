@@ -74,7 +74,6 @@ import { Tabset, TabsetType } from 'src/tabsets/models/Tabset'
 import { PropType, ref, watchEffect } from 'vue'
 import '@he-tree/vue/style/default.css'
 import '@he-tree/vue/style/material-design.css'
-import { useNavigationService } from 'src/core/services/NavigationService'
 import { useActionHandlers } from 'src/tabsets/actionHandling/ActionHandlers'
 import { ActionHandlerButtonClickedHolder } from 'src/tabsets/actionHandling/model/ActionHandlerButtonClickedHolder'
 import SpecialUrlAddToTabsetComponent from 'src/tabsets/actionHandling/SpecialUrlAddToTabsetComponent.vue'
@@ -93,7 +92,7 @@ const currentChromeTab = ref<chrome.tabs.Tab | undefined>(undefined)
 const hoveredTabset = ref<string | undefined>(undefined)
 
 watchEffect(() => {
-  const windowId = useWindowsStore().currentChromeWindow?.id || 0
+  const windowId = useWindowsStore().currentBrowserWindow?.id || 0
   currentChromeTab.value = useTabsStore2().getCurrentChromeTab(windowId) || useTabsStore2().currentChromeTab
 })
 
