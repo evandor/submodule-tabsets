@@ -1,3 +1,4 @@
+import { DocumentReference } from '@firebase/firestore'
 import { APP_INSTALLATION_ID } from 'boot/constants'
 import { addDoc, collection, deleteDoc, doc, Firestore, getDoc, getDocs, setDoc } from 'firebase/firestore'
 import { sha256 } from 'js-sha256'
@@ -7,7 +8,7 @@ import { useNotesStore } from 'src/notes/stores/NotesStore'
 import FirebaseServices from 'src/services/firebase/FirebaseServices'
 import { useEmailTemplates } from 'src/tabsets/emails/EmailTemplates'
 import { Tab } from 'src/tabsets/models/Tab'
-import { Tabset, TabsetSharing } from 'src/tabsets/models/Tabset'
+import { AugmentedData, Tabset, TabsetSharing } from 'src/tabsets/models/Tabset'
 import TabsetsPersistence from 'src/tabsets/persistence/TabsetsPersistence'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { useThumbnailsService } from 'src/thumbnails/services/ThumbnailsService'
@@ -55,13 +56,13 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
       newItem.id = doc.id
 
       if (newItem['reference']) {
-        await this.loadFromReference(newItem['reference'])
+        await this.loadFromReference(newItem as { reference: DocumentReference; readonly: boolean; sharedAt: number })
       } else {
         newItem.loaded = new Date().getTime()
         useTabsetsStore().setTabset(newItem as Tabset)
       }
     }
-    //console.log('loading tabsets, found ', useTabsetsStore().tabsets.size)
+    console.log('loading tabsets, found ', useTabsetsStore().tabsets.size)
     // useUiStore().syncing = false
     return Promise.resolve(undefined)
   }
@@ -81,10 +82,14 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
   async saveTabset(tabset: Tabset): Promise<any> {
     //useUiStore().syncing = true
     tabset.origin = installationId
-    console.log(`saving tabset ${tabset.id} in installation ${installationId}, ref:${tabset.shareReference}`)
-    if (tabset.shareReference) {
+    tabset.augmentedData = new AugmentedData()
+    console.log(`saving tabset ${tabset.id} in installation ${installationId}, ref:${tabset.sharing?.shareReference}`)
+    if (tabset.sharing?.shareReference) {
       tabset.lastChangeBy = useAuthStore().user.uid
-      await setDoc(doc(FirebaseServices.getFirestore(), tabset.shareReference), JSON.parse(JSON.stringify(tabset)))
+      await setDoc(
+        doc(FirebaseServices.getFirestore(), tabset.sharing?.shareReference),
+        JSON.parse(JSON.stringify(tabset)),
+      )
     } else {
       await setDoc(tabsetDoc(tabset.id), JSON.parse(JSON.stringify(tabset)))
     }
@@ -100,26 +105,26 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
 
   async share(
     ts: Tabset,
-    sharing: TabsetSharing,
+    sharingType: TabsetSharing,
     sharedId: string | undefined,
     sharedBy: string | undefined,
   ): Promise<TabsetSharing | void> {
-    console.log(`setting property 'sharing' to ${sharing} for tabset  ${ts.id} with sharedId ${sharedId}`, ts)
+    console.log(`setting property 'sharing' to ${sharingType} for tabset  ${ts.id} with sharedId ${sharedId}`, ts)
     // const ts = getTabset(tabsetId) ?? throwIdNotFound("tabset", tabsetId)
 
     const firestore: Firestore = FirebaseServices.getFirestore()
 
-    ts.sharing = sharing
-    ts.sharedBy = sharedBy
+    ts.sharing!.sharing = sharingType
+    ts.sharing!.sharedBy = sharedBy
     ts.view = 'list'
 
-    if (sharing === TabsetSharing.UNSHARED) {
-      console.log('deleting share for tabset', ts.sharedId)
+    if (sharingType === TabsetSharing.UNSHARED) {
+      console.log('deleting share for tabset', ts.sharing?.sharedId)
       if (sharedId) {
         await deleteDoc(doc(firestore, 'public-tabsets', sharedId))
-        ts.sharedBy = undefined
-        ts.sharedById = undefined
-        ts.sharedId = undefined
+        ts.sharing!.sharedBy = undefined
+        ts.sharing!.sharedById = undefined
+        ts.sharing!.sharedId = undefined
         await this.saveTabset(ts)
       }
       return
@@ -131,7 +136,7 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
         console.log('found comment', c.author, c)
         if (c.author === '<me>') {
           c.author = useUiStore().sharingAuthor || '---'
-          c.avatar = useUiStore().sharingAvatar
+          c.authorEmail = useAuthStore().user.email || undefined
         }
       }
     }
@@ -148,7 +153,7 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
 
     try {
       if (sharedId) {
-        ts.sharedAt = new Date().getTime()
+        ts.sharing.sharedAt = new Date().getTime()
         console.log('updating with ts', ts)
         await setDoc(doc(firestore, 'public-tabsets', sharedId), JSON.parse(JSON.stringify(ts)))
         await this.saveTabset(ts)
@@ -161,24 +166,24 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
 
         return
       } else {
-        ts.sharedAt = new Date().getTime()
+        ts.sharing.sharedAt = new Date().getTime()
 
         const publicId = uid()
         console.log('setting shared id to ', publicId)
 
-        ts.sharedId = publicId
-        ts.sharedById = useAuthStore().user.uid
+        ts.sharing!.sharedId = publicId
+        ts.sharing!.sharedById = useAuthStore().user.uid
         await this.saveTabset(ts)
 
         // avoid id leakage
         ts.id = 'publicly-shared-tabset'
-        //ts.sharedById = sha256(ts.sharedById)
+        //ts.sharing?.sharedById = sha256(ts.sharing?.sharedById)
         await setDoc(doc(firestore, 'public-tabsets', publicId), JSON.parse(JSON.stringify(ts)))
 
         const notesForTabset = await useNotesStore().getNotesFor(ts.id)
         console.log('found notes for tabset', ts.id, notesForTabset)
         for (const note of notesForTabset) {
-          note.sharedById = sha256(ts.sharedById!)
+          note.sharedById = sha256(ts.sharing!.sharedById!)
           note.sharedId = publicId
           await setDoc(doc(firestore, 'public-notes', note.id), JSON.parse(JSON.stringify(note)))
         }
@@ -231,8 +236,8 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
     const invitationEmail = useEmailTemplates().invitationSetup(email, ts.name, sharedBy || 'unknown', tabsToShare)
     //console.log('about to add', invitationEmail)
     await addDoc(collection(firestore, 'emails'), JSON.parse(JSON.stringify(invitationEmail)))
-    ts.sharing = TabsetSharing.USER
-    ts.sharedBy = useAuthStore().user.email || undefined
+    ts.sharing!.sharing = TabsetSharing.USER
+    ts.sharing!.sharedBy = useAuthStore().user.email || undefined
     await useTabsetsStore().saveTabset(ts)
   }
 
@@ -245,19 +250,24 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
     console.debug('reloading tabset', tabsetId)
     const res = await getDoc(tabsetDoc(tabsetId))
     if (res.data() && res.data()!['reference']) {
-      return this.loadFromReference(res.data()!['reference'])
+      return this.loadFromReference(res.data() as { reference: DocumentReference; readonly: boolean; sharedAt: number })
     }
     return res.data() as Tabset
   }
 
-  private async loadFromReference(r: any) {
-    //console.warn('found ref', r)
+  private async loadFromReference(r: { reference: DocumentReference; readonly: boolean; sharedAt: number }) {
+    console.warn('found ref', r)
     //console.log('r', r.path)
-    const refDoc = await getDoc(r)
+    const refDoc = await getDoc(r.reference)
     const referencedTabset = refDoc.data() as Tabset
-    referencedTabset.shareReference = r.path
+    referencedTabset.sharing!.shareReference = r.reference.path
     referencedTabset.loaded = new Date().getTime()
-    console.log('referencedTabset:', referencedTabset.shareReference)
+    if (!referencedTabset.augmentedData) {
+      referencedTabset.augmentedData = new AugmentedData()
+    }
+    referencedTabset.augmentedData.sharedAt = r.sharedAt || 0
+    referencedTabset.augmentedData.readonly = r.readonly
+    console.log('referencedTabset:', referencedTabset.sharing?.shareReference)
     useTabsetsStore().setTabset(referencedTabset)
     return referencedTabset
   }

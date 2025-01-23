@@ -115,9 +115,9 @@ export class AddTabToTabsetCommand implements Command<any> {
       }
 
       // Sharing
-      if (tabset.sharedId && tabset.sharing === TabsetSharing.PUBLIC_LINK && !this.activeFolder) {
-        tabset.sharing = TabsetSharing.PUBLIC_LINK_OUTDATED
-        tabset.sharedAt = new Date().getTime()
+      if (tabset.sharing?.sharedId && tabset.sharing.sharing === TabsetSharing.PUBLIC_LINK && !this.activeFolder) {
+        tabset.sharing.sharing = TabsetSharing.PUBLIC_LINK_OUTDATED
+        tabset.sharing.sharedAt = new Date().getTime()
       }
 
       // Placeholder Defaults Application

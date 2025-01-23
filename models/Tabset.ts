@@ -1,5 +1,6 @@
 // 4 expected diffs to localstorage
 import { STRIP_CHARS_IN_USER_INPUT } from 'src/boot/constants'
+import { SharingInfo } from 'src/tabsets/models/SharingInfo'
 import { Tab } from 'src/tabsets/models/Tab'
 import { TabsetColumn } from 'src/tabsets/models/TabsetColumn'
 import { TabsetLog } from 'src/tabsets/models/TabsetLog'
@@ -28,6 +29,16 @@ export enum TabsetSharing {
   PUBLIC_LINK_OUTDATED = 'PUBLIC_LINK_OUTDATED',
   USER = 'USER',
   ROLE = 'ROLE',
+}
+
+/**
+ * data added when loading and removed before saving (as, for example,
+ * it is only specific for the current user, but not for the tabset itself).
+ * Kind of transient.
+ */
+export class AugmentedData {
+  sharedAt: number = 0
+  readonly: boolean = true
 }
 
 export const TABSET_NAME_MAX_LENGTH = 32
@@ -61,13 +72,7 @@ export class Tabset {
   bookmarkId: string | undefined = undefined
 
   // sharing
-  sharing: TabsetSharing = TabsetSharing.UNSHARED
-  sharedBy: string | undefined = undefined
-  sharedById: string | undefined = undefined
-  sharedId: string | undefined = undefined
-  sharedAt: number | undefined = undefined
-  sharedPath: string | undefined = undefined // e.g. /pwa/imp/AlCYSrGGmOnsOnf0htA9?n=c2hvcHBpbmc=
-  shareReference: string | undefined = undefined
+  sharing: SharingInfo = new SharingInfo()
 
   importedAt: number | undefined = undefined
 
@@ -91,6 +96,8 @@ export class Tabset {
 
   loaded: number = 0 // will always be set when the tabset is loaded
   lastChangeBy: string = '' // set for tabsets with sharedReference
+
+  augmentedData: AugmentedData = new AugmentedData()
 
   constructor(id: string, name: string, tabs: Tab[] = [], columns: TabsetColumn[] = [], spaces: string[] = []) {
     // some guards
@@ -123,4 +130,14 @@ export class Tabset {
   }
 
   static newTabsetNameIsShortEnough = (val: string) => (val ? val.length <= TABSET_NAME_MAX_LENGTH : true)
+
+  // 'addLog is not a method' when not static !?!
+  static addLog = (ts: Tabset, logMsg: string | undefined) => {
+    if (logMsg) {
+      if (!ts.log) {
+        ts.log = []
+      }
+      ts.log.push(new TabsetLog(logMsg))
+    }
+  }
 }

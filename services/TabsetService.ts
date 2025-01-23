@@ -365,8 +365,8 @@ class TabsetService {
       tabs.splice(newIndex, 0, tab!)
 
       // Sharing
-      if (currentTabset.sharedId && currentTabset.sharing === TabsetSharing.PUBLIC_LINK) {
-        currentTabset.sharing = TabsetSharing.PUBLIC_LINK_OUTDATED
+      if (currentTabset.sharing.sharedId && currentTabset.sharing.sharing === TabsetSharing.PUBLIC_LINK) {
+        currentTabset.sharing.sharing = TabsetSharing.PUBLIC_LINK_OUTDATED
       }
 
       await saveCurrentTabset()

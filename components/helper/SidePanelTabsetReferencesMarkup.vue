@@ -1,5 +1,5 @@
 <template>
-  <template v-if="tabset?.shareReference">
+  <template v-if="tabset?.sharing?.shareReference">
     <div class="row q-py-xs darkColors lightColors">
       <div class="col-11">
         <q-icon name="ios_share" size="xs" class="q-pr-xs q-mb-xs" />
@@ -66,7 +66,7 @@ const updateSharedInfo = async () => {
   const currentTabsetId = useTabsetsStore().currentTabsetId
   if (currentTabsetId) {
     tabset.value = useTabsetsStore().getCurrentTabset
-    sharedBy.value = tabset.value?.sharedBy || ''
+    sharedBy.value = tabset.value?.sharing?.sharedBy || ''
     //console.log('updating shared info')
     const sharedInfo: DocumentSnapshot = await getDoc(
       doc(FirebaseServices.getFirestore(), 'users', useAuthStore().user.uid, 'tabset-shares', currentTabsetId),

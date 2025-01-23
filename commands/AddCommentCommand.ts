@@ -5,6 +5,7 @@ import { TabsetSharing } from 'src/tabsets/models/Tabset'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { useUiStore } from 'src/ui/stores/uiStore'
+import { useAuthStore } from 'stores/authStore'
 
 export class AddCommentCommand implements Command<any> {
   constructor(
@@ -17,16 +18,20 @@ export class AddCommentCommand implements Command<any> {
     if (tabData && tabData.tab) {
       console.log('retrieved tabData', tabData)
       const tab = tabData.tab
-      const comment = new TabComment(useUiStore().sharingAuthor || '<me>', useUiStore().sharingAvatar, this.comment)
+      const comment = new TabComment(
+        useUiStore().sharingAuthor || useAuthStore().user?.email || '<me>',
+        useAuthStore().user.email || undefined,
+        this.comment,
+      )
       if (!tab.comments) {
         tab.comments = []
       }
       console.log('pushing comment', comment)
       tab.comments.push(comment)
       const tabset = useTabsetsStore().getTabset(tabData.tabsetId)
-      if (tabset && tabset.sharedId) {
-        tabset.sharing = TabsetSharing.PUBLIC_LINK_OUTDATED
-        //MqttService.publishTabComment(tabset.sharedId, tabData.tab, comment)
+      if (tabset && tabset.sharing?.sharedId) {
+        tabset.sharing.sharing = TabsetSharing.PUBLIC_LINK_OUTDATED
+        //MqttService.publishTabComment(tabset.sharing?.sharedId, tabData.tab, comment)
       }
       if (tabset) {
         return useTabsetService()

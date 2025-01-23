@@ -35,7 +35,7 @@
         group="otherTabs"
         :tabsetId="tabsetFolder.id"
         :tabsetSorting="tabset.sorting"
-        :tabsetSharedId="tabset.sharedId!"
+        :tabsetSharedId="tabset.sharing?.sharedId!"
         :tabs="tabsetFolder.tabs" />
     </q-tab-panel>
   </q-tab-panels>

@@ -79,7 +79,7 @@ export function useTabsetService() {
     const tabs: Tab[] = _.filter(
       _.map(chromeTabs, (t: chrome.tabs.Tab) => {
         const tab = new Tab(uid(), t)
-        tab.addTags([name])
+        Tab.addTags(tab, [name])
         return tab
       }),
       (t: Tab) => {
@@ -362,7 +362,7 @@ export function useTabsetService() {
                 if (!t.tags) {
                   t.tags = []
                 }
-                t.addTags(splits)
+                Tab.addTags(t, splits)
                 // t.tags = t.tags.concat(
                 //   _.union(
                 //     _.filter(
@@ -470,9 +470,9 @@ export function useTabsetService() {
       }
 
       // add tabset's name to tab's tags
-      tab.addTags([ts.name])
+      Tab.addTags(tab, [ts.name])
       try {
-        tab.addTags([new URL(tab.url).hostname.replace('www.', '')])
+        Tab.addTags(tab, [new URL(tab.url).hostname.replace('www.', '')])
       } catch (err) {
         // ignore
       }

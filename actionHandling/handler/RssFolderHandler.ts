@@ -91,7 +91,10 @@ export class RssFolderHandler implements AddUrlToTabsetHandler {
       newTab.description = desc
       newTab.image = img
       newTab.extension = UrlExtension.RSS
-      newTab.setTags(item.categories.map((c: FeedCategory) => c.term))
+      Tab.setTags(
+        newTab,
+        item.categories.map((c: FeedCategory) => c.term),
+      )
       if (published) {
         newTab.created = new Date(published).getTime()
       }

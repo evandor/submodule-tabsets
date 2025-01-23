@@ -700,7 +700,7 @@ const editSelectedComment = (m: TabComment) => {
   if (selectedCommentId.value) {
     $q.dialog({
       component: CommentDialog,
-      componentProps: { tabId: props.tab.id, sharedId: props.tabset?.sharedId, comment: m },
+      componentProps: { tabId: props.tab.id, sharedId: props.tabset?.sharing?.sharedId, comment: m },
     })
   }
 }

@@ -177,6 +177,6 @@ const setColor = (tab: Tab) => useCommandExecutor().execute(new UpdateTabColorCo
 const addCommentDialog = () =>
   $q.dialog({
     component: CommentDialog,
-    componentProps: { tabId: props.tab.id, sharedId: props.tabset?.sharedId },
+    componentProps: { tabId: props.tab.id, sharedId: props.tabset?.sharing?.sharedId },
   })
 </script>

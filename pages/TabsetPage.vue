@@ -1,3 +1,5 @@
+<!-- TabsetsPage -->
+<!-- used in pwa, and bex full-page-applciation view -->
 <template>
   <!-- toolbar -->
   <q-toolbar v-if="!useTabsetsStore().currentTabsetId">
@@ -20,7 +22,7 @@
           <template v-if="useUiStore().leftDrawerOpen">
             <!--            <span class="text-dark" v-if="$q.screen.gt.xs">Tabs of </span>-->
             <span
-              class="text-primary text-weight-bold cursor-pointer"
+              class="text-weight-bold cursor-pointer"
               @mouseenter="showEditButton = true"
               @mouseout="showEditButton = false">
               {{ useTabsetsStore().currentTabsetName }}
@@ -30,18 +32,27 @@
                 @update:model-value="(val: string) => setNewName(val)">
                 <q-input v-model="scope.value" dense autofocus counter @keyup.enter="scope.set" />
               </q-popup-edit>
-              <span v-if="tabset.sharedId" class="text-caption"
-                >shared by {{ tabset.sharedBy }}, {{ date.formatDate(tabset.sharedAt, 'DD.MM.YYYY HH:mm') }}</span
+              <span v-if="tabset.sharing?.sharedBy" class="text-caption"
+                >shared by {{ tabset.sharing?.sharedBy }},
+                {{ date.formatDate(tabset.augmentedData.sharedAt, 'DD.MM.YYYY HH:mm') }} (readonly:
+                {{ tabset.augmentedData.readonly }})</span
               >
             </span>
-            <span v-if="tabset.sharedPath">
-              <q-icon class="q-ml-md cursor-pointer" name="refresh" @click="router.push(tabset.sharedPath)">
+            <span v-if="tabset.sharing.sharedPath">
+              <q-icon class="q-ml-md cursor-pointer" name="refresh" @click="router.push(tabset.sharing.sharedPath)">
                 <q-tooltip class="tooltip-small">Refresh</q-tooltip>
               </q-icon>
             </span>
           </template>
           <template v-else>
-            <TabsetsSelectorWidget />
+            <div>
+              <TabsetsSelectorWidget />
+              <span v-if="tabset.sharing?.sharedBy" class="text-caption"
+                >shared by {{ tabset.sharing?.sharedBy }},
+                {{ date.formatDate(tabset.augmentedData.sharedAt, 'DD.MM.YYYY HH:mm') }} (readonly:
+                {{ tabset.augmentedData.readonly }})</span
+              >
+            </div>
           </template>
           <q-icon
             v-if="showEditButton"
@@ -75,55 +86,31 @@
           <q-tooltip>Sorting descending or ascending, currently {{ orderDesc }}</q-tooltip>
         </q-btn>
 
-        <q-btn
-          v-if="tabset?.tabs.length > 0"
-          @click="setView('grid')"
-          style="width: 14px"
-          class="q-mr-sm"
-          size="8px"
-          :flat="tabset?.view !== 'grid'"
-          :outline="tabset?.view === 'grid'"
-          icon="grid_on">
-          <q-tooltip class="tooltip">Use grid layout to visualize your tabs</q-tooltip>
-        </q-btn>
+        <!--        <q-btn-->
+        <!--          v-if="tabset?.tabs.length > 0"-->
+        <!--          @click="setView('grid')"-->
+        <!--          style="width: 14px"-->
+        <!--          class="q-mr-sm"-->
+        <!--          size="8px"-->
+        <!--          :flat="tabset?.view !== 'grid'"-->
+        <!--          :outline="tabset?.view === 'grid'"-->
+        <!--          icon="grid_on">-->
+        <!--          <q-tooltip class="tooltip">Use grid layout to visualize your tabs</q-tooltip>-->
+        <!--        </q-btn>-->
 
         <!-- default view, no need to show if there is no alternative -->
-        <q-btn
-          v-if="tabset?.tabs.length > 0"
-          @click="setView('list')"
-          style="width: 14px"
-          class="q-mr-sm"
-          size="10px"
-          :flat="tabset?.view !== 'list'"
-          :outline="tabset?.view === 'list'"
-          icon="o_list">
-          <q-tooltip class="tooltip">Use the list layout to visualize your tabs</q-tooltip>
-        </q-btn>
-
         <!--        <q-btn-->
-        <!--          v-if="useFeaturesStore().hasFeature(FeatureIdent.EXPERIMENTAL_VIEWS) && tabset?.tabs.length > 0"-->
-        <!--          @click="setView('canvas')"-->
-        <!--          style="width:14px"-->
-        <!--          class="q-mr-sm" size="10px"-->
-        <!--          :flat="tabset?.view !== 'canvas'"-->
-        <!--          :outline="tabset?.view === 'canvas'"-->
-        <!--          icon="o_shape_line">-->
-        <!--          <q-tooltip>Use the canvas freestyle layout to visualize your tabs</q-tooltip>-->
+        <!--          v-if="tabset?.tabs.length > 0"-->
+        <!--          @click="setView('list')"-->
+        <!--          style="width: 14px"-->
+        <!--          class="q-mr-sm"-->
+        <!--          size="10px"-->
+        <!--          :flat="tabset?.view !== 'list'"-->
+        <!--          :outline="tabset?.view === 'list'"-->
+        <!--          icon="o_list">-->
+        <!--          <q-tooltip class="tooltip">Use the list layout to visualize your tabs</q-tooltip>-->
         <!--        </q-btn>-->
 
-        <!--        <q-btn-->
-        <!--          v-if="useFeaturesStore().hasFeature(FeatureIdent.EXPERIMENTAL_VIEWS) && tabset?.tabs.length > 0"-->
-        <!--          @click="setView('exporter')"-->
-        <!--          style="width:14px"-->
-        <!--          class="q-mr-sm" size="10px"-->
-        <!--          :flat="tabset?.view !== 'exporter'"-->
-        <!--          :outline="tabset?.view === 'exporter'"-->
-        <!--          icon="o_ios_share">-->
-        <!--          <q-tooltip>Use the exporter layout if you want to copy and paste the urls of this tabset</q-tooltip>-->
-        <!--        </q-btn>-->
-
-        <!--        <q-separator vertical dark inset />-->
-        <!--        <span>{{ useUiStore().tabsFilter }}</span>-->
         <q-btn
           v-if="
             useTabsetsStore().currentTabsetId !== '' &&
@@ -176,7 +163,6 @@
     v-model="tab"
     dense
     class="text-grey q-ma-none q-pa-none"
-    active-color="primary"
     indicator-color="primary"
     align="left"
     narrow-indicator>
@@ -230,7 +216,7 @@ a tab's url starts with one of the urls of this tabset, it will be ignored and n
         group="otherTabs"
         :tabsetId="tabset.id"
         :tabsetSorting="tabset.sorting"
-        :tabsetSharedId="tabset.sharedId!"
+        :tabsetSharedId="tabset.sharing?.sharedId!"
         :tabs="tabset.tabs" />
     </q-tab-panel>
 
@@ -249,6 +235,7 @@ a tab's url starts with one of the urls of this tabset, it will be ignored and n
 import TabsetsSelectorWidget from 'components/widgets/TabsetsSelectorWidget.vue'
 import { date, uid, useQuasar } from 'quasar'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
+import { useUtils } from 'src/core/services/Utils'
 import Analytics from 'src/core/utils/google-analytics'
 import { RenameTabsetCommand } from 'src/tabsets/commands/RenameTabset'
 import { ToggleSortingCommand } from 'src/tabsets/commands/ToggleSorting'
@@ -270,6 +257,8 @@ const route = useRoute()
 const router = useRouter()
 
 const $q = useQuasar()
+
+const { inBexMode } = useUtils()
 
 const tabsetId = ref(null as unknown as string)
 const tabset = ref<Tabset>(new Tabset(uid(), 'empty', []))
@@ -294,8 +283,8 @@ watchEffect(() => {
   }
   tabsetId.value = route?.params.tabsetId as string
   tabset.value = useTabsetsStore().getTabset(tabsetId.value) || new Tabset(uid(), 'empty', [])
-  console.log('watch effect in tabsetpage', tabsetId.value)
-  tab.value = route.query['tab'] ? (route.query['tab'] as string) : 'grid'
+  console.log('watch effect in tabsetpage', tabsetId.value, tabset.value)
+  tab.value = route.query['tab'] ? (route.query['tab'] as string) : 'list'
   tabsetFolder.value = useTabsetsStore().getActiveFolder(tabset.value) || tabset.value
 })
 
