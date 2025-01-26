@@ -6,7 +6,7 @@ import { useUtils } from 'src/core/services/Utils'
 import Analytics from 'src/core/utils/google-analytics'
 import { useFeaturesStore } from 'src/features/stores/featuresStore'
 import { useLogger } from 'src/services/Logger'
-import { StaticSuggestionIdent, Suggestion } from 'src/suggestions/models/Suggestion'
+import { Suggestion } from 'src/suggestions/models/Suggestion'
 import { useSuggestionsStore } from 'src/suggestions/stores/suggestionsStore'
 import { SaveOrReplaceResult } from 'src/tabsets/models/SaveOrReplaceResult'
 import { TabsetType } from 'src/tabsets/models/Tabset'
@@ -56,18 +56,14 @@ export class CreateTabsetCommand implements Command<SaveOrReplaceResult> {
             !useFeaturesStore().hasFeature(FeatureIdent.BOOKMARKS) &&
             process.env.MODE === 'bex'
           ) {
-            useSuggestionsStore().addSuggestion(
-              Suggestion.getStaticSuggestion(StaticSuggestionIdent.TRY_BOOKMARKS_FEATURE),
-            )
+            useSuggestionsStore().addSuggestion(Suggestion.getStaticSuggestion('TRY_BOOKMARKS_FEATURE'))
           }
           if (
             useTabsetsStore().tabsets.size >= 15 &&
             !useFeaturesStore().hasFeature(FeatureIdent.SPACES) &&
             process.env.MODE === 'bex'
           ) {
-            useSuggestionsStore().addSuggestion(
-              Suggestion.getStaticSuggestion(StaticSuggestionIdent.TRY_SPACES_FEATURE),
-            )
+            useSuggestionsStore().addSuggestion(Suggestion.getStaticSuggestion('TRY_SPACES_FEATURE'))
             // } else if (useTabsetsStore().tabsets.size >= 3 &&
             //     useTabsetsStore().allTabsCount > 10 &&
             //     !useFeaturesStore().hasFeature(FeatureIdent.NEWEST_TABS) &&

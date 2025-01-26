@@ -57,6 +57,7 @@ export class TabCoordinate {
 export class TabComment {
   date: number = 0
   public id: string
+  public edited = false
 
   constructor(
     public author: string = '<me>',
@@ -107,6 +108,8 @@ export class Tab {
   lastActive: number
   activatedCount: number
   loadedCount: number
+
+  createdBy: string | undefined // email or empty
 
   // from Chrome tab
   chromeTabId: number | undefined

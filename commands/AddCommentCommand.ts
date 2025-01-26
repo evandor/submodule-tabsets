@@ -1,7 +1,7 @@
 import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { TabComment } from 'src/tabsets/models/Tab'
-import { TabsetSharing } from 'src/tabsets/models/Tabset'
+import { ChangeInfo, TabsetSharing } from 'src/tabsets/models/Tabset'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { useUiStore } from 'src/ui/stores/uiStore'
@@ -26,16 +26,15 @@ export class AddCommentCommand implements Command<any> {
       if (!tab.comments) {
         tab.comments = []
       }
-      console.log('pushing comment', comment)
+      // console.log('pushing comment', comment)
       tab.comments.push(comment)
       const tabset = useTabsetsStore().getTabset(tabData.tabsetId)
       if (tabset && tabset.sharing?.sharedId) {
         tabset.sharing.sharing = TabsetSharing.PUBLIC_LINK_OUTDATED
-        //MqttService.publishTabComment(tabset.sharing?.sharedId, tabData.tab, comment)
       }
       if (tabset) {
         return useTabsetService()
-          .saveTabset(tabset)
+          .saveTabset(tabset, new ChangeInfo('tabcomment', 'added', comment.id, tabset.id))
           .then(() => new ExecutionResult('done', 'Comment Published'))
       } else {
         return Promise.reject('could not find tabset')

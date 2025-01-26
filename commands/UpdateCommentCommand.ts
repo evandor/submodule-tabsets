@@ -1,7 +1,6 @@
 import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { TabComment } from 'src/tabsets/models/Tab'
-import { TabsetSharing } from 'src/tabsets/models/Tabset'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { useUiStore } from 'src/ui/stores/uiStore'
@@ -20,11 +19,13 @@ export class UpdateCommentCommand implements Command<any> {
       const tab = tabData.tab
       const comment = new TabComment(useUiStore().sharingAuthor || '<me>', useUiStore().sharingAvatar, this.comment)
 
-      const originalComment = tabData.tab.comments.find((tc: TabComment) => tc.id === this.tabComment.id)
+      const originalComment = tab.comments.find((tc: TabComment) => tc.id === this.tabComment.id)
       if (!originalComment) {
         return Promise.reject('could not find original comment')
       }
       originalComment.comment = this.comment
+      originalComment.edited = true
+      originalComment.date = new Date().getTime()
       console.log('pushing comment', comment)
       const tabset = useTabsetsStore().getTabset(tabData.tabsetId)
       if (tabset) {
@@ -41,5 +42,5 @@ export class UpdateCommentCommand implements Command<any> {
 }
 
 UpdateCommentCommand.prototype.toString = function cmdToString() {
-  return `UpdateCommentCommand: {tabId=${this.tabId}, tabComment: ${this.tabComment}}`
+  return `UpdateCommentCommand: {tabId=${this.tabId}, tabComment: ${JSON.stringify(this.tabComment)}}`
 }

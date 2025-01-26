@@ -117,5 +117,5 @@ export class CreateTabFromOpenTabsCommand implements Command<any> {
 }
 
 CreateTabFromOpenTabsCommand.prototype.toString = function cmdToString() {
-  return `CreateTabFromOpenTabs: {tab=${this.chromeTab.toString()}}`
+  return `CreateTabFromOpenTabs: {tabId=${this.chromeTab.id}}`
 }

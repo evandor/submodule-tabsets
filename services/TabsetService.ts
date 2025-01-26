@@ -19,12 +19,7 @@ import { ListDetailLevel } from 'src/ui/stores/uiStore'
 
 const { saveTabset, saveCurrentTabset, tabsetsFor, addToTabset } = useTabsetService()
 
-// const {db} = useDB()
 class TabsetService {
-  setLocalStorage(localStorage: any) {
-    //    this.localStorage = localStorage;
-  }
-
   async saveToCurrentTabset(tab: Tab, useIndex: number | undefined = undefined): Promise<Tabset> {
     const currentTs = useTabsetsStore().getCurrentTabset as Tabset | undefined
     if (currentTs) {

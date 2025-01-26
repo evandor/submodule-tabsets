@@ -17,7 +17,7 @@
     @mouseleave="showButtons(tab.id, false)"
     @dragstart="startDrag($event, tab)"
     :key="props.group + '_' + tab.id">
-    <PanelTabListElementWidget :key="props.group + '__' + tab.id" :tab="tabAsTab(tab)" />
+    <PanelTabListElementWidget :key="props.group + '__' + tab.id" :tab="tabAsTab(tab)" :tabset-id="props.tabsetId" />
   </q-item>
 </template>
 

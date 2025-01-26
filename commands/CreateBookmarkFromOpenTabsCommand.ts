@@ -28,5 +28,5 @@ export class CreateBookmarkFromOpenTabsCommand implements Command<any> {
 }
 
 CreateBookmarkFromOpenTabsCommand.prototype.toString = function cmdToString() {
-  return `CreateBookmarkFromOpenTabsCommand: {tab=${this.tab.toString()}, parent=${this.parentBookmark}}`
+  return `CreateBookmarkFromOpenTabsCommand: {tabId=${this.tab.id}, parent=${this.parentBookmark}}`
 }

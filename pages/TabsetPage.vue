@@ -35,7 +35,8 @@
               <span v-if="tabset.sharing?.sharedBy" class="text-caption"
                 >shared by {{ tabset.sharing?.sharedBy }},
                 {{ date.formatDate(tabset.augmentedData.sharedAt, 'DD.MM.YYYY HH:mm') }} (readonly:
-                {{ tabset.augmentedData.readonly }})</span
+                {{ tabset.augmentedData.readonly }}, loaded:
+                {{ date.formatDate(tabset.loaded, 'DD.MM.YYYY HH:mm') }})</span
               >
             </span>
             <span v-if="tabset.sharing.sharedPath">
@@ -50,7 +51,8 @@
               <span v-if="tabset.sharing?.sharedBy" class="text-caption"
                 >shared by {{ tabset.sharing?.sharedBy }},
                 {{ date.formatDate(tabset.augmentedData.sharedAt, 'DD.MM.YYYY HH:mm') }} (readonly:
-                {{ tabset.augmentedData.readonly }})</span
+                {{ tabset.augmentedData.readonly }}, loaded:
+                {{ date.formatDate(tabset.loaded, 'DD.MM.YYYY HH:mm') }})</span
               >
             </div>
           </template>
@@ -152,7 +154,7 @@
           </q-tooltip>
         </q-icon>
 
-        <OpenRightDrawerWidget />
+        <!--        <OpenRightDrawerWidget />-->
       </div>
     </div>
   </q-toolbar>
@@ -283,7 +285,7 @@ watchEffect(() => {
   }
   tabsetId.value = route?.params.tabsetId as string
   tabset.value = useTabsetsStore().getTabset(tabsetId.value) || new Tabset(uid(), 'empty', [])
-  console.log('watch effect in tabsetpage', tabsetId.value, tabset.value)
+  //console.log('watch effect in tabsetpage', tabsetId.value, tabset.value)
   tab.value = route.query['tab'] ? (route.query['tab'] as string) : 'list'
   tabsetFolder.value = useTabsetsStore().getActiveFolder(tabset.value) || tabset.value
 })

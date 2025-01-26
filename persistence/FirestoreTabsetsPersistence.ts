@@ -83,7 +83,7 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
     //useUiStore().syncing = true
     tabset.origin = installationId
     tabset.augmentedData = new AugmentedData()
-    console.log(`saving tabset ${tabset.id} in installation ${installationId}, ref:${tabset.sharing?.shareReference}`)
+    // console.log(`saving tabset ${tabset.id} in installation ${installationId}, ref:${tabset.sharing?.shareReference}`)
     if (tabset.sharing?.shareReference) {
       tabset.lastChangeBy = useAuthStore().user.uid
       await setDoc(
@@ -256,7 +256,7 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
   }
 
   private async loadFromReference(r: { reference: DocumentReference; readonly: boolean; sharedAt: number }) {
-    console.warn('found ref', r)
+    //console.warn('found ref', r)
     //console.log('r', r.path)
     const refDoc = await getDoc(r.reference)
     const referencedTabset = refDoc.data() as Tabset

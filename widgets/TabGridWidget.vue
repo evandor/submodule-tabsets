@@ -61,7 +61,7 @@ onMounted(() => {
         reader.onloadend = function () {
           let base64data = reader.result
           if (base64data) {
-            imgFromBlob.value = base64data.toString()
+            imgFromBlob.value = base64data as string
           }
         }
       })

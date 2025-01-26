@@ -1,6 +1,6 @@
 <template>
   <div class="row q-py-xs darkColors lightColors" v-if="messages.length > 0">
-    <div class="col-10 text-primary">
+    <div class="col-10">
       <q-icon name="o_email" class="q-pr-sm q-mb-xs" />
       Messages
       <q-badge color="orange">{{ messageCount }}</q-badge>
@@ -8,7 +8,7 @@
         >[delete {{ messageCount > messages.length ? 'all shown' : 'all' }}]</span
       >
     </div>
-    <div class="col-2 text-primary text-right">
+    <div class="col-2 text-right">
       <!--      <q-icon v-if="showDetails" name="o_delete" color="negative" class="cursor-pointer" @click="clearMessages()" />-->
 
       <q-icon
@@ -19,7 +19,7 @@
     <div class="column fit" v-if="showDetails">
       <div class="col text-body2 ellipsis" v-for="m in messages">
         <div class="row">
-          <div class="col-8 ellipsis">
+          <div class="col-8 ellipsis" :class="m.actionPath ? 'cursor-pointer' : ''">
             {{ m['message' as keyof object] }}
             <q-tooltip class="tooltip-small">{{ m.id }}</q-tooltip>
           </div>
