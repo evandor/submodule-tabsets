@@ -31,7 +31,7 @@ export function useActionHandlers($q: QVueGlobals | undefined) {
     folder: Tabset | undefined,
   ) {
     const handler = args.actionHandler
-    console.log('handleClick: ', tabset.id, handler, args.actionContext?.identifier)
+    //console.log('handleClick: ', tabset.id, handler, args.actionContext?.identifier)
     switch (args.actionContext?.identifier) {
       case ButtonActions.AddTab:
         await handler.clicked(chromeTab, tabset, folder, { action: args.actionContext })

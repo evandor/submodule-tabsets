@@ -90,6 +90,11 @@
       </div>
     </q-item-label>
 
+    <!-- === created by === -->
+    <q-item-label v-if="props.tab?.createdBy && props.tab.createdBy !== useAuthStore().user.email">
+      <div class="text-body2 ellipsis" style="font-size: x-small">created by {{ props.tab.createdBy }}</div>
+    </q-item-label>
+
     <!-- === description === -->
     <template v-if="useUiStore().listDetailLevelGreaterEqual(ListDetailLevel.SOME, props.tabset?.details)">
       <template v-if="props.tab?.extension !== UrlExtension.NOTE">
@@ -172,7 +177,7 @@
       @mouseover="showButtonsProp = true"
       @mouseleave="showButtonsProp = false">
       <div class="row q-ma-none">
-        <div class="col-12 q-pr-lg cursor-pointer" @click="gotoTab()">
+        <div class="col-12 q-pr-lg q-mb-xs cursor-pointer" @click="gotoTab()">
           <span v-if="props.sorting === TabSorting.URL">
             <q-icon name="arrow_right" size="16px" />
           </span>
@@ -257,19 +262,27 @@
               <q-tooltip class="tooltip-small">This tab is created by substituting parts of its URL</q-tooltip>
             </q-icon>
 
-            <q-icon
+            <q-btn
               v-if="(props.tab as Tab).comments && (props.tab as Tab).comments.length > 0"
-              size="xs"
-              name="o_chat"
-              class="q-mr-xs q-mt-sm"
+              @click.stop="toggleLists('comments')"
+              class="q-mr-xs q-mt-xs"
               color="warning"
-              @click.stop="toggleLists('comments')">
-              <q-tooltip class="tooltip-small">This tab has comments</q-tooltip>
-            </q-icon>
+              dense
+              round
+              flat
+              icon="o_chat">
+              <q-tooltip class="tooltip-small"
+                >This tab has {{ newCommentIds.length > 0 ? 'new' : '' }} comments
+              </q-tooltip>
+              <q-badge v-if="newCommentIds.length > 0" color="accent" rounded floating transparent>
+                {{ newCommentIds.length }}
+              </q-badge>
+            </q-btn>
+
             <span
               v-if="(props.tab as Tab).comments && (props.tab as Tab).comments.length > 1"
               @click.stop="toggleLists('comments')"
-              class="q-mr-sm q-mt-sm"
+              class="q-mr-sm q-ml-none"
               >({{ (props.tab as Tab).comments.length }})</span
             >
 
@@ -317,24 +330,51 @@
 
     <!-- === comments === -->
     <q-item-label v-if="showComments()" class="text-grey-5">
+      <CommentChatMessages :comments="oldComments()" :tab="props.tab" :tabset-id="props.tabsetId" />
+      <h6 v-if="newComments().length > 0">new Message(s)</h6>
+      <CommentChatMessages :comments="newComments()" :tab="props.tab" :tabset-id="props.tabsetId" />
+
       <!--      <q-chat-message-->
       <!--        v-for="m in props.tab.comments"-->
       <!--        :name="m.author"-->
       <!--        @click="selectComment(m.id)"-->
-      <!--        :avatar="m.avatar || 'http://www.gravatar.com/avatar'"-->
+      <!--        :avatar="'http://www.gravatar.com/avatar/' + sha256(m.authorEmail?.trim().toLowerCase() || '')"-->
       <!--        :text="[m.comment]"-->
+      <!--        :size="$q.screen.lt.md ? '11' : '6'"-->
       <!--        :sent="isSender(m)"-->
       <!--        :bg-color="m.id === selectedCommentId ? 'warning' : isSender(m) ? 'blue' : 'grey-2'"-->
-      <!--        :text-color="isSender(m) ? 'white' : 'black'"-->
-      <!--        :stamp="formatDate(m.date)" />-->
-      <div v-for="m in props.tab.comments" @click="selectComment(m.id)">
-        <div class="text-subtitle1 q-ma-none q-pa-none">{{ m.comment }}</div>
-        <div class="col-12 text-right q-mr-lg text-caption q-pa-none q-ma-none" v-if="selectedCommentId === m.id">
-          <span @click.stop="editSelectedComment(m)">Edit</span>&nbsp;
-          <span @click.stop="deleteSelectedComment()">Delete</span>
+      <!--        :text-color="isSender(m) ? 'white' : 'black'">-->
+      <!--        <template v-slot:stamp>{{ m.edited ? 'Edited' : '' }} {{ formatDate(m.date) }}</template>-->
+      <!--        <template v-slot:name>-->
+      <!--          <div v-if="m.id === selectedCommentId">-->
+      <!--            <span @click.stop="editSelectedComment(m)" class="q-mr-sm">[edit]</span>-->
+      <!--            <span @click.stop="deleteSelectedComment()">[delete]</span>-->
+      <!--          </div>-->
+      <!--          <div v-else>-->
+      <!--            <div class="q-mt-sm" v-if="newCommentIds.findIndex((id: string) => id === m.id) >= 0">-->
+      <!--              new messages-->
+      <!--              <hr />-->
+      <!--            </div>-->
+      <!--            {{ m.authorEmail === useAuthStore().user.email ? 'me' : m.authorEmail }}-->
+      <!--          </div>-->
+      <!--        </template>-->
+      <!--      </q-chat-message>-->
+      <!--      <div v-for="m in props.tab.comments" @click="selectComment(m.id)">-->
+      <!--        <div class="text-subtitle1 q-ma-none q-pa-none">{{ m.comment }}</div>-->
+      <!--        <div class="col-12 text-right q-mr-lg text-caption q-pa-none q-ma-none" v-if="selectedCommentId === m.id">-->
+      <!--          <span @click.stop="editSelectedComment(m)">Edit</span>&nbsp;-->
+      <!--          <span @click.stop="deleteSelectedComment()">Delete</span>-->
+      <!--        </div>-->
+      <!--      </div>-->
+      <div class="row">
+        <div class="col-6 text-right">&nbsp;</div>
+        <div class="col text-right">
+          <q-input dense filled v-model="sendComment" />
+        </div>
+        <div class="col-1">
+          <q-btn icon="send" size="sm" @click="send()" />
         </div>
       </div>
-      <div class="row"></div>
     </q-item-label>
 
     <!-- === snippets === -->
@@ -387,37 +427,30 @@ import { NotificationType, useNotificationHandler } from 'src/core/services/Erro
 import { useNavigationService } from 'src/core/services/NavigationService'
 import { useUtils } from 'src/core/services/Utils'
 import ShortUrl from 'src/core/utils/ShortUrl.vue'
+import { useEventsServices } from 'src/events/services/EventsServices'
 import { useFeaturesStore } from 'src/features/stores/featuresStore'
 import NavigationService from 'src/services/NavigationService'
 import TabService from 'src/services/TabService'
 import { SavedBlob } from 'src/snapshots/models/SavedBlob'
-import { Suggestion, SuggestionState } from 'src/suggestions/domain/models/Suggestion'
+import { Suggestion } from 'src/suggestions/domain/models/Suggestion'
 import { useSuggestionsStore } from 'src/suggestions/stores/suggestionsStore'
+import { AddCommentCommand } from 'src/tabsets/commands/AddCommentCommand'
 import { DeleteChromeGroupCommand } from 'src/tabsets/commands/DeleteChromeGroupCommand'
-import { DeleteCommentCommand } from 'src/tabsets/commands/DeleteCommentCommand'
 import { DeleteTabCommand } from 'src/tabsets/commands/DeleteTabCommand'
 import { OpenTabCommand } from 'src/tabsets/commands/OpenTabCommand'
-import CommentDialog from 'src/tabsets/dialogues/CommentDialog.vue'
 import { PlaceholdersType } from 'src/tabsets/models/Placeholders'
-import {
-  HTMLSelection,
-  HTMLSelectionComment,
-  Tab,
-  TabComment,
-  TabFavorite,
-  TabPreview,
-  TabSorting,
-  UrlExtension,
-} from 'src/tabsets/models/Tab'
+import { Tab, TabComment, TabFavorite, TabPreview, TabSorting, UrlExtension } from 'src/tabsets/models/Tab'
 import { Tabset, TabsetType } from 'src/tabsets/models/Tabset'
 import TabsetService from 'src/tabsets/services/TabsetService'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useGroupsStore } from 'src/tabsets/stores/groupsStore'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+import CommentChatMessages from 'src/tabsets/widgets/CommentChatMessages.vue'
 import PanelTabListContextMenu from 'src/tabsets/widgets/PanelTabListContextMenu.vue'
 import TabFaviconWidget from 'src/tabsets/widgets/TabFaviconWidget.vue'
 import { useThumbnailsService } from 'src/thumbnails/services/ThumbnailsService'
 import { ListDetailLevel, useUiStore } from 'src/ui/stores/uiStore'
+import { useAuthStore } from 'stores/authStore'
 import { onMounted, PropType, ref, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -445,17 +478,18 @@ const thumbnail = ref<string | undefined>(undefined)
 const hoveredTab = ref<string | undefined>(undefined)
 const tsBadges = ref<object[]>([])
 const newState = ref(false)
-const showAnnotationList = ref(false)
+// const showAnnotationList = ref(false)
 const showCommentList = ref(false)
 const groupName = ref<string | undefined>(undefined)
 const groups = ref<Map<string, chrome.tabGroups.TabGroup>>(new Map())
 const placeholders = ref<Object[]>([])
 const suggestion = ref<Suggestion | undefined>(undefined)
 const pngs = ref<SavedBlob[]>([])
-const selectedAnnotation = ref<HTMLSelection | undefined>(undefined)
+// const selectedAnnotation = ref<HTMLSelection | undefined>(undefined)
 const newComment = ref('')
-const selectedCommentId = ref<string | undefined>(undefined)
 const opensearchterm = ref<string | undefined>(undefined)
+const sendComment = ref('')
+const newCommentIds = ref<string[]>([])
 
 onMounted(() => {
   if (new Date().getTime() - props.tab.created < 500) {
@@ -467,10 +501,13 @@ onMounted(() => {
     }
     setTimeout(() => (newState.value = false), 2000)
   }
+  if (props.tabsetId) {
+    newCommentIds.value = useEventsServices().listNewComments(props.tabsetId, props.tab)
+  }
 })
 
 const thumbnailFor = async (tab: Tab): Promise<string> => {
-  return useThumbnailsService().getThumbnailFor(tab.id)
+  return useThumbnailsService().getThumbnailFor(tab.id, useAuthStore().user.uid)
 }
 
 watchEffect(() => {
@@ -487,12 +524,12 @@ watchEffect(() => {
   }
 })
 
-watchEffect(() => {
-  if (selectedAnnotation.value && newComment.value && newComment.value.trim() !== '') {
-    selectedAnnotation.value.comments.push(new HTMLSelectionComment('author', newComment.value))
-    useTabsetService().saveCurrentTabset()
-  }
-})
+// watchEffect(() => {
+//   if (selectedAnnotation.value && newComment.value && newComment.value.trim() !== '') {
+//     selectedAnnotation.value.comments.push(new HTMLSelectionComment('author', newComment.value))
+//     useTabsetService().saveCurrentTabset()
+//   }
+// })
 watchEffect(() => {
   groups.value = useGroupsStore().tabGroups
 })
@@ -662,10 +699,10 @@ const toggleLists = (ident: string) => {
   switch (ident) {
     case 'annotations':
       showCommentList.value = false
-      showAnnotationList.value = !showAnnotationList.value
+      //showAnnotationList.value = !showAnnotationList.value
       break
     case 'comments':
-      showAnnotationList.value = false
+      //showAnnotationList.value = false
       showCommentList.value = !showCommentList.value
       break
     default:
@@ -684,24 +721,6 @@ const togglePreview = () => {
         ? TabPreview.THUMBNAIL
         : TabPreview.FAVICON
     useTabsetService().saveCurrentTabset()
-  }
-}
-
-const selectComment = (commentId: string) => (selectedCommentId.value = commentId)
-
-const deleteSelectedComment = () => {
-  if (selectedCommentId.value) {
-    useCommandExecutor().executeFromUi(new DeleteCommentCommand(props.tab.id, selectedCommentId.value))
-    selectedCommentId.value = undefined
-  }
-}
-
-const editSelectedComment = (m: TabComment) => {
-  if (selectedCommentId.value) {
-    $q.dialog({
-      component: CommentDialog,
-      componentProps: { tabId: props.tab.id, sharedId: props.tabset?.sharedId, comment: m },
-    })
   }
 }
 
@@ -769,6 +788,19 @@ const removeSessionTab = (tab: Tab) => {
   useCommandExecutor().executeFromUi(new DeleteTabCommand(tab, props.tabset!))
   //}
 }
+
+const send = () => {
+  if (sendComment.value.trim() !== '') {
+    useCommandExecutor()
+      .executeFromUi(new AddCommentCommand(props.tab.id, sendComment.value))
+      .then(() => (sendComment.value = ''))
+  }
+}
+
+const oldComments = () =>
+  props.tab.comments.filter((c: TabComment) => newCommentIds.value.findIndex((id: string) => id === c.id) < 0)
+const newComments = () =>
+  props.tab.comments.filter((c: TabComment) => newCommentIds.value.findIndex((id: string) => id === c.id) >= 0)
 </script>
 
 <!--https://stackoverflow.com/questions/41078478/css-animated-checkmark -->
@@ -834,4 +866,34 @@ const removeSessionTab = (tab: Tab) => {
     box-shadow: inset 0 0 0 30px #8acb88;
   }
 }
+
+// line with text in middle
+// https://stackoverflow.com/questions/5214127/css-technique-for-a-horizontal-line-with-words-in-the-middle
+h6 {
+  overflow: hidden;
+  text-align: center;
+}
+
+h6::before,
+h6::after {
+  background-color: #bfbfbf;
+  content: '';
+  display: inline-block;
+  height: 1px;
+  position: relative;
+  vertical-align: middle;
+  width: 50%;
+}
+
+h6::before {
+  right: 0.5em;
+  margin-left: -50%;
+}
+
+h6::after {
+  left: 0.5em;
+  margin-right: -50%;
+}
+
+// line with text in middle - end
 </style>

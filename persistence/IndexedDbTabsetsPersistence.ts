@@ -1,3 +1,4 @@
+// 3 expected diffs to localstorage
 import { IDBPDatabase, openDB } from 'idb'
 import { useDB } from 'src/services/usePersistenceService'
 import { Tabset, TabsetSharing } from 'src/tabsets/models/Tabset'
@@ -90,6 +91,21 @@ class IndexedDbTabsetsPersistence implements TabsetsPersistence {
     sharedBy: string | undefined,
   ): Promise<TabsetSharing | void> {
     return Promise.reject('sharing not possible in local mode')
+  }
+
+  loadPublicTabset(sharedId: string): Promise<Tabset> {
+    const useDb = useDB().tabsetsDb
+    // delegate to cloud db
+    return useDb.loadPublicTabset(sharedId)
+  }
+
+  shareWith(
+    tabset: Tabset,
+    email: string,
+    readonly: boolean,
+    sharedBy: string | undefined,
+  ): Promise<TabsetSharing | void> {
+    return Promise.resolve(undefined)
   }
 }
 

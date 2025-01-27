@@ -53,5 +53,5 @@ export class UpdateTabCommand implements Command<any> {
 }
 
 UpdateTabCommand.prototype.toString = function cmdToString() {
-  return `UpdateTabNameCommand: {tabId=${this.tab.id}, newUrl=${this.newUrl}, placeholders=${this.placeholders}, placeholderValues=${this.placeholderValues}}`
+  return `UpdateTabNameCommand: {tabId=${this.tab.id}, newUrl=${this.newUrl}, placeholders=${this.placeholders}, placeholderValues=${JSON.stringify(this.placeholderValues)}}`
 }

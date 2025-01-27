@@ -7,17 +7,19 @@ import { ContentItem } from 'src/content/models/ContentItem'
 import { useContentService } from 'src/content/services/ContentService'
 import { TabPredicate } from 'src/core/domain/Types'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
+import NavigationService from 'src/services/NavigationService'
 import { useSpacesStore } from 'src/spaces/stores/spacesStore'
 import { useSettingsStore } from 'src/stores/settingsStore'
 import { GithubLogCommand } from 'src/tabsets/commands/github/GithubLogCommand'
 import { SaveOrReplaceResult } from 'src/tabsets/models/SaveOrReplaceResult'
 import { Tab } from 'src/tabsets/models/Tab'
 import { TabInFolder } from 'src/tabsets/models/TabInFolder'
-import { Tabset, TabsetStatus, TabsetType } from 'src/tabsets/models/Tabset'
+import { ChangeInfo, Tabset, TabsetStatus, TabsetType } from 'src/tabsets/models/Tabset'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { useTabsStore2 } from 'src/tabsets/stores/tabsStore2'
 import { useUiStore } from 'src/ui/stores/uiStore'
 import JsUtils from 'src/utils/JsUtils'
+import { useAuthStore } from 'stores/authStore'
 import throttledQueue from 'throttled-queue'
 import { v5 as uuidv5 } from 'uuid'
 
@@ -77,7 +79,7 @@ export function useTabsetService() {
     const tabs: Tab[] = _.filter(
       _.map(chromeTabs, (t: chrome.tabs.Tab) => {
         const tab = new Tab(uid(), t)
-        tab.addTags([name])
+        Tab.addTags(tab, [name])
         return tab
       }),
       (t: Tab) => {
@@ -277,7 +279,7 @@ export function useTabsetService() {
     return ts
   }
 
-  const saveTabset = async (tabset: Tabset): Promise<any> => {
+  const saveTabset = async (tabset: Tabset, changeInfo?: ChangeInfo): Promise<any> => {
     if (tabset.id) {
       tabset.updated = new Date().getTime()
       // seems necessary !?
@@ -287,7 +289,7 @@ export function useTabsetService() {
       const rootTabset = rootTabsetFor(tabset)
       //console.debug(`saving (sub-)tabset '${tabset.name}' with ${tabset.tabs.length} tab(s) at id ${rootTabset?.id}`)
       if (rootTabset) {
-        return await useTabsetsStore().saveTabset(rootTabset)
+        return await useTabsetsStore().saveTabset(rootTabset, changeInfo)
       }
     }
     return Promise.reject('tabset id not set')
@@ -301,10 +303,10 @@ export function useTabsetService() {
     return Promise.reject('no tabset for given id ' + tsId)
   }
 
-  const saveCurrentTabset = async (): Promise<any> => {
+  const saveCurrentTabset = async (changeInfo?: ChangeInfo): Promise<any> => {
     const currentTabset = useTabsetsStore().getCurrentTabset as Tabset | undefined
     if (currentTabset) {
-      return await saveTabset(currentTabset)
+      return await saveTabset(currentTabset, changeInfo)
     }
     return Promise.reject('current tabset could not be found')
   }
@@ -325,7 +327,7 @@ export function useTabsetService() {
     if (!tab || !tab.url) {
       return Promise.resolve('done')
     }
-    console.debug('saving text for', tab.id, tab.url, metas)
+    //console.debug('saving text for', tab.id, tab.url, metas)
     const title = tab.title || ''
     const tabsetIds: string[] = tabsetsFor(tab.url)
 
@@ -360,7 +362,7 @@ export function useTabsetService() {
                 if (!t.tags) {
                   t.tags = []
                 }
-                t.addTags(splits)
+                Tab.addTags(t, splits)
                 // t.tags = t.tags.concat(
                 //   _.union(
                 //     _.filter(
@@ -450,6 +452,16 @@ export function useTabsetService() {
     allowDuplicates = false,
   ): Promise<Tabset> => {
     if (tab.url) {
+      const exceedInfo = useAuthStore().limitExceeded('TABS', useTabsetsStore().allTabsCount)
+      if (exceedInfo.exceeded) {
+        await NavigationService.openOrCreateTab([
+          chrome.runtime.getURL(
+            `/www/index.html#/mainpanel/settings?tab=account&exceeded=tabs&limit=${exceedInfo.limit}`,
+          ),
+        ])
+        return Promise.reject('Tabs Limit was Exceeded')
+      }
+
       if (!allowDuplicates) {
         const indexInTabset = _.findIndex(ts.tabs, (t: any) => t.url === tab.url)
         if (indexInTabset >= 0 && !tab.image) {
@@ -458,9 +470,9 @@ export function useTabsetService() {
       }
 
       // add tabset's name to tab's tags
-      tab.addTags([ts.name])
+      Tab.addTags(tab, [ts.name])
       try {
-        tab.addTags([new URL(tab.url).hostname.replace('www.', '')])
+        Tab.addTags(tab, [new URL(tab.url).hostname.replace('www.', '')])
       } catch (err) {
         // ignore
       }
@@ -506,16 +518,13 @@ export function useTabsetService() {
     return useContentService().deleteContent(tabId)
   }
 
-  const deleteTab = (tab: Tab, tabset: Tabset): Promise<Tabset> => {
+  const deleteTab = async (tab: Tab, tabset: Tabset): Promise<Tabset> => {
     console.log('deleting tab', tab) //.id, tab.chromeTabId, tabset.id)
     const tabUrl = tab.url || ''
     if (tabsetsFor(tabUrl).length <= 1) {
       AppEventDispatcher.dispatchEvent('remove-captured-screenshot', {
         tabId: tab.id,
       })
-      // useThumbnailsService().removeThumbnailsFor(tab.id)
-      //  .then(() => console.debug("deleting thumbnail for ", tabUrl))
-      //  .catch(err => console.log("error deleting thumbnail", err))
 
       removeContentFor(tab.id)
         .then(() => console.debug('deleting content for ', tab.id))
@@ -523,7 +532,7 @@ export function useTabsetService() {
     }
     useTabsStore2().removeTab(tabset, tab.id)
     console.log('deletion: saving tabset', tabset)
-    return saveTabset(tabset).then(() => tabset)
+    return saveTabset(tabset, new ChangeInfo('tab', 'deleted', tab.id)).then(() => tabset)
   }
 
   const getIfAvailable = (metas: object, key: string): string | undefined => {
@@ -692,7 +701,7 @@ export function useTabsetService() {
       await pushToIndex(tabset)
     }
 
-    console.debug(` ...populating search index from tabsets with ${minimalIndex.length} entries`)
+    //console.debug(` ...populating search index from tabsets with ${minimalIndex.length} entries`)
     const perInterval = 250
     const throttleRequests = throttledQueue(perInterval, 1000, true)
 

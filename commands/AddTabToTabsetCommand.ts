@@ -1,3 +1,6 @@
+// 6 expected diffs to localstorage
+// 6 expected diffs to localstorage
+import { doc, setDoc } from 'firebase/firestore'
 import _ from 'lodash'
 import { uid } from 'quasar'
 import AppEventDispatcher from 'src/app/AppEventDispatcher'
@@ -11,14 +14,16 @@ import ContentUtils from 'src/core/utils/ContentUtils'
 import { useFeaturesStore } from 'src/features/stores/featuresStore'
 import { useRequestsService } from 'src/requests/services/RequestsService'
 import { useRequestsStore } from 'src/requests/stores/requestsStore'
+import FirebaseServices from 'src/services/firebase/FirebaseServices'
 import { useLogger } from 'src/services/Logger'
 import { Tab } from 'src/tabsets/models/Tab'
-import { Tabset, TabsetSharing } from 'src/tabsets/models/Tabset'
+import { ChangeInfo, Tabset, TabsetSharing } from 'src/tabsets/models/Tabset'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useGroupsStore } from 'src/tabsets/stores/groupsStore'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import PlaceholderUtils from 'src/tabsets/utils/PlaceholderUtils'
 import { useThumbnailsService } from 'src/thumbnails/services/ThumbnailsService'
+import { useAuthStore } from 'stores/authStore'
 
 const { sendMsg } = useUtils()
 const { info } = useLogger()
@@ -45,7 +50,7 @@ export class AddTabToTabsetCommand implements Command<any> {
   }
 
   async execute(): Promise<ExecutionResult<any>> {
-    console.info(`adding tab '${this.tab.id}' to tabset '${this.tabset!.id}', active folder: ${this.activeFolder}`)
+    //console.info(`adding tab '${this.tab.id}' to tabset '${this.tabset!.id}', active folder: ${this.activeFolder}`)
 
     let tabsetOrFolder = this.tabset!
     if (this.activeFolder) {
@@ -58,7 +63,7 @@ export class AddTabToTabsetCommand implements Command<any> {
 
     if (!this.allowDuplicates) {
       const exists = _.findIndex(tabsetOrFolder.tabs, (t: any) => t.url === this.tab.url) >= 0
-      console.debug("checking 'tab exists' yields", exists)
+      //console.debug("checking 'tab exists' yields", exists)
       if (exists && !this.ignoreDuplicates) {
         return Promise.reject('tab already exists in this tabset')
       } else if (exists) {
@@ -68,7 +73,7 @@ export class AddTabToTabsetCommand implements Command<any> {
 
     try {
       // manage (chrome) Group
-      console.log('updating tab group for group id', this.tab.groupId)
+      // console.log('updating tab group for group id', this.tab.groupId)
       const currentGroup = useGroupsStore().currentGroupForId(this.tab.groupId)
       this.tab.groupName = currentGroup?.title || undefined
       if (currentGroup) {
@@ -101,12 +106,19 @@ export class AddTabToTabsetCommand implements Command<any> {
 
       const tabset: Tabset = await useTabsetService().addToTabset(tabsetOrFolder, this.tab, 0, this.allowDuplicates)
 
-      // Analysis - expected diff to main branch
+      // Analysis not needed, remove
+      if (useAuthStore().user.uid && this.tab.url?.startsWith('https://')) {
+        const userId = useAuthStore().user.uid
+        setDoc(doc(FirebaseServices.getFirestore(), 'users', userId, 'queue', uid()), {
+          event: 'new-tab',
+          url: this.tab.url,
+        })
+      }
 
       // Sharing
-      if (tabset.sharedId && tabset.sharing === TabsetSharing.PUBLIC_LINK && !this.activeFolder) {
-        tabset.sharing = TabsetSharing.PUBLIC_LINK_OUTDATED
-        tabset.sharedAt = new Date().getTime()
+      if (tabset.sharing?.sharedId && tabset.sharing.sharing === TabsetSharing.PUBLIC_LINK && !this.activeFolder) {
+        tabset.sharing.sharing = TabsetSharing.PUBLIC_LINK_OUTDATED
+        tabset.sharing.sharedAt = new Date().getTime()
       }
 
       // Placeholder Defaults Application
@@ -135,11 +147,14 @@ export class AddTabToTabsetCommand implements Command<any> {
         }
 
         //res = new ExecutionResult("result", "Link was added")
-        const res2 = await useTabsetService().saveTabset(this.tabset!)
+        const res2 = await useTabsetService().saveTabset(
+          this.tabset!,
+          new ChangeInfo('tab', 'added', this.tab.id, this.tabset!.id),
+        )
         res = new ExecutionResult(res2, 'Link was added')
 
         // saving thumbnail
-        useThumbnailsService().captureVisibleTab(this.tab.id)
+        useThumbnailsService().captureVisibleTab(this.tab.id, this.tabset?.id || 'unknown tabsetid')
       } else {
         const res2 = await useTabsetService().saveTabset(this.tabset!)
         res = new ExecutionResult(res2, 'Link was added')
@@ -173,5 +188,5 @@ export class AddTabToTabsetCommand implements Command<any> {
 }
 
 AddTabToTabsetCommand.prototype.toString = function cmdToString() {
-  return `AddTabToTabsetCommand: {tab=${this.tab.toString()}}`
+  return `AddTabToTabsetCommand: {tabId=${this.tab.id}}`
 }

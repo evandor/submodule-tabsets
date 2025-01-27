@@ -46,7 +46,6 @@ watchEffect(() => {
         autofocus: true,
         readOnly: false,
         data: (tabset.value.page || {}) as OutputData,
-        // @ts-expect-error unknown
         tools: EditorJsConfig.toolsconfig,
       })
     }
@@ -79,9 +78,9 @@ const saveWork = () => {
           sendMsg('reload-tabset', { tabsetId: tabsetId.value })
 
           // Sharing
-          if (tabset.value.sharedId && tabset.value.sharing === TabsetSharing.PUBLIC_LINK) {
-            tabset.value.sharing = TabsetSharing.PUBLIC_LINK_OUTDATED
-            tabset.value.sharedAt = new Date().getTime()
+          if (tabset.value.sharing?.sharedId && tabset.value.sharing.sharing === TabsetSharing.PUBLIC_LINK) {
+            tabset.value.sharing.sharing = TabsetSharing.PUBLIC_LINK_OUTDATED
+            tabset.value.sharing.sharedAt = new Date().getTime()
           }
 
           useTabsetService().saveTabset(tabset.value as Tabset)

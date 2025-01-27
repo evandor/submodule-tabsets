@@ -1,11 +1,15 @@
+import { openURL } from 'quasar'
 import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { useNavigationService } from 'src/core/services/NavigationService'
+import { useUtils } from 'src/core/services/Utils'
 import { useActionHandlers } from 'src/tabsets/actionHandling/ActionHandlers'
 import { AddUrlToTabsetHandler } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { Tab } from 'src/tabsets/models/Tab'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { ref } from 'vue'
+
+const { inBexMode } = useUtils()
 
 export class OpenTabCommand implements Command<string> {
   getHandler = useActionHandlers(undefined).getHandler
@@ -14,6 +18,10 @@ export class OpenTabCommand implements Command<string> {
 
   async execute() {
     try {
+      if (!inBexMode()) {
+        openURL(this.tab.url!)
+        return Promise.resolve(new ExecutionResult('', 'opened'))
+      }
       const handler = ref<AddUrlToTabsetHandler>(this.getHandler(this.tab.url!))
       const browserTab = await useNavigationService().browserTabFor(this.tab.url!)
       handler.value.handleOpenedTab(browserTab, this.tab)

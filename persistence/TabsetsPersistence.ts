@@ -1,3 +1,4 @@
+// 2 expected diffs to localstorage
 import { Tabset, TabsetSharing } from 'src/tabsets/models/Tabset'
 
 interface TabsetsPersistence {
@@ -25,6 +26,15 @@ interface TabsetsPersistence {
     sharedId: string | undefined,
     sharedBy: string | undefined,
   ): Promise<TabsetSharing | void>
+
+  shareWith(
+    tabset: Tabset,
+    email: string,
+    readonly: boolean,
+    sharedBy: string | undefined,
+  ): Promise<TabsetSharing | void>
+
+  loadPublicTabset(sharedId: string): Promise<Tabset>
 
   // optional migration code for 0.4.11 to 0.5.0
   migrate(): any

@@ -17,8 +17,6 @@ export class SelectTabsetCommand implements Command<Tabset | undefined> {
   ) {}
 
   async execute(): Promise<ExecutionResult<Tabset | undefined>> {
-    console.debug(this.toString())
-
     useTabsetService().selectTabset(this.tabsetId)
     const tabset = useTabsetsStore().getCurrentTabset
     if (tabset && this.folderId) {

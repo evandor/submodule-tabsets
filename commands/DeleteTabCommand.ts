@@ -35,9 +35,9 @@ export class DeleteTabCommand implements Command<Tabset> {
     return deleteTab(this.tab, this.tabset)
       .then((tabset: Tabset) => {
         // sharing
-        if (tabset.sharedId && tabset.sharing === TabsetSharing.PUBLIC_LINK) {
-          tabset.sharing = TabsetSharing.PUBLIC_LINK_OUTDATED
-          tabset.sharedAt = new Date().getTime()
+        if (tabset.sharing?.sharedId && tabset.sharing.sharing === TabsetSharing.PUBLIC_LINK) {
+          tabset.sharing.sharing = TabsetSharing.PUBLIC_LINK_OUTDATED
+          tabset.sharing.sharedAt = new Date().getTime()
         }
         return tabset
       })

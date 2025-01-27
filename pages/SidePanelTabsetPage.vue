@@ -53,7 +53,7 @@
             icon="o_add_circle"
             style="max-width: 20px"
             size="10px">
-            <q-tooltip class="tooltip-small"> Add Note to '{{ tabset?.name }}' </q-tooltip>
+            <q-tooltip class="tooltip-small"> Add Note to '{{ tabset?.name }}'</q-tooltip>
           </q-btn>
 
           <q-btn
@@ -64,7 +64,7 @@
             :color="alreadyInTabset() ? 'grey-5' : 'warning'"
             style="max-width: 20px"
             size="10px">
-            <q-tooltip class="tooltip-small"> *Add current Tab to '{{ tabset?.name }}' </q-tooltip>
+            <q-tooltip class="tooltip-small"> *Add current Tab to '{{ tabset?.name }}'</q-tooltip>
           </q-btn>
         </template>
       </FirstToolbarHelper2>
@@ -185,9 +185,11 @@ const startTabsetNote = () => {
     chrome && chrome.runtime && chrome.runtime.getURL
       ? chrome.runtime.getURL('www/index.html') +
         '#/mainpanel/notes/?tsId=' +
+        // eslint-disable-next-line @typescript-eslint/no-base-to-string
         (tabsetId?.toString() || '') +
         '&edit=true'
-      : '#/mainpanel/notes/?tsId=' + (tabsetId?.toString() || '') + '&edit=true'
+      : // eslint-disable-next-line @typescript-eslint/no-base-to-string
+        '#/mainpanel/notes/?tsId=' + (tabsetId?.toString() || '') + '&edit=true'
   NavigationService.openOrCreateTab([url])
 }
 </script>

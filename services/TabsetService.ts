@@ -1,3 +1,4 @@
+// 2 expected diffs to localstorage
 import _ from 'lodash'
 import { uid } from 'quasar'
 import AppEventDispatcher from 'src/app/AppEventDispatcher'
@@ -18,12 +19,7 @@ import { ListDetailLevel } from 'src/ui/stores/uiStore'
 
 const { saveTabset, saveCurrentTabset, tabsetsFor, addToTabset } = useTabsetService()
 
-// const {db} = useDB()
 class TabsetService {
-  setLocalStorage(localStorage: any) {
-    //    this.localStorage = localStorage;
-  }
-
   async saveToCurrentTabset(tab: Tab, useIndex: number | undefined = undefined): Promise<Tabset> {
     const currentTs = useTabsetsStore().getCurrentTabset as Tabset | undefined
     if (currentTs) {
@@ -364,8 +360,8 @@ class TabsetService {
       tabs.splice(newIndex, 0, tab!)
 
       // Sharing
-      if (currentTabset.sharedId && currentTabset.sharing === TabsetSharing.PUBLIC_LINK) {
-        currentTabset.sharing = TabsetSharing.PUBLIC_LINK_OUTDATED
+      if (currentTabset.sharing.sharedId && currentTabset.sharing.sharing === TabsetSharing.PUBLIC_LINK) {
+        currentTabset.sharing.sharing = TabsetSharing.PUBLIC_LINK_OUTDATED
       }
 
       await saveCurrentTabset()
@@ -472,6 +468,11 @@ class TabsetService {
   share(tabsetId: string, sharing: TabsetSharing, sharedId: string | undefined, sharedBy: string) {
     const tabset = useTabsetsStore().getTabset(tabsetId)!
     return useTabsetsStore().share(tabset, sharing, sharedId, sharedBy)
+  }
+
+  shareWith(tabsetId: string, email: string, readonly: boolean, sharedBy: string) {
+    const tabset = useTabsetsStore().getTabset(tabsetId)!
+    return useTabsetsStore().shareWith(tabset, email, readonly, sharedBy)
   }
 }
 

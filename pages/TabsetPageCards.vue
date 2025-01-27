@@ -7,7 +7,7 @@
         :highlightUrl="highlightUrl"
         :tabsetId="props.tabset.id"
         :tabsetSorting="props.tabset.sorting"
-        :tabsetSharedId="props.tabset.sharedId!"
+        :tabsetSharedId="props.tabset.sharing?.sharedId!"
         :simpleUi="props.simpleUi"
         :tabs="currentTabs()" />
 

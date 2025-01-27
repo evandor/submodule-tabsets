@@ -1,3 +1,5 @@
+// 7 expected diffs to localstorage
+// 7 expected diffs to localstorage
 import _, { forEach } from 'lodash'
 import { defineStore } from 'pinia'
 import { uid } from 'quasar'
@@ -7,7 +9,7 @@ import NavigationService from 'src/services/NavigationService'
 import { useAuthStore } from 'src/stores/authStore'
 import { Tab, TabComment } from 'src/tabsets/models/Tab'
 import { TabAndTabsetId } from 'src/tabsets/models/TabAndTabsetId'
-import { Tabset, TabsetSharing, TabsetStatus } from 'src/tabsets/models/Tabset'
+import { ChangeInfo, Tabset, TabsetSharing, TabsetStatus } from 'src/tabsets/models/Tabset'
 import TabsetsPersistence from 'src/tabsets/persistence/TabsetsPersistence'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useWindowsStore } from 'src/windows/stores/windowsStore'
@@ -163,13 +165,15 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     // TODO markDuplicates(ts)
   }
 
-  async function saveTabset(ts: Tabset) {
+  async function saveTabset(ts: Tabset, changeInfo?: ChangeInfo) {
     if (ts.id === currentTabsetId.value) {
       //console.debug('setting folderactive', ts.folderActive)
       currentTabsetFolderId.value = ts.folderActive
     }
-    //console.log("--- storing tabset ---", ts.tabs.map((t: Tab) => JSON.stringify(t.coordinates[0]?.val)), ts)
-    return await storage.saveTabset(JSON.parse(JSON.stringify(ts)))
+    ts.lastChange = changeInfo
+    const tabsetWithType: Tabset = JSON.parse(JSON.stringify(ts))
+    //console.log('--- storing tabset! ---', tabsetWithType.lastChange)
+    return await storage.saveTabset(tabsetWithType)
   }
 
   function deleteTabset(tsId: string) {
@@ -213,6 +217,10 @@ export const useTabsetsStore = defineStore('tabsets', () => {
 
   function share(tabset: Tabset, sharing: TabsetSharing, sharedId: string | undefined, sharedBy: string) {
     return storage.share(tabset, sharing, sharedId, sharedBy)
+  }
+
+  function shareWith(tabset: Tabset, email: string, readonly: boolean, sharedBy: string) {
+    return storage.shareWith(tabset, email, readonly, sharedBy)
   }
 
   // *** getters ***
@@ -364,6 +372,8 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     return undefined
   }
 
+  const loadPublicTabset = (sharedId: string) => storage.loadPublicTabset(sharedId)
+
   return {
     initialize,
     tabsets,
@@ -391,6 +401,8 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     loadTabsets,
     getActiveFolder,
     share,
+    shareWith,
+    loadPublicTabset,
     reloadTabset,
   }
 })

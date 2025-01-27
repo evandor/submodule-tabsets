@@ -37,8 +37,15 @@
       :w="item.w"
       :h="item.h"
       :i="item.i">
-      <TabGridWidget :key="item.tab.id" :tab="item.tab" />
-      <q-menu touch-position context-menu>
+      <TabGridWidget :tab="item.tab as Tab" :sharedById="props.tabset?.sharing.sharedById" />
+      <q-badge
+        v-if="newCommentIds.get(item.tab.id) && newCommentIds.get(item.tab.id)!.length > 0"
+        color="accent"
+        rounded
+        floating>
+        &nbsp;{{ newCommentIds.get(item.tab.id)?.length }}&nbsp;</q-badge
+      >
+      <q-menu touch-position context-menu v-if="inBexMode()">
         <q-list dense style="min-width: 100px">
           <q-item clickable v-close-popup @click="createThumbnail(item.tab)">
             <q-item-section>(re-)create thumbnail</q-item-section>
@@ -53,7 +60,8 @@
 import _ from 'lodash'
 import AppEventDispatcher from 'src/app/AppEventDispatcher'
 import { useUtils } from 'src/core/services/Utils'
-import { Tab, TabCoordinate, TabFavorite } from 'src/tabsets/models/Tab'
+import { useEventsServices } from 'src/events/services/EventsServices'
+import { Tab, TabCoordinate } from 'src/tabsets/models/Tab'
 import { Tabset } from 'src/tabsets/models/Tabset'
 import { TabsetColumn } from 'src/tabsets/models/TabsetColumn'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
@@ -74,7 +82,7 @@ type LayoutType = {
 }
 type StateType = { layout: LayoutType[]; draggable: boolean; resizable: boolean; index: number }
 
-const { sendMsg } = useUtils()
+const { sendMsg, inBexMode } = useUtils()
 
 const props = defineProps({
   tabs: { type: Array as PropType<Array<Tab>>, required: true },
@@ -105,6 +113,7 @@ const columns = ref<any[]>([
   { title: ' ' },
 ])
 const currentTabsetFolderId = ref<string | undefined>(useTabsetsStore().currentTabsetId)
+const newCommentIds = ref<Map<string, string[]>>(new Map())
 
 const onWidthChange = () => (windowWidth.value = window.innerWidth)
 
@@ -130,6 +139,12 @@ onMounted(() => {
     //console.log(`===> x=${JSON.stringify(griddata)})`)
     layout.value.push(griddata)
     state2.layout.push(griddata)
+  }
+  if (props.tabset.id) {
+    newCommentIds.value = new Map()
+    props.tabset.tabs.forEach((tab: Tab) => {
+      newCommentIds.value.set(tab.id, useEventsServices().listNewComments(props.tabset.id, tab))
+    })
   }
 })
 
@@ -218,9 +233,10 @@ const createThumbnail = async (tab: Tab) => {
   if (openTab) {
     console.log('found open tab', openTab.id)
     await chrome.tabs.update(openTab.id || 0, { active: true })
-    useThumbnailsService().captureVisibleTab(tab.id, (tabId: string, dataUrl: string) => {
+    useThumbnailsService().captureVisibleTab(tab.id, '?????', (tabId: string, tabsetId: string, dataUrl: string) => {
       AppEventDispatcher.dispatchEvent('capture-screenshot', {
         tabId: tabId,
+        tabsetId: '?????',
         data: dataUrl,
       })
       if (currentTab) {
@@ -234,9 +250,10 @@ const createThumbnail = async (tab: Tab) => {
     const newTab: chrome.tabs.Tab = await chrome.tabs.create({ url: tab.url })
     console.log('opened new tab...', newTab.id)
     setTimeout(() => {
-      useThumbnailsService().captureVisibleTab(tab.id, (tabId: string, dataUrl: string) => {
+      useThumbnailsService().captureVisibleTab(tab.id, '??', (tabId: string, tabsetId: string, dataUrl: string) => {
         AppEventDispatcher.dispatchEvent('capture-screenshot', {
           tabId: tabId,
+          tabsetId: '????',
           data: dataUrl,
         })
       })

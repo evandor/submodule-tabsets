@@ -33,9 +33,11 @@ import { uid, useDialogPluginComponent } from 'quasar'
 import ChromeApi from 'src/app/BrowserApi'
 import { useUtils } from 'src/core/services/Utils'
 import { Tab } from 'src/tabsets/models/Tab'
+import { ChangeInfo } from 'src/tabsets/models/Tabset'
 import TabsetService from 'src/tabsets/services/TabsetService'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+import { useAuthStore } from 'stores/authStore'
 import { ref, watchEffect } from 'vue'
 
 defineEmits([...useDialogPluginComponent.emits])
@@ -46,8 +48,6 @@ const props = defineProps({
     default: '',
   },
 })
-
-// useUiStore().setIgnoreKeypress(true)
 
 const url = ref<string>(props.providedUrl)
 
@@ -68,8 +68,11 @@ const createNewUrl = () => {
   const chromeTab = ChromeApi.createChromeTabObject(useUrl, useUrl, null as unknown as string)
   const tab = new Tab(uid(), chromeTab)
   tab.created = new Date().getTime()
+  tab.createdBy = useAuthStore().user.email || undefined
   tab.extension = tab.determineUrlExtension(chromeTab)
-  TabsetService.saveToCurrentTabset(tab).then((res) => useTabsetService().saveCurrentTabset())
+  TabsetService.saveToCurrentTabset(tab).then(() =>
+    useTabsetService().saveCurrentTabset(new ChangeInfo('tab', 'added', tab.id, useTabsetsStore().currentTabsetId)),
+  )
   // useUiStore().setIgnoreKeypress(false)
   onDialogOK()
 }

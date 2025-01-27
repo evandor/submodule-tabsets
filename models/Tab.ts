@@ -4,6 +4,7 @@ import { TabReference, TabReferenceType } from 'src/content/models/TabReference'
 import { useUtils } from 'src/core/services/Utils'
 import { ExcalidrawStorage } from 'src/tabsets/actionHandling/model/ExcalidrawStorage'
 import { Placeholders } from 'src/tabsets/models/Placeholders'
+import { TabLog } from 'src/tabsets/models/TabLog'
 
 const { sanitizeAsText, sanitizeAsHtml } = useUtils()
 
@@ -56,10 +57,11 @@ export class TabCoordinate {
 export class TabComment {
   date: number = 0
   public id: string
+  public edited = false
 
   constructor(
     public author: string = '<me>',
-    public avatar: string | undefined = undefined,
+    public authorEmail: string | undefined = undefined,
     public comment: string = '',
   ) {
     this.date = new Date().getTime()
@@ -106,6 +108,8 @@ export class Tab {
   lastActive: number
   activatedCount: number
   loadedCount: number
+
+  createdBy: string | undefined // email or empty
 
   // from Chrome tab
   chromeTabId: number | undefined
@@ -174,6 +178,9 @@ export class Tab {
   tabReferences: TabReference[] = []
 
   quickaccess: string = ''
+  log: TabLog[] = []
+
+  lastChangeBy: string = ''
 
   constructor(
     public id: string,
@@ -262,12 +269,12 @@ export class Tab {
     return this.tabReferences.findIndex((ref: TabReference) => ref.type === type) >= 0
   }
 
-  setTags(tags: string[]) {
-    this.tags = [...new Set(tags.map((tag: string) => tag.trim()))]
+  static setTags(tab: Tab, tags: string[]) {
+    tab.tags = [...new Set(tags.map((tag: string) => tag.trim()))]
   }
 
-  addTags(tags: string[]) {
-    this.setTags(this.tags.concat(tags))
+  static addTags(tab: Tab, tags: string[]) {
+    Tab.setTags(tab, tags.concat(tags))
   }
 }
 

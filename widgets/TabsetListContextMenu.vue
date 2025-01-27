@@ -59,28 +59,28 @@
         <q-menu anchor="top end" self="top start">
           <q-list dense>
             <q-item
-              v-if="props.tabset.sharing === TabsetSharing.UNSHARED || !props.tabset.sharing"
+              v-if="props.tabset.sharing.sharing === TabsetSharing.UNSHARED || !props.tabset.sharing"
               clickable
               v-close-popup
               @click="sharePublicly(props.tabset.id)">
               <q-item-section>Share publicly</q-item-section>
             </q-item>
             <q-item
-              v-if="props.tabset.sharing === TabsetSharing.PUBLIC_LINK"
+              v-if="props.tabset.sharing.sharing === TabsetSharing.PUBLIC_LINK"
               @click="openPublicShare(props.tabset.id)"
               clickable
               v-close-popup>
               <q-item-section>Open public page</q-item-section>
             </q-item>
             <q-item
-              v-if="props.tabset.sharing === TabsetSharing.PUBLIC_LINK"
+              v-if="props.tabset.sharing.sharing === TabsetSharing.PUBLIC_LINK"
               @click="copyPublicShareToClipboard(props.tabset.id)"
               clickable
               v-close-popup>
               <q-item-section>Copy public page link</q-item-section>
             </q-item>
             <q-item
-              v-if="props.tabset.sharing === TabsetSharing.PUBLIC_LINK"
+              v-if="props.tabset.sharing.sharing === TabsetSharing.PUBLIC_LINK"
               clickable
               v-close-popup
               @click="removePublicShare(props.tabset.id)">
@@ -222,14 +222,14 @@ const publictabsetsPath = 'https://tabsets.web.app/#/tabsets/'
 
 const openPublicShare = (tabsetId: string) => {
   const ts = useTabsetsStore().getTabset(tabsetId)
-  if (ts && ts.sharedId) {
+  if (ts && ts.sharing?.sharedId) {
     openURL(getPublicTabsetLink(ts))
   }
 }
 
 const copyPublicShareToClipboard = (tabsetId: string) => {
   const ts = useTabsetsStore().getTabset(tabsetId)
-  if (ts && ts.sharedId) {
+  if (ts && ts.sharing?.sharedId) {
     useCommandExecutor().executeFromUi(new CopyToClipboardCommand(getPublicTabsetLink(ts)))
   }
 }
@@ -309,13 +309,13 @@ const deleteDialog = (tabset: Tabset) => {
 
 const getPublicTabsetLink = (ts: Tabset) => {
   let image = 'https://tabsets.web.app/favicon.ico'
-  if (ts && ts.sharedId) {
+  if (ts && ts.sharing?.sharedId) {
     ts.tabs.reverse().forEach((t: Tab) => {
       if (t.image) {
         image = t.image
       }
     })
-    return publictabsetsPath + ts.sharedId + '?n=' + btoa(ts.name) + '&i=' + btoa(image)
+    return publictabsetsPath + ts.sharing?.sharedId + '?n=' + btoa(ts.name) + '&i=' + btoa(image)
   }
   return image
 }
