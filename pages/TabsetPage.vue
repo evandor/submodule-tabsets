@@ -41,7 +41,12 @@
             </span>
           </template>
           <template v-else>
-            <TabsetsSelectorWidget />
+            <div>
+              <TabsetsSelectorWidget />
+              <span v-if="tabset.sharedId" class="text-caption"
+                >shared by {{ tabset.sharedBy }}, {{ date.formatDate(tabset.sharedAt, 'DD.MM.YYYY HH:mm') }}</span
+              >
+            </div>
           </template>
           <q-icon
             v-if="showEditButton"
@@ -176,11 +181,10 @@
     v-model="tab"
     dense
     class="text-grey q-ma-none q-pa-none"
-    active-color="primary"
     indicator-color="primary"
     align="left"
     narrow-indicator>
-    <q-tab name="grid" label="As Grid" />
+    <q-tab name="grid" label="As Grid" v-if="inBexMode()" />
     <q-tab name="list" label="As List" />
     <q-tab name="export" label="Export" />
   </q-tabs>
@@ -249,6 +253,7 @@ a tab's url starts with one of the urls of this tabset, it will be ignored and n
 import TabsetsSelectorWidget from 'components/widgets/TabsetsSelectorWidget.vue'
 import { date, uid, useQuasar } from 'quasar'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
+import { useUtils } from 'src/core/services/Utils'
 import Analytics from 'src/core/utils/google-analytics'
 import { RenameTabsetCommand } from 'src/tabsets/commands/RenameTabset'
 import { ToggleSortingCommand } from 'src/tabsets/commands/ToggleSorting'
@@ -270,6 +275,8 @@ const route = useRoute()
 const router = useRouter()
 
 const $q = useQuasar()
+
+const { inBexMode } = useUtils()
 
 const tabsetId = ref(null as unknown as string)
 const tabset = ref<Tabset>(new Tabset(uid(), 'empty', []))
@@ -295,7 +302,7 @@ watchEffect(() => {
   tabsetId.value = route?.params.tabsetId as string
   tabset.value = useTabsetsStore().getTabset(tabsetId.value) || new Tabset(uid(), 'empty', [])
   console.log('watch effect in tabsetpage', tabsetId.value)
-  tab.value = route.query['tab'] ? (route.query['tab'] as string) : 'grid'
+  tab.value = route.query['tab'] ? (route.query['tab'] as string) : 'list'
   tabsetFolder.value = useTabsetsStore().getActiveFolder(tabset.value) || tabset.value
 })
 

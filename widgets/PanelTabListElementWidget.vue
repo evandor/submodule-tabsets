@@ -231,8 +231,8 @@
               name="o_notifications"
               class="q-mr-xs"
               size="xs"
-              :color="suggestion.state === SuggestionState.NOTIFICATION ? 'negative' : 'accent'">
-              <q-tooltip class="tooltip-small" v-if="suggestion.state === SuggestionState.NOTIFICATION"
+              :color="suggestion.state === 'NOTIFICATION' ? 'negative' : 'accent'">
+              <q-tooltip class="tooltip-small" v-if="suggestion.state === 'NOTIFICATION'"
                 >There is a new notification for this tab
               </q-tooltip>
               <q-tooltip class="tooltip-small" v-else>There is a notification for this tab</q-tooltip>
@@ -391,7 +391,7 @@ import { useFeaturesStore } from 'src/features/stores/featuresStore'
 import NavigationService from 'src/services/NavigationService'
 import TabService from 'src/services/TabService'
 import { SavedBlob } from 'src/snapshots/models/SavedBlob'
-import { Suggestion, SuggestionState } from 'src/suggestions/models/Suggestion'
+import { Suggestion, SuggestionState } from 'src/suggestions/domain/models/Suggestion'
 import { useSuggestionsStore } from 'src/suggestions/stores/suggestionsStore'
 import { DeleteChromeGroupCommand } from 'src/tabsets/commands/DeleteChromeGroupCommand'
 import { DeleteCommentCommand } from 'src/tabsets/commands/DeleteCommentCommand'
