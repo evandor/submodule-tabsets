@@ -1,6 +1,5 @@
 // 6 expected diffs to localstorage
 // 6 expected diffs to localstorage
-import { doc, setDoc } from 'firebase/firestore'
 import _ from 'lodash'
 import { uid } from 'quasar'
 import AppEventDispatcher from 'src/app/AppEventDispatcher'
@@ -14,7 +13,6 @@ import ContentUtils from 'src/core/utils/ContentUtils'
 import { useFeaturesStore } from 'src/features/stores/featuresStore'
 import { useRequestsService } from 'src/requests/services/RequestsService'
 import { useRequestsStore } from 'src/requests/stores/requestsStore'
-import FirebaseServices from 'src/services/firebase/FirebaseServices'
 import { useLogger } from 'src/services/Logger'
 import { Tab } from 'src/tabsets/models/Tab'
 import { ChangeInfo, Tabset, TabsetSharing } from 'src/tabsets/models/Tabset'
@@ -109,10 +107,10 @@ export class AddTabToTabsetCommand implements Command<any> {
       // Analysis not needed, remove
       if (useAuthStore().user.uid && this.tab.url?.startsWith('https://')) {
         const userId = useAuthStore().user.uid
-        setDoc(doc(FirebaseServices.getFirestore(), 'users', userId, 'queue', uid()), {
-          event: 'new-tab',
-          url: this.tab.url,
-        })
+        // setDoc(doc(FirebaseServices.getFirestore(), 'users', userId, 'queue', uid()), {
+        //   event: 'new-tab',
+        //   url: this.tab.url,
+        // })
       }
 
       // Sharing
