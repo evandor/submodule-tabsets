@@ -143,7 +143,7 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
 
     console.log('setting thumbnails as images')
     for (const tab of ts.tabs) {
-      const thumb = await useThumbnailsService().getThumbnailFor(tab.id)
+      const thumb = await useThumbnailsService().getThumbnailFor(tab.id, useAuthStore().user.uid)
       if (thumb) {
         if (thumb && thumb['thumbnail' as keyof object]) {
           tab.image = thumb['thumbnail' as keyof object]!
@@ -261,13 +261,14 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
     const refDoc = await getDoc(r.reference)
     const referencedTabset = refDoc.data() as Tabset
     referencedTabset.sharing!.shareReference = r.reference.path
+    referencedTabset.sharing!.sharedById = r.reference.path.split('/')[1]
     referencedTabset.loaded = new Date().getTime()
     if (!referencedTabset.augmentedData) {
       referencedTabset.augmentedData = new AugmentedData()
     }
     referencedTabset.augmentedData.sharedAt = r.sharedAt || 0
     referencedTabset.augmentedData.readonly = r.readonly
-    console.log('referencedTabset:', referencedTabset.sharing?.shareReference)
+    console.log('referencedTabset:', referencedTabset)
     useTabsetsStore().setTabset(referencedTabset)
     return referencedTabset
   }

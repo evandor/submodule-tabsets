@@ -41,12 +41,11 @@ import { Tab } from 'src/tabsets/models/Tab'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import TabFaviconWidget from 'src/tabsets/widgets/TabFaviconWidget.vue'
 import { useThumbnailsService } from 'src/thumbnails/services/ThumbnailsService'
-import { onMounted, PropType, ref, watchEffect } from 'vue'
+import { useAuthStore } from 'stores/authStore'
+import { onMounted, ref, watchEffect } from 'vue'
 
-const props = defineProps({
-  tab: { type: Object as PropType<Tab>, required: true },
-  highlightUrl: { type: String, required: false },
-})
+const props = defineProps<{ tab: Tab; sharedById: string | undefined }>()
+
 const imgFromBlob = ref<string>('')
 const thumbnail = ref<string | undefined>(undefined)
 
@@ -80,7 +79,7 @@ const shortUrl = () => {
   return ''
 }
 const thumbnailFor = async (tab: Tab): Promise<string> => {
-  return useThumbnailsService().getThumbnailFor(tab.id)
+  return useThumbnailsService().getThumbnailFor(tab.id, props.sharedById ? props.sharedById : useAuthStore().user.uid)
 }
 
 watchEffect(() => {

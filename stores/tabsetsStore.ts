@@ -1,4 +1,5 @@
 // 7 expected diffs to localstorage
+// 7 expected diffs to localstorage
 import _, { forEach } from 'lodash'
 import { defineStore } from 'pinia'
 import { uid } from 'quasar'
@@ -171,7 +172,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     }
     ts.lastChange = changeInfo
     const tabsetWithType: Tabset = JSON.parse(JSON.stringify(ts))
-    console.log('--- storing tabset! ---', tabsetWithType.lastChange)
+    //console.log('--- storing tabset! ---', tabsetWithType.lastChange)
     return await storage.saveTabset(tabsetWithType)
   }
 

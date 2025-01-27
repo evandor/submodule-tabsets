@@ -193,19 +193,19 @@
         <!--If you want to assign your open tabs straight away, click <span class="cursor-pointer text-blue" @click="addOpenTabs()"><u>here</u></span>.-->
       </q-banner>
 
-      <InfoMessageWidget
-        v-if="tabsetId === 'BACKUP'"
-        :probability="1"
-        ident="tabsetPage_backupTabset"
-        hint="This is a special type of tabset - it's meant for Backups. You can use it as any other tabset, but when you use the feature
- 'backup and close current tabs' from the 'open tabs' menu, all tabs will be closed and automatically added to this backup tabset." />
+      <!--      <InfoMessageWidget-->
+      <!--        v-if="tabsetId === 'BACKUP'"-->
+      <!--        :probability="1"-->
+      <!--        ident="tabsetPage_backupTabset"-->
+      <!--        hint="This is a special type of tabset - it's meant for Backups. You can use it as any other tabset, but when you use the feature-->
+      <!-- 'backup and close current tabs' from the 'open tabs' menu, all tabs will be closed and automatically added to this backup tabset." />-->
 
-      <InfoMessageWidget
-        v-if="tabsetId === 'IGNORE'"
-        :probability="1"
-        ident="tabsetPage_ignoreTabset"
-        hint="This is a special type of tabset - it's meant for those tabs which you don't want to track. You can add urls and whenever
-a tab's url starts with one of the urls of this tabset, it will be ignored and not added to the tabs to be added." />
+      <!--      <InfoMessageWidget-->
+      <!--        v-if="tabsetId === 'IGNORE'"-->
+      <!--        :probability="1"-->
+      <!--        ident="tabsetPage_ignoreTabset"-->
+      <!--        hint="This is a special type of tabset - it's meant for those tabs which you don't want to track. You can add urls and whenever-->
+      <!--a tab's url starts with one of the urls of this tabset, it will be ignored and not added to the tabs to be added." />-->
 
       <TabsetPageCards
         :tabset="tabset as unknown as Tabset"
@@ -237,7 +237,6 @@ a tab's url starts with one of the urls of this tabset, it will be ignored and n
 import TabsetsSelectorWidget from 'components/widgets/TabsetsSelectorWidget.vue'
 import { date, uid, useQuasar } from 'quasar'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
-import { useUtils } from 'src/core/services/Utils'
 import Analytics from 'src/core/utils/google-analytics'
 import { RenameTabsetCommand } from 'src/tabsets/commands/RenameTabset'
 import { ToggleSortingCommand } from 'src/tabsets/commands/ToggleSorting'
@@ -249,7 +248,6 @@ import TabsetPageCards from 'src/tabsets/pages/pwa/TabsetPageCards.vue'
 import TabsetService from 'src/tabsets/services/TabsetService'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { useUiStore } from 'src/ui/stores/uiStore'
-import InfoMessageWidget from 'src/ui/widgets/InfoMessageWidget.vue'
 import OpenRightDrawerWidget from 'src/ui/widgets/OpenRightDrawerWidget.vue'
 import JsUtils from 'src/utils/JsUtils'
 import { onMounted, onUpdated, ref, watchEffect } from 'vue'
@@ -259,8 +257,6 @@ const route = useRoute()
 const router = useRouter()
 
 const $q = useQuasar()
-
-const { inBexMode } = useUtils()
 
 const tabsetId = ref(null as unknown as string)
 const tabset = ref<Tabset>(new Tabset(uid(), 'empty', []))

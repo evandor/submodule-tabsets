@@ -417,7 +417,7 @@
 <script setup lang="ts">
 import { formatDistance } from 'date-fns'
 import _ from 'lodash'
-import { LocalStorage, useQuasar } from 'quasar'
+import { useQuasar } from 'quasar'
 import BrowserApi from 'src/app/BrowserApi'
 import TabListIconIndicatorsHook from 'src/app/hooks/tabsets/TabListIconIndicatorsHook.vue'
 import { FeatureIdent } from 'src/app/models/FeatureIdent'
@@ -427,27 +427,19 @@ import { NotificationType, useNotificationHandler } from 'src/core/services/Erro
 import { useNavigationService } from 'src/core/services/NavigationService'
 import { useUtils } from 'src/core/services/Utils'
 import ShortUrl from 'src/core/utils/ShortUrl.vue'
+import { useEventsServices } from 'src/events/services/EventsServices'
 import { useFeaturesStore } from 'src/features/stores/featuresStore'
 import NavigationService from 'src/services/NavigationService'
 import TabService from 'src/services/TabService'
 import { SavedBlob } from 'src/snapshots/models/SavedBlob'
-import { Suggestion } from 'src/suggestions/models/Suggestion'
+import { Suggestion } from 'src/suggestions/domain/models/Suggestion'
 import { useSuggestionsStore } from 'src/suggestions/stores/suggestionsStore'
 import { AddCommentCommand } from 'src/tabsets/commands/AddCommentCommand'
 import { DeleteChromeGroupCommand } from 'src/tabsets/commands/DeleteChromeGroupCommand'
 import { DeleteTabCommand } from 'src/tabsets/commands/DeleteTabCommand'
 import { OpenTabCommand } from 'src/tabsets/commands/OpenTabCommand'
 import { PlaceholdersType } from 'src/tabsets/models/Placeholders'
-import {
-  HTMLSelection,
-  HTMLSelectionComment,
-  Tab,
-  TabComment,
-  TabFavorite,
-  TabPreview,
-  TabSorting,
-  UrlExtension,
-} from 'src/tabsets/models/Tab'
+import { Tab, TabComment, TabFavorite, TabPreview, TabSorting, UrlExtension } from 'src/tabsets/models/Tab'
 import { Tabset, TabsetType } from 'src/tabsets/models/Tabset'
 import TabsetService from 'src/tabsets/services/TabsetService'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
@@ -486,14 +478,14 @@ const thumbnail = ref<string | undefined>(undefined)
 const hoveredTab = ref<string | undefined>(undefined)
 const tsBadges = ref<object[]>([])
 const newState = ref(false)
-const showAnnotationList = ref(false)
+// const showAnnotationList = ref(false)
 const showCommentList = ref(false)
 const groupName = ref<string | undefined>(undefined)
 const groups = ref<Map<string, chrome.tabGroups.TabGroup>>(new Map())
 const placeholders = ref<Object[]>([])
 const suggestion = ref<Suggestion | undefined>(undefined)
 const pngs = ref<SavedBlob[]>([])
-const selectedAnnotation = ref<HTMLSelection | undefined>(undefined)
+// const selectedAnnotation = ref<HTMLSelection | undefined>(undefined)
 const newComment = ref('')
 const opensearchterm = ref<string | undefined>(undefined)
 const sendComment = ref('')
@@ -509,11 +501,13 @@ onMounted(() => {
     }
     setTimeout(() => (newState.value = false), 2000)
   }
-  newCommentIds.value = listNewComments()
+  if (props.tabsetId) {
+    newCommentIds.value = useEventsServices().listNewComments(props.tabsetId, props.tab)
+  }
 })
 
 const thumbnailFor = async (tab: Tab): Promise<string> => {
-  return useThumbnailsService().getThumbnailFor(tab.id)
+  return useThumbnailsService().getThumbnailFor(tab.id, useAuthStore().user.uid)
 }
 
 watchEffect(() => {
@@ -530,12 +524,12 @@ watchEffect(() => {
   }
 })
 
-watchEffect(() => {
-  if (selectedAnnotation.value && newComment.value && newComment.value.trim() !== '') {
-    selectedAnnotation.value.comments.push(new HTMLSelectionComment('author', newComment.value))
-    useTabsetService().saveCurrentTabset()
-  }
-})
+// watchEffect(() => {
+//   if (selectedAnnotation.value && newComment.value && newComment.value.trim() !== '') {
+//     selectedAnnotation.value.comments.push(new HTMLSelectionComment('author', newComment.value))
+//     useTabsetService().saveCurrentTabset()
+//   }
+// })
 watchEffect(() => {
   groups.value = useGroupsStore().tabGroups
 })
@@ -705,10 +699,10 @@ const toggleLists = (ident: string) => {
   switch (ident) {
     case 'annotations':
       showCommentList.value = false
-      showAnnotationList.value = !showAnnotationList.value
+      //showAnnotationList.value = !showAnnotationList.value
       break
     case 'comments':
-      showAnnotationList.value = false
+      //showAnnotationList.value = false
       showCommentList.value = !showCommentList.value
       break
     default:
@@ -801,35 +795,6 @@ const send = () => {
       .executeFromUi(new AddCommentCommand(props.tab.id, sendComment.value))
       .then(() => (sendComment.value = ''))
   }
-}
-
-const listNewComments = (): string[] => {
-  console.log('---here', props.tabsetId)
-  let found: string[] = []
-  if (props.tabsetId && props.tab) {
-    const tabsetEvents = ((LocalStorage.getItem('ui.events.tabsets') as object) || {})[
-      props.tabsetId as keyof object
-    ] as
-      | {
-          added: string[]
-          removed: string[]
-        }
-      | undefined
-    if (tabsetEvents?.added) {
-      for (const c of props.tab.comments) {
-        if (
-          tabsetEvents.added.findIndex((a: string) => {
-            //console.log('checking tabsetEvents', a, c.id, a.endsWith(c.id))
-            return a.endsWith(c.id)
-          }) >= 0
-        ) {
-          found.push(c.id)
-        }
-      }
-      return found
-    }
-  }
-  return []
 }
 
 const oldComments = () =>
@@ -929,5 +894,6 @@ h6::after {
   left: 0.5em;
   margin-right: -50%;
 }
+
 // line with text in middle - end
 </style>
