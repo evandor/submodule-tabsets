@@ -14,6 +14,7 @@ import { useFeaturesStore } from 'src/features/stores/featuresStore'
 import { useRequestsService } from 'src/requests/services/RequestsService'
 import { useRequestsStore } from 'src/requests/stores/requestsStore'
 import { useLogger } from 'src/services/Logger'
+import { useAuthStore } from 'src/stores/authStore'
 import { Tab } from 'src/tabsets/models/Tab'
 import { ChangeInfo, Tabset, TabsetSharing } from 'src/tabsets/models/Tabset'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
@@ -21,7 +22,6 @@ import { useGroupsStore } from 'src/tabsets/stores/groupsStore'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import PlaceholderUtils from 'src/tabsets/utils/PlaceholderUtils'
 import { useThumbnailsService } from 'src/thumbnails/services/ThumbnailsService'
-import { useAuthStore } from 'stores/authStore'
 
 const { sendMsg } = useUtils()
 const { info } = useLogger()

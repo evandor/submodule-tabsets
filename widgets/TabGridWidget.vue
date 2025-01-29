@@ -37,11 +37,11 @@
 
 <script setup lang="ts">
 import NavigationService from 'src/services/NavigationService'
+import { useAuthStore } from 'src/stores/authStore'
 import { Tab } from 'src/tabsets/models/Tab'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import TabFaviconWidget from 'src/tabsets/widgets/TabFaviconWidget.vue'
 import { useThumbnailsService } from 'src/thumbnails/services/ThumbnailsService'
-import { useAuthStore } from 'stores/authStore'
 import { onMounted, ref, watchEffect } from 'vue'
 
 const props = defineProps<{ tab: Tab; sharedById: string | undefined }>()

@@ -51,7 +51,7 @@
             emits('buttonClicked', new ActionHandlerButtonClickedHolder(handler, ButtonActions.Save, l, {}))
           ">
           <q-item-section>
-            <q-item-label style="font-size: smaller" :class="isActive(l) ? 'text-primary' : 'text-grey-5'">{{
+            <q-item-label style="font-size: smaller" :class="isActive(l) ? '' : 'text-grey-5'">{{
               l.label
             }}</q-item-label>
           </q-item-section>

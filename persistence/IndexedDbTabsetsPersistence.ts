@@ -1,6 +1,7 @@
 // 3 expected diffs to localstorage
 import { IDBPDatabase, openDB } from 'idb'
 import { useDB } from 'src/services/usePersistenceService'
+import { SharingInfo } from 'src/tabsets/models/SharingInfo'
 import { Tabset, TabsetSharing } from 'src/tabsets/models/Tabset'
 import TabsetsPersistence from 'src/tabsets/persistence/TabsetsPersistence'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
@@ -36,6 +37,10 @@ class IndexedDbTabsetsPersistence implements TabsetsPersistence {
   async loadTabsets(): Promise<any> {
     const tabsets = await this.db.getAll('tabsets')
     tabsets.forEach((ts: Tabset) => {
+      // adapt older tabsets
+      if (!ts.sharing) {
+        ts.sharing = new SharingInfo()
+      }
       useTabsetsStore().setTabset(ts)
     })
     console.log(' ...loaded tabsets, found ', useTabsetsStore().tabsets.size)

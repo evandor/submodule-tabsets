@@ -32,11 +32,11 @@ import { sha256 } from 'js-sha256'
 import { useQuasar } from 'quasar'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import { useEventsServices } from 'src/events/services/EventsServices'
+import { useAuthStore } from 'src/stores/authStore'
 import { DeleteCommentCommand } from 'src/tabsets/commands/DeleteCommentCommand'
 import CommentDialog from 'src/tabsets/dialogues/CommentDialog.vue'
 import { Tab, TabComment } from 'src/tabsets/models/Tab'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
-import { useAuthStore } from 'stores/authStore'
 import { ref } from 'vue'
 
 const $q = useQuasar()

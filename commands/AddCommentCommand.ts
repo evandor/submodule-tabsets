@@ -1,11 +1,11 @@
 import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
+import { useAuthStore } from 'src/stores/authStore'
 import { TabComment } from 'src/tabsets/models/Tab'
 import { ChangeInfo, TabsetSharing } from 'src/tabsets/models/Tabset'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { useUiStore } from 'src/ui/stores/uiStore'
-import { useAuthStore } from 'stores/authStore'
 
 export class AddCommentCommand implements Command<any> {
   constructor(

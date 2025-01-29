@@ -1,4 +1,4 @@
-import { useAuthStore } from 'stores/authStore'
+import { useAuthStore } from 'src/stores/authStore'
 
 export class TabLog {
   date: number

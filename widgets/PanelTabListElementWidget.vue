@@ -72,18 +72,6 @@
               class="q-ma-mone">
               <q-tooltip class="tooltip_small">This tab is marked as favorite</q-tooltip>
             </q-icon>
-            <!--            <q-icon v-if="props.tab?.tabReferences && props.tab?.tabReferences.length > 0"-->
-            <!--                    @click.stop="showTabReferencesDialog()"-->
-            <!--                    color="positive"-->
-            <!--                    name="o_auto_awesome" class="q-ma-mone">-->
-            <!--              <q-tooltip class="tooltip_small">This tab references other interesting URLs - click here.</q-tooltip>-->
-            <!--            </q-icon>-->
-            <!--             <q-icon v-if="useFeaturesStore().hasFeature(FeatureIdent.READING_MODE) && props.tab.article && props.tab.article['title' as keyof object]"-->
-            <!--                     @click.stop="showInReadingMode()"-->
-            <!--                     color="primary"-->
-            <!--                     name="o_library_books" class="q-ma-mone">-->
-            <!--              <q-tooltip class="tooltip_small">This tab references other interesting URLs - click here.</q-tooltip>-->
-            <!--            </q-icon>-->
             {{ nameOrTitle(props.tab as Tab) }}
           </span>
         </div>
@@ -432,6 +420,7 @@ import { useFeaturesStore } from 'src/features/stores/featuresStore'
 import NavigationService from 'src/services/NavigationService'
 import TabService from 'src/services/TabService'
 import { SavedBlob } from 'src/snapshots/models/SavedBlob'
+import { useAuthStore } from 'src/stores/authStore'
 import { Suggestion } from 'src/suggestions/domain/models/Suggestion'
 import { useSuggestionsStore } from 'src/suggestions/stores/suggestionsStore'
 import { AddCommentCommand } from 'src/tabsets/commands/AddCommentCommand'
@@ -450,7 +439,6 @@ import PanelTabListContextMenu from 'src/tabsets/widgets/PanelTabListContextMenu
 import TabFaviconWidget from 'src/tabsets/widgets/TabFaviconWidget.vue'
 import { useThumbnailsService } from 'src/thumbnails/services/ThumbnailsService'
 import { ListDetailLevel, useUiStore } from 'src/ui/stores/uiStore'
-import { useAuthStore } from 'stores/authStore'
 import { onMounted, PropType, ref, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 
