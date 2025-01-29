@@ -35,14 +35,6 @@ export class HTMLSelectionComment {
   }
 }
 
-export class HTMLSelection {
-  constructor(
-    public text: string = '',
-    public range: string = '',
-    public comments: HTMLSelectionComment[] = [],
-  ) {}
-}
-
 export class TabCoordinate {
   // public id: string;
 
@@ -107,7 +99,7 @@ export class Tab {
   updated: number
   lastActive: number
   activatedCount: number
-  loadedCount: number
+  // loadedCount: number
 
   createdBy: string | undefined // email or empty
 
@@ -190,7 +182,7 @@ export class Tab {
     this.updated = new Date().getTime()
     this.lastActive = new Date().getTime()
     this.activatedCount = 1
-    this.loadedCount = 0 //?
+    //  this.loadedCount = 0 //?
 
     this.chromeTabId = chromeTab.id
     this.favIconUrl = chromeTab.favIconUrl

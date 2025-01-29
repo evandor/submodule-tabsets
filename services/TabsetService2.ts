@@ -9,6 +9,7 @@ import { TabPredicate } from 'src/core/domain/Types'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import NavigationService from 'src/services/NavigationService'
 import { useSpacesStore } from 'src/spaces/stores/spacesStore'
+import { useAuthStore } from 'src/stores/authStore'
 import { useSettingsStore } from 'src/stores/settingsStore'
 import { GithubLogCommand } from 'src/tabsets/commands/github/GithubLogCommand'
 import { SaveOrReplaceResult } from 'src/tabsets/models/SaveOrReplaceResult'
@@ -19,9 +20,8 @@ import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { useTabsStore2 } from 'src/tabsets/stores/tabsStore2'
 import { useUiStore } from 'src/ui/stores/uiStore'
 import JsUtils from 'src/utils/JsUtils'
-import { useAuthStore } from 'stores/authStore'
 import throttledQueue from 'throttled-queue'
-import { v5 as uuidv5 } from 'uuid'
+import { v5 as uuidv5 } from 'uuid' // let db: TabsetsPersistence = null as unknown as TabsetsPersistence
 
 // let db: TabsetsPersistence = null as unknown as TabsetsPersistence
 
@@ -571,6 +571,11 @@ export function useTabsetService() {
   }
 
   const urlWasActivated = (url: string): void => {
+    function updatedAfterGraceTime(h: Tab) {
+      return new Date().getTime() - h.lastActive > 1000
+    }
+
+    //console.log('urlWasActivataed', url)
     _.forEach([...useTabsetsStore().tabsets.keys()], (key: string) => {
       const ts = useTabsetsStore().tabsets.get(key)
       if (ts && ts.status !== TabsetStatus.DELETED) {
@@ -578,12 +583,14 @@ export function useTabsetService() {
         const hits = _.filter(ts.tabs, (t: Tab) => t.url === url) as Tab[]
         let hit = false
         _.forEach(hits, (h: Tab) => {
-          h.activatedCount = 1 + h.activatedCount
-          h.lastActive = new Date().getTime()
-          hit = true
+          if (updatedAfterGraceTime(h)) {
+            h.activatedCount = 1 + h.activatedCount
+            h.lastActive = new Date().getTime()
+            hit = true
+          }
         })
         if (hit) {
-          //console.debug('saving tabset on activated', ts.name)
+          console.debug('saving tabset on activated', ts.name)
           saveTabset(ts as Tabset).catch((err: any) => console.warn(err))
         }
       }

@@ -32,12 +32,12 @@
 import { uid, useDialogPluginComponent } from 'quasar'
 import ChromeApi from 'src/app/BrowserApi'
 import { useUtils } from 'src/core/services/Utils'
+import { useAuthStore } from 'src/stores/authStore'
 import { Tab } from 'src/tabsets/models/Tab'
 import { ChangeInfo } from 'src/tabsets/models/Tabset'
 import TabsetService from 'src/tabsets/services/TabsetService'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
-import { useAuthStore } from 'stores/authStore'
 import { ref, watchEffect } from 'vue'
 
 defineEmits([...useDialogPluginComponent.emits])

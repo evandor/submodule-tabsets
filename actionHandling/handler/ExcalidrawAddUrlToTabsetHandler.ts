@@ -64,7 +64,7 @@ export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   ): Promise<ExecutionResult<any>> {
     console.log('saving...', chromeTab.id, additionalData)
     try {
-      const filename = additionalData ? additionalData.data!.more!['filename' as keyof object] : undefined
+      const filename = additionalData ? additionalData.data!['filename' as keyof object] : undefined
       if (!filename) {
         throw new Error('filename is missing')
       }

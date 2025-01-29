@@ -1,10 +1,10 @@
 // 4 expected diffs to localstorage
 import { STRIP_CHARS_IN_USER_INPUT } from 'src/boot/constants'
+import { useAuthStore } from 'src/stores/authStore'
 import { SharingInfo } from 'src/tabsets/models/SharingInfo'
 import { Tab } from 'src/tabsets/models/Tab'
 import { TabsetColumn } from 'src/tabsets/models/TabsetColumn'
 import { ListDetailLevel } from 'src/ui/stores/uiStore'
-import { useAuthStore } from 'stores/authStore'
 
 export enum TabsetStatus {
   DEFAULT = 'DEFAULT',
