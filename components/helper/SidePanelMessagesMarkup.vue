@@ -3,6 +3,10 @@
     <div class="col-10">
       <q-icon name="o_email" class="q-pr-sm q-mb-xs" />
       Messages
+      <q-badge color="orange">{{ messageCount }}</q-badge>
+      <span v-if="messageCount > 1" class="cursor-pointer text-body2 q-ml-md" @click="clearMessages()"
+        >[delete {{ messageCount > messages.length ? 'all shown' : 'all' }}]</span
+      >
     </div>
     <div class="col-2 text-right">
       <!--      <q-icon v-if="showDetails" name="o_delete" color="negative" class="cursor-pointer" @click="clearMessages()" />-->
@@ -21,7 +25,7 @@
           </div>
           <div class="col-4 text-right ellipsis" style="font-size: smaller">
             {{ formatDate(m.created) }}
-            <q-icon name="o_delete" class="cursor-pointer"></q-icon>
+            <q-icon name="o_delete" class="cursor-pointer" @click="deleteMessage(m)"></q-icon>
           </div>
         </div>
       </div>
@@ -31,14 +35,35 @@
 
 <script lang="ts" setup>
 import { formatDistance } from 'date-fns'
+import { deleteDoc, doc } from 'firebase/firestore'
+import { useMessagesStore } from 'src/messages/stores/messagesStore'
+import FirebaseServices from 'src/services/firebase/FirebaseServices'
 import { Message } from 'src/tabsets/models/Message'
-import { ref } from 'vue'
+import { useAuthStore } from 'stores/authStore'
+import { ref, watchEffect } from 'vue'
 
 const messages = ref<Message[]>([])
 const showDetails = ref(true)
 const messageCount = ref(0)
 
+watchEffect(async () => {
+  const msgs = useMessagesStore().getUnreadMessages
+  messages.value = msgs.slice(0, 20)
+  messageCount.value = msgs.length
+})
+
 const toggleShowDetails = () => (showDetails.value = !showDetails.value)
+
+const clearMessages = async () => {
+  for (const m of messages.value) {
+    // console.log('deleting message', m)
+    await deleteDoc(doc(FirebaseServices.getFirestore(), `users/${useAuthStore().user.uid}/messages/${m.id}`))
+  }
+}
+
+const deleteMessage = async (m: Message) => {
+  await deleteDoc(doc(FirebaseServices.getFirestore(), `users/${useAuthStore().user.uid}/messages/${m.id}`))
+}
 
 const formatDate = (timestamp: number | undefined) =>
   timestamp ? formatDistance(timestamp, new Date(), { addSuffix: true }) : ''
