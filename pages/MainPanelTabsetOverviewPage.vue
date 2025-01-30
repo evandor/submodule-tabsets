@@ -13,14 +13,7 @@
 
   <div class="row fit greyBorderTop"></div>
 
-  <q-tabs
-    v-model="tab"
-    dense
-    class="text-grey q-ma-none q-pa-none"
-    active-color="primary"
-    indicator-color="primary"
-    align="left"
-    narrow-indicator>
+  <q-tabs v-model="tab" dense class="text-grey q-ma-none q-pa-none" align="left" narrow-indicator>
     <q-tab name="grid" label="As Grid" @click="setView('grid')" />
     <q-tab name="list" label="As List" @click="setView('list')" />
   </q-tabs>

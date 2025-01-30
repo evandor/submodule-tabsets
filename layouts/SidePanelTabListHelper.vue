@@ -41,7 +41,7 @@ const props = defineProps({
 })
 
 const startDrag = (evt: any, tab: Tab) => {
-  console.log('start drag', evt, tab)
+  //console.log('start drag', evt, tab)
   if (evt.dataTransfer) {
     evt.dataTransfer.dropEffect = 'all'
     evt.dataTransfer.effectAllowed = 'all'
