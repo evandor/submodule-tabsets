@@ -267,11 +267,9 @@ const createThumbnail = async (tab: Tab) => {
 
 <style scoped>
 .vue-grid-layout {
-  background: white;
 }
 
 .vue-grid-item:not(.vue-grid-placeholder) {
-  background: #efefef;
   border: 0 solid black;
 }
 
@@ -280,7 +278,6 @@ const createThumbnail = async (tab: Tab) => {
 }
 
 .vue-grid-item .static {
-  background: #cce;
 }
 
 .vue-grid-item .text {

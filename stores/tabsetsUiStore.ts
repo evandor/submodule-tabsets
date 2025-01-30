@@ -24,9 +24,11 @@ export const useTabsetsUiStore = defineStore('tabsetsUi', () => {
     lastUpdate.value = new Date().getTime()
   }
 
-  function setMatchingTabsFor(url: string) {
-    const tabAndTabsetIds = useTabsetsStore().tabsForUrl(url)
-    matchingTabs.value = tabAndTabsetIds
+  function setMatchingTabsFor(url: string | undefined) {
+    if (url) {
+      const tabAndTabsetIds = useTabsetsStore().tabsForUrl(url)
+      matchingTabs.value = tabAndTabsetIds
+    }
   }
 
   function addTabsetToLastUsedList(id: string) {

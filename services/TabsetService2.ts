@@ -202,7 +202,7 @@ export function useTabsetService() {
   }
 
   const selectTabset = (tabsetId: string | undefined): void => {
-    console.debug('selecting tabset', tabsetId)
+    //console.debug('selecting tabset', tabsetId)
     if (tabsetId) {
       useTabsetsStore().selectCurrentTabset(tabsetId)
     }
@@ -570,9 +570,13 @@ export function useTabsetService() {
     return false
   }
 
-  const urlWasActivated = (url: string): void => {
+  const urlWasActivated = (url: string | undefined): void => {
     function updatedAfterGraceTime(h: Tab) {
       return new Date().getTime() - h.lastActive > 1000
+    }
+
+    if (!url) {
+      return
     }
 
     //console.log('urlWasActivataed', url)
@@ -590,7 +594,7 @@ export function useTabsetService() {
           }
         })
         if (hit) {
-          console.debug('saving tabset on activated', ts.name)
+          //console.debug('saving tabset on activated', ts.name)
           saveTabset(ts as Tabset).catch((err: any) => console.warn(err))
         }
       }
