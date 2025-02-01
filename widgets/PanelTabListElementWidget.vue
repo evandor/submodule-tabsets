@@ -419,7 +419,7 @@
 <script setup lang="ts">
 import { formatDistance } from 'date-fns'
 import _ from 'lodash'
-import { useQuasar } from 'quasar'
+import { date, useQuasar } from 'quasar'
 import BrowserApi from 'src/app/BrowserApi'
 import TabListIconIndicatorsHook from 'src/app/hooks/tabsets/TabListIconIndicatorsHook.vue'
 import { FeatureIdent } from 'src/app/models/FeatureIdent'

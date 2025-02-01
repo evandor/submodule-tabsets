@@ -1,5 +1,4 @@
 // 7 expected diffs to localstorage
-// 7 expected diffs to localstorage
 import _, { forEach } from 'lodash'
 import { defineStore } from 'pinia'
 import { uid } from 'quasar'
@@ -70,7 +69,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
   }
 
   function setTabset(ts: Tabset) {
-    console.log('setting tabset', ts.id, ts)
+    //console.log('setting tabset', ts.id, ts)
     if (useFeaturesStore().hasFeature(FeatureIdent.REMINDER)) {
       ts.tabs.forEach((t: Tab) => {
         if (t.reminder) {
@@ -386,6 +385,12 @@ export const useTabsetsStore = defineStore('tabsets', () => {
 
   const loadPublicTabset = (sharedId: string) => storage.loadPublicTabset(sharedId)
 
+  const removeReminder = (tab: Tab) =>
+    (reminderTabset.value.tabs = reminderTabset.value.tabs.filter((t: Tab) => t.id !== tab.id))
+
+  const activeReminders = (): Tab[] =>
+    reminderTabset.value.tabs.filter((t: Tab) => new Date().getTime() >= (t.reminder ?? 0))
+
   return {
     initialize,
     tabsets,
@@ -417,5 +422,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     loadPublicTabset,
     reloadTabset,
     reminderTabset,
+    removeReminder,
+    activeReminders,
   }
 })
