@@ -3,10 +3,13 @@ import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { useNavigationService } from 'src/core/services/NavigationService'
 import { useUtils } from 'src/core/services/Utils'
+import { Suggestion } from 'src/suggestions/domain/models/Suggestion'
+import { useSuggestionsStore } from 'src/suggestions/stores/suggestionsStore'
 import { useActionHandlers } from 'src/tabsets/actionHandling/ActionHandlers'
 import { AddUrlToTabsetHandler } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { Tab } from 'src/tabsets/models/Tab'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+import { useTabsStore2 } from 'src/tabsets/stores/tabsStore2'
 import { ref } from 'vue'
 
 const { inBexMode } = useUtils()
@@ -35,6 +38,9 @@ export class OpenTabCommand implements Command<string> {
       }
       if (this.tab.httpStatus === 0) {
         this.tab.httpStatus = 200 // ok "for now"
+      }
+      if (useTabsStore2().browserTabs.length > 7) {
+        useSuggestionsStore().addSuggestion(Suggestion.getStaticSuggestion('TRY_OPENTABS_FEATURE'))
       }
       return Promise.resolve(new ExecutionResult('', 'opened'))
     } catch (err: any) {
