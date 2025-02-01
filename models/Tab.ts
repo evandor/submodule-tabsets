@@ -174,6 +174,9 @@ export class Tab {
 
   lastChangeBy: string = ''
 
+  reminder: number | undefined
+  reminderComment: string | undefined
+
   constructor(
     public id: string,
     chromeTab: chrome.tabs.Tab,

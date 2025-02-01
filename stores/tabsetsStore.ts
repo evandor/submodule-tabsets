@@ -3,8 +3,10 @@
 import _, { forEach } from 'lodash'
 import { defineStore } from 'pinia'
 import { uid } from 'quasar'
+import { FeatureIdent } from 'src/app/models/FeatureIdent'
 import { STRIP_CHARS_IN_COLOR_INPUT, STRIP_CHARS_IN_USER_INPUT } from 'src/boot/constants'
 import { useUtils } from 'src/core/services/Utils'
+import { useFeaturesStore } from 'src/features/stores/featuresStore'
 import NavigationService from 'src/services/NavigationService'
 import { useAuthStore } from 'src/stores/authStore'
 import { Tab, TabComment } from 'src/tabsets/models/Tab'
@@ -41,6 +43,8 @@ export const useTabsetsStore = defineStore('tabsets', () => {
 
   const currentTabsetFolderId = ref<string | undefined>(undefined)
 
+  const reminderTabset = ref<Tabset>(new Tabset('reminders', 'reminder'))
+
   watch(
     () => currentTabsetFolderId.value,
     (newValue: string | undefined, oldValue: string | undefined) => {
@@ -62,11 +66,19 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     await storage.migrate()
 
     // console.debug(' ...initialized tabsets: Store', '✅')
-    await storage.loadTabsets()
+    //await storage.loadTabsets()
   }
 
   function setTabset(ts: Tabset) {
-    //console.log('setting tabset', ts.id, ts)
+    console.log('setting tabset', ts.id, ts)
+    if (useFeaturesStore().hasFeature(FeatureIdent.REMINDER)) {
+      ts.tabs.forEach((t: Tab) => {
+        if (t.reminder) {
+          console.log('adding reminder for ', t)
+          reminderTabset.value.tabs.push(t)
+        }
+      })
+    }
     ts.size = JSON.stringify(ts).length
     tabsets.value.set(ts.id, ts)
   }
@@ -404,5 +416,6 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     shareWith,
     loadPublicTabset,
     reloadTabset,
+    reminderTabset,
   }
 })

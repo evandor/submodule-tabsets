@@ -46,6 +46,14 @@
       {{ props.tab.httpStatus }}
       <q-tooltip class="tooltip">Tabsets has problems accessing this site.</q-tooltip>
     </div>
+    <div v-if="props.tab.reminder" class="text-center">
+      <q-icon name="o_alarm" @click="openReminderDialog()">
+        <q-tooltip class="tooltip-small"
+          >Reminder set to {{ date.formatDate(props.tab.reminder, 'DD.MM.YYYY') }}
+          {{ props.tab.reminderComment ? ' - ' : '' }} {{ props.tab.reminderComment }}
+        </q-tooltip>
+      </q-icon>
+    </div>
   </q-item-section>
 
   <!-- middle part: name, title, description, url && note -->
@@ -93,7 +101,7 @@
           {{ props.tab.longDescription || props.tab.description }}
         </q-item-label>
       </template>
-      <template else>
+      <template v-else>
         <q-item-label class="ellipsis-2-lines text-grey-8" @click.stop="gotoTab()">
           {{ props.tab.description }}
         </q-item-label>
@@ -388,18 +396,24 @@
   </q-item-section>
 
   <!-- right part -->
-  <q-item-section
-    class="q-ma-none q-pa-none"
-    @mouseover="hoveredTab = tab.id"
-    @mouseleave="hoveredTab = undefined"
-    :style="TabService.isCurrentTab(props.tab) ? 'border-right:3px solid #1565C0;border-radius:3px' : ''"
-    style="justify-content: start; width: 30px; max-width: 30px">
-    <span v-if="props.tabset && props.tabset.type !== TabsetType.SESSION">
-      <q-icon name="more_vert" class="cursor-pointer q-mt-sm" color="black" size="20px" />
-      <PanelTabListContextMenu v-if="!props.hideMenu" :tabset="props.tabset!" :tabsetId="props.tabsetId!" :tab="tab" />
-    </span>
-    <span v-else @click="removeSessionTab(tab)"> x </span>
-  </q-item-section>
+  <slot name="actionPart">
+    <q-item-section
+      class="q-ma-none q-pa-none"
+      @mouseover="hoveredTab = tab.id"
+      @mouseleave="hoveredTab = undefined"
+      :style="TabService.isCurrentTab(props.tab) ? 'border-right:3px solid #1565C0;border-radius:3px' : ''"
+      style="justify-content: start; width: 30px; max-width: 30px">
+      <span v-if="props.tabset && props.tabset.type !== TabsetType.SESSION">
+        <q-icon name="more_vert" class="cursor-pointer q-mt-sm" color="black" size="20px" />
+        <PanelTabListContextMenu
+          v-if="!props.hideMenu"
+          :tabset="props.tabset!"
+          :tabsetId="props.tabsetId!"
+          :tab="tab" />
+      </span>
+      <span v-else @click="removeSessionTab(tab)"> x </span>
+    </q-item-section>
+  </slot>
 </template>
 
 <script setup lang="ts">
@@ -427,6 +441,7 @@ import { AddCommentCommand } from 'src/tabsets/commands/AddCommentCommand'
 import { DeleteChromeGroupCommand } from 'src/tabsets/commands/DeleteChromeGroupCommand'
 import { DeleteTabCommand } from 'src/tabsets/commands/DeleteTabCommand'
 import { OpenTabCommand } from 'src/tabsets/commands/OpenTabCommand'
+import ReminderDialog from 'src/tabsets/dialogues/ReminderDialog.vue'
 import { PlaceholdersType } from 'src/tabsets/models/Placeholders'
 import { Tab, TabComment, TabFavorite, TabPreview, TabSorting, UrlExtension } from 'src/tabsets/models/Tab'
 import { Tabset, TabsetType } from 'src/tabsets/models/Tabset'
@@ -473,8 +488,6 @@ const groups = ref<Map<string, chrome.tabGroups.TabGroup>>(new Map())
 const placeholders = ref<Object[]>([])
 const suggestion = ref<Suggestion | undefined>(undefined)
 const pngs = ref<SavedBlob[]>([])
-// const selectedAnnotation = ref<HTMLSelection | undefined>(undefined)
-const newComment = ref('')
 const opensearchterm = ref<string | undefined>(undefined)
 const sendComment = ref('')
 const newCommentIds = ref<string[]>([])
@@ -789,6 +802,12 @@ const oldComments = () =>
   props.tab.comments.filter((c: TabComment) => newCommentIds.value.findIndex((id: string) => id === c.id) < 0)
 const newComments = () =>
   props.tab.comments.filter((c: TabComment) => newCommentIds.value.findIndex((id: string) => id === c.id) >= 0)
+
+const openReminderDialog = () =>
+  $q.dialog({
+    component: ReminderDialog,
+    componentProps: { tabId: props.tab.id, date: props.tab.reminder, comment: props.tab?.reminderComment },
+  })
 </script>
 
 <!--https://stackoverflow.com/questions/41078478/css-animated-checkmark -->
