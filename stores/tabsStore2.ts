@@ -37,21 +37,7 @@ export const useTabsStore2 = defineStore('browsertabs', () => {
    * @param ps a persistence storage
    */
   async function initialize() {
-    // console.debug(' ...initializing tabsStore2')
-    // storage = ps
-    // await storage.init()
-    // // TODO remove after version 0.4.12
-    // await storage.migrate()
-    // await storage.loadTabsets()
     if ('bex' === process.env.MODE) {
-      // --- own tab id ---
-      // const ownTab = await ChromeApi.getCurrentTab()
-      // if (ownTab && ownTab.id) {
-      //   //console.log("setting extension tab id to ", ownTab.id)
-      //   this.ownTabId = ownTab.id
-      // }
-
-      // --- setting current tabs
       browserTabs.value = await queryTabs()
     }
   }

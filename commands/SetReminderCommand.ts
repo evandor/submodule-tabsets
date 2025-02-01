@@ -1,0 +1,34 @@
+import { date } from 'quasar'
+import Command from 'src/core/domain/Command'
+import { ExecutionResult } from 'src/core/domain/ExecutionResult'
+import { useUtils } from 'src/core/services/Utils'
+import { Tab } from 'src/tabsets/models/Tab'
+import { useTabsetService } from 'src/tabsets/services/TabsetService2'
+import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+
+const { sanitizeAsText } = useUtils()
+
+export class SetReminderCommand implements Command<any> {
+  constructor(
+    public tabId: string,
+    public reminderDate: string | undefined,
+    public comment: string | undefined,
+  ) {}
+
+  async execute(): Promise<ExecutionResult<any>> {
+    const tabset = useTabsetsStore().getCurrentTabset
+    if (!tabset) {
+      return Promise.reject('could not get current tabset')
+    }
+    const tab: Tab = tabset.tabs.filter((t: Tab) => t.id === this.tabId)[0]!
+    tab.reminder = this.reminderDate ? date.extractDate(this.reminderDate, 'YYYY/MM/DD').getTime() : undefined
+    tab.reminderComment = sanitizeAsText(this.comment ?? '')
+    return useTabsetService()
+      .saveTabset(tabset)
+      .then(() => new ExecutionResult('done', 'Reminder set'))
+  }
+}
+
+SetReminderCommand.prototype.toString = function cmdToString() {
+  return `SetReminderCommand: {tabId=${this.tabId}}`
+}

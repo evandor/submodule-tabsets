@@ -20,20 +20,6 @@
         <q-item-section> Edit Tab</q-item-section>
       </q-item>
 
-      <!--      <q-item clickable v-close-popup @click.stop="toggleFav(props['tab' as keyof object])">-->
-      <!--        <q-item-section style="padding-right:0;min-width:25px;max-width: 25px;">-->
-      <!--          <q-icon v-if="!props['tab']?.favorite" size="xs" name="sym_o_star" color="warning"/>-->
-      <!--          <q-icon v-if="props['tab']?.favorite === TabFavorite.NONE" size="xs" name="sym_o_star" color="warning"/>-->
-      <!--          <q-icon v-if="props['tab']?.favorite === TabFavorite.TABSET" size="xs" name="star" color="warning"/>-->
-      <!--          <q-icon v-if="props['tab']?.favorite === TabFavorite.SPACE" size="xs" name="star" color="positive"/>-->
-      <!--        </q-item-section>-->
-      <!--        <q-item-section v-if="!props['tab']?.favorite">Make Favorite</q-item-section>-->
-      <!--        <q-item-section v-if="props['tab']?.favorite === TabFavorite.NONE">Make Favorite</q-item-section>-->
-      <!--        <q-item-section v-if="props['tab']?.favorite === TabFavorite.TABSET && useFeaturesStore().hasFeature(FeatureIdent.SPACES)">Make Spaces Favorite</q-item-section>-->
-      <!--        <q-item-section v-if="props['tab']?.favorite === TabFavorite.TABSET && !useFeaturesStore().hasFeature(FeatureIdent.SPACES)">Remove as Favorite</q-item-section>-->
-      <!--        <q-item-section v-if="props['tab']?.favorite === TabFavorite.SPACE">Remove as Favorite</q-item-section>-->
-      <!--      </q-item>-->
-
       <template v-if="props.tabset?.type.toString() !== TabsetType.DYNAMIC.toString()">
         <q-item clickable v-close-popup @click.stop="addCommentDialog()">
           <q-item-section style="padding-right: 0; min-width: 25px; max-width: 25px">
@@ -79,6 +65,17 @@
       <!--        </q-item>-->
       <!--      </template>-->
 
+      <q-item
+        v-if="useFeaturesStore().hasFeature(FeatureIdent.REMINDER)"
+        clickable
+        v-close-popup
+        @click.stop="openReminderDialog()">
+        <q-item-section style="padding-right: 0; min-width: 25px; max-width: 25px">
+          <q-icon size="xs" name="o_alarm" color="accent" />
+        </q-item-section>
+        <q-item-section> {{ props.tab.reminder ? 'Update' : 'Add' }} Reminder</q-item-section>
+      </q-item>
+
       <q-separator inset />
       <q-item clickable v-close-popup @click.stop="deleteTab()">
         <q-item-section style="padding-right: 0; min-width: 25px; max-width: 25px">
@@ -104,6 +101,7 @@ import { DeleteTabCommand } from 'src/tabsets/commands/DeleteTabCommand'
 import { UpdateTabColorCommand } from 'src/tabsets/commands/UpdateTabColor'
 import CommentDialog from 'src/tabsets/dialogues/CommentDialog.vue'
 import EditUrlDialog from 'src/tabsets/dialogues/EditUrlDialog.vue'
+import ReminderDialog from 'src/tabsets/dialogues/ReminderDialog.vue'
 import { PlaceholdersType } from 'src/tabsets/models/Placeholders'
 import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset, TabsetType } from 'src/tabsets/models/Tabset'
@@ -178,5 +176,11 @@ const addCommentDialog = () =>
   $q.dialog({
     component: CommentDialog,
     componentProps: { tabId: props.tab.id, sharedId: props.tabset?.sharing?.sharedId },
+  })
+
+const openReminderDialog = () =>
+  $q.dialog({
+    component: ReminderDialog,
+    componentProps: { tabId: props.tab.id, date: props.tab.reminder, comment: props.tab?.reminderComment },
   })
 </script>
