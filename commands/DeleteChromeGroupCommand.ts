@@ -1,5 +1,6 @@
 import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
+import Analytics from 'src/core/utils/google-analytics'
 import { useGroupsStore } from 'src/tabsets/stores/groupsStore'
 
 export class DeleteChromeGroupCommand implements Command<string> {
@@ -9,6 +10,7 @@ export class DeleteChromeGroupCommand implements Command<string> {
     return useGroupsStore()
       .deleteGroupByTitle(this.groupTitle)
       .then((res) => {
+        Analytics.fireEvent('tabset_group_deleted', {})
         return new ExecutionResult('', 'Chrome Group was removed')
       })
   }

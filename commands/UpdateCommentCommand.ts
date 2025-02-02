@@ -1,5 +1,6 @@
 import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
+import Analytics from 'src/core/utils/google-analytics'
 import { TabComment } from 'src/tabsets/models/Tab'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
@@ -31,7 +32,10 @@ export class UpdateCommentCommand implements Command<any> {
       if (tabset) {
         return useTabsetService()
           .saveTabset(tabset)
-          .then(() => new ExecutionResult('done', 'Comment Published'))
+          .then(() => {
+            Analytics.fireEvent('tabset_comment_updated', {})
+            return new ExecutionResult('done', 'Comment Published')
+          })
       } else {
         return Promise.reject('could not find tabset')
       }

@@ -1,6 +1,7 @@
 import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { useUtils } from 'src/core/services/Utils'
+import Analytics from 'src/core/utils/google-analytics'
 import { useLogger } from 'src/services/Logger'
 import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset, TabsetSharing } from 'src/tabsets/models/Tabset'
@@ -34,6 +35,7 @@ export class DeleteTabCommand implements Command<Tabset> {
   async execute(): Promise<ExecutionResult<Tabset>> {
     return deleteTab(this.tab, this.tabset)
       .then((tabset: Tabset) => {
+        Analytics.fireEvent('tabset_tab_deleted', { tabsCount: tabset.tabs.length })
         // sharing
         if (tabset.sharing?.sharedId && tabset.sharing.sharing === TabsetSharing.PUBLIC_LINK) {
           tabset.sharing.sharing = TabsetSharing.PUBLIC_LINK_OUTDATED

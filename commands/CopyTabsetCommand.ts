@@ -1,5 +1,6 @@
 import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
+import Analytics from 'src/core/utils/google-analytics'
 import { DeleteTabsetCommand } from 'src/tabsets/commands/DeleteTabsetCommand'
 import { Tabset } from 'src/tabsets/models/Tabset'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
@@ -20,6 +21,7 @@ export class CopyTabsetCommand implements Command<object> {
   async execute(): Promise<ExecutionResult<object>> {
     try {
       const result = await useTabsetService().copyFromTabset(this.tabset)
+      Analytics.fireEvent('tabset_copied', {})
       return Promise.resolve(
         new ExecutionResult(
           result,

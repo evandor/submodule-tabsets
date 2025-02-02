@@ -2,6 +2,7 @@ import _ from 'lodash'
 import BrowserApi from 'src/app/BrowserApi'
 import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
+import Analytics from 'src/core/utils/google-analytics'
 import { Tabset } from 'src/tabsets/models/Tabset'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useUiStore } from 'src/ui/stores/uiStore'
@@ -36,6 +37,7 @@ export class CreateTabsetFromBookmarksRecursive implements Command<Tabset> {
   async execute(): Promise<ExecutionResult<any>> {
     const tabset = await createTabsetFrom(this.name, '' + this.bookmarkId)
     tabset.bookmarkId = this.bookmarkId
+    Analytics.fireEvent('tabset_created_from_bookmarks_recursive', { tabsCount: tabset.tabs.length })
     return Promise.resolve(new ExecutionResult(tabset, 'done'))
   }
 }

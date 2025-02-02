@@ -1,5 +1,6 @@
 import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
+import Analytics from 'src/core/utils/google-analytics'
 import { useLogger } from 'src/services/Logger'
 import { Tabset } from 'src/tabsets/models/Tabset'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
@@ -20,6 +21,7 @@ export class RenameFolderCommand implements Command<string> {
       this.folder.name = this.newName.toString().trim()
       await useTabsetService().saveTabset(this.tabset)
       info('renamed folder')
+      Analytics.fireEvent('tabset_folder_renamed', {})
       return Promise.resolve(new ExecutionResult('done', 'done'))
     }
     return Promise.reject('name was not valid')

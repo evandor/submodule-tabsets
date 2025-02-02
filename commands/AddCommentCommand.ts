@@ -1,5 +1,6 @@
 import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
+import Analytics from 'src/core/utils/google-analytics'
 import { useAuthStore } from 'src/stores/authStore'
 import { TabComment } from 'src/tabsets/models/Tab'
 import { ChangeInfo, TabsetSharing } from 'src/tabsets/models/Tabset'
@@ -33,6 +34,7 @@ export class AddCommentCommand implements Command<any> {
         tabset.sharing.sharing = TabsetSharing.PUBLIC_LINK_OUTDATED
       }
       if (tabset) {
+        Analytics.fireEvent('tabset_comment_added', {})
         return useTabsetService()
           .saveTabset(tabset, new ChangeInfo('tabcomment', 'added', comment.id, tabset.id))
           .then(() => new ExecutionResult('done', 'Comment Published'))

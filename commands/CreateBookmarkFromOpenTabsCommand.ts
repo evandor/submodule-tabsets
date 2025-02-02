@@ -1,5 +1,6 @@
 import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
+import Analytics from 'src/core/utils/google-analytics'
 import { Tab } from 'src/tabsets/models/Tab'
 
 export class CreateBookmarkFromOpenTabsCommand implements Command<any> {
@@ -22,7 +23,7 @@ export class CreateBookmarkFromOpenTabsCommand implements Command<any> {
     }
     console.log('newBookmark', newBookmark)
     const res: chrome.bookmarks.BookmarkTreeNode = await chrome.bookmarks.create(newBookmark)
-
+    Analytics.fireEvent('tabset_createdBookmark_from_opentab', {})
     return new ExecutionResult(res, 'Bookmark was added')
   }
 }

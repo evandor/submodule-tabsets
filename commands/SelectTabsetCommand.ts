@@ -1,6 +1,7 @@
 import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { useUtils } from 'src/core/services/Utils'
+import Analytics from 'src/core/utils/google-analytics'
 import { Tabset, TabsetType } from 'src/tabsets/models/Tabset'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
@@ -36,6 +37,7 @@ export class SelectTabsetCommand implements Command<Tabset | undefined> {
       sendMsg('current-tabset-id-change', data)
     }
 
+    Analytics.fireEvent('tabset_selected', {})
     const executionResult = new ExecutionResult(tabset, 'done')
     return Promise.resolve(executionResult)
   }

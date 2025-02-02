@@ -1,8 +1,11 @@
 import { openURL } from 'quasar'
+import { FeatureIdent } from 'src/app/models/FeatureIdent'
 import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { useNavigationService } from 'src/core/services/NavigationService'
 import { useUtils } from 'src/core/services/Utils'
+import Analytics from 'src/core/utils/google-analytics'
+import { useFeaturesStore } from 'src/features/stores/featuresStore'
 import { Suggestion } from 'src/suggestions/domain/models/Suggestion'
 import { useSuggestionsStore } from 'src/suggestions/stores/suggestionsStore'
 import { useActionHandlers } from 'src/tabsets/actionHandling/ActionHandlers'
@@ -39,9 +42,10 @@ export class OpenTabCommand implements Command<string> {
       if (this.tab.httpStatus === 0) {
         this.tab.httpStatus = 200 // ok "for now"
       }
-      if (useTabsStore2().browserTabs.length > 7) {
+      if (useTabsStore2().browserTabs.length > 7 && !useFeaturesStore().hasFeature(FeatureIdent.OPEN_TABS)) {
         useSuggestionsStore().addSuggestion(Suggestion.getStaticSuggestion('TRY_OPENTABS_FEATURE'))
       }
+      Analytics.fireEvent('tabset_tab_opened', {})
       return Promise.resolve(new ExecutionResult('', 'opened'))
     } catch (err: any) {
       return Promise.reject(err)

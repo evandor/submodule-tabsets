@@ -3,6 +3,7 @@ import { uid } from 'quasar'
 import AppEventDispatcher from 'src/app/AppEventDispatcher'
 import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
+import Analytics from 'src/core/utils/google-analytics'
 import { DeleteTabCommand } from 'src/tabsets/commands/DeleteTabCommand'
 import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset } from 'src/tabsets/models/Tabset'
@@ -72,6 +73,7 @@ export class CreateTabFromOpenTabsCommand implements Command<any> {
         })
         .then((res) => {
           if (currentTabset) {
+            Analytics.fireEvent('tabset_tab_created_from_opentabs', { tabsCount: currentTabset.tabs.length })
             return TabsetService.getContentFor(tab).then((content) => {
               if (content) {
                 return useTabsetService()

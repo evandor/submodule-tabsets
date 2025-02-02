@@ -47,7 +47,7 @@ export class CreateTabsetCommand implements Command<SaveOrReplaceResult> {
         )
         .then((res) => {
           //JsUtils.gaEvent('tabset-created', {"tabsCount": this.tabsToUse.length})
-          Analytics.fireEvent('tabset-created', { tabsCount: this.tabsToUse.length })
+          Analytics.fireEvent('tabset_created', { tabsCount: this.tabsToUse.length })
           return res
         })
         .then((res) => {
