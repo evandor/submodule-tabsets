@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import { defineStore } from 'pinia'
+import { useUtils } from 'src/core/services/Utils'
 import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset } from 'src/tabsets/models/Tabset'
 import { computed, ref } from 'vue'
@@ -12,6 +13,16 @@ async function queryTabs(): Promise<chrome.tabs.Tab[]> {
  * a pinia store for "browsertabs".
  */
 export const useTabsStore2 = defineStore('browsertabs', () => {
+  const { inBexMode, addListenerOnce } = useUtils()
+
+  // === listeners ===
+  const onTabUpdatedListener = (tabId: number, changeInfo: chrome.tabs.TabChangeInfo, tab: chrome.tabs.Tab) =>
+    onTabUpdated(tabId, changeInfo, tab)
+
+  const onTabRemovedListener = (tabId: number, removeInfo: chrome.tabs.TabRemoveInfo) => onTabRemoved(tabId, removeInfo)
+  const onTabMovedListener = (tabId: number, removeInfo: chrome.tabs.TabMoveInfo) => onTabMoved(tabId, removeInfo)
+
+  // === state ===
   // browser's current windows tabs, reloaded on various events
   const browserTabs = ref<chrome.tabs.Tab[]>([])
 
@@ -37,14 +48,36 @@ export const useTabsStore2 = defineStore('browsertabs', () => {
    * @param ps a persistence storage
    */
   async function initialize() {
-    if ('bex' === process.env.MODE) {
+    if (inBexMode()) {
       browserTabs.value = await queryTabs()
+
+      addListenerOnce(chrome.tabs.onUpdated, onTabUpdatedListener)
+      addListenerOnce(chrome.tabs.onRemoved, onTabRemovedListener)
+      addListenerOnce(chrome.tabs.onMoved, onTabMovedListener)
     }
   }
 
-  async function loadTabs(eventName: string) {
+  // #region snippet
+  async function onTabUpdated(number: number, info: chrome.tabs.TabChangeInfo, chromeTab: chrome.tabs.Tab) {
+    if (info.status !== 'complete') {
+      return
+    }
+    console.debug(`==> tabUpdate: ${chromeTab.url?.substring(0, 40)}`)
     browserTabs.value = await queryTabs()
   }
+  // #endregion snippet
+
+  async function onTabRemoved(tabId: number, removeInfo: chrome.tabs.TabRemoveInfo) {
+    console.log('onTabRemoved', tabId, removeInfo)
+    browserTabs.value = await queryTabs()
+  }
+
+  async function onTabMoved(tabId: number, moveInfo: chrome.tabs.TabMoveInfo) {
+    console.log('onTabMoved', tabId, moveInfo)
+    browserTabs.value = await queryTabs()
+  }
+
+  //async function loadTabs(eventName: string) {}
 
   function setCurrentChromeTab(tab: chrome.tabs.Tab) {
     currentChromeTab.value = tab
@@ -132,7 +165,6 @@ export const useTabsStore2 = defineStore('browsertabs', () => {
     initialize,
     browserTabs,
     tabsCount,
-    loadTabs,
     getChromeTabs,
     setCurrentChromeTab,
     getCurrentChromeTab,

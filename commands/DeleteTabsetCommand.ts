@@ -1,5 +1,6 @@
 import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
+import Analytics from 'src/core/utils/google-analytics'
 import { useLogger } from 'src/services/Logger'
 import { useSpacesStore } from 'src/spaces/stores/spacesStore'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
@@ -15,6 +16,7 @@ export class DeleteTabsetCommand implements Command<string> {
       .deleteTabset(this.tabsetId)
       .then((res) => {
         //sendMsg('tabset-deleted', {tabsetId: this.tabsetId})
+        Analytics.fireEvent('tabset_deleted', {})
         useTabsetsUiStore().clearFromLastUsedTabsets(useSpacesStore().space?.id || undefined, this.tabsetId)
         info('tabset deleted')
         return res

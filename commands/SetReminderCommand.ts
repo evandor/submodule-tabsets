@@ -2,6 +2,7 @@ import { date } from 'quasar'
 import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { useUtils } from 'src/core/services/Utils'
+import Analytics from 'src/core/utils/google-analytics'
 import { Tab } from 'src/tabsets/models/Tab'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
@@ -25,7 +26,10 @@ export class SetReminderCommand implements Command<any> {
     tab.reminderComment = sanitizeAsText(this.comment ?? '')
     return useTabsetService()
       .saveTabset(tabset)
-      .then(() => new ExecutionResult('done', 'Reminder set'))
+      .then(() => {
+        Analytics.fireEvent('tabset_tab_reminder_set', {})
+        return new ExecutionResult('done', 'Reminder set')
+      })
   }
 }
 

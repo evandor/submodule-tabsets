@@ -1,5 +1,6 @@
 import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
+import Analytics from 'src/core/utils/google-analytics'
 import { useLogger } from 'src/services/Logger'
 import { MarkTabsetAsDefaultCommand } from 'src/tabsets/commands/MarkTabsetAsDefault'
 import { TabsetStatus } from 'src/tabsets/models/Tabset'
@@ -27,6 +28,7 @@ export class MarkTabsetAsFavoriteCommand implements Command<TabsetStatus> {
     return TabsetService.markAs(this.tabsetId, TabsetStatus.FAVORITE)
       .then((res: any) => {
         info('made tabset favorite')
+        Analytics.fireEvent('tabset_marked_favorite', {})
         return res
       })
       .then((oldStatus) =>

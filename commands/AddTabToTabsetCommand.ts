@@ -10,6 +10,7 @@ import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { useUtils } from 'src/core/services/Utils'
 import ContentUtils from 'src/core/utils/ContentUtils'
+import Analytics from 'src/core/utils/google-analytics'
 import { useFeaturesStore } from 'src/features/stores/featuresStore'
 import { useRequestsService } from 'src/requests/services/RequestsService'
 import { useRequestsStore } from 'src/requests/stores/requestsStore'
@@ -103,6 +104,8 @@ export class AddTabToTabsetCommand implements Command<any> {
       }
 
       const tabset: Tabset = await useTabsetService().addToTabset(tabsetOrFolder, this.tab, 0, this.allowDuplicates)
+
+      Analytics.fireEvent('tabset_tab_added', { tabsCount: tabset.tabs.length })
 
       // Analysis not needed, remove
       if (useAuthStore().user.uid && this.tab.url?.startsWith('https://')) {

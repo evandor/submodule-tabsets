@@ -1,5 +1,6 @@
 import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
+import Analytics from 'src/core/utils/google-analytics'
 import { useLogger } from 'src/services/Logger'
 import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset, TabsetType } from 'src/tabsets/models/Tabset'
@@ -42,6 +43,7 @@ export class CreateFolderCommand implements Command<Tabset> {
         tabset.folders.push(newFolder)
         await useTabsetService().saveTabset(tabset)
         info('folder created')
+        Analytics.fireEvent('tabset_folder_created', {})
         return Promise.resolve(new ExecutionResult<Tabset>(newFolder, 'Folder created'))
       }
       const parentFolder = useTabsetsStore().getActiveFolder(tabset)
@@ -59,6 +61,7 @@ export class CreateFolderCommand implements Command<Tabset> {
         }
         await useTabsetService().saveTabset(tabset)
         info('subfolder created')
+        Analytics.fireEvent('tabset_subfolder_created', {})
         return Promise.resolve(new ExecutionResult<Tabset>(newFolder, 'Subfolder created'))
       }
       return Promise.reject('could not find subfolder')

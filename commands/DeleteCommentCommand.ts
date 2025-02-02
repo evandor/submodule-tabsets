@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
+import Analytics from 'src/core/utils/google-analytics'
 import { TabComment } from 'src/tabsets/models/Tab'
 import { TabsetSharing } from 'src/tabsets/models/Tabset'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
@@ -27,7 +28,10 @@ export class DeleteCommentCommand implements Command<any> {
       if (tabset) {
         return useTabsetService()
           .saveTabset(tabset)
-          .then(() => new ExecutionResult('done', 'Comment Deleted'))
+          .then(() => {
+            Analytics.fireEvent('tabset_comment_deleted', {})
+            return new ExecutionResult('done', 'Comment Deleted')
+          })
       } else {
         return Promise.reject('could not find tabset')
       }

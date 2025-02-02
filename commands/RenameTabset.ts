@@ -1,6 +1,7 @@
 import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { useUtils } from 'src/core/services/Utils'
+import Analytics from 'src/core/utils/google-analytics'
 import { useLogger } from 'src/services/Logger'
 import TabsetService from 'src/tabsets/services/TabsetService'
 import { ListDetailLevel } from 'src/ui/stores/uiStore'
@@ -17,9 +18,10 @@ class UndoRenameTabsetCommand implements Command<any> {
 
   execute(): Promise<ExecutionResult<any>> {
     console.log('execution undo command', this.tabsetId, this.oldName)
-    return new RenameTabsetCommand(this.tabsetId, this.oldName, this.oldColor)
-      .execute()
-      .then((res) => new ExecutionResult(res, 'Tabset was renamed back again'))
+    return new RenameTabsetCommand(this.tabsetId, this.oldName, this.oldColor).execute().then((res) => {
+      Analytics.fireEvent('tabset_renamed', {})
+      return new ExecutionResult(res, 'Tabset was renamed back again')
+    })
   }
 }
 

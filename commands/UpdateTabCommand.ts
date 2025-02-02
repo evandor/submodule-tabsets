@@ -1,5 +1,6 @@
 import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
+import Analytics from 'src/core/utils/google-analytics'
 import { useSearchStore } from 'src/search/stores/searchStore'
 import { Tab, UrlExtension } from 'src/tabsets/models/Tab'
 import TabsetService from 'src/tabsets/services/TabsetService'
@@ -14,6 +15,7 @@ class UndoCommand implements Command<any> {
     console.info(this.tab, `reverting changed tab url to ${this.oldUrl}`)
     return TabsetService.setUrl(this.tab, this.oldUrl)
       .then((res) => {
+        Analytics.fireEvent('tabset_tab_updated', {})
         if (this.tab.url) {
           useSearchStore().update(this.tab.url, 'url', this.oldUrl)
         }
