@@ -11,7 +11,10 @@
         </div>
       </q-card-section>
       <q-card-section>
-        <div class="text-body">Author:</div>
+        <div class="text-body">
+          Author:
+          <help-widget>The Invitee will see this name to know who invited her</help-widget>
+        </div>
         <q-input
           v-model="author"
           class="q-mb-md q-pb-none"
@@ -21,7 +24,10 @@
           error-message="Please do not use special Characters, maximum length is 32" />
       </q-card-section>
       <q-card-section>
-        <div class="text-body">User to share with:</div>
+        <div class="text-body">
+          User to share with:
+          <help-widget>Provide an email this invitation is sent to</help-widget>
+        </div>
         <q-input
           v-model="shareWithEmail"
           class="q-mb-md q-pb-none"
@@ -66,6 +72,7 @@ import { doc, DocumentSnapshot, getDoc } from 'firebase/firestore'
 import { LocalStorage, useDialogPluginComponent, useQuasar } from 'quasar'
 import { SHARING_AUTHOR_IDENT } from 'src/boot/constants'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
+import HelpWidget from 'src/core/widget/HelpWidget.vue'
 import FirebaseServices from 'src/services/firebase/FirebaseServices'
 import { ShareWithTabsetCommand } from 'src/tabsets/commands/ShareWithTabsetCommand'
 import { useAuthStore } from 'stores/authStore'

@@ -61,10 +61,14 @@ import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import PanelTabListElementWidget from 'src/tabsets/widgets/PanelTabListElementWidget.vue'
 import { onMounted, ref, watchEffect } from 'vue'
 
+export interface Dictionary<T> {
+  [index: string]: T
+}
+
 const tabsetsSessions = ref<Tabset[]>([])
 const userCanSelect = ref(false)
 
-const groupedTabs = ref<_.Dictionary<Tab[]> | undefined>(undefined)
+const groupedTabs = ref<Dictionary<Tab[]> | undefined>(undefined)
 
 onMounted(async () => {
   Analytics.firePageViewEvent('SidePanelRemindersListViewer', document.location.href)
