@@ -16,14 +16,13 @@ import { SaveOrReplaceResult } from 'src/tabsets/models/SaveOrReplaceResult'
 import { Tab } from 'src/tabsets/models/Tab'
 import { TabInFolder } from 'src/tabsets/models/TabInFolder'
 import { ChangeInfo, Tabset, TabsetStatus, TabsetType } from 'src/tabsets/models/Tabset'
+import { useSelectedTabsetService } from 'src/tabsets/services/selectedTabsetService' // let db: TabsetsPersistence = null as unknown as TabsetsPersistence
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { useTabsStore2 } from 'src/tabsets/stores/tabsStore2'
 import { useUiStore } from 'src/ui/stores/uiStore'
 import JsUtils from 'src/utils/JsUtils'
 import throttledQueue from 'throttled-queue'
-import { v5 as uuidv5 } from 'uuid' // let db: TabsetsPersistence = null as unknown as TabsetsPersistence
-
-// let db: TabsetsPersistence = null as unknown as TabsetsPersistence
+import { v5 as uuidv5 } from 'uuid'
 
 export function useTabsetService() {
   const throttleOne50Millis = throttledQueue(1, 50, true)
@@ -38,7 +37,7 @@ export function useTabsetService() {
 
     // console.debug(' ...initializing tabsetService2 as (TODO)')
     await useTabsetsStore().loadTabsets()
-    const selectedTabsetId = localStorage.getItem('selectedTabset')
+    const selectedTabsetId = await useSelectedTabsetService().getFromStorage()
     if (selectedTabsetId) {
       //console.debug(` ...config: setting selected tabset from storage: ${selectedTabsetId}`)
       const selectedTabset = useTabsetsStore().selectCurrentTabset(selectedTabsetId)
@@ -208,11 +207,6 @@ export function useTabsetService() {
     }
     //tabsStore.currentTabsetId = tabsetId || null as unknown as string;
     ChromeApi.buildContextMenu('tabsetService 230')
-    if (tabsetId) {
-      localStorage.setItem('selectedTabset', tabsetId)
-    } else {
-      localStorage.removeItem('selectedTabset')
-    }
   }
 
   const deleteTabset = async (tabsetId: string): Promise<string> => {

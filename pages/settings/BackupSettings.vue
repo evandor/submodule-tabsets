@@ -102,27 +102,35 @@ function clearIncluding(idenfier: string) {
 }
 
 watchEffect(() => {
-  username.value && username.value.trim().length > 0
-    ? LocalStorage.set(GITHUB_USERNAME, username.value)
-    : clearIncluding(GITHUB_USERNAME)
+  if (username.value && username.value.trim().length > 0) {
+    LocalStorage.set(GITHUB_USERNAME, username.value)
+  } else {
+    clearIncluding(GITHUB_USERNAME)
+  }
 })
 
 watchEffect(() => {
-  reponame.value && reponame.value.trim().length > 0
-    ? LocalStorage.set(GITHUB_REPONAME, reponame.value)
-    : clearIncluding(GITHUB_REPONAME)
+  if (reponame.value && reponame.value.trim().length > 0) {
+    LocalStorage.set(GITHUB_REPONAME, reponame.value)
+  } else {
+    clearIncluding(GITHUB_REPONAME)
+  }
 })
 
 watchEffect(() => {
-  githubToken.value && githubToken.value.trim().length > 0
-    ? LocalStorage.set(GITHUB_TOKEN, githubToken.value)
-    : clearIncluding(GITHUB_TOKEN)
+  if (githubToken.value && githubToken.value.trim().length > 0) {
+    LocalStorage.set(GITHUB_TOKEN, githubToken.value)
+  } else {
+    clearIncluding(GITHUB_TOKEN)
+  }
 })
 
 watchEffect(() => {
-  githubPath.value && githubPath.value.trim().length > 0
-    ? LocalStorage.set(GITHUB_PATH, githubPath.value)
-    : clearIncluding(GITHUB_PATH)
+  if (githubPath.value && githubPath.value.trim().length > 0) {
+    LocalStorage.set(GITHUB_PATH, githubPath.value)
+  } else {
+    clearIncluding(GITHUB_PATH)
+  }
 })
 
 watchEffect(() => LocalStorage.set(GITHUB_AUTO_BACKUP, autobackup.value))

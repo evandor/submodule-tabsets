@@ -412,6 +412,10 @@
           :tab="tab" />
       </span>
       <span v-else @click="removeSessionTab(tab)"> x </span>
+      <span v-if="tab.readingTime > 0" class="text-grey-5 q-mt-sm" style="font-size: x-small">
+        {{ formatReadingTime(tab.readingTime) }}
+        <q-tooltip class="tooltip-small">cumulated reading time</q-tooltip>
+      </span>
     </q-item-section>
   </slot>
 </template>
@@ -808,6 +812,20 @@ const openReminderDialog = () =>
     component: ReminderDialog,
     componentProps: { tabId: props.tab.id, date: props.tab.reminder, comment: props.tab?.reminderComment },
   })
+
+const formatReadingTime = (ms: number) => {
+  if (ms < 1000) {
+    return ''
+  } else if (ms < 60000) {
+    return Math.round(ms / 1000) + 's.'
+  } else if (ms < 60 * 60000) {
+    return Math.round(ms / 60000) + 'm.'
+  } else if (ms < 24 * 60 * 60000) {
+    return Math.round((ms / 60) * 60000) + 'h.'
+  } else {
+    return ms
+  }
+}
 </script>
 
 <!--https://stackoverflow.com/questions/41078478/css-animated-checkmark -->

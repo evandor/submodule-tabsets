@@ -1,7 +1,7 @@
 <template>
   <div class="row q-py-xs darkColors lightColors" v-if="messages.length > 0">
     <div class="col-10">
-      <q-icon name="o_email" class="q-pr-sm q-mb-xs" />
+      <q-icon name="o_email" class="q-pr-sm q-mb-sm" />
       Messages
       <q-badge color="orange">{{ messageCount }}</q-badge>
       <span v-if="messageCount > 1" class="cursor-pointer text-body2 q-ml-md" @click="clearMessages()"
@@ -19,9 +19,9 @@
     <div class="column fit" v-if="showDetails">
       <div class="col text-body2 ellipsis" v-for="m in messages">
         <div class="row">
-          <div class="col-8 ellipsis" :class="m.actionPath ? 'cursor-pointer' : ''">
+          <div class="col-8 ellipsis" :class="m.actionPath ? 'cursor-pointer' : ''" @click.stop="handleActionPath(m)">
             {{ m['message' as keyof object] }}
-            <q-tooltip class="tooltip-small">{{ m.id }}</q-tooltip>
+            <q-tooltip class="tooltip-small">{{ m.id }} {{ m.actionPath }}</q-tooltip>
           </div>
           <div class="col-4 text-right ellipsis" style="font-size: smaller">
             {{ formatDate(m.created) }}
@@ -41,6 +41,8 @@ import FirebaseServices from 'src/services/firebase/FirebaseServices'
 import { Message } from 'src/tabsets/models/Message'
 import { useAuthStore } from 'stores/authStore'
 import { ref, watchEffect } from 'vue'
+
+const $q = useQuasar()
 
 const messages = ref<Message[]>([])
 const showDetails = ref(true)
@@ -67,6 +69,33 @@ const deleteMessage = async (m: Message) => {
 
 const formatDate = (timestamp: number | undefined) =>
   timestamp ? formatDistance(timestamp, new Date(), { addSuffix: true }) : ''
+
+const handleActionPath = (m: Message) => {
+  if (m.actionPath) {
+    if (m.actionPath.startsWith('dialog://deleteTabs/')) {
+      const params = m.actionPath.split('/deleteTabs/')[1]!
+      const paramsSplit = params.split('/')
+      const url = atob(paramsSplit[0]!)
+      const bmCount = Number(paramsSplit[1]!)
+      console.log('url', url)
+      $q.dialog({
+        component: DeleteBookmarksByUrlDialog,
+        componentProps: {
+          url,
+          bmCount,
+        },
+      })
+        .onOk(() => {
+          useMessagesStore().deleteMessage(m.id)
+        })
+        .onCancel(() => {
+          useMessagesStore().deleteMessage(m.id)
+        })
+    } else {
+      console.warn('unknown action path ', m)
+    }
+  }
+}
 </script>
 
 <style scoped lang="scss">

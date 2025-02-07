@@ -34,7 +34,8 @@ export class SelectTabsetCommand implements Command<Tabset | undefined> {
       if (tabset && tabset.type === TabsetType.DEFAULT) {
         useTabsetsUiStore().addTabsetToLastUsedList(this.tabsetId)
       }
-      sendMsg('current-tabset-id-change', data)
+      // TODO sending too many massages (!?)
+      //sendMsg('current-tabset-id-change', data)
     }
 
     Analytics.fireEvent('tabset_selected', {})

@@ -112,7 +112,7 @@ const columns = ref<any[]>([
   { title: ' ' },
   { title: ' ' },
 ])
-const currentTabsetFolderId = ref<string | undefined>(useTabsetsStore().currentTabsetId)
+const currentTabsetFolderId = ref<string | undefined>(await useTabsetsStore().getCurrentTabsetId())
 const newCommentIds = ref<Map<string, string[]>>(new Map())
 
 const onWidthChange = () => (windowWidth.value = window.innerWidth)
