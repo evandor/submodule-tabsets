@@ -65,6 +65,7 @@ export const useTabsStore2 = defineStore('browsertabs', () => {
     console.debug(`==> tabUpdate: ${chromeTab.url?.substring(0, 40)}`)
     browserTabs.value = await queryTabs()
   }
+
   // #endregion snippet
 
   async function onTabRemoved(tabId: number, removeInfo: chrome.tabs.TabRemoveInfo) {
@@ -161,6 +162,25 @@ export const useTabsStore2 = defineStore('browsertabs', () => {
     }
   })
 
+  const getOverlap = computed(() => {
+    return (tabset: Tabset): number => {
+      const currentTabsetTabs: Set<string> = new Set(tabset.tabs.map((t: Tab) => t.url || ''))
+      const browserTabs: Set<string> = new Set(useTabsStore2().browserTabs.map((t: chrome.tabs.Tab) => t.url || ''))
+      try {
+        const allTabs = currentTabsetTabs.union(browserTabs)
+        const lapover1 = currentTabsetTabs.intersection(allTabs)
+        const lapover2 = browserTabs.intersection(allTabs)
+        const overlap = Math.min(lapover1.size, lapover2.size) / allTabs.size
+        console.log('overlap', overlap, lapover1.size, lapover2.size, allTabs.size)
+        //overlapTooltip.value = `${Math.round(100 * overlap.value)}% overlap between this tabset and the currently open tabs`
+        return overlap
+      } catch (err) {
+        console.log('could not determine overlap', err)
+        return 0
+      }
+    }
+  })
+
   return {
     initialize,
     browserTabs,
@@ -175,5 +195,6 @@ export const useTabsStore2 = defineStore('browsertabs', () => {
     chromeTabsHistoryPosition,
     chromeTabsHistory,
     removeTab,
+    getOverlap,
   }
 })

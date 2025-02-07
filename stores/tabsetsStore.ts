@@ -12,6 +12,7 @@ import { Tab, TabComment } from 'src/tabsets/models/Tab'
 import { TabAndTabsetId } from 'src/tabsets/models/TabAndTabsetId'
 import { ChangeInfo, Tabset, TabsetSharing, TabsetStatus } from 'src/tabsets/models/Tabset'
 import TabsetsPersistence from 'src/tabsets/persistence/TabsetsPersistence'
+import { useSelectedTabsetService } from 'src/tabsets/services/selectedTabsetService'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useWindowsStore } from 'src/windows/stores/windowsStore'
 import { computed, ref, watch } from 'vue'
@@ -44,13 +45,18 @@ export const useTabsetsStore = defineStore('tabsets', () => {
 
   const reminderTabset = ref<Tabset>(new Tabset('reminders', 'reminder'))
 
+  const getCurrentTabsetId = async (): Promise<string | undefined> => {
+    return useSelectedTabsetService().getSelectedTabsetId()
+  }
+
   watch(
     () => currentTabsetFolderId.value,
     (newValue: string | undefined, oldValue: string | undefined) => {
       console.log(`currentTabsetFolderId changed from ${oldValue} -> ${newValue}`)
       const data = { tabsetId: currentTabsetId.value, folderId: newValue }
       //console.log("data", data)
-      sendMsg('tabsets.app.change.currentTabset', data)
+      // TODO sending too many messages (!?!)
+      //sendMsg('tabsets.app.change.currentTabset', data)
     },
   )
 
@@ -192,12 +198,15 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       tabsets.value.delete(tsId)
       if (currentTabsetId.value && currentTabsetId.value === tsId) {
         currentTabsetId.value = undefined
+        useSelectedTabsetService().clearCurrentTabsetId(tsId)
       }
       return res
     })
   }
 
   function selectCurrentTabset(tabsetId: string, stop: boolean = false): Tabset | undefined {
+    useSelectedTabsetService().setCurrentTabsetId(tabsetId)
+
     const found = _.find([...tabsets.value.values()] as Tabset[], (k: any) => {
       const ts = k || new Tabset('', '', [])
       return ts.id === tabsetId
@@ -222,9 +231,12 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     return undefined
   }
 
-  function unsetCurrentTabset(): void {
-    currentTabsetId.value = undefined
-  }
+  // function unsetCurrentTabset(): void {
+  //   currentTabsetId.value = undefined
+  //   chrome.windows.getCurrent((w: chrome.windows.Window) =>
+  //     currentTabsetToWindowMap.value.delete('' + w.id || w.sessionId || '-'),
+  //   )
+  // }
 
   function share(tabset: Tabset, sharing: TabsetSharing, sharedId: string | undefined, sharedBy: string) {
     return storage.share(tabset, sharing, sharedId, sharedBy)
@@ -370,7 +382,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       return root
     }
     for (const f of root.folders) {
-      console.log('  checking folder', f.id)
+      //console.log('  checking folder', f.id)
       if (f.id === folderActive) {
         return f
       } else {
@@ -395,7 +407,6 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     initialize,
     tabsets,
     createTabset,
-    unsetCurrentTabset,
     addTabset,
     saveTabset, // check save vs add vs create
     setTabset,
@@ -404,7 +415,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     getCurrentTabs,
     getCurrentTabset,
     currentTabsetName,
-    currentTabsetId,
+    getCurrentTabsetId,
     currentTabsetFolderId,
     tabForUrlInSelectedTabset,
     getTabset,

@@ -177,6 +177,8 @@ export class Tab {
   reminder: number | undefined
   reminderComment: string | undefined
 
+  readingTime: number = 0
+
   constructor(
     public id: string,
     chromeTab: chrome.tabs.Tab,

@@ -7,8 +7,8 @@
       <q-badge
         class="q-ma-none q-ma-xs"
         v-for="t in lastTabsets"
-        :class="t.id === useTabsetsStore().currentTabsetId ? '' : 'cursor-pointer'"
-        :color="t.id === useTabsetsStore().currentTabsetId ? 'grey' : 'warning'"
+        :class="t.id === currentTabsetId ? '' : 'cursor-pointer'"
+        :color="t.id === currentTabsetId ? 'grey' : 'warning'"
         outline
         @click="useTabsetService().selectTabset(t.id)">
         {{ t.name }}
@@ -40,6 +40,11 @@ import { useTabsetsUiStore } from 'src/tabsets/stores/tabsetsUiStore'
 import { ref, watchEffect } from 'vue'
 
 const lastTabsets = ref<Pick<Tabset, 'id' | 'name' | 'status'>[]>([])
+const currentTabsetId = ref<string | undefined>(undefined)
+
+watchEffect(async () => {
+  currentTabsetId.value = await useTabsetsStore().getCurrentTabsetId()
+})
 
 watchEffect(() => {
   if (useTabsetsUiStore().lastUpdate) {

@@ -1,8 +1,12 @@
 <template>
   <div class="row q-py-xs darkColors lightColors" v-if="messages.length > 0">
     <div class="col-10">
-      <q-icon name="o_email" class="q-pr-sm q-mb-xs" />
+      <q-icon name="o_email" class="q-pr-sm q-mb-sm" />
       Messages
+      <q-badge color="orange">{{ messageCount }}</q-badge>
+      <span v-if="messageCount > 1" class="cursor-pointer text-body2 q-ml-md" @click="clearMessages()"
+        >[delete {{ messageCount > messages.length ? 'all shown' : 'all' }}]</span
+      >
     </div>
     <div class="col-2 text-right">
       <!--      <q-icon v-if="showDetails" name="o_delete" color="negative" class="cursor-pointer" @click="clearMessages()" />-->
@@ -15,13 +19,13 @@
     <div class="column fit" v-if="showDetails">
       <div class="col text-body2 ellipsis" v-for="m in messages">
         <div class="row">
-          <div class="col-8 ellipsis" :class="m.actionPath ? 'cursor-pointer' : ''">
+          <div class="col-8 ellipsis" :class="m.actionPath ? 'cursor-pointer' : ''" @click.stop="handleActionPath(m)">
             {{ m['message' as keyof object] }}
-            <q-tooltip class="tooltip-small">{{ m.id }}</q-tooltip>
+            <q-tooltip class="tooltip-small">{{ m.id }} {{ m.actionPath }}</q-tooltip>
           </div>
           <div class="col-4 text-right ellipsis" style="font-size: smaller">
             {{ formatDate(m.created) }}
-            <q-icon name="o_delete" class="cursor-pointer"></q-icon>
+            <q-icon name="o_delete" class="cursor-pointer" @click="deleteMessage(m)"></q-icon>
           </div>
         </div>
       </div>
@@ -31,17 +35,65 @@
 
 <script lang="ts" setup>
 import { formatDistance } from 'date-fns'
+import { useQuasar } from 'quasar'
+import { useMessagesStore } from 'src/messages/stores/messagesStore'
+import DeleteBookmarksByUrlDialog from 'src/tabsets/components/messageDialogs/DeleteBookmarksByUrlDialog.vue'
 import { Message } from 'src/tabsets/models/Message'
-import { ref } from 'vue'
+import { ref, watchEffect } from 'vue'
+
+const $q = useQuasar()
 
 const messages = ref<Message[]>([])
 const showDetails = ref(true)
 const messageCount = ref(0)
 
+watchEffect(async () => {
+  const msgs = useMessagesStore().getUnreadMessages
+  messages.value = msgs.slice(0, 20)
+  messageCount.value = msgs.length
+})
+
 const toggleShowDetails = () => (showDetails.value = !showDetails.value)
+
+const clearMessages = async () => {
+  for (const m of messages.value) {
+    deleteMessage(m)
+  }
+}
+
+const deleteMessage = async (m: Message) => {
+  useMessagesStore().deleteMessage(m.id)
+}
 
 const formatDate = (timestamp: number | undefined) =>
   timestamp ? formatDistance(timestamp, new Date(), { addSuffix: true }) : ''
+
+const handleActionPath = (m: Message) => {
+  if (m.actionPath) {
+    if (m.actionPath.startsWith('dialog://deleteTabs/')) {
+      const params = m.actionPath.split('/deleteTabs/')[1]!
+      const paramsSplit = params.split('/')
+      const url = atob(paramsSplit[0]!)
+      const bmCount = Number(paramsSplit[1]!)
+      console.log('url', url)
+      $q.dialog({
+        component: DeleteBookmarksByUrlDialog,
+        componentProps: {
+          url,
+          bmCount,
+        },
+      })
+        .onOk(() => {
+          useMessagesStore().deleteMessage(m.id)
+        })
+        .onCancel(() => {
+          useMessagesStore().deleteMessage(m.id)
+        })
+    } else {
+      console.warn('unknown action path ', m)
+    }
+  }
+}
 </script>
 
 <style scoped lang="scss">

@@ -1,16 +1,18 @@
 <template>
   <!--  @click.stop="saveInTabset(props.tabset.id, props.tabset.folderActive)" -->
-  <template v-if="handler.actions().length === 0"> ---</template>
-  <template v-else-if="handler.actions().length === 1">
+  <template v-if="handler.actions(currentTabsetId).length === 0"> ---</template>
+  <template v-else-if="handler.actions(currentTabsetId).length === 1">
     <q-btn
       outline
-      @click.stop="emits('buttonClicked', new ActionHandlerButtonClickedHolder(handler, '', handler.actions()[0]))"
+      @click.stop="
+        emits('buttonClicked', new ActionHandlerButtonClickedHolder(handler, '', handler.actions(currentTabsetId)[0]))
+      "
       class="q-ma-none q-px-sm q-py-none"
       :class="{ shake: animateAddtabButton, 'cursor-pointer': !alreadyInTabset() }"
       :color="alreadyInTabset() ? 'grey-5' : tsBadges.length > 0 ? 'positive' : ''"
       size="xs"
       data-testid="saveInTabsetBtn">
-      <div>{{ handler.actions()[0]!.label }}</div>
+      <div>{{ handler.actions(currentTabsetId)[0]!.label }}</div>
       <!--                  <q-icon right class="q-ma-none q-pa-none" size="2em" name="o_south" />-->
     </q-btn>
     <q-tooltip class="tooltip-small" v-if="alreadyInTabset()">
@@ -24,27 +26,27 @@
     </q-tooltip>
   </template>
 
-  <template v-else-if="handler.actions().length > 1">
+  <template v-else-if="handler.actions(currentTabsetId).length > 1">
     <!-- :disable="!handler.actions()[0]!.active(props.currentChromeTab)"-->
     <q-btn-dropdown
-      :label="handler.actions()[0]!.label"
+      :label="handler.actions(currentTabsetId)[0]!.label"
       v-close-popup
       @click.stop="
         emits(
           'buttonClicked',
-          new ActionHandlerButtonClickedHolder(handler, ButtonActions.Save, handler.actions()[0], {
-            filename: handler.actions()[0]!.label,
+          new ActionHandlerButtonClickedHolder(handler, ButtonActions.Save, handler.actions(currentTabsetId)[0], {
+            filename: handler.actions(currentTabsetId)[0]!.label,
           }),
         )
       "
       class="q-ma-none q-px-none q-py-none"
-      :color="color(handler.actions()[0]!)"
+      :color="color(handler.actions(currentTabsetId)[0]!)"
       size="xs"
       split
       outline>
       <q-list dense>
         <q-item
-          v-for="l in handler.actions().slice(1)"
+          v-for="l in handler.actions(currentTabsetId).slice(1)"
           :clickable="isActive(l)"
           dense
           @click.stop="
@@ -99,6 +101,11 @@ const { getHandler } = useActionHandlers($q)
 const handler = ref<AddUrlToTabsetHandler>(new NoopAddUrlToTabsetHandler())
 const tsBadges = ref<object[]>([])
 const animateAddtabButton = ref(false)
+const currentTabsetId = ref<string | undefined>(undefined)
+
+watchEffect(async () => {
+  currentTabsetId.value = await useTabsetsStore().getCurrentTabsetId()
+})
 
 watchEffect(() => {
   handler.value = getHandler(props.currentChromeTab.url, props.folder)

@@ -38,7 +38,7 @@ export interface AddUrlToTabsetHandler {
 
   contentMatcher: (content: string) => boolean
 
-  actions: () => ActionContext[]
+  actions: (currentTabsetId: string | undefined) => ActionContext[]
 
   withDialog: (action: ButtonActions) => DialogChainObject | undefined
 

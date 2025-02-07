@@ -55,19 +55,22 @@ export class CreateTabFromOpenTabsCommand implements Command<any> {
           if (tab.url) {
             useUiStore().clearHighlights()
             useUiStore().addHighlight(tab.url)
-            const currentTsId = useTabsetsStore().currentTabsetId
-            if (currentTsId) {
-              // useSearchStore().update(this.tab.url, 'name', this.newName)
-              AppEventDispatcher.dispatchEvent('add-to-index', {
-                name: '',
-                title: tab.title || '',
-                url: tab.url || '',
-                description: tab.description,
-                content: '',
-                tabsets: [currentTsId],
-                favIconUrl: tab.favIconUrl || '',
+            useTabsetsStore()
+              .getCurrentTabsetId()
+              .then((currentTsId: string | undefined) => {
+                if (currentTsId) {
+                  // useSearchStore().update(this.tab.url, 'name', this.newName)
+                  AppEventDispatcher.dispatchEvent('add-to-index', {
+                    name: '',
+                    title: tab.title || '',
+                    url: tab.url || '',
+                    description: tab.description,
+                    content: '',
+                    tabsets: [currentTsId],
+                    favIconUrl: tab.favIconUrl || '',
+                  })
+                }
               })
-            }
           }
           return res
         })

@@ -21,9 +21,11 @@ export class ToggleTabFavoriteCommand implements Command<any> {
         tab.favorite = TabFavorite.TABSET
         break
       case TabFavorite.TABSET:
-        useFeaturesStore().hasFeature(FeatureIdent.SPACES)
-          ? (tab.favorite = TabFavorite.SPACE)
-          : (tab.favorite = TabFavorite.NONE)
+        if (useFeaturesStore().hasFeature(FeatureIdent.SPACES)) {
+          tab.favorite = TabFavorite.SPACE
+        } else {
+          tab.favorite = TabFavorite.NONE
+        }
         break
       case TabFavorite.SPACE:
         tab.favorite = TabFavorite.NONE

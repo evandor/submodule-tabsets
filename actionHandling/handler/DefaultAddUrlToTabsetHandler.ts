@@ -23,9 +23,9 @@ export class DefaultAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
     return true
   }
 
-  actions(): ActionContext[] {
+  actions(currentTabsetId: string | undefined): ActionContext[] {
     const url = useContentStore().getCurrentTabUrl
-    const currentTabsetId = useTabsetsStore().currentTabsetId
+    // const currentTabsetId = await useTabsetsStore().getCurrentTabsetId()
     const actions = [new ActionContext('Add Tab', ButtonActions.AddTab)]
     if (url) {
       // TODO folders?

@@ -70,9 +70,13 @@ const createNewUrl = () => {
   tab.created = new Date().getTime()
   tab.createdBy = useAuthStore().user.email || undefined
   tab.extension = tab.determineUrlExtension(chromeTab)
-  TabsetService.saveToCurrentTabset(tab).then(() =>
-    useTabsetService().saveCurrentTabset(new ChangeInfo('tab', 'added', tab.id, useTabsetsStore().currentTabsetId)),
-  )
+  TabsetService.saveToCurrentTabset(tab).then(() => {
+    useTabsetsStore()
+      .getCurrentTabsetId()
+      .then((currentTabsetId: string | undefined) => {
+        useTabsetService().saveCurrentTabset(new ChangeInfo('tab', 'added', tab.id, currentTabsetId))
+      })
+  })
   // useUiStore().setIgnoreKeypress(false)
   onDialogOK()
 }

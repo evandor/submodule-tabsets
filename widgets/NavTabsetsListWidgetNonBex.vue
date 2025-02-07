@@ -83,7 +83,7 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
-const activeTabset = ref<string | undefined>(useTabsetsStore().currentTabsetId)
+const activeTabset = ref<string | undefined>(await useTabsetsStore().getCurrentTabsetId())
 const hoveredTab = ref<string | undefined>(undefined)
 
 const props = defineProps({
@@ -92,8 +92,8 @@ const props = defineProps({
   fromPanel: { type: Boolean, default: false },
 })
 
-watchEffect(() => {
-  activeTabset.value = useTabsetsStore().currentTabsetId
+watchEffect(async () => {
+  activeTabset.value = await useTabsetsStore().getCurrentTabsetId()
 })
 
 const selectTS = (tabset: Tabset) => {
@@ -109,20 +109,24 @@ const selectTS = (tabset: Tabset) => {
       console.log('tabset was selected', tabset.id, tabset.type, props.fromPanel)
       activeTabset.value = tabset.id
       if (!props.fromPanel) {
-        tabset.type === TabsetType.DYNAMIC
-          ? router.push('/dynamicTs/' + tabset.id)
-          : router.push('/tabsets/' + tabset.id)
+        if (tabset.type === TabsetType.DYNAMIC) {
+          router.push('/dynamicTs/' + tabset.id)
+        } else {
+          router.push('/tabsets/' + tabset.id)
+        }
       } else {
-        tabset.type === TabsetType.DYNAMIC
-          ? router.push('/sidepanel/dynamicTs/' + tabset.id)
-          : router.push('/sidepanel')
+        if (tabset.type === TabsetType.DYNAMIC) {
+          router.push('/sidepanel/dynamicTs/' + tabset.id)
+        } else {
+          router.push('/sidepanel')
+        }
       }
     })
 }
 
-const onDrop = (evt: DragEvent, tabsetId: string) => {
+const onDrop = async (evt: DragEvent, tabsetId: string) => {
   const tabId = useUiStore().droppingTab()
-  const currenTabsetId = useTabsetsStore().currentTabsetId
+  const currenTabsetId = await useTabsetsStore().getCurrentTabsetId()
   if (evt.dataTransfer && tabId && currenTabsetId) {
     useCommandExecutor().executeFromUi(new MoveToTabsetCommand(tabId, tabsetId, currenTabsetId, evt.shiftKey))
   }

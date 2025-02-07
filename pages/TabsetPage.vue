@@ -2,7 +2,7 @@
 <!-- used in pwa, and bex full-page-applciation view -->
 <template>
   <!-- toolbar -->
-  <q-toolbar v-if="!useTabsetsStore().currentTabsetId">
+  <q-toolbar v-if="!currentTabsetId">
     <div class="row fit">
       <q-toolbar-title>
         <div class="row justify-start items-baseline">
@@ -115,8 +115,8 @@
 
         <q-btn
           v-if="
-            useTabsetsStore().currentTabsetId !== '' &&
-            useTabsetsStore().getTabset(useTabsetsStore().currentTabsetId!) &&
+            currentTabsetId !== '' &&
+            useTabsetsStore().getTabset(currentTabsetId!) &&
             useTabsetsStore().getCurrentTabset!?.tabs?.length > 10 &&
             $q.screen.gt.xs
           "
@@ -140,9 +140,9 @@
 
         <q-icon
           v-if="
-            useTabsetsStore().currentTabsetId !== '' &&
+            currentTabsetId !== '' &&
             tabset?.type !== TabsetType.DYNAMIC &&
-            useTabsetsStore().getTabset(useTabsetsStore().currentTabsetId!)
+            useTabsetsStore().getTabset(currentTabsetId!)
           "
           class="cursor-pointer"
           size="22px"
@@ -179,7 +179,7 @@
         rounded
         class="text-primary q-ma-md"
         style="border: 1px solid #efefef"
-        v-if="!useTabsetsStore().currentTabsetId && useTabsetsStore().tabsets.size > 0">
+        v-if="!currentTabsetId && useTabsetsStore().tabsets.size > 0">
         <div class="text-body2">Select an existing tabset from the list or create a new tabset.</div>
       </q-banner>
 
@@ -263,6 +263,7 @@ const tabset = ref<Tabset>(new Tabset(uid(), 'empty', []))
 const tabsetFolder = ref<Tabset>(new Tabset(uid(), 'empty', []))
 const orderDesc = ref(false)
 const showEditButton = ref(false)
+const currentTabsetId = ref<string | undefined>(undefined)
 
 const tab = ref('grid')
 
@@ -275,6 +276,9 @@ onUpdated(() => {
   JsUtils.runCssHighlight()
 })
 
+watchEffect(async () => {
+  currentTabsetId.value = await useTabsetsStore().getCurrentTabsetId()
+})
 watchEffect(() => {
   if (!route || !route.params) {
     return
@@ -286,8 +290,10 @@ watchEffect(() => {
   tabsetFolder.value = useTabsetsStore().getActiveFolder(tabset.value) || tabset.value
 })
 
-const setNewName = (newValue: string) =>
-  useCommandExecutor().executeFromUi(new RenameTabsetCommand(useTabsetsStore().currentTabsetId!, newValue))
+const setNewName = async (newValue: string) => {
+  const currentTabsetId = await useTabsetsStore().getCurrentTabsetId()
+  useCommandExecutor().executeFromUi(new RenameTabsetCommand(currentTabsetId!, newValue))
+}
 
 const setFilter = (newValue: string) => {
   console.log('filter', newValue)

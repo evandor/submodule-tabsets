@@ -1,10 +1,16 @@
+import { uid } from 'quasar'
+import AppEventDispatcher from 'src/app/AppEventDispatcher'
+import { FeatureIdent } from 'src/app/models/FeatureIdent'
 import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { useUtils } from 'src/core/services/Utils'
 import Analytics from 'src/core/utils/google-analytics'
+import { useFeaturesStore } from 'src/features/stores/featuresStore'
+import { useMessagesStore } from 'src/messages/stores/messagesStore'
 import { useLogger } from 'src/services/Logger'
+import { Message } from 'src/tabsets/models/Message'
 import { Tab } from 'src/tabsets/models/Tab'
-import { Tabset, TabsetSharing } from 'src/tabsets/models/Tabset'
+import { Tabset } from 'src/tabsets/models/Tabset'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 
 const { addToTabset, deleteTab } = useTabsetService()
@@ -33,30 +39,40 @@ export class DeleteTabCommand implements Command<Tabset> {
   ) {}
 
   async execute(): Promise<ExecutionResult<Tabset>> {
-    return deleteTab(this.tab, this.tabset)
-      .then((tabset: Tabset) => {
-        Analytics.fireEvent('tabset_tab_deleted', { tabsCount: tabset.tabs.length })
-        // sharing
-        if (tabset.sharing?.sharedId && tabset.sharing.sharing === TabsetSharing.PUBLIC_LINK) {
-          tabset.sharing.sharing = TabsetSharing.PUBLIC_LINK_OUTDATED
-          tabset.sharing.sharedAt = new Date().getTime()
-        }
-        return tabset
-      })
-      .then((tabset: Tabset) => {
-        info('tab deleted')
-        return tabset
-      })
-      .then((tabset) =>
-        Promise.resolve(
-          new ExecutionResult(tabset, 'Tab was deleted', new Map([['Undo', new UndoCommand(tabset, this.tab)]])),
+    const tabset: Tabset = await deleteTab(this.tab, this.tabset)
+    Analytics.fireEvent('tabset_tab_deleted', { tabsCount: tabset.tabs.length })
+    // sharing
+    // if (tabset.sharing?.sharedId && tabset.sharing.sharing === TabsetSharing.PUBLIC_LINK) {
+    //   tabset.sharing.sharing = TabsetSharing.PUBLIC_LINK_OUTDATED
+    //   tabset.sharing.sharedAt = new Date().getTime()
+    // }
+    info('tab deleted')
+    sendMsg('tab-deleted', { tabsetId: tabset.id })
+    const result = await AppEventDispatcher.dispatchEvent('tab-deleted', { url: this.tab.url })
+    console.log('bookmarksToDelete', result)
+    if (result && this.tab.url && useFeaturesStore().hasFeature(FeatureIdent.BOOKMARKS)) {
+      const bookmarksCount = (result['bookmarks' as keyof object] as number) || 0
+      useMessagesStore().addMessage(
+        new Message(
+          uid(),
+          new Date().getTime(),
+          new Date().getTime(),
+          'new',
+          'Delete Bookmark(s) as well?',
+          'dialog://deleteTabs/' + btoa(this.tab.url) + '/' + ('' + bookmarksCount),
         ),
       )
-      .then((res) => {
-        sendMsg('tab-deleted', { tabsetId: res.result.id })
-        return res
-      })
-      .catch((err) => Promise.reject(err))
+    }
+    return Promise.resolve(
+      new ExecutionResult(
+        tabset,
+        'Tab was deleted from collection',
+        new Map([
+          ['Undo', new UndoCommand(tabset, this.tab)],
+          // ['Delete Bookmark also', new UndoCommand(tabset, this.tab)],
+        ]),
+      ),
+    )
   }
 }
 

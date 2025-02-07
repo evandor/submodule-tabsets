@@ -94,17 +94,19 @@ export const useTabsetsUiStore = defineStore('tabsetsUi', () => {
         chrome.action.setBadgeText({ tabId, text: '' + matchingTabs.value.length })
         chrome.action.setBadgeBackgroundColor({ tabId, color: 'orange' })
         chrome.action.setTitle({ tabId, title: `The current tab is contained in ${matchingTabs.value.length} tabsets` })
-        if (
-          matchingTabs.value
-            .map((ts: TabAndTabsetId) => ts.tabsetId)
-            .indexOf(useTabsetsStore().currentTabsetId || '') >= 0
-        ) {
-          chrome.action.setBadgeBackgroundColor({ tabId, color: 'green' })
-          chrome.action.setTitle({
-            tabId,
-            title: `The current tab is contained in ${matchingTabs.value.length} tabsets, including the current one (${useTabsetsStore().currentTabsetName}).`,
+        useTabsetsStore()
+          .getCurrentTabsetId()
+          .then((currentTabsetId: string | undefined) => {
+            if (currentTabsetId) {
+              if (matchingTabs.value.map((ts: TabAndTabsetId) => ts.tabsetId).indexOf(currentTabsetId || '') >= 0) {
+                chrome.action.setBadgeBackgroundColor({ tabId, color: 'green' })
+                chrome.action.setTitle({
+                  tabId,
+                  title: `The current tab is contained in ${matchingTabs.value.length} tabsets, including the current one (${useTabsetsStore().currentTabsetName}).`,
+                })
+              }
+            }
           })
-        }
       }
     }
   }
