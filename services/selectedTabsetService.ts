@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { LocalStorage } from 'quasar'
+import BrowserApi from 'src/app/BrowserApi'
 import { ref } from 'vue'
 
 type WindowToTabsetId = { [k: string]: string }
@@ -16,6 +17,16 @@ const useTabsetToWindowStore = defineStore('tabsetToWindowStore', () => {
 
 const getWindowIdentifier = (w: chrome.windows.Window) => {
   return 'window-' + w.id || w.sessionId || '0'
+}
+
+function deleteWindow(windowIdent: string) {
+  useTabsetToWindowStore().currentTabsetToWindowMap.delete(windowIdent)
+  const oldTabsets = LocalStorage.getItem(CURRENT_TABSETS_STORAGE_ID) as string | undefined
+  if (oldTabsets) {
+    const mapping: WindowToTabsetId = oldTabsets as unknown as WindowToTabsetId
+    delete mapping[windowIdent]
+    LocalStorage.setItem(CURRENT_TABSETS_STORAGE_ID, mapping)
+  }
 }
 
 /**
@@ -68,12 +79,12 @@ export function useSelectedTabsetService() {
       }
     } else {
       localStorage.removeItem(CURRENT_TABSET_STORAGE_ID)
-
-      if (oldTabsets) {
-        const mapping: WindowToTabsetId = oldTabsets as unknown as WindowToTabsetId
-        delete mapping[ident]
-        LocalStorage.setItem(CURRENT_TABSETS_STORAGE_ID, mapping)
-      }
+      deleteWindow(ident)
+      // if (oldTabsets) {
+      //   const mapping: WindowToTabsetId = oldTabsets as unknown as WindowToTabsetId
+      //   delete mapping[ident]
+      //   LocalStorage.setItem(CURRENT_TABSETS_STORAGE_ID, mapping)
+      // }
     }
   }
 
@@ -100,8 +111,25 @@ export function useSelectedTabsetService() {
       }
     }
     if (windowToDelete) {
-      useTabsetToWindowStore().currentTabsetToWindowMap.delete(windowToDelete)
+      deleteWindow(windowToDelete)
     }
+  }
+
+  const clearWindow = async (windowId: number) => {
+    const pseudoWindow = BrowserApi.createChromeWindowObject(windowId, 0, 0)
+    const ident = getWindowIdentifier(pseudoWindow)
+    // console.log('clearing window', windowId, ident)
+    // console.log('1', useTabsetToWindowStore().currentTabsetToWindowMap)
+    // useTabsetToWindowStore().currentTabsetToWindowMap.delete(ident)
+    // console.log('2', useTabsetToWindowStore().currentTabsetToWindowMap)
+    //LocalStorage.setItem(CURRENT_TABSETS_STORAGE_ID, useTabsetToWindowStore().currentTabsetToWindowMap)
+    deleteWindow(ident)
+    // const oldTabsets = LocalStorage.getItem(CURRENT_TABSETS_STORAGE_ID) as string | undefined
+    // if (oldTabsets) {
+    //   const mapping: WindowToTabsetId = oldTabsets as unknown as WindowToTabsetId
+    //   delete mapping[ident]
+    //   LocalStorage.setItem(CURRENT_TABSETS_STORAGE_ID, mapping)
+    // }
   }
 
   return {
@@ -109,5 +137,6 @@ export function useSelectedTabsetService() {
     setCurrentTabsetId,
     getSelectedTabsetId,
     clearCurrentTabsetId,
+    clearWindow,
   }
 }
