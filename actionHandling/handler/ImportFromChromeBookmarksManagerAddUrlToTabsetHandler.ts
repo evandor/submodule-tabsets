@@ -76,7 +76,7 @@ export class ImportFromChromeBookmarksManagerAddUrlToTabsetHandler implements Ad
       try {
         const currentTabsetName = useTabsetsStore().getCurrentTabset?.name || 'unknown'
         const res: ExecutionResult<Tabset> = await useCommandExecutor().execute(
-          new CreateTabsetFromBookmarksRecursive(currentTabsetName, bmFolderId),
+          new CreateTabsetFromBookmarksRecursive(currentTabsetName, bmFolderId, true),
         )
         const tabset = res.result
         await useTabsetService().saveTabset(tabset)

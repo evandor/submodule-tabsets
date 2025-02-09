@@ -3,10 +3,38 @@ import { defineStore } from 'pinia'
 import { useUtils } from 'src/core/services/Utils'
 import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset } from 'src/tabsets/models/Tabset'
-import { computed, ref } from 'vue'
+import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+import { computed, ComputedRef, ref } from 'vue'
 
 async function queryTabs(): Promise<chrome.tabs.Tab[]> {
   return await chrome.tabs.query({ currentWindow: true })
+}
+
+function calcOverlapForTabsets(
+  tabsets: Tabset[],
+  getOverlap: ComputedRef<(tabset: Tabset) => number>,
+  maxOverlap: number,
+  maxOverlapTs: Tabset | undefined,
+  maxOverlapFolder: Tabset | undefined,
+  level: number = 0,
+) {
+  tabsets.forEach((ts: Tabset) => {
+    const overlap = getOverlap.value(ts)
+    if (overlap > maxOverlap) {
+      console.log('overlap!!!', overlap, ts.name)
+      maxOverlap = overlap
+      maxOverlapTs = level == 0 ? ts : maxOverlapTs
+      maxOverlapFolder = level == 0 ? undefined : ts
+    }
+    const folderRes = calcOverlapForTabsets(ts.folders, getOverlap, maxOverlap, maxOverlapTs, maxOverlapFolder, level++)
+    if (folderRes && folderRes.maxOverlap > maxOverlap) {
+      console.log('overlap!!!', overlap, folderRes.maxOverlapFolder?.name)
+      maxOverlap = folderRes.maxOverlap
+      maxOverlapTs = folderRes.maxOverlapTs
+      maxOverlapFolder = folderRes.maxOverlapFolder
+    }
+  })
+  return { maxOverlap, maxOverlapTs, maxOverlapFolder }
 }
 
 /**
@@ -171,7 +199,7 @@ export const useTabsStore2 = defineStore('browsertabs', () => {
         const lapover1 = currentTabsetTabs.intersection(allTabs)
         const lapover2 = browserTabs.intersection(allTabs)
         const overlap = Math.min(lapover1.size, lapover2.size) / allTabs.size
-        console.log('overlap', overlap, lapover1.size, lapover2.size, allTabs.size)
+        //console.log('overlap', overlap, tabset.name, lapover1.size, lapover2.size, allTabs.size)
         //overlapTooltip.value = `${Math.round(100 * overlap.value)}% overlap between this tabset and the currently open tabs`
         return overlap
       } catch (err) {
@@ -180,6 +208,35 @@ export const useTabsStore2 = defineStore('browsertabs', () => {
       }
     }
   })
+
+  const suggestTabsetAndFolder = async (
+    threshold: number,
+  ): Promise<{ tabsetId: string; tabsetName: string; folder: string | undefined } | undefined> => {
+    const currentTabset: Tabset | undefined = useTabsetsStore().getCurrentTabset
+    if (currentTabset) {
+      const currentOverlap = getOverlap.value(currentTabset)
+      if (currentOverlap > threshold) {
+        return undefined
+      }
+    }
+    const tabsets = [...useTabsetsStore().tabsets.values()] as Tabset[]
+    let maxOverlap = 0
+    let maxOverlapTs: Tabset | undefined = undefined
+    let maxOverlapFolder: Tabset | undefined = undefined
+
+    const __ret = calcOverlapForTabsets(tabsets, getOverlap, maxOverlap, maxOverlapTs, maxOverlapFolder)
+    maxOverlap = __ret.maxOverlap
+    maxOverlapTs = __ret.maxOverlapTs
+    maxOverlapFolder = __ret.maxOverlapFolder
+
+    console.log('---res-overlap---', maxOverlap, maxOverlapTs, maxOverlapFolder)
+
+    if (maxOverlap > threshold && maxOverlapTs!.id !== (await useTabsetsStore().getCurrentTabsetId())) {
+      //console.log('should switch to', maxOverlapTs!.name)
+      return { tabsetId: maxOverlapTs!.id, tabsetName: maxOverlapTs!.name, folder: undefined }
+    }
+    return undefined
+  }
 
   return {
     initialize,
@@ -196,5 +253,6 @@ export const useTabsStore2 = defineStore('browsertabs', () => {
     chromeTabsHistory,
     removeTab,
     getOverlap,
+    suggestTabsetAndFolder,
   }
 })
