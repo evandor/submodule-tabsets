@@ -7,16 +7,18 @@ import { Tabset } from 'src/tabsets/models/Tabset'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useUiStore } from 'src/ui/stores/uiStore'
 
-async function createTabsetFrom(name: string, bookmarkId: string) {
+async function createTabsetFrom(name: string, bookmarkId: string, recurse: boolean) {
   console.log('creating recursively', name, bookmarkId)
   const subTree: chrome.bookmarks.BookmarkTreeNode[] = await BrowserApi.childrenFor(bookmarkId)
   const folders = _.filter(subTree, (e: chrome.bookmarks.BookmarkTreeNode) => e.url === undefined)
   const nodes = _.filter(subTree, (e: chrome.bookmarks.BookmarkTreeNode) => e.url !== undefined)
   const subfolders: Tabset[] = []
-  for (const f of folders) {
-    console.log('found folder', f)
-    const subTabset = await createTabsetFrom(f.title, f.id)
-    subfolders.push(subTabset)
+  if (recurse) {
+    for (const f of folders) {
+      console.log('found folder', f)
+      const subTabset = await createTabsetFrom(f.title, f.id, recurse)
+      subfolders.push(subTabset)
+    }
   }
   const result = await useTabsetService().saveOrReplaceFromBookmarks(name, nodes, true, true)
   console.log('result', result)
@@ -32,12 +34,17 @@ export class CreateTabsetFromBookmarksRecursive implements Command<Tabset> {
   constructor(
     public name: string,
     public bookmarkId: string,
+    public recurse: boolean,
   ) {}
 
   async execute(): Promise<ExecutionResult<any>> {
-    const tabset = await createTabsetFrom(this.name, '' + this.bookmarkId)
+    const tabset = await createTabsetFrom(this.name, '' + this.bookmarkId, this.recurse)
     tabset.bookmarkId = this.bookmarkId
     Analytics.fireEvent('tabset_created_from_bookmarks_recursive', { tabsCount: tabset.tabs.length })
     return Promise.resolve(new ExecutionResult(tabset, 'done'))
   }
+}
+
+CreateTabsetFromBookmarksRecursive.prototype.toString = function cmdToString() {
+  return `CreateTabsetFromBookmarksRecursive: {name=${this.name}, bookmarkId=${this.bookmarkId}}`
 }
