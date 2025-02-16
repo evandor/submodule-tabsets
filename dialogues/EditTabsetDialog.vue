@@ -165,8 +165,7 @@ const disableSubmit = (): boolean => {
     newTabsetName.value.trim().length === 0 ||
     (newTabsetName.value.trim() === props.tabsetName &&
       windowModel.value?.trim() === props.window &&
-      theColor.value?.trim() === props.tabsetColor &&
-      detailOption.value === props.details) ||
+      theColor.value?.trim() === props.tabsetColor) ||
     newTabsetDialogWarning() !== '' ||
     windowMgtSelectionHasFocus.value
   )
