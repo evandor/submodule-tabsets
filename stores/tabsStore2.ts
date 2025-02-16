@@ -229,7 +229,7 @@ export const useTabsStore2 = defineStore('browsertabs', () => {
     maxOverlapTs = __ret.maxOverlapTs
     maxOverlapFolder = __ret.maxOverlapFolder
 
-    console.log('---res-overlap---', maxOverlap, maxOverlapTs, maxOverlapFolder)
+    // console.log('---res-overlap---', maxOverlap, maxOverlapTs, maxOverlapFolder)
 
     if (maxOverlap > threshold && maxOverlapTs!.id !== (await useTabsetsStore().getCurrentTabsetId())) {
       //console.log('should switch to', maxOverlapTs!.name)

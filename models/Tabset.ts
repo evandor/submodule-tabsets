@@ -1,5 +1,6 @@
 // 4 expected diffs to localstorage
 import { STRIP_CHARS_IN_USER_INPUT } from 'src/boot/constants'
+import { RestApiIdent } from 'src/rest/RestApi'
 import { useAuthStore } from 'src/stores/authStore'
 import { SharingInfo } from 'src/tabsets/models/SharingInfo'
 import { Tab } from 'src/tabsets/models/Tab'
@@ -21,6 +22,7 @@ export enum TabsetType {
   SPECIAL = 'SPECIAL',
   DYNAMIC = 'DYNAMIC',
   RSS_FOLDER = 'RSS_FOLDER',
+  REST = 'REST',
 }
 
 export enum TabsetSharing {
@@ -118,6 +120,8 @@ export class Tabset {
   augmentedData: AugmentedData = new AugmentedData()
 
   lastChange?: ChangeInfo | undefined = undefined
+
+  restDefinition?: RestApiIdent | undefined = undefined
 
   constructor(id: string, name: string, tabs: Tab[] = [], columns: TabsetColumn[] = [], spaces: string[] = []) {
     // some guards

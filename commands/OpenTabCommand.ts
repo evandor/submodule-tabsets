@@ -28,6 +28,21 @@ export class OpenTabCommand implements Command<string> {
         openURL(this.tab.url!)
         return Promise.resolve(new ExecutionResult('', 'opened'))
       }
+
+      // special handling
+      const protocol = this.tab.url?.split('://')[0]
+      switch (protocol) {
+        case 'ts-obsidian':
+          console.log('protocol', protocol)
+          ///www/index.html#/mainpanel/settings
+          this.tab.url = chrome.runtime.getURL(
+            'www/index.html/#/mainpanel/obsidian/files/' + this.tab.url?.split('://')[1],
+          )
+          break
+        default:
+          break
+      }
+
       const handler = ref<AddUrlToTabsetHandler>(this.getHandler(this.tab.url!))
       const browserTab = await useNavigationService().browserTabFor(this.tab.url!)
       handler.value.handleOpenedTab(browserTab, this.tab)

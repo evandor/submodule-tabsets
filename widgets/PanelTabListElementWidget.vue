@@ -108,6 +108,16 @@
       </template>
     </template>
 
+    <!-- === RestTab === -->
+    <div v-if="'params' in props.tab && 'api' in props.tab">
+      <div v-for="p in props.tab.params">
+        <q-input type="text" v-model="p['val' as keyof object]" :label="p['name' as keyof object]" />
+      </div>
+      <div>
+        <q-btn label="submit" type="submit" @click="callRestApi(props.tab)" />
+      </div>
+    </div>
+
     <!-- === open search === -->
     <q-item-label v-if="showOpenSearchInput()">
       <div class="row q-ma-none q-pa-none q-my-xs">
@@ -435,6 +445,7 @@ import { useUtils } from 'src/core/services/Utils'
 import ShortUrl from 'src/core/utils/ShortUrl.vue'
 import { useEventsServices } from 'src/events/services/EventsServices'
 import { useFeaturesStore } from 'src/features/stores/featuresStore'
+import { RestTab } from 'src/rest/models/RestTab'
 import NavigationService from 'src/services/NavigationService'
 import TabService from 'src/services/TabService'
 import { SavedBlob } from 'src/snapshots/models/SavedBlob'
@@ -825,6 +836,12 @@ const formatReadingTime = (ms: number) => {
   } else {
     return ms
   }
+}
+
+const callRestApi = (tab: Tab) => {
+  const restTab = tab as RestTab
+  console.log(`about to call ${restTab.api} with ${JSON.stringify(restTab.params)}`)
+  useNavigationService().browserTabFor(chrome.runtime.getURL('www/index.html/#/mainpanel/restapi/' + restTab.api))
 }
 </script>
 
