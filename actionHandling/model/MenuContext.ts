@@ -1,14 +1,10 @@
-import { DialogChainObject, QVueGlobals } from 'quasar'
+import { QVueGlobals } from 'quasar'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { AddUrlToTabsetHandlerAdditionalData, ClickedHandler } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { Tabset } from 'src/tabsets/models/Tabset'
 
-export class ActionContext {
+export class MenuContext {
   public clicked?: ClickedHandler
-
-  public dialog?: ($q: QVueGlobals) => DialogChainObject | undefined = undefined
-
-  public ok?: (payload: any) => ClickedHandler
 
   public colorFkt?: () => string
 
@@ -31,17 +27,6 @@ export class ActionContext {
     ) => Promise<ExecutionResult<any>>,
   ) {
     this.clicked = clicked
-    return this
-  }
-
-  withDialog(withDialog: ($q: QVueGlobals) => DialogChainObject | undefined, $q: QVueGlobals) {
-    this.dialog = withDialog
-    this.$q = $q
-    return this
-  }
-
-  onOk(onOkFunction: (data: any) => ClickedHandler) {
-    this.ok = onOkFunction
     return this
   }
 

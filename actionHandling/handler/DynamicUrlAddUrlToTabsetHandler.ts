@@ -1,15 +1,15 @@
-import { DialogChainObject, QVueGlobals, uid } from 'quasar'
+import { QVueGlobals, uid } from 'quasar'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import {
   AddUrlToTabsetHandler,
   AddUrlToTabsetHandlerAdditionalData,
-  ButtonActions,
 } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
 import { AddTabToTabsetCommand } from 'src/tabsets/commands/AddTabToTabsetCommand'
 import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset } from 'src/tabsets/models/Tabset'
+import { Component } from 'vue'
 
 export class DynamicUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   constructor(public $q: QVueGlobals | undefined) {}
@@ -26,13 +26,14 @@ export class DynamicUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
     return false
   }
 
-  actions(): ActionContext[] {
-    // return [new ActionContext("Dynamic Load", ButtonActions.DynamicLoad, this.folder)]
-    return [new ActionContext('Dynamic Load', ButtonActions.DynamicLoad, undefined)]
+  defaultAction(): ActionContext {
+    return null as unknown as ActionContext
   }
 
-  withDialog(action: ButtonActions): DialogChainObject | undefined {
-    return undefined
+  actions(): Component[] {
+    // return [new ActionContext("Dynamic Load", ButtonActions.DynamicLoad, this.folder)]
+    // new ActionContext('Dynamic Load', ButtonActions.DynamicLoad, undefined)
+    return []
   }
 
   clicked(
@@ -48,7 +49,8 @@ export class DynamicUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   updateInTabset(
     chromeTab: chrome.tabs.Tab,
     ts: Tabset,
-    additionalData: AddUrlToTabsetHandlerAdditionalData = {},
+    folder?: Tabset,
+    additionalData?: AddUrlToTabsetHandlerAdditionalData,
   ): Promise<ExecutionResult<any>> {
     throw new Error('not implemented J')
   }

@@ -1,20 +1,25 @@
-import { DialogChainObject, uid } from 'quasar'
+import { QVueGlobals, uid } from 'quasar'
 import { useContentStore } from 'src/content/stores/contentStore'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import {
   AddUrlToTabsetHandler,
   AddUrlToTabsetHandlerAdditionalData,
-  ButtonActions,
 } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
+import CreateSubfolderAction from 'src/tabsets/actions/CreateSubfolderAction.vue'
+import DeleteTabsetAction from 'src/tabsets/actions/DeleteTabsetAction.vue'
+import EditTabsetAction from 'src/tabsets/actions/EditTabsetAction.vue'
+import OpenAllInMenuAction from 'src/tabsets/actions/OpenAllInMenuAction.vue'
 import { AddTabToTabsetCommand } from 'src/tabsets/commands/AddTabToTabsetCommand'
 import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset } from 'src/tabsets/models/Tabset'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+import { Component } from 'vue'
 
 export class DefaultAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
+  constructor(public $q: QVueGlobals) {}
   urlMatcher(): RegExp {
     return /.*/
   }
@@ -23,10 +28,15 @@ export class DefaultAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
     return true
   }
 
-  actions(currentTabsetId: string | undefined): ActionContext[] {
+  defaultAction(): ActionContext {
+    return new ActionContext('Add Tab').onClicked(this.clicked)
+  }
+
+  actions(currentTabsetId: string | undefined): Component[] {
     const url = useContentStore().getCurrentTabUrl
     // const currentTabsetId = await useTabsetsStore().getCurrentTabsetId()
-    const actions = [new ActionContext('Add Tab', ButtonActions.AddTab)]
+    const actions = [EditTabsetAction, CreateSubfolderAction, OpenAllInMenuAction, DeleteTabsetAction]
+
     if (url) {
       // TODO folders?
       const tabsetIds = useTabsetService()
@@ -35,15 +45,11 @@ export class DefaultAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
 
       if (tabsetIds.length > 0) {
         tabsetIds.forEach((tabsetId: string) => {
-          actions.push(new ActionContext('Open', ButtonActions.OpenTab, undefined, { tabsetId }))
+          //actions.push(new ActionContext('Open', undefined, undefined, { tabsetId }).onClicked(this.clicked))
         })
       }
     }
     return actions
-  }
-
-  withDialog(action: ButtonActions): DialogChainObject | undefined {
-    return undefined
   }
 
   clicked(
@@ -53,7 +59,7 @@ export class DefaultAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
     additionalData: AddUrlToTabsetHandlerAdditionalData = {},
   ): Promise<ExecutionResult<any>> {
     const actionContext: ActionContext | undefined = additionalData.action
-    if (actionContext && actionContext.identifier === ButtonActions.OpenTab && actionContext.additionalData) {
+    if (actionContext && actionContext.additionalData) {
       useTabsetsStore().selectCurrentTabset(actionContext.additionalData['tabsetId' as keyof object])
       return Promise.resolve(new ExecutionResult('', ''))
     }

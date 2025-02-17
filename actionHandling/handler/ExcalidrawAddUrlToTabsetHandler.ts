@@ -1,10 +1,9 @@
-import { DialogChainObject, QVueGlobals, uid } from 'quasar'
+import { QVueGlobals, uid } from 'quasar'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import {
   AddUrlToTabsetHandler,
   AddUrlToTabsetHandlerAdditionalData,
-  ButtonActions,
 } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
 import { ExcalidrawStorage } from 'src/tabsets/actionHandling/model/ExcalidrawStorage'
@@ -13,9 +12,6 @@ import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset } from 'src/tabsets/models/Tabset'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 
-/**
- * does not work as intended; cannot overwrite local storage of excalidraw.com
- */
 export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   constructor(public $q: QVueGlobals | undefined) {}
 
@@ -27,6 +23,28 @@ export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
     return false
   }
 
+  defaultAction(): ActionContext | undefined {
+    const tabset: Tabset | undefined = useTabsetsStore().getCurrentTabset
+    if (tabset) {
+      var actions = (tabset.tabs as Tab[])
+        .filter((t: Tab) => t.url !== undefined)
+        .filter((t: Tab) => t.url!.match(this.urlMatcher()))
+        .map((t: Tab) => {
+          return new ActionContext(t.title || 'undefined').onClicked(this.updateInTabset)
+        })
+      const res =
+        actions.length > 0
+          ? actions
+              .concat([new ActionContext('Save as new file').withDialog(this.newFileDialog, this.$q!).onOk(this.onOk)])
+              .concat([new ActionContext('Clear canvas')])
+          : actions.concat([
+              new ActionContext('Add Excalidraw').withDialog(this.newFileDialog, this.$q!).onOk(this.onOk),
+            ])
+      return res[0]
+    }
+    return undefined
+  }
+
   actions(): ActionContext[] {
     const tabset: Tabset | undefined = useTabsetsStore().getCurrentTabset
     if (tabset) {
@@ -34,26 +52,15 @@ export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
         .filter((t: Tab) => t.url !== undefined)
         .filter((t: Tab) => t.url!.match(this.urlMatcher()))
         .map((t: Tab) => {
-          return new ActionContext(t.title || 'undefined', ButtonActions.Save)
+          return new ActionContext(t.title || 'undefined').onClicked(this.updateInTabset)
         })
       return actions.length > 0
         ? actions
-            .concat([new ActionContext('Save as new file', ButtonActions.SaveAs)])
-            .concat([new ActionContext('Clear canvas', ButtonActions.ClearCanvas)])
-        : actions.concat([new ActionContext('Add Excalidraw', ButtonActions.SaveAs)])
+            .concat([new ActionContext('Save as new file').withDialog(this.newFileDialog, this.$q!).onOk(this.onOk)])
+            .concat([new ActionContext('Clear canvas')])
+        : actions.concat([new ActionContext('Add Excalidraw').withDialog(this.newFileDialog, this.$q!).onOk(this.onOk)])
     }
     return []
-  }
-
-  withDialog(action: ButtonActions): DialogChainObject | undefined {
-    switch (action) {
-      case ButtonActions.NewFile:
-        return this.newFileDialog()
-      case ButtonActions.SaveAs:
-        return this.newFileDialog()
-      default:
-        console.log('no dialog for action', action)
-    }
   }
 
   async clicked(
@@ -64,14 +71,14 @@ export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   ): Promise<ExecutionResult<any>> {
     console.log('saving...', chromeTab.id, additionalData)
     try {
-      const filename = additionalData ? additionalData.data!['filename' as keyof object] : undefined
+      const filename: string | undefined = additionalData ? (additionalData.dialog as unknown as string) : undefined
       if (!filename) {
         throw new Error('filename is missing')
       }
 
       const newTab = new Tab(uid(), chromeTab)
 
-      const returned = await this.queryBrowserTab(chromeTab, newTab.id, filename!)
+      const returned = await ExcalidrawAddUrlToTabsetHandler.queryBrowserTab(chromeTab, newTab.id, filename!)
       if (returned.length > 0) {
         newTab.title = filename
 
@@ -97,15 +104,16 @@ export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   async updateInTabset(
     chromeTab: chrome.tabs.Tab,
     ts: Tabset,
-    additionalData: AddUrlToTabsetHandlerAdditionalData = {},
+    folder?: Tabset,
+    additionalData?: AddUrlToTabsetHandlerAdditionalData,
   ): Promise<ExecutionResult<any>> {
     console.log('updating...', chromeTab.id, additionalData)
     try {
-      const filename = additionalData.data!.more!['filename' as keyof object]
+      const filename = additionalData!.dialog as unknown as string
       if (!filename) {
         throw new Error('filename is missing')
       }
-      const returned = await this.queryBrowserTab(chromeTab, '', filename)
+      const returned = await ExcalidrawAddUrlToTabsetHandler.queryBrowserTab(chromeTab, '', filename)
       if (returned.length > 0) {
         const tabCandidates = ts.tabs.filter((t: Tab) => t.url!.match(this.urlMatcher()) && t.title === filename)
         const firstFrameReturned = returned.at(0)
@@ -155,7 +163,7 @@ export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
       })
   }
 
-  private async queryBrowserTab(
+  private static async queryBrowserTab(
     chromeTab: chrome.tabs.Tab,
     tabId: string,
     filename: string,
@@ -181,17 +189,18 @@ export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
     })
   }
 
-  newFileDialog(filename: string = '') {
-    if (this.$q) {
-      return this.$q!.dialog({
-        title: 'Save as Excalidraw File',
-        message: 'Please Provide a name (min 3 characters)',
-        prompt: { model: filename, isValid: (val: string) => val.length > 2, type: 'text' },
-        cancel: true,
-        persistent: true,
-      })
-    } else {
-      console.warn('could not display newFileDialog, quasar not set')
-    }
+  newFileDialog($q: QVueGlobals, filename: string = '') {
+    return $q!.dialog({
+      title: 'Save as Excalidraw File',
+      message: 'Please Provide a name (min 3 characters)',
+      prompt: { model: filename, isValid: (val: string) => val.length > 2, type: 'text' },
+      cancel: true,
+      persistent: true,
+    })
+  }
+
+  onOk = (data: string[]) => {
+    //console.log('data!', data)
+    return this.clicked // handler could depend on data
   }
 }
