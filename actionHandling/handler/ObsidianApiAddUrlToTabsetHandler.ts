@@ -1,10 +1,8 @@
-import { DialogChainObject } from 'quasar'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { RestApiDefinitions } from 'src/rest/RestApiDefinitions'
 import {
   AddUrlToTabsetHandler,
   AddUrlToTabsetHandlerAdditionalData,
-  ButtonActions,
 } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
 import { Tab } from 'src/tabsets/models/Tab'
@@ -20,8 +18,12 @@ export class ObsidianApiAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
     return false
   }
 
+  defaultAction(): ActionContext {
+    return null as unknown as ActionContext
+  }
+
   actions(): ActionContext[] {
-    return [new ActionContext('Add Obsidian vault', ButtonActions.Save)]
+    return [new ActionContext('Add Obsidian vault')]
   }
 
   clicked(
@@ -44,7 +46,8 @@ export class ObsidianApiAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   async updateInTabset(
     browserTab: chrome.tabs.Tab,
     ts: Tabset,
-    additionalData: AddUrlToTabsetHandlerAdditionalData,
+    folder?: Tabset,
+    additionalData?: AddUrlToTabsetHandlerAdditionalData,
   ): Promise<ExecutionResult<any>> {
     // eslint-disable-next-line @typescript-eslint/no-base-to-string
     console.log(`handleOpenedTab ${browserTab}, ${ts as Tabset}, ${additionalData}`)
@@ -58,9 +61,5 @@ export class ObsidianApiAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
       return new ExecutionResult('done', 'done')
     }
     return Promise.reject('could not find API')
-  }
-
-  withDialog(action: ButtonActions): DialogChainObject | undefined {
-    return undefined
   }
 }

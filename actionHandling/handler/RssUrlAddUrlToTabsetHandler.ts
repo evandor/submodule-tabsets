@@ -5,7 +5,7 @@ import { useRequestsStore } from 'src/requests/stores/requestsStore'
 import {
   AddUrlToTabsetHandler,
   AddUrlToTabsetHandlerAdditionalData,
-  ButtonActions,
+  ClickedHandler,
 } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
 import { AddTabToTabsetCommand } from 'src/tabsets/commands/AddTabToTabsetCommand'
@@ -20,7 +20,7 @@ import { Tabset, TabsetType } from 'src/tabsets/models/Tabset'
  * https://www.spiegel.de/sport/index.rss
  */
 export class RssUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
-  constructor(public $q: QVueGlobals | undefined) {}
+  constructor(public $q: QVueGlobals) {}
 
   urlMatcher(): RegExp {
     return /.*\.rss$/
@@ -49,17 +49,12 @@ export class RssUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
     )
   }
 
-  actions(): ActionContext[] {
-    return [new ActionContext('Add RSS Feed', ButtonActions.AddRssFeed)]
+  defaultAction(): ActionContext {
+    return null as unknown as ActionContext
   }
 
-  withDialog(action: ButtonActions): DialogChainObject | undefined {
-    switch (action) {
-      case ButtonActions.AddRssFeed:
-        return this.storeAsFeed()
-      default:
-        console.log('no dialog for action', action)
-    }
+  actions(): ActionContext[] {
+    return [new ActionContext('Add RSS Feed').withDialog(this.storeAsFeed, this.$q).onOk(this.onOk)]
   }
 
   async clicked(
@@ -70,11 +65,11 @@ export class RssUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   ): Promise<ExecutionResult<any>> {
     console.log('saving...', chromeTab, additionalData)
     try {
-      const displayFeed = additionalData.data!.more!['displayFeed' as keyof object] as boolean
+      const displayFeed = additionalData.dialog!['displayFeed' as keyof object] as boolean
       const newTab = new Tab(uid(), chromeTab)
       if (displayFeed) {
         // let title = chromeTab.url?.replace("https://","").replace("http://", "").replace(STRIP_CHARS_IN_USER_INPUT, '') || 'no title'
-        let title: string = additionalData.data!.more!['feedName' as keyof object] || 'no title'
+        let title: string = additionalData.dialog!['feedName' as keyof object] || 'no title'
         if (title.length > 32) {
           title = title.substring(0, 28) + '...'
         }
@@ -94,6 +89,7 @@ export class RssUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   updateInTabset(
     chromeTab: chrome.tabs.Tab,
     ts: Tabset,
+    folder?: Tabset,
     additionalData?: AddUrlToTabsetHandlerAdditionalData,
   ): Promise<ExecutionResult<any>> {
     throw new Error('not implemented M')
@@ -101,28 +97,29 @@ export class RssUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
 
   handleOpenedTab(browserTab: chrome.tabs.Tab, tab: Tab) {}
 
-  storeAsFeed(): DialogChainObject | undefined {
-    if (this.$q) {
-      return this.$q.dialog({
-        component: AddRssFeedDialog,
-        componentProps: { parentFolderId: 'bookmarkId.value' },
-      })
+  storeAsFeed($q: QVueGlobals): DialogChainObject | undefined {
+    return $q.dialog({
+      component: AddRssFeedDialog,
+      componentProps: { parentFolderId: 'bookmarkId.value' },
+    })
 
-      // return this.$q!.dialog({
-      //   title: 'Display RSS Feed?',
-      //   message: 'This file seems to contain an RSS Feed',
-      //   options: {
-      //     type: 'checkbox',
-      //     model: [],
-      //     items: [
-      //       {label: 'Display Feed', value: 'displayFeed', color: 'secondary'},
-      //     ]
-      //   },
-      //   cancel: true,
-      //   persistent: true
-      // })
-    } else {
-      console.warn('could not display storeAsFeed, quasar not set')
-    }
+    // return this.$q!.dialog({
+    //   title: 'Display RSS Feed?',
+    //   message: 'This file seems to contain an RSS Feed',
+    //   options: {
+    //     type: 'checkbox',
+    //     model: [],
+    //     items: [
+    //       {label: 'Display Feed', value: 'displayFeed', color: 'secondary'},
+    //     ]
+    //   },
+    //   cancel: true,
+    //   persistent: true
+    // })
+  }
+
+  onOk = (data: string[]): ClickedHandler => {
+    console.log('data!', data)
+    return this.clicked
   }
 }

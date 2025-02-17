@@ -11,7 +11,7 @@ import { RssUrlAddUrlToTabsetHandler } from 'src/tabsets/actionHandling/handler/
 import { Tabset } from 'src/tabsets/models/Tabset'
 
 export class AddUrlToTabsetHandlers {
-  defaultAddUrlToTabsetHandler = new DefaultAddUrlToTabsetHandler()
+  defaultAddUrlToTabsetHandler = new DefaultAddUrlToTabsetHandler(null as unknown as QVueGlobals)
 
   handlers: AddUrlToTabsetHandler[] = []
 
@@ -20,9 +20,9 @@ export class AddUrlToTabsetHandlers {
     this.handlers.push(new ExcalidrawAddUrlToTabsetHandler(this.quasar))
     this.handlers.push(new ObsidianApiAddUrlToTabsetHandler())
     this.handlers.push(new RapidApiAddUrlToTabsetHandler())
-    this.handlers.push(new MarkdownFileAddUrlToTabsetHandler(this.quasar))
-    this.handlers.push(new ImportFromChromeBookmarksManagerAddUrlToTabsetHandler(this.quasar))
-    this.handlers.push(new RssUrlAddUrlToTabsetHandler(this.quasar))
+    this.handlers.push(new MarkdownFileAddUrlToTabsetHandler(this.quasar!))
+    this.handlers.push(new ImportFromChromeBookmarksManagerAddUrlToTabsetHandler(this.quasar!))
+    this.handlers.push(new RssUrlAddUrlToTabsetHandler(this.quasar!))
     // this.handlers.push(new TtlUrlAddUrlToTabsetHandler(this.quasar))
     this.handlers.push(new FileProtocolUrlAddUrlToTabsetHandler(this.quasar))
   }
@@ -36,6 +36,6 @@ export class AddUrlToTabsetHandlers {
       //handler[0].setFolder(folder)
       return handler[0]!
     }
-    return this.defaultAddUrlToTabsetHandler
+    return new DefaultAddUrlToTabsetHandler(this.quasar!)
   }
 }

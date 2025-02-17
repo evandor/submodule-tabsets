@@ -1,7 +1,7 @@
 import { parseFeed } from '@rowanmanning/feed-parser'
 import { FeedCategory } from '@rowanmanning/feed-parser/lib/feed/base'
 import * as cheerio from 'cheerio'
-import { DialogChainObject, QVueGlobals, uid } from 'quasar'
+import { QVueGlobals, uid } from 'quasar'
 import BrowserApi from 'src/app/BrowserApi'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
@@ -9,7 +9,6 @@ import { useUtils } from 'src/core/services/Utils'
 import {
   AddUrlToTabsetHandler,
   AddUrlToTabsetHandlerAdditionalData,
-  ButtonActions,
 } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
 import { AddTabToTabsetCommand } from 'src/tabsets/commands/AddTabToTabsetCommand'
@@ -29,12 +28,12 @@ export class RssFolderHandler implements AddUrlToTabsetHandler {
     return true
   }
 
-  actions(): ActionContext[] {
-    return [new ActionContext('(Re-)Load', ButtonActions.LoadRssFeed)]
+  defaultAction(): ActionContext {
+    return null as unknown as ActionContext
   }
 
-  withDialog(action: ButtonActions): DialogChainObject | undefined {
-    return undefined
+  actions(): ActionContext[] {
+    return [new ActionContext('(Re-)Load').onClicked(this.clicked)]
   }
 
   async clicked(
@@ -108,7 +107,8 @@ export class RssFolderHandler implements AddUrlToTabsetHandler {
   updateInTabset(
     chromeTab: chrome.tabs.Tab,
     ts: Tabset,
-    additionalData: AddUrlToTabsetHandlerAdditionalData = {},
+    folder?: Tabset,
+    additionalData?: AddUrlToTabsetHandlerAdditionalData,
   ): Promise<ExecutionResult<any>> {
     throw new Error('not implemented L')
   }

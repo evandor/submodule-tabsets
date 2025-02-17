@@ -74,6 +74,7 @@ import { Tabset, TabsetType } from 'src/tabsets/models/Tabset'
 import { PropType, ref, watchEffect } from 'vue'
 import '@he-tree/vue/style/default.css'
 import '@he-tree/vue/style/material-design.css'
+import { QVueGlobals } from 'quasar'
 import { useActionHandlers } from 'src/tabsets/actionHandling/ActionHandlers'
 import { ActionHandlerButtonClickedHolder } from 'src/tabsets/actionHandling/model/ActionHandlerButtonClickedHolder'
 import SpecialUrlAddToTabsetComponent from 'src/tabsets/actionHandling/SpecialUrlAddToTabsetComponent.vue'
@@ -169,7 +170,7 @@ const folderCaption = (folder: Tabset): string =>
 
 const handleButtonClicked = async (tabset: Tabset, args: ActionHandlerButtonClickedHolder, folder?: Tabset) => {
   console.log(`button clicked: tsId=${tabset.id}, folderId=${folder?.id}, args=...`)
-  await useActionHandlers(undefined).handleClick(tabset, currentChromeTab.value!, args, folder)
+  await useActionHandlers(null as unknown as QVueGlobals).handleClick(tabset, currentChromeTab.value!, args, folder)
 }
 
 const parentChain = (tabset: Tabset, folder?: Tabset, chain: Tabset[] = []): Tabset[] => {

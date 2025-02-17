@@ -1,29 +1,12 @@
-import { DialogChainObject } from 'quasar'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
 import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset } from 'src/tabsets/models/Tabset'
-
-export enum ButtonActions {
-  AddTab = 'AddTab',
-  OpenTab = 'OpenTab',
-  AddReadingModeTab = 'AddReadingModeTab',
-  AddTabWithDynamicFolder = 'AddTabWithDynamicFolder',
-  NewFile = 'NewFile',
-  SaveAs = 'SaveAs',
-  Save = 'Save',
-  DynamicLoad = 'DynamicLoad',
-  AddRssFeed = 'AddRssFeed',
-  LoadRssFeed = 'LoadRssFeed',
-  ClearCanvas = 'ClearCanvas',
-  ImportChromeBookmarks = 'ImportChromeBookmarks',
-}
+import { Component } from 'vue'
 
 export type AddUrlToTabsetHandlerAdditionalData = {
-  action?: {
-    identifier: ButtonActions
-    label: string
-  }
+  action?: ActionContext
+  dialog?: object
   data?: {
     useForLinks?: boolean
     displayFeed?: boolean
@@ -33,26 +16,29 @@ export type AddUrlToTabsetHandlerAdditionalData = {
   }
 }
 
+export type ClickedHandler = (
+  browserTab: chrome.tabs.Tab,
+  ts: Tabset,
+  folder?: Tabset,
+  additionalData?: AddUrlToTabsetHandlerAdditionalData,
+) => Promise<ExecutionResult<any>>
+
 export interface AddUrlToTabsetHandler {
   urlMatcher: () => RegExp
 
   contentMatcher: (content: string) => boolean
 
-  actions: (currentTabsetId: string | undefined) => ActionContext[]
+  defaultAction: () => ActionContext | undefined
 
-  withDialog: (action: ButtonActions) => DialogChainObject | undefined
+  actions: (currentTabsetId: string | undefined) => Component[]
 
-  clicked: (
-    browserTab: chrome.tabs.Tab,
-    ts: Tabset,
-    folder?: Tabset,
-    additionalData?: AddUrlToTabsetHandlerAdditionalData,
-  ) => Promise<ExecutionResult<any>>
+  clicked: ClickedHandler
 
   updateInTabset: (
     browserTab: chrome.tabs.Tab,
     ts: Tabset,
-    additionalData: AddUrlToTabsetHandlerAdditionalData,
+    folder?: Tabset,
+    additionalData?: AddUrlToTabsetHandlerAdditionalData,
   ) => Promise<ExecutionResult<any>>
 
   handleOpenedTab: (browserTab: chrome.tabs.Tab, tab: Tab) => void

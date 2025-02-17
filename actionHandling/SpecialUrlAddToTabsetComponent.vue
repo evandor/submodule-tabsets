@@ -1,18 +1,16 @@
 <template>
   <!--  @click.stop="saveInTabset(props.tabset.id, props.tabset.folderActive)" -->
-  <template v-if="handler.actions(currentTabsetId).length === 0"> ---</template>
-  <template v-else-if="handler.actions(currentTabsetId).length === 1">
+  <!--  <template v-if="handler.actions(currentTabsetId).length === 0"> -&#45;&#45;</template>-->
+  <template v-if="handler.actions(currentTabsetId).length == 0 && handler.defaultAction()">
     <q-btn
       outline
-      @click.stop="
-        emits('buttonClicked', new ActionHandlerButtonClickedHolder(handler, '', handler.actions(currentTabsetId)[0]))
-      "
+      @click.stop="emits('buttonClicked', new ActionHandlerButtonClickedHolder(handler, handler.defaultAction()))"
       class="q-ma-none q-px-sm q-py-none"
       :class="{ shake: animateAddtabButton, 'cursor-pointer': !alreadyInTabset() }"
       :color="alreadyInTabset() ? 'grey-5' : tsBadges.length > 0 ? 'positive' : ''"
       size="xs"
       data-testid="saveInTabsetBtn">
-      <div>{{ handler.actions(currentTabsetId)[0]!.label }}</div>
+      <div>{{ handler.defaultAction()!.label }}</div>
       <!--                  <q-icon right class="q-ma-none q-pa-none" size="2em" name="o_south" />-->
     </q-btn>
     <q-tooltip class="tooltip-small" v-if="alreadyInTabset()">
@@ -26,39 +24,81 @@
     </q-tooltip>
   </template>
 
-  <template v-else-if="handler.actions(currentTabsetId).length > 1">
+  <template v-else-if="handler.actions(currentTabsetId).length > 0 && handler.defaultAction()">
     <!-- :disable="!handler.actions()[0]!.active(props.currentChromeTab)"-->
     <q-btn-dropdown
-      :label="handler.actions(currentTabsetId)[0]!.label"
+      :label="handler.defaultAction()!.label"
+      :class="{ shake: animateAddtabButton, 'cursor-pointer': !alreadyInTabset() }"
       v-close-popup
       @click.stop="
         emits(
           'buttonClicked',
-          new ActionHandlerButtonClickedHolder(handler, ButtonActions.Save, handler.actions(currentTabsetId)[0], {
-            filename: handler.actions(currentTabsetId)[0]!.label,
+          new ActionHandlerButtonClickedHolder(handler, handler.defaultAction(), {
+            filename: handler.defaultAction()!.label,
           }),
         )
       "
       class="q-ma-none q-px-none q-py-none"
-      :color="color(handler.actions(currentTabsetId)[0]!)"
-      size="xs"
+      size="sm"
       split
       outline>
-      <q-list dense>
-        <q-item
-          v-for="l in handler.actions(currentTabsetId).slice(1)"
-          :clickable="isActive(l)"
-          dense
-          @click.stop="
-            emits('buttonClicked', new ActionHandlerButtonClickedHolder(handler, ButtonActions.Save, l, {}))
-          ">
-          <q-item-section>
-            <q-item-label style="font-size: smaller" :class="isActive(l) ? '' : 'text-grey-5'">{{
-              l.label
-            }}</q-item-label>
-          </q-item-section>
-        </q-item>
+      <q-list dense style="min-width: 200px">
+        <template v-for="l in handler.actions(currentTabsetId)">
+          <!--          <template v-if="(l as ActionContext).dialog">-->
+          <!--            <ContextMenuItem-->
+          <!--              @click.stop="emits('buttonClicked', new ActionHandlerButtonClickedHolder(handler, l, {}))"-->
+          <!--              v-close-popup-->
+          <!--              :color="l.colorFkt ? l.colorFkt() : ''"-->
+          <!--              :icon="l.icon ? l.icon : 'o_tab'"-->
+          <!--              :label="l.label" />-->
+          <!--          </template>-->
+          <component :is="l" :tabset="props.tabset" />
+          <!--          <template v-else>-->
+          <!--            <ContextMenuItem :icon="l.icon ? l.icon : 'o_tab'" :label="l.label">-->
+          <!--              <q-item-section side>-->
+          <!--                <q-icon name="keyboard_arrow_right" />-->
+          <!--              </q-item-section>-->
+          <!--              <q-menu anchor="top end" self="top start">-->
+          <!--                <q-list>-->
+          <!--                  &lt;!&ndash; @click="startAutoSwitchingTab(tabset.id)" &ndash;&gt;-->
+          <!--                  <q-item-->
+          <!--                    v-if="useFeaturesStore().hasFeature(FeatureIdent.AUTO_TAB_SWITCHER)"-->
+          <!--                    dense-->
+          <!--                    clickable-->
+          <!--                    v-close-popup>-->
+          <!--                    <q-item-section>switching tab</q-item-section>-->
+          <!--                  </q-item>-->
+          <!--                  &lt;!&ndash; @click="restoreInNewWindow(tabset.id)"&ndash;&gt;-->
+          <!--                  <q-item dense clickable v-close-popup>-->
+          <!--                    <q-item-section>new window</q-item-section>-->
+          <!--                  </q-item>-->
+          <!--                  &lt;!&ndash; @click="restoreInGroup(tabset.id)"&ndash;&gt;-->
+          <!--                  <q-item dense clickable v-close-popup>-->
+          <!--                    <q-item-section>this window</q-item-section>-->
+          <!--                  </q-item>-->
+          <!--                </q-list>-->
+          <!--              </q-menu>-->
+          <!--            </ContextMenuItem>-->
+          <!--          </template>-->
+        </template>
       </q-list>
+      <!--      <q-list dense style="min-width: 150px">-->
+      <!--        <q-item-->
+      <!--          v-for="l in handler.actions(currentTabsetId).slice(1)"-->
+      <!--          :clickable="isActive(l)"-->
+      <!--          dense-->
+      <!--          v-close-popup-->
+      <!--          @click.stop="emits('buttonClicked', new ActionHandlerButtonClickedHolder(handler, l, {}))">-->
+      <!--          <q-item-section class="q-ma-none q-pa-none" style="max-width: 30px">-->
+      <!--            <q-icon name="o_note" color="primary"></q-icon>-->
+      <!--          </q-item-section>-->
+      <!--          <q-item-section no-wrap class="q-ma-none q-pa-none">-->
+      <!--            <q-item-label style="font-size: smaller" :class="isActive(l) ? '' : 'text-grey-5'">{{-->
+      <!--              l.label-->
+      <!--            }}</q-item-label>-->
+      <!--          </q-item-section>-->
+      <!--        </q-item>-->
+      <!--      </q-list>-->
     </q-btn-dropdown>
     <q-tooltip
       class="tooltip-small"
@@ -75,7 +115,7 @@
 import _ from 'lodash'
 import { useQuasar } from 'quasar'
 import { useActionHandlers } from 'src/tabsets/actionHandling/ActionHandlers'
-import { AddUrlToTabsetHandler, ButtonActions } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
+import { AddUrlToTabsetHandler } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { NoopAddUrlToTabsetHandler } from 'src/tabsets/actionHandling/handler/NoopAddUrlToTabsetHandler'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
 import { ActionHandlerButtonClickedHolder } from 'src/tabsets/actionHandling/model/ActionHandlerButtonClickedHolder'
@@ -85,6 +125,7 @@ import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { useUiStore } from 'src/ui/stores/uiStore'
 import { PropType, ref, watchEffect } from 'vue'
 import { Tabset } from '../models/Tabset'
+import { MenuContext } from './model/MenuContext'
 
 const props = defineProps({
   currentChromeTab: { type: Object as PropType<chrome.tabs.Tab>, required: true },
@@ -162,9 +203,10 @@ const isActive = (ac: ActionContext) => {
   return ac.active ? ac.active(props.currentChromeTab) : true
 }
 
-const color = (ac: ActionContext) => {
-  if (ac.active) {
-    return ac.active(props.currentChromeTab) ? 'primary' : 'grey-5'
+const color = (ac: ActionContext | MenuContext) => {
+  if ((ac as ActionContext | MenuContext).active) {
+    // return (ac as (ActionContext | MenuContext))!.active(props.currentChromeTab) ? 'primary' : 'grey-5'
+    return 'primary'
   }
   return alreadyInTabset() ? 'grey-5' : tsBadges.value.length > 0 ? 'positive' : 'primary'
 }

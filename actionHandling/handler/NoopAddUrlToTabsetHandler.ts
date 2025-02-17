@@ -1,9 +1,7 @@
-import { DialogChainObject } from 'quasar'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import {
   AddUrlToTabsetHandler,
   AddUrlToTabsetHandlerAdditionalData,
-  ButtonActions,
 } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
 import { Tab } from 'src/tabsets/models/Tab'
@@ -18,12 +16,12 @@ export class NoopAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
     return true
   }
 
-  actions(): ActionContext[] {
-    return []
+  defaultAction(): ActionContext {
+    return null as unknown as ActionContext
   }
 
-  withDialog(action: ButtonActions): DialogChainObject | undefined {
-    return undefined
+  actions(): ActionContext[] {
+    return []
   }
 
   clicked(
@@ -38,7 +36,8 @@ export class NoopAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   updateInTabset(
     chromeTab: chrome.tabs.Tab,
     ts: Tabset,
-    additionalData: AddUrlToTabsetHandlerAdditionalData = {},
+    folder?: Tabset,
+    additionalData?: AddUrlToTabsetHandlerAdditionalData,
   ): Promise<ExecutionResult<any>> {
     return Promise.reject('noop AddurlToTabsetHandler')
   }

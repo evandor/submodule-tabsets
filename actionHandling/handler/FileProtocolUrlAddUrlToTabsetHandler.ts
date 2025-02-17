@@ -1,9 +1,8 @@
-import { DialogChainObject, QVueGlobals } from 'quasar'
+import { QVueGlobals } from 'quasar'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import {
   AddUrlToTabsetHandler,
   AddUrlToTabsetHandlerAdditionalData,
-  ButtonActions,
 } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
 import { Tab } from 'src/tabsets/models/Tab'
@@ -23,8 +22,13 @@ export class FileProtocolUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandl
     return false
   }
 
+  defaultAction(): ActionContext {
+    return null as unknown as ActionContext
+  }
+
   actions(): ActionContext[] {
-    return [new ActionContext('Save Local Directory', ButtonActions.Save)]
+    // new ActionContext('Save Local Directory', ButtonActions.Save)
+    return []
   }
 
   async clicked(
@@ -80,7 +84,8 @@ export class FileProtocolUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandl
   async updateInTabset(
     browserTab: chrome.tabs.Tab,
     ts: Tabset,
-    additionalData: AddUrlToTabsetHandlerAdditionalData,
+    folder?: Tabset,
+    additionalData?: AddUrlToTabsetHandlerAdditionalData,
   ): Promise<ExecutionResult<any>> {
     console.log('saving...', browserTab.id, additionalData)
     try {
@@ -117,10 +122,5 @@ export class FileProtocolUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandl
     }
 
     return Promise.reject('error updating excalidraw')
-  }
-
-  withDialog(action: ButtonActions): DialogChainObject | undefined {
-    //
-    return undefined
   }
 }
