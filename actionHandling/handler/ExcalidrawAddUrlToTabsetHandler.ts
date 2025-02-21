@@ -1,4 +1,4 @@
-import { QVueGlobals, uid } from 'quasar'
+import { DialogChainObject, QVueGlobals, uid } from 'quasar'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import {
@@ -7,10 +7,15 @@ import {
 } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
 import { ExcalidrawStorage } from 'src/tabsets/actionHandling/model/ExcalidrawStorage'
+import CreateSubfolderAction from 'src/tabsets/actions/CreateSubfolderAction.vue'
+import DeleteTabsetAction from 'src/tabsets/actions/DeleteTabsetAction.vue'
+import EditTabsetAction from 'src/tabsets/actions/EditTabsetAction.vue'
+import OpenAllInMenuAction from 'src/tabsets/actions/OpenAllInMenuAction.vue'
 import { AddTabToTabsetCommand } from 'src/tabsets/commands/AddTabToTabsetCommand'
 import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset } from 'src/tabsets/models/Tabset'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+import { Component } from 'vue'
 
 export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   constructor(public $q: QVueGlobals | undefined) {}
@@ -45,10 +50,10 @@ export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
     return undefined
   }
 
-  actions(): ActionContext[] {
+  actions(): Component[] {
     const tabset: Tabset | undefined = useTabsetsStore().getCurrentTabset
     if (tabset) {
-      var actions = (tabset.tabs as Tab[])
+      const actions: Component[] = (tabset.tabs as Tab[])
         .filter((t: Tab) => t.url !== undefined)
         .filter((t: Tab) => t.url!.match(this.urlMatcher()))
         .map((t: Tab) => {
@@ -59,8 +64,9 @@ export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
             .concat([new ActionContext('Save as new file').withDialog(this.newFileDialog, this.$q!).onOk(this.onOk)])
             .concat([new ActionContext('Clear canvas')])
         : actions.concat([new ActionContext('Add Excalidraw').withDialog(this.newFileDialog, this.$q!).onOk(this.onOk)])
+    } else {
+      return [EditTabsetAction, CreateSubfolderAction, OpenAllInMenuAction, DeleteTabsetAction]
     }
-    return []
   }
 
   async clicked(
@@ -83,7 +89,7 @@ export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
         newTab.title = filename
 
         const firstFrameReturned = returned.at(0)
-        console.log('hier', firstFrameReturned)
+        // console.log('hier', firstFrameReturned)
         if (firstFrameReturned && firstFrameReturned.result) {
           newTab.storage = new ExcalidrawStorage(
             JSON.stringify(JSON.parse(firstFrameReturned.result['excalidraw' as keyof object])),
@@ -189,7 +195,7 @@ export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
     })
   }
 
-  newFileDialog($q: QVueGlobals, filename: string = '') {
+  async newFileDialog($q: QVueGlobals, filename: string = ''): Promise<DialogChainObject> {
     return $q!.dialog({
       title: 'Save as Excalidraw File',
       message: 'Please Provide a name (min 3 characters)',

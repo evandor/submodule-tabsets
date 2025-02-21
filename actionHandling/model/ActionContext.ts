@@ -6,7 +6,7 @@ import { Tabset } from 'src/tabsets/models/Tabset'
 export class ActionContext {
   public clicked?: ClickedHandler
 
-  public dialog?: ($q: QVueGlobals) => DialogChainObject | undefined = undefined
+  public dialog?: ($q: QVueGlobals) => Promise<DialogChainObject>
 
   public ok?: (payload: any) => ClickedHandler
 
@@ -34,7 +34,7 @@ export class ActionContext {
     return this
   }
 
-  withDialog(withDialog: ($q: QVueGlobals) => DialogChainObject | undefined, $q: QVueGlobals) {
+  withDialog(withDialog: ($q: QVueGlobals) => Promise<DialogChainObject>, $q: QVueGlobals) {
     this.dialog = withDialog
     this.$q = $q
     return this

@@ -1,4 +1,4 @@
-import { QVueGlobals } from 'quasar'
+import { DialogChainObject, QVueGlobals } from 'quasar'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import {
@@ -99,7 +99,7 @@ export class ImportFromChromeBookmarksManagerAddUrlToTabsetHandler implements Ad
 
   handleOpenedTab(browserTab: chrome.tabs.Tab, tab: Tab) {}
 
-  importChromeBookmarksDialog($q: QVueGlobals) {
+  async importChromeBookmarksDialog($q: QVueGlobals): Promise<DialogChainObject> {
     return $q.dialog({
       title: 'Import Bookmarks',
       message: 'Click "OK" to import the  selected bookmarks folder to the current tabset',

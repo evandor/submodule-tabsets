@@ -19,7 +19,7 @@ export class AddUrlToTabsetHandlers {
     // this.handlers.push(new DynamicUrlAddUrlToTabsetHandler(this.quasar))
     this.handlers.push(new ExcalidrawAddUrlToTabsetHandler(this.quasar))
     this.handlers.push(new ObsidianApiAddUrlToTabsetHandler())
-    this.handlers.push(new RapidApiAddUrlToTabsetHandler())
+    this.handlers.push(new RapidApiAddUrlToTabsetHandler(this.quasar!))
     this.handlers.push(new MarkdownFileAddUrlToTabsetHandler(this.quasar!))
     this.handlers.push(new ImportFromChromeBookmarksManagerAddUrlToTabsetHandler(this.quasar!))
     this.handlers.push(new RssUrlAddUrlToTabsetHandler(this.quasar!))

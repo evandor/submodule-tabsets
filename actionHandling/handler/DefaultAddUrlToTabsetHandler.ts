@@ -1,12 +1,15 @@
 import { QVueGlobals, uid } from 'quasar'
+import { FeatureIdent } from 'src/app/models/FeatureIdent'
 import { useContentStore } from 'src/content/stores/contentStore'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
+import { useFeaturesStore } from 'src/features/stores/featuresStore'
 import {
   AddUrlToTabsetHandler,
   AddUrlToTabsetHandlerAdditionalData,
 } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
+import CreateNoteAction from 'src/tabsets/actions/CreateNoteAction.vue'
 import CreateSubfolderAction from 'src/tabsets/actions/CreateSubfolderAction.vue'
 import DeleteTabsetAction from 'src/tabsets/actions/DeleteTabsetAction.vue'
 import EditTabsetAction from 'src/tabsets/actions/EditTabsetAction.vue'
@@ -20,6 +23,7 @@ import { Component } from 'vue'
 
 export class DefaultAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   constructor(public $q: QVueGlobals) {}
+
   urlMatcher(): RegExp {
     return /.*/
   }
@@ -35,7 +39,12 @@ export class DefaultAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   actions(currentTabsetId: string | undefined): Component[] {
     const url = useContentStore().getCurrentTabUrl
     // const currentTabsetId = await useTabsetsStore().getCurrentTabsetId()
-    const actions = [EditTabsetAction, CreateSubfolderAction, OpenAllInMenuAction, DeleteTabsetAction]
+
+    const actions = [EditTabsetAction, CreateSubfolderAction]
+    if (useFeaturesStore().hasFeature(FeatureIdent.NOTES)) {
+      actions.push(CreateNoteAction)
+    }
+    actions.push(OpenAllInMenuAction, DeleteTabsetAction)
 
     if (url) {
       // TODO folders?
