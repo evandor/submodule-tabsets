@@ -7,10 +7,15 @@ import {
   ClickedHandler,
 } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
+import CreateSubfolderAction from 'src/tabsets/actions/CreateSubfolderAction.vue'
+import DeleteTabsetAction from 'src/tabsets/actions/DeleteTabsetAction.vue'
+import EditTabsetAction from 'src/tabsets/actions/EditTabsetAction.vue'
+import OpenAllInMenuAction from 'src/tabsets/actions/OpenAllInMenuAction.vue'
 import { AddTabToTabsetCommand } from 'src/tabsets/commands/AddTabToTabsetCommand'
 import { LoadDynamicTabsCommand } from 'src/tabsets/commands/LoadDynamicTabsCommand'
 import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset } from 'src/tabsets/models/Tabset'
+import { Component } from 'vue'
 
 export class MarkdownFileAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   constructor(public $q: QVueGlobals) {}
@@ -24,11 +29,12 @@ export class MarkdownFileAddUrlToTabsetHandler implements AddUrlToTabsetHandler 
   }
 
   defaultAction(): ActionContext {
-    return null as unknown as ActionContext
+    return new ActionContext('Add Markdown').withDialog(this.analyseMarkdownDialog, this.$q).onOk(this.onOk)
   }
 
-  actions(): ActionContext[] {
-    return [new ActionContext('Add Markdown Page').withDialog(this.analyseMarkdownDialog, this.$q).onOk(this.onOk)]
+  actions(): Component[] {
+    // return [new ActionContext('Add Markdown Page').withDialog(this.analyseMarkdownDialog, this.$q).onOk(this.onOk)]
+    return [EditTabsetAction, CreateSubfolderAction, OpenAllInMenuAction, DeleteTabsetAction]
   }
 
   withDialog(): DialogChainObject | undefined {
@@ -67,24 +73,20 @@ export class MarkdownFileAddUrlToTabsetHandler implements AddUrlToTabsetHandler 
 
   handleOpenedTab(browserTab: chrome.tabs.Tab, tab: Tab) {}
 
-  analyseMarkdownDialog($q: QVueGlobals, filename: string = '') {
-    return $q.dialog({
-      title: 'Save Markdown File',
-      message: "The file's content can be analysed and dynamically extracted.",
-      options: {
-        type: 'checkbox',
-        model: [],
-        items: [{ label: 'Use for links', value: 'useForLinks', color: 'secondary' }],
-      },
-      cancel: true,
-      persistent: true,
-    })
-    // ?.onOk((data: string[]) => {
-    //   console.log('data', data)
-    //   this.clicked(chromeTab, tabset, undefined, {
-    //     data: { useForLinks: data.indexOf('useForLinks') >= 0 },
-    //   })
-    // })
+  async analyseMarkdownDialog($q: QVueGlobals, filename: string = '') {
+    return Promise.resolve(
+      $q.dialog({
+        title: 'Save Markdown File',
+        message: "The file's content can be analysed and dynamically extracted.",
+        options: {
+          type: 'checkbox',
+          model: [],
+          items: [{ label: 'Use for links', value: 'useForLinks', color: 'secondary' }],
+        },
+        cancel: true,
+        persistent: true,
+      }),
+    )
   }
 
   onOk = (data: string[]): ClickedHandler => {

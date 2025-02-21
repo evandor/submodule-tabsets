@@ -30,6 +30,8 @@ export function useActionHandlers($q: QVueGlobals | undefined) {
   ) {
     const handler = args.actionHandler
 
+    //console.log('handleClick', args)
+
     if (args.actionContext?.clicked) {
       console.log('executing...')
       await args.actionContext.clicked.apply(null, [chromeTab, tabset, folder, { action: args.actionContext }])
@@ -38,7 +40,10 @@ export function useActionHandlers($q: QVueGlobals | undefined) {
 
     if (args.actionContext?.dialog) {
       console.log('executing dialog...', args.actionContext)
-      args.actionContext.dialog.apply(null, [args.actionContext.$q!])?.onOk((payload: any) => {
+
+      const r = await args.actionContext.dialog.apply(null, [args.actionContext.$q!])
+
+      r.onOk((payload: any) => {
         console.log('payload', payload)
         const onOkHandler: (payload: any) => ClickedHandler = args.actionContext!.ok!
         const h = onOkHandler.apply(null, [payload])

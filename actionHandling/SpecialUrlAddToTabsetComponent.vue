@@ -40,6 +40,7 @@
       "
       class="q-ma-none q-px-none q-py-none"
       size="sm"
+      :dense="handler.defaultAction()!.label.length > 10"
       split
       outline>
       <q-list dense style="min-width: 200px">

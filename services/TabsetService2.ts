@@ -635,6 +635,7 @@ export function useTabsetService() {
   }
 
   const findTabInFolder = (folders: Tabset[], tabId: string): TabInFolder | undefined => {
+    //console.log(`searching ${tabId}`)
     for (const f of folders) {
       for (const t of f.tabs) {
         if (t.id === tabId) {

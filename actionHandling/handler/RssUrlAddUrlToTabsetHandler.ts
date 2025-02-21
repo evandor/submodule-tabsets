@@ -8,11 +8,16 @@ import {
   ClickedHandler,
 } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
+import CreateSubfolderAction from 'src/tabsets/actions/CreateSubfolderAction.vue'
+import DeleteTabsetAction from 'src/tabsets/actions/DeleteTabsetAction.vue'
+import EditTabsetAction from 'src/tabsets/actions/EditTabsetAction.vue'
+import OpenAllInMenuAction from 'src/tabsets/actions/OpenAllInMenuAction.vue'
 import { AddTabToTabsetCommand } from 'src/tabsets/commands/AddTabToTabsetCommand'
 import { CreateFolderCommand } from 'src/tabsets/commands/CreateFolderCommand'
 import AddRssFeedDialog from 'src/tabsets/dialogues/actions/AddRssFeedDialog.vue'
 import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset, TabsetType } from 'src/tabsets/models/Tabset'
+import { Component } from 'vue'
 
 /**
  * examples
@@ -50,11 +55,11 @@ export class RssUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   }
 
   defaultAction(): ActionContext {
-    return null as unknown as ActionContext
+    return new ActionContext('Add RSS Feed').withDialog(this.storeAsFeed, this.$q).onOk(this.onOk)
   }
 
-  actions(): ActionContext[] {
-    return [new ActionContext('Add RSS Feed').withDialog(this.storeAsFeed, this.$q).onOk(this.onOk)]
+  actions(): Component[] {
+    return [EditTabsetAction, CreateSubfolderAction, OpenAllInMenuAction, DeleteTabsetAction]
   }
 
   async clicked(
@@ -97,7 +102,7 @@ export class RssUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
 
   handleOpenedTab(browserTab: chrome.tabs.Tab, tab: Tab) {}
 
-  storeAsFeed($q: QVueGlobals): DialogChainObject | undefined {
+  async storeAsFeed($q: QVueGlobals): Promise<DialogChainObject> {
     return $q.dialog({
       component: AddRssFeedDialog,
       componentProps: { parentFolderId: 'bookmarkId.value' },

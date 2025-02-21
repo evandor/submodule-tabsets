@@ -4,7 +4,6 @@ import { defineStore } from 'pinia'
 import { uid } from 'quasar'
 import { FeatureIdent } from 'src/app/models/FeatureIdent'
 import { STRIP_CHARS_IN_COLOR_INPUT, STRIP_CHARS_IN_USER_INPUT } from 'src/boot/constants'
-import { useUtils } from 'src/core/services/Utils'
 import { useFeaturesStore } from 'src/features/stores/featuresStore'
 import NavigationService from 'src/services/NavigationService'
 import { useAuthStore } from 'src/stores/authStore'
@@ -23,7 +22,7 @@ import { computed, ref, watch } from 'vue'
  * Elements are persisted to the storage provided in the initialize function
  */
 export const useTabsetsStore = defineStore('tabsets', () => {
-  const { sendMsg } = useUtils()
+  let loaded = ref(false)
 
   /**
    * the (internal) storage for this store to use
@@ -91,6 +90,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
   async function loadTabsets() {
     if (storage) {
       await storage.loadTabsets()
+      loaded.value = true
     }
   }
 
@@ -294,7 +294,9 @@ export const useTabsetsStore = defineStore('tabsets', () => {
 
   const getTabAndTabsetId = computed(() => {
     return (tabId: string): TabAndTabsetId | undefined => {
+      //console.log('---', tabId, tabsets.value)
       for (const value of tabsets.value.values()) {
+        //console.log('---', tabId, value)
         const found = useTabsetService().findTabInFolder([value as Tabset], tabId)
         // const found: Tab | undefined = _.find(value.tabs, t => {
         //   return t.id === tabId
@@ -435,5 +437,6 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     reminderTabset,
     removeReminder,
     activeReminders,
+    loaded,
   }
 })

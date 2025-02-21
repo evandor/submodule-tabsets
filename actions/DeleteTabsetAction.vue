@@ -12,10 +12,28 @@
   </ContextMenuItem>
 </template>
 <script setup lang="ts">
+import { useQuasar } from 'quasar'
 import ContextMenuItem from 'src/core/components/helper/ContextMenuItem.vue'
+import { useCommandExecutor } from 'src/core/services/CommandExecutor'
+import { DeleteTabsetCommand } from 'src/tabsets/commands/DeleteTabsetCommand'
+import DeleteTabsetDialog from 'src/tabsets/dialogues/DeleteTabsetDialog.vue'
 import { Tabset, TabsetType } from 'src/tabsets/models/Tabset'
 
+const $q = useQuasar()
 const props = defineProps<{ tabset: Tabset }>()
 
-const deleteTabsetDialog = () => {}
+const deleteTabsetDialog = () => {
+  if (props.tabset.tabs.length === 0) {
+    useCommandExecutor().executeFromUi(new DeleteTabsetCommand(props.tabset.id))
+    return
+  }
+  $q.dialog({
+    component: DeleteTabsetDialog,
+    componentProps: {
+      tabsetId: props.tabset.id,
+      tabsetName: props.tabset.name,
+      tabsCount: props.tabset.tabs.length,
+    },
+  })
+}
 </script>
