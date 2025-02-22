@@ -1,4 +1,5 @@
 import { DialogChainObject, QVueGlobals, uid } from 'quasar'
+import { TabReference, TabReferenceType } from 'src/content/models/TabReference'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import { RestParam, RestTab } from 'src/rest/models/RestTab'
@@ -77,6 +78,12 @@ export class RapidApiAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
           apiParams,
         )
         tab.description = config.description
+        // if (config.externalDocs) {
+        tab.tabReferences.push(
+          new TabReference(uid(), TabReferenceType.DOCUMENTATION, 'external documentation', [], config.externalDocs),
+        )
+        // }
+        console.log('restTab', tab)
         if (
           additionalData &&
           additionalData.dialog &&
