@@ -80,7 +80,7 @@ export class AddTabToTabsetCommand implements Command<any> {
       }
 
       // TabReferences
-      this.tab.tabReferences = useContentStore().currentTabReferences
+      this.tab.tabReferences = this.tab.tabReferences.concat(useContentStore().currentTabReferences)
 
       // Article (ReaderMode)
       if (useFeaturesStore().hasFeature(FeatureIdent.READING_MODE)) {
