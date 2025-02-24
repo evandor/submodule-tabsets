@@ -8,10 +8,10 @@
 <script setup lang="ts">
 import { useQuasar } from 'quasar'
 import ContextMenuItem from 'src/core/components/helper/ContextMenuItem.vue'
-import { Tabset } from 'src/tabsets/models/Tabset'
+import { ActionProps } from 'src/tabsets/actions/models/ActionProps'
 
 const $q = useQuasar()
-const props = defineProps<{ tabset: Tabset }>()
+const props = defineProps<ActionProps>()
 
 const clicked = () => {
   $q.dialog({

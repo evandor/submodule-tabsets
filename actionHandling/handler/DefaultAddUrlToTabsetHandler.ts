@@ -1,19 +1,13 @@
 import { QVueGlobals, uid } from 'quasar'
-import { FeatureIdent } from 'src/app/models/FeatureIdent'
 import { useContentStore } from 'src/content/stores/contentStore'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
-import { useFeaturesStore } from 'src/features/stores/featuresStore'
 import {
   AddUrlToTabsetHandler,
   AddUrlToTabsetHandlerAdditionalData,
 } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
+import { DefaultActions } from 'src/tabsets/actionHandling/handler/DefaultActions'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
-import CreateNoteAction from 'src/tabsets/actions/CreateNoteAction.vue'
-import CreateSubfolderAction from 'src/tabsets/actions/CreateSubfolderAction.vue'
-import DeleteTabsetAction from 'src/tabsets/actions/DeleteTabsetAction.vue'
-import EditTabsetAction from 'src/tabsets/actions/EditTabsetAction.vue'
-import OpenAllInMenuAction from 'src/tabsets/actions/OpenAllInMenuAction.vue'
 import { AddTabToTabsetCommand } from 'src/tabsets/commands/AddTabToTabsetCommand'
 import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset } from 'src/tabsets/models/Tabset'
@@ -38,13 +32,9 @@ export class DefaultAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
 
   actions(currentTabsetId: string | undefined): Component[] {
     const url = useContentStore().getCurrentTabUrl
-    // const currentTabsetId = await useTabsetsStore().getCurrentTabsetId()
+    const currentTabset = useTabsetsStore().getCurrentTabset
 
-    const actions = [EditTabsetAction, CreateSubfolderAction]
-    if (useFeaturesStore().hasFeature(FeatureIdent.NOTES)) {
-      actions.push(CreateNoteAction)
-    }
-    actions.push(OpenAllInMenuAction, DeleteTabsetAction)
+    const actions = DefaultActions.getDefaultActions(currentTabset)
 
     if (url) {
       // TODO folders?

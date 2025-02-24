@@ -32,7 +32,7 @@ export class RssUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   }
 
   contentMatcher(content: string) {
-    // console.log('content', content.indexOf('<rss '), content.substring(0, 30))
+    // console.log('content', content.indexOf('<rss '), content.substring(0, 3000))
     const request = useRequestsStore().getCurrentTabRequest
     if (request) {
       const contentType =
@@ -40,7 +40,8 @@ export class RssUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
           ?.find((rh: chrome.webRequest.HttpHeader) => rh.name.toLowerCase() === 'content-type')
           ?.value?.toLowerCase() || 'text/html'
       // console.log('found contnt type ', contentType)
-      if (contentType.indexOf('application/xml') >= 0 || contentType.indexOf('application/rss+xml')) {
+      if (contentType.indexOf('application/xml') >= 0 || contentType.indexOf('application/rss+xml') >= 0) {
+        console.log('found application/xml or application/rss+xml content type', request)
         return true
       }
     }

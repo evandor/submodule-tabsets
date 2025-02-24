@@ -1,18 +1,17 @@
 <template>
-  <ContextMenuItem v-close-popup @was-clicked="clicked()" icon="o_tab" color="primary" label="Create Subfolder">
-    <!--    <q-tooltip class="tooltip-small" v-if="props.tabset.sharing?.sharedId !== undefined">-->
-    <!--      Stop sharing first if you want to delete this tabset-->
-    <!--    </q-tooltip>-->
-  </ContextMenuItem>
+  <template v-if="props.level === 'root'">
+    <q-separator inset />
+    <ContextMenuItem v-close-popup @was-clicked="clicked()" icon="o_tab" color="warning" label="New Subfolder" />
+  </template>
 </template>
 <script setup lang="ts">
 import { useQuasar } from 'quasar'
 import ContextMenuItem from 'src/core/components/helper/ContextMenuItem.vue'
+import { ActionProps } from 'src/tabsets/actions/models/ActionProps'
 import NewSubfolderDialog from 'src/tabsets/dialogues/NewSubfolderDialog.vue'
-import { Tabset } from 'src/tabsets/models/Tabset'
 
 const $q = useQuasar()
-const props = defineProps<{ tabset: Tabset }>()
+const props = defineProps<ActionProps>()
 
 const clicked = () => {
   $q.dialog({

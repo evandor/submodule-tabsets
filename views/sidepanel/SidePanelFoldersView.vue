@@ -59,10 +59,11 @@
             @button-clicked="(args: ActionHandlerButtonClickedHolder) => handleButtonClicked(tabset, args, folder)"
             :currentChromeTab="currentChromeTab"
             :tabset="tabset"
+            :level="'folder'"
             :folder="folder" />
 
-          <q-icon class="cursor-pointer" name="more_vert" size="16px" />
-          <SidePanelSubfolderContextMenu :tabset="tabset" :folder="folder" />
+          <!--          <q-icon class="cursor-pointer" name="more_vert" size="16px" />-->
+          <!--          <SidePanelSubfolderContextMenu :tabset="tabset" :folder="folder" />-->
         </q-item-label>
       </q-item-section>
     </q-item>
@@ -81,7 +82,6 @@ import SpecialUrlAddToTabsetComponent from 'src/tabsets/actionHandling/SpecialUr
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { useTabsStore2 } from 'src/tabsets/stores/tabsStore2'
-import SidePanelSubfolderContextMenu from 'src/tabsets/widgets/SidePanelSubfolderContextMenu.vue'
 import { useUiStore } from 'src/ui/stores/uiStore'
 import { useWindowsStore } from 'src/windows/stores/windowsStore'
 

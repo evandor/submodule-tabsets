@@ -4,12 +4,16 @@ import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import {
   AddUrlToTabsetHandler,
   AddUrlToTabsetHandlerAdditionalData,
+  ComponentWithContext,
 } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
+import { DefaultActions } from 'src/tabsets/actionHandling/handler/DefaultActions'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
 import { ExcalidrawStorage } from 'src/tabsets/actionHandling/model/ExcalidrawStorage'
 import CreateSubfolderAction from 'src/tabsets/actions/CreateSubfolderAction.vue'
 import DeleteTabsetAction from 'src/tabsets/actions/DeleteTabsetAction.vue'
 import EditTabsetAction from 'src/tabsets/actions/EditTabsetAction.vue'
+import ExcalidrawSaveAsFileAction from 'src/tabsets/actions/excalidraw/ExcalidrawSaveAsFileAction.vue'
+import ExcalidrawUpdateFileAction from 'src/tabsets/actions/excalidraw/ExcalidrawUpdateFileAction.vue'
 import OpenAllInMenuAction from 'src/tabsets/actions/OpenAllInMenuAction.vue'
 import { AddTabToTabsetCommand } from 'src/tabsets/commands/AddTabToTabsetCommand'
 import { Tab } from 'src/tabsets/models/Tab'
@@ -53,17 +57,27 @@ export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   actions(): Component[] {
     const tabset: Tabset | undefined = useTabsetsStore().getCurrentTabset
     if (tabset) {
-      const actions: Component[] = (tabset.tabs as Tab[])
+      const actions: (ComponentWithContext | Component)[] = (tabset.tabs as Tab[])
         .filter((t: Tab) => t.url !== undefined)
         .filter((t: Tab) => t.url!.match(this.urlMatcher()))
         .map((t: Tab) => {
-          return new ActionContext(t.title || 'undefined').onClicked(this.updateInTabset)
+          return { component: ExcalidrawUpdateFileAction, context: { label: t.title || 'undef' } }
         })
-      return actions.length > 0
-        ? actions
-            .concat([new ActionContext('Save as new file').withDialog(this.newFileDialog, this.$q!).onOk(this.onOk)])
-            .concat([new ActionContext('Clear canvas')])
-        : actions.concat([new ActionContext('Add Excalidraw').withDialog(this.newFileDialog, this.$q!).onOk(this.onOk)])
+      const list: Component[] =
+        actions.length > 0
+          ? actions
+              // .concat([new ActionContext('Save as new file').withDialog(this.newFileDialog, this.$q!).onOk(this.onOk)])
+              .concat([
+                ExcalidrawSaveAsFileAction,
+                { component: ExcalidrawUpdateFileAction, context: { label: 'Clear Canvas' } },
+              ])
+          : //.concat([new ActionContext('Clear canvas')])
+            actions.concat([
+              // new ActionContext('Add Excalidraw').withDialog(this.newFileDialog, this.$q!).onOk(this.onOk),
+              { component: ExcalidrawUpdateFileAction, context: { label: 'Add Excalidraw' } },
+            ])
+      // console.log('list', list)
+      return list.concat(DefaultActions.getDefaultActions(tabset))
     } else {
       return [EditTabsetAction, CreateSubfolderAction, OpenAllInMenuAction, DeleteTabsetAction]
     }
@@ -77,7 +91,10 @@ export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   ): Promise<ExecutionResult<any>> {
     console.log('saving...', chromeTab.id, additionalData)
     try {
-      const filename: string | undefined = additionalData ? (additionalData.dialog as unknown as string) : undefined
+      const filename: string | undefined =
+        additionalData && additionalData.dialog
+          ? (additionalData.dialog['filename' as keyof object] as unknown as string)
+          : undefined
       if (!filename) {
         throw new Error('filename is missing')
       }

@@ -10,7 +10,7 @@ export function useActionHandlers($q: QVueGlobals | undefined) {
   const actionHandlerRepo = new AddUrlToTabsetHandlers($q)
 
   function getHandler(url?: string, folder?: Tabset): AddUrlToTabsetHandler {
-    //console.log(`getHandler for '${url}', folderId=${folder?.id}`)
+    console.log(`getHandler for '${url}', folderId=${folder?.id}, type=${folder?.type}`)
     if (folder && folder.type === TabsetType.RSS_FOLDER) {
       return new RssFolderHandler($q)
     }
@@ -18,7 +18,7 @@ export function useActionHandlers($q: QVueGlobals | undefined) {
     const handler = url
       ? actionHandlerRepo.handlerFor(url, content || '', folder)
       : actionHandlerRepo.defaultAddUrlToTabsetHandler
-    //console.log("getting url handler for ", url, handler)
+    // console.log('getting url handler for ', url, handler)
     return handler
   }
 

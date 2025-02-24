@@ -1,16 +1,26 @@
 <template>
-  <ContextMenuItem v-close-popup @was-clicked="clicked()" icon="o_description" color="primary" label="Create Note">
-    <!--    <q-tooltip class="tooltip-small" v-if="props.tabset.sharing?.sharedId !== undefined">-->
-    <!--      Stop sharing first if you want to delete this tabset-->
-    <!--    </q-tooltip>-->
-  </ContextMenuItem>
+  <template v-if="props.level === 'root'">
+    <ContextMenuItem
+      v-if="useFeaturesStore().hasFeature(FeatureIdent.NOTES)"
+      v-close-popup
+      @was-clicked="clicked()"
+      icon="o_description"
+      color="primary"
+      label="New Note">
+      <!--    <q-tooltip class="tooltip-small" v-if="props.tabset.sharing?.sharedId !== undefined">-->
+      <!--      Stop sharing first if you want to delete this tabset-->
+      <!--    </q-tooltip>-->
+    </ContextMenuItem>
+  </template>
 </template>
 <script setup lang="ts">
+import { FeatureIdent } from 'src/app/models/FeatureIdent'
 import ContextMenuItem from 'src/core/components/helper/ContextMenuItem.vue'
+import { useFeaturesStore } from 'src/features/stores/featuresStore'
 import NavigationService from 'src/services/NavigationService'
-import { Tabset } from 'src/tabsets/models/Tabset'
+import { ActionProps } from 'src/tabsets/actions/models/ActionProps'
 
-const props = defineProps<{ tabset: Tabset }>()
+const props = defineProps<ActionProps>()
 
 const clicked = () => {
   const url =

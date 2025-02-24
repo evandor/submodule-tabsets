@@ -1,6 +1,11 @@
 <template>
   <template
-    v-if="props.tabset.tabs.length > 0 && inBexMode() && (!props.tabset.window || props.tabset.window === 'current')">
+    v-if="
+      props.level === 'root' &&
+      props.tabset.tabs.length > 0 &&
+      inBexMode() &&
+      (!props.tabset.window || props.tabset.window === 'current')
+    ">
     <ContextMenuItem icon="open_in_new" label="Open all in...">
       <q-item-section side>
         <q-icon name="keyboard_arrow_right" />
@@ -43,11 +48,11 @@ import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import { useUtils } from 'src/core/services/Utils'
 import { useFeaturesStore } from 'src/features/stores/featuresStore'
 import NavigationService from 'src/services/NavigationService'
+import { ActionProps } from 'src/tabsets/actions/models/ActionProps'
 import { RestoreTabsetCommand } from 'src/tabsets/commands/RestoreTabset'
-import { Tabset } from 'src/tabsets/models/Tabset'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 
-const props = defineProps<{ tabset: Tabset }>()
+const props = defineProps<ActionProps>()
 
 const { inBexMode } = useUtils()
 
