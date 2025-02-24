@@ -1,7 +1,7 @@
 <template>
   <!-- left part: icon plus various -->
   <q-item-section
-    v-if="useUiStore().listDetailLevelGreaterEqual(ListDetailLevel.SOME, props.tabset?.details)"
+    v-if="useUiStore().listDetailLevelGreaterEqual('SOME', props.tabset?.details)"
     @mouseover="hoveredTab = tab.id"
     @mouseleave="hoveredTab = undefined"
     class="q-mr-sm q-mt-sm text-right"
@@ -92,7 +92,7 @@
     </q-item-label>
 
     <!-- === description === -->
-    <template v-if="useUiStore().listDetailLevelGreaterEqual(ListDetailLevel.SOME, props.tabset?.details)">
+    <template v-if="useUiStore().listDetailLevelGreaterEqual('SOME', props.tabset?.details)">
       <template v-if="props.tab?.extension !== UrlExtension.NOTE">
         <q-item-label
           class="ellipsis-2-lines text-body2 darkColors lightColors"
@@ -321,7 +321,7 @@
               <span
                 v-if="
                   props.tab.extension !== UrlExtension.RSS &&
-                  useUiStore().listDetailLevelGreaterEqual(ListDetailLevel.MAXIMAL, props.tabset?.details)
+                  useUiStore().listDetailLevelGreaterEqual('MAXIMAL', props.tabset?.details)
                 "
                 >last active: {{ formatDate(props.tab.lastActive) }}</span
               >
@@ -468,7 +468,7 @@ import CommentChatMessages from 'src/tabsets/widgets/CommentChatMessages.vue'
 import PanelTabListContextMenu from 'src/tabsets/widgets/PanelTabListContextMenu.vue'
 import TabFaviconWidget from 'src/tabsets/widgets/TabFaviconWidget.vue'
 import { useThumbnailsService } from 'src/thumbnails/services/ThumbnailsService'
-import { ListDetailLevel, useUiStore } from 'src/ui/stores/uiStore'
+import { useUiStore } from 'src/ui/stores/uiStore'
 import { onMounted, PropType, ref, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -707,7 +707,7 @@ const openImage = () =>
 
 const showComments = () =>
   showCommentList.value &&
-  useUiStore().listDetailLevelGreaterEqual(ListDetailLevel.SOME, props.tabset?.details) &&
+  useUiStore().listDetailLevelGreaterEqual('SOME', props.tabset?.details) &&
   (props.tab as Tab).comments &&
   (props.tab as Tab).comments.length > 0
 

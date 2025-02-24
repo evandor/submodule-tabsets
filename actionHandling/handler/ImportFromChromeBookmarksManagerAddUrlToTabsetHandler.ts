@@ -71,7 +71,7 @@ export class ImportFromChromeBookmarksManagerAddUrlToTabsetHandler implements Ad
       action: new ActionContext('default'),
     },
   ): Promise<ExecutionResult<any>> {
-    console.log('clicked...', chromeTab.id, additionalData)
+    console.log('clicked...', chromeTab, additionalData)
     const bmFolderId = getBmFolderId(chromeTab)
     if (!bmFolderId) {
       return Promise.reject('could not parse bookmarks id from URL')

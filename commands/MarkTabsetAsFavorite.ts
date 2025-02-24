@@ -4,7 +4,7 @@ import Analytics from 'src/core/utils/google-analytics'
 import { useLogger } from 'src/services/Logger'
 import { MarkTabsetAsDefaultCommand } from 'src/tabsets/commands/MarkTabsetAsDefault'
 import { TabsetStatus } from 'src/tabsets/models/Tabset'
-import TabsetService from 'src/tabsets/services/TabsetService'
+import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 
 const { info } = useLogger()
 
@@ -25,7 +25,8 @@ export class MarkTabsetAsFavoriteCommand implements Command<TabsetStatus> {
   constructor(public tabsetId: string) {}
 
   async execute(): Promise<ExecutionResult<TabsetStatus>> {
-    return TabsetService.markAs(this.tabsetId, TabsetStatus.FAVORITE)
+    return useTabsetService()
+      .markAs(this.tabsetId, TabsetStatus.FAVORITE)
       .then((res: any) => {
         info('made tabset favorite')
         Analytics.fireEvent('tabset_marked_favorite', {})

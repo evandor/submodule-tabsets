@@ -19,7 +19,7 @@ import { ChangeInfo, Tabset, TabsetStatus, TabsetType } from 'src/tabsets/models
 import { useSelectedTabsetService } from 'src/tabsets/services/selectedTabsetService' // let db: TabsetsPersistence = null as unknown as TabsetsPersistence
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { useTabsStore2 } from 'src/tabsets/stores/tabsStore2'
-import { useUiStore } from 'src/ui/stores/uiStore'
+import { ListDetailLevel, useUiStore } from 'src/ui/stores/uiStore'
 import JsUtils from 'src/utils/JsUtils'
 import throttledQueue from 'throttled-queue'
 import { v5 as uuidv5 } from 'uuid'
@@ -926,6 +926,59 @@ export function useTabsetService() {
     await useTabsetService().saveTabset(selectedTabset)
   }
 
+  /**
+   * renames a tabset identified by its id with the new name. The old name
+   * is returned.
+   *
+   * @param tabsetId
+   * @param tabsetName
+   */
+  const rename = (
+    tabsetId: string,
+    tabsetName: string,
+    newColor: string | undefined,
+    window: string = 'current',
+    details: ListDetailLevel = 'MAXIMAL',
+  ): Promise<object> => {
+    const trustedName = tabsetName.replace(STRIP_CHARS_IN_USER_INPUT, '')
+    let trustedColor = newColor ? newColor.replace(STRIP_CHARS_IN_COLOR_INPUT, '') : undefined
+    trustedColor = trustedColor && trustedColor.length > 20 ? trustedColor?.substring(0, 19) : trustedColor
+
+    const tabset = useTabsetsStore().getTabset(tabsetId)
+    if (tabset) {
+      const oldName = tabset.name
+      const oldColor = tabset.color
+      tabset.name = trustedName
+      tabset.color = trustedColor
+      tabset.window = window
+      tabset.details = details
+      //console.log("saving tabset", tabset)
+      return saveTabset(tabset).then(() =>
+        Promise.resolve({
+          oldName: oldName,
+          oldColor: oldColor,
+        }),
+      )
+    }
+    return Promise.reject('could not find tabset for id ' + tabsetId)
+  }
+
+  const markAs = (
+    tabsetId: string,
+    status: TabsetStatus,
+    type: TabsetType = TabsetType.DEFAULT,
+  ): Promise<TabsetStatus> => {
+    console.debug(`marking ${tabsetId} as ${status}`)
+    const ts = useTabsetsStore().getTabset(tabsetId)
+    if (ts) {
+      const oldStatus = ts.status
+      ts.status = status
+      ts.type = type
+      return saveTabset(ts).then(() => oldStatus)
+    }
+    return Promise.reject('could not change status : ' + tabsetId)
+  }
+
   return {
     init,
     saveOrReplaceFromChromeTabs,
@@ -959,5 +1012,7 @@ export function useTabsetService() {
     exportDataAsJson,
     findFolder,
     handleHeadRequests,
+    rename,
+    markAs,
   }
 }
