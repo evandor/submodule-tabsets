@@ -78,18 +78,22 @@ import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { useTabsetsUiStore } from 'src/tabsets/stores/tabsetsUiStore'
 import TabsetListContextMenu from 'src/tabsets/widgets/TabsetListContextMenu.vue'
 import { useUiStore } from 'src/ui/stores/uiStore'
-import { PropType, ref, watchEffect } from 'vue'
+import { onMounted, PropType, ref, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
-const activeTabset = ref<string | undefined>(await useTabsetsStore().getCurrentTabsetId())
+const activeTabset = ref<string | undefined>(undefined)
 const hoveredTab = ref<string | undefined>(undefined)
 
 const props = defineProps({
   tabsets: { type: Array as PropType<Array<Tabset>>, required: true },
   spaceId: { type: String, required: false },
   fromPanel: { type: Boolean, default: false },
+})
+
+onMounted(async () => {
+  activeTabset.value = await useTabsetsStore().getCurrentTabsetId()
 })
 
 watchEffect(async () => {

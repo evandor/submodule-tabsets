@@ -1,6 +1,5 @@
 <template>
-  <!--  @click.stop="saveInTabset(props.tabset.id, props.tabset.folderActive)" -->
-  <!--  <template v-if="handler.actions(currentTabsetId).length === 0"> -&#45;&#45;</template>-->
+  <!-- SpecialUrlAddToTabsetComponent -->
   <template v-if="handler.actions(currentTabsetId).length == 0 && handler.defaultAction()">
     <q-btn
       outline
@@ -8,7 +7,7 @@
       class="q-ma-none q-px-sm q-py-none"
       :class="{ shake: animateAddtabButton, 'cursor-pointer': !alreadyInTabset() }"
       :color="alreadyInTabset() ? 'grey-5' : tsBadges.length > 0 ? 'positive' : ''"
-      size="xs"
+      :size="props.level === 'root' ? 'sm' : 'xs'"
       data-testid="saveInTabsetBtn">
       <div>{{ handler.defaultAction()!.label }}</div>
       <!--                  <q-icon right class="q-ma-none q-pa-none" size="2em" name="o_south" />-->
@@ -24,6 +23,7 @@
     </q-tooltip>
   </template>
 
+  <!-- SpecialUrlAddToTabsetComponent handlerDefaultAction -->
   <template v-else-if="handler.actions(currentTabsetId).length > 0 && handler.defaultAction()">
     <!-- :disable="!handler.actions()[0]!.active(props.currentChromeTab)"-->
     <q-btn-dropdown
@@ -39,67 +39,26 @@
         )
       "
       class="q-ma-none q-px-none q-py-none"
-      size="sm"
-      :dense="handler.defaultAction()!.label.length > 10"
+      :size="props.level === 'root' ? 'sm' : 'xs'"
+      :dense="handler.defaultAction()!.label.length > 15"
       split
       outline>
       <q-list dense style="min-width: 200px">
         <template v-for="l in handler.actions(currentTabsetId)">
-          <!--          <template v-if="(l as ActionContext).dialog">-->
-          <!--            <ContextMenuItem-->
-          <!--              @click.stop="emits('buttonClicked', new ActionHandlerButtonClickedHolder(handler, l, {}))"-->
-          <!--              v-close-popup-->
-          <!--              :color="l.colorFkt ? l.colorFkt() : ''"-->
-          <!--              :icon="l.icon ? l.icon : 'o_tab'"-->
-          <!--              :label="l.label" />-->
-          <!--          </template>-->
-          <component :is="l" :tabset="props.tabset" />
-          <!--          <template v-else>-->
-          <!--            <ContextMenuItem :icon="l.icon ? l.icon : 'o_tab'" :label="l.label">-->
-          <!--              <q-item-section side>-->
-          <!--                <q-icon name="keyboard_arrow_right" />-->
-          <!--              </q-item-section>-->
-          <!--              <q-menu anchor="top end" self="top start">-->
-          <!--                <q-list>-->
-          <!--                  &lt;!&ndash; @click="startAutoSwitchingTab(tabset.id)" &ndash;&gt;-->
-          <!--                  <q-item-->
-          <!--                    v-if="useFeaturesStore().hasFeature(FeatureIdent.AUTO_TAB_SWITCHER)"-->
-          <!--                    dense-->
-          <!--                    clickable-->
-          <!--                    v-close-popup>-->
-          <!--                    <q-item-section>switching tab</q-item-section>-->
-          <!--                  </q-item>-->
-          <!--                  &lt;!&ndash; @click="restoreInNewWindow(tabset.id)"&ndash;&gt;-->
-          <!--                  <q-item dense clickable v-close-popup>-->
-          <!--                    <q-item-section>new window</q-item-section>-->
-          <!--                  </q-item>-->
-          <!--                  &lt;!&ndash; @click="restoreInGroup(tabset.id)"&ndash;&gt;-->
-          <!--                  <q-item dense clickable v-close-popup>-->
-          <!--                    <q-item-section>this window</q-item-section>-->
-          <!--                  </q-item>-->
-          <!--                </q-list>-->
-          <!--              </q-menu>-->
-          <!--            </ContextMenuItem>-->
-          <!--          </template>-->
+          <template v-if="'context' in l">
+            <component
+              :key="l.component.name"
+              :is="l.component"
+              :tabset="props.tabset"
+              :folder="props.folder"
+              :level="props.level"
+              :context="'context' in l ? l.context : {}" />
+          </template>
+          <template v-else>
+            <component :key="l.name" :is="l" :tabset="props.tabset" :folder="props.folder" :level="props.level" />
+          </template>
         </template>
       </q-list>
-      <!--      <q-list dense style="min-width: 150px">-->
-      <!--        <q-item-->
-      <!--          v-for="l in handler.actions(currentTabsetId).slice(1)"-->
-      <!--          :clickable="isActive(l)"-->
-      <!--          dense-->
-      <!--          v-close-popup-->
-      <!--          @click.stop="emits('buttonClicked', new ActionHandlerButtonClickedHolder(handler, l, {}))">-->
-      <!--          <q-item-section class="q-ma-none q-pa-none" style="max-width: 30px">-->
-      <!--            <q-icon name="o_note" color="primary"></q-icon>-->
-      <!--          </q-item-section>-->
-      <!--          <q-item-section no-wrap class="q-ma-none q-pa-none">-->
-      <!--            <q-item-label style="font-size: smaller" :class="isActive(l) ? '' : 'text-grey-5'">{{-->
-      <!--              l.label-->
-      <!--            }}</q-item-label>-->
-      <!--          </q-item-section>-->
-      <!--        </q-item>-->
-      <!--      </q-list>-->
     </q-btn-dropdown>
     <q-tooltip
       class="tooltip-small"
@@ -118,21 +77,20 @@ import { useQuasar } from 'quasar'
 import { useActionHandlers } from 'src/tabsets/actionHandling/ActionHandlers'
 import { AddUrlToTabsetHandler } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { NoopAddUrlToTabsetHandler } from 'src/tabsets/actionHandling/handler/NoopAddUrlToTabsetHandler'
-import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
 import { ActionHandlerButtonClickedHolder } from 'src/tabsets/actionHandling/model/ActionHandlerButtonClickedHolder'
 import TabsetService from 'src/tabsets/services/TabsetService'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { useUiStore } from 'src/ui/stores/uiStore'
-import { PropType, ref, watchEffect } from 'vue'
+import { ref, watchEffect } from 'vue'
 import { Tabset } from '../models/Tabset'
-import { MenuContext } from './model/MenuContext'
 
-const props = defineProps({
-  currentChromeTab: { type: Object as PropType<chrome.tabs.Tab>, required: true },
-  tabset: { type: Object as PropType<Tabset>, required: true },
-  folder: { type: Object as PropType<Tabset>, required: false },
-})
+const props = defineProps<{
+  currentChromeTab: chrome.tabs.Tab
+  tabset: Tabset
+  folder?: Tabset
+  level: 'root' | 'folder'
+}>()
 
 const emits = defineEmits(['buttonClicked', 'asNewFile'])
 
@@ -149,9 +107,10 @@ watchEffect(async () => {
   currentTabsetId.value = await useTabsetsStore().getCurrentTabsetId()
 })
 
-watchEffect(() => {
+watchEffect(async () => {
   handler.value = getHandler(props.currentChromeTab.url, props.folder)
-  // console.log("===>",JSON.stringify(handler.value.actions()), props.folder)
+  // const currentTabsetId = await useTabsetsStore().getCurrentTabsetId()
+  // console.log('===>', JSON.stringify(handler.value.actions(currentTabsetId)), props.folder)
 })
 
 watchEffect(() => {
@@ -200,15 +159,17 @@ const tooltipAlreadyInOtherTabsets = (tabsetName: string) => {
   )
 }
 
-const isActive = (ac: ActionContext) => {
-  return ac.active ? ac.active(props.currentChromeTab) : true
-}
+// const isActive = (ac: ActionContext) => {
+//   return ac.active ? ac.active(props.currentChromeTab) : true
+// }
+//
+// const color = (ac: ActionContext | MenuContext) => {
+//   if ((ac as ActionContext | MenuContext).active) {
+//     // return (ac as (ActionContext | MenuContext))!.active(props.currentChromeTab) ? 'primary' : 'grey-5'
+//     return 'primary'
+//   }
+//   return alreadyInTabset() ? 'grey-5' : tsBadges.value.length > 0 ? 'positive' : 'primary'
+// }
 
-const color = (ac: ActionContext | MenuContext) => {
-  if ((ac as ActionContext | MenuContext).active) {
-    // return (ac as (ActionContext | MenuContext))!.active(props.currentChromeTab) ? 'primary' : 'grey-5'
-    return 'primary'
-  }
-  return alreadyInTabset() ? 'grey-5' : tsBadges.value.length > 0 ? 'positive' : 'primary'
-}
+//const getFolder = () => useTabsetsStore().getActiveFolder(props.tabset)
 </script>

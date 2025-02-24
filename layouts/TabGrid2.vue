@@ -112,13 +112,14 @@ const columns = ref<any[]>([
   { title: ' ' },
   { title: ' ' },
 ])
-const currentTabsetFolderId = ref<string | undefined>(await useTabsetsStore().getCurrentTabsetId())
+const currentTabsetFolderId = ref<string | undefined>(undefined)
 const newCommentIds = ref<Map<string, string[]>>(new Map())
 
 const onWidthChange = () => (windowWidth.value = window.innerWidth)
 
-onMounted(() => {
+onMounted(async () => {
   window.addEventListener('resize', onWidthChange)
+  currentTabsetFolderId.value = await useTabsetsStore().getCurrentTabsetId()
 
   layout.value = []
   state2.layout = []

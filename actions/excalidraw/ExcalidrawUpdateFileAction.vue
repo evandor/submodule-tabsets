@@ -1,27 +1,23 @@
 <template>
   <ContextMenuItem
-    v-if="props.level === 'root'"
     v-close-popup
     @was-clicked="clicked()"
     icon="o_tab"
     color="primary"
     :disable="props.tabset.sharing?.sharedId !== undefined"
-    :label="props.tabset.type === TabsetType.SESSION ? 'Edit Session' : 'Edit Tabset'">
-    <!--    <q-tooltip class="tooltip-small" v-if="props.tabset.sharing?.sharedId !== undefined">-->
-    <!--      Stop sharing first if you want to delete this tabset-->
-    <!--    </q-tooltip>-->
+    :label="context?.label || '???'">
   </ContextMenuItem>
 </template>
 <script setup lang="ts">
 import { useQuasar } from 'quasar'
 import ContextMenuItem from 'src/core/components/helper/ContextMenuItem.vue'
-import { ActionProps } from 'src/tabsets/actions/models/ActionProps'
+import { ComponentContext } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import EditTabsetDialog from 'src/tabsets/dialogues/EditTabsetDialog.vue'
-import { TabsetType } from 'src/tabsets/models/Tabset'
+import { Tabset } from 'src/tabsets/models/Tabset'
 import { useUiStore } from 'src/ui/stores/uiStore'
 
 const $q = useQuasar()
-const props = defineProps<ActionProps>()
+const props = defineProps<{ tabset: Tabset; context?: ComponentContext }>()
 
 const clicked = () => {
   $q.dialog({

@@ -23,6 +23,15 @@ export type ClickedHandler = (
   additionalData?: AddUrlToTabsetHandlerAdditionalData,
 ) => Promise<ExecutionResult<any>>
 
+export type ComponentContext = {
+  label?: string
+}
+
+export type ComponentWithContext = {
+  component: Component
+  context: ComponentContext
+}
+
 export interface AddUrlToTabsetHandler {
   urlMatcher: () => RegExp
 
@@ -30,16 +39,11 @@ export interface AddUrlToTabsetHandler {
 
   defaultAction: () => ActionContext | undefined
 
-  actions: (currentTabsetId: string | undefined) => Component[]
+  actions: (currentTabsetId: string | undefined) => (ComponentWithContext | Component)[]
 
   clicked: ClickedHandler
 
-  updateInTabset: (
-    browserTab: chrome.tabs.Tab,
-    ts: Tabset,
-    folder?: Tabset,
-    additionalData?: AddUrlToTabsetHandlerAdditionalData,
-  ) => Promise<ExecutionResult<any>>
+  updateInTabset: ClickedHandler
 
   handleOpenedTab: (browserTab: chrome.tabs.Tab, tab: Tab) => void
 }
