@@ -71,7 +71,7 @@ export class RssUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   ): Promise<ExecutionResult<any>> {
     console.log('saving...', chromeTab, additionalData)
     try {
-      const displayFeed = additionalData.dialog!['displayFeed' as keyof object] as boolean
+      const displayFeed = additionalData.data!['displayFeed' as keyof object] as boolean
       const newTab = new Tab(uid(), chromeTab)
       if (displayFeed) {
         // let title = chromeTab.url?.replace("https://","").replace("http://", "").replace(STRIP_CHARS_IN_USER_INPUT, '') || 'no title'

@@ -89,14 +89,28 @@ import { computed, ref, watchEffect } from 'vue'
 
 defineEmits([...useDialogPluginComponent.emits])
 
-const props = defineProps({
-  tabsetId: { type: String, required: true },
-  tabsetName: { type: String, required: true },
-  tabsetColor: { type: String, required: false },
-  window: { type: String, required: false },
-  details: { type: String, default: ListDetailLevel.MAXIMAL.toString() },
-  fromPanel: { type: Boolean, default: false },
+type Props = {
+  tabsetId: string
+  tabsetName: string
+  tabsetColor?: string
+  window?: string
+  details: ListDetailLevel
+  fromPanel: boolean
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  details: 'MINIMAL',
+  fromPanel: false,
 })
+
+// const props = defineProps({
+//   tabsetId: { type: String, required: true },
+//   tabsetName: { type: String, required: true },
+//   tabsetColor: { type: String, required: false },
+//   window: { type: String, required: false },
+//   details: { type: ListDetailLevel, default: 'MAXIMAL' },
+//   fromPanel: { type: Boolean, default: false },
+// })
 
 const { dialogRef, onDialogHide, onDialogCancel } = useDialogPluginComponent()
 
@@ -108,12 +122,12 @@ const windowMgtSelectionEdited = ref(false)
 const theColor = ref<string | undefined>(props.tabsetColor || undefined)
 const windowModel = ref<string>(props.window || 'current')
 const windowOptions = ref<string[]>([])
-const detailOption = ref<ListDetailLevel>(ListDetailLevel[props.details as keyof typeof ListDetailLevel])
+const detailOption = ref<ListDetailLevel>(props.details)
 
 const detailOptions = [
-  { label: 'Minimal Details', value: ListDetailLevel.MINIMAL },
-  { label: 'Some Details', value: ListDetailLevel.SOME },
-  { label: 'All Details', value: ListDetailLevel.MAXIMAL },
+  { label: 'Minimal Details', value: 'MINIMAL' },
+  { label: 'Some Details', value: 'SOME' },
+  { label: 'All Details', value: 'MAXIMAL' },
 ]
 
 watchEffect(() => {

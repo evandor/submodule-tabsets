@@ -25,12 +25,12 @@
 </template>
 
 <script lang="ts" setup>
-import ViewToolbarHelper from 'pages/sidepanel/helper/ViewToolbarHelper.vue'
 import { useQuasar } from 'quasar'
 import BrowserApi from 'src/app/BrowserApi'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import Analytics from 'src/core/utils/google-analytics'
+import ViewToolbarHelper from 'src/pages/sidepanel/helper/ViewToolbarHelper.vue'
 import { CreateTabsetCommand } from 'src/tabsets/commands/CreateTabsetCommand'
 import { RestoreTabsetCommand } from 'src/tabsets/commands/RestoreTabset'
 import StartSessionDialog from 'src/tabsets/dialogues/StartSessionDialog.vue'

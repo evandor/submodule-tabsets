@@ -2,7 +2,9 @@ import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { MarkTabsetAsFavoriteCommand } from 'src/tabsets/commands/MarkTabsetAsFavorite'
 import { TabsetStatus } from 'src/tabsets/models/Tabset'
-import TabsetService from 'src/tabsets/services/TabsetService'
+import { useTabsetService } from 'src/tabsets/services/TabsetService2'
+
+//import TabsetService from 'src/tabsets/services/TabsetService'
 
 class UndoCommand implements Command<TabsetStatus> {
   constructor(
@@ -22,7 +24,8 @@ export class MarkTabsetAsDefaultCommand implements Command<TabsetStatus> {
   constructor(public tabsetId: string) {}
 
   async execute(): Promise<ExecutionResult<TabsetStatus>> {
-    return TabsetService.markAs(this.tabsetId, TabsetStatus.DEFAULT)
+    return useTabsetService()
+      .markAs(this.tabsetId, TabsetStatus.DEFAULT)
       .then((oldStatus) =>
         Promise.resolve(
           new ExecutionResult(
