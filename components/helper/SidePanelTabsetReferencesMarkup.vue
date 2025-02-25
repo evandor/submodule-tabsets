@@ -61,16 +61,20 @@ const sharedBy = ref<string>('')
 const sharedWith = ref<string>('')
 const showDetails = ref(true)
 const shared = ref<object[]>([])
+const currentTabsetId = ref<string | undefined>(undefined)
+
+watchEffect(async () => {
+  currentTabsetId.value = await useTabsetsStore().getCurrentTabsetId()
+})
 
 const updateSharedInfo = async () => {
-  const currentTabsetId = useTabsetsStore().currentTabsetId
-  if (currentTabsetId) {
+  if (currentTabsetId.value) {
+    const fs = FirebaseServices.getFirestore()
     tabset.value = useTabsetsStore().getCurrentTabset
     sharedBy.value = tabset.value?.sharing?.sharedBy || ''
     //console.log('updating shared info')
-    const sharedInfo: DocumentSnapshot = await getDoc(
-      doc(FirebaseServices.getFirestore(), 'users', useAuthStore().user.uid, 'tabset-shares', currentTabsetId),
-    )
+    const theDoc = doc(fs, `users/${useAuthStore().user.uid}/tabset-shares/${currentTabsetId.value}`)
+    const sharedInfo: DocumentSnapshot = await getDoc(theDoc)
     if (sharedInfo.data()) {
       const data = sharedInfo.data() as object
       // console.log('data', data)
@@ -108,15 +112,14 @@ watchEffect(() => {
 })
 
 const removeShare = async (email: string) => {
-  const currentTabsetId = useTabsetsStore().currentTabsetId
-  if (currentTabsetId) {
+  if (currentTabsetId.value) {
     console.log('removing share', email, currentTabsetId)
     const docRef = doc(
       FirebaseServices.getFirestore(),
       'users',
       useAuthStore().user.uid,
       'tabset-shares',
-      currentTabsetId,
+      currentTabsetId.value,
     )
     const sharedDoc = await getDoc(docRef)
     const data = sharedDoc.data() as object
