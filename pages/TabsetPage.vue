@@ -235,7 +235,7 @@
 
 <script setup lang="ts">
 import TabsetsSelectorWidget from 'components/widgets/TabsetsSelectorWidget.vue'
-import { date, uid, useQuasar } from 'quasar'
+import { uid, useQuasar } from 'quasar'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import Analytics from 'src/core/utils/google-analytics'
 import { RenameTabsetCommand } from 'src/tabsets/commands/RenameTabset'
