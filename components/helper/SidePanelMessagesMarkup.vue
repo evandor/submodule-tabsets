@@ -38,7 +38,7 @@ import { formatDistance } from 'date-fns'
 import { deleteDoc, doc } from 'firebase/firestore'
 import { useQuasar } from 'quasar'
 import { useMessagesStore } from 'src/messages/stores/messagesStore'
-import FirebaseServices from 'src/services/firebase/FirebaseServices'
+import useSidePanelMessagesMarkupView from 'src/tabsets/components/helper/sidePanelMessagesMarkupView'
 import DeleteBookmarksByUrlDialog from 'src/tabsets/components/messageDialogs/DeleteBookmarksByUrlDialog.vue'
 import { Message } from 'src/tabsets/models/Message'
 import { useAuthStore } from 'stores/authStore'
@@ -50,6 +50,8 @@ const messages = ref<Message[]>([])
 const showDetails = ref(true)
 const messageCount = ref(0)
 
+const { clearMessage } = useSidePanelMessagesMarkupView()
+
 watchEffect(async () => {
   const msgs = useMessagesStore().getUnreadMessages
   messages.value = msgs.slice(0, 20)
@@ -60,13 +62,12 @@ const toggleShowDetails = () => (showDetails.value = !showDetails.value)
 
 const clearMessages = async () => {
   for (const m of messages.value) {
-    // console.log('deleting message', m)
-    await deleteDoc(doc(FirebaseServices.getFirestore(), `users/${useAuthStore().user.uid}/messages/${m.id}`))
+    await clearMessage(m.id)
   }
 }
 
 const deleteMessage = async (m: Message) => {
-  await deleteDoc(doc(FirebaseServices.getFirestore(), `users/${useAuthStore().user.uid}/messages/${m.id}`))
+  await clearMessage(m.id)
 }
 
 const formatDate = (timestamp: number | undefined) =>
