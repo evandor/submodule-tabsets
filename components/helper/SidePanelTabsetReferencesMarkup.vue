@@ -57,13 +57,17 @@ const sharedWith = ref<string>('')
 const showDetails = ref(true)
 const shared = ref<object[]>([])
 
-const updateSharedInfo = async () => {}
+const updateSharedInfo = async () => {
+  // no op
+}
 
 watchEffect(async () => {
   await updateSharedInfo()
 })
 
-const removeShare = async (email: string) => {}
+const removeShare = async (email: string) => {
+  // no op
+}
 
 const toggleShowDetails = () => (showDetails.value = !showDetails.value)
 </script>
