@@ -10,10 +10,12 @@ import {
   AddUrlToTabsetHandler,
   AddUrlToTabsetHandlerAdditionalData,
 } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
+import { DefaultActions } from 'src/tabsets/actionHandling/handler/DefaultActions'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
 import { AddTabToTabsetCommand } from 'src/tabsets/commands/AddTabToTabsetCommand'
 import { Tab, UrlExtension } from 'src/tabsets/models/Tab'
 import { Tabset } from 'src/tabsets/models/Tabset'
+import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { Component } from 'vue'
 
 const { sanitizeAsPlainText } = useUtils()
@@ -34,7 +36,8 @@ export class RssFolderHandler implements AddUrlToTabsetHandler {
   }
 
   actions(): Component[] {
-    return []
+    const currentTabset = useTabsetsStore().getCurrentTabset
+    return DefaultActions.getDefaultActions(currentTabset)
   }
 
   async clicked(

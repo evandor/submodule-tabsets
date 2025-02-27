@@ -72,7 +72,7 @@
 
 <script lang="ts" setup>
 import { Tabset, TabsetType } from 'src/tabsets/models/Tabset'
-import { PropType, ref, watchEffect } from 'vue'
+import { ref, watchEffect } from 'vue'
 import '@he-tree/vue/style/default.css'
 import '@he-tree/vue/style/material-design.css'
 import { QVueGlobals } from 'quasar'
@@ -85,9 +85,7 @@ import { useTabsStore2 } from 'src/tabsets/stores/tabsStore2'
 import { useUiStore } from 'src/ui/stores/uiStore'
 import { useWindowsStore } from 'src/windows/stores/windowsStore'
 
-const props = defineProps({
-  tabset: { type: Object as PropType<Tabset>, required: true },
-})
+const props = defineProps<{ tabset: Tabset }>()
 
 const currentChromeTab = ref<chrome.tabs.Tab | undefined>(undefined)
 const hoveredTabset = ref<string | undefined>(undefined)
@@ -165,8 +163,18 @@ const selectFolder = (tabset: Tabset, folder?: Tabset) => {
   useTabsetService().handleHeadRequests(tabset, folder?.id)
 }
 
-const folderCaption = (folder: Tabset): string =>
-  folder.name !== '..' ? folder.tabs.length + ' tab' + (folder.tabs.length !== 1 ? 's' : '') : ''
+const folderCaption = (folder: Tabset): string => {
+  if (folder.name !== '..') {
+    const tabsInfo = folder.tabs.length + ' tab' + (folder.tabs.length !== 1 ? 's' : '')
+    if (folder.folders.length > 0) {
+      return tabsInfo + ', ' + folder.folders.length + ' folder' + (folder.folders.length !== 1 ? 's' : '')
+    } else {
+      return tabsInfo
+    }
+  } else {
+    return ''
+  }
+}
 
 const handleButtonClicked = async (tabset: Tabset, args: ActionHandlerButtonClickedHolder, folder?: Tabset) => {
   console.log(`button clicked: tsId=${tabset.id}, folderId=${folder?.id}, args=...`)

@@ -27,6 +27,7 @@
   <template v-else-if="handler.actions(currentTabsetId).length > 0 && handler.defaultAction()">
     <!-- :disable="!handler.actions()[0]!.active(props.currentChromeTab)"-->
     <q-btn-dropdown
+      style="border-radius: 5px"
       :label="handler.defaultAction()!.label"
       :class="{ shake: animateAddtabButton, 'cursor-pointer': !alreadyInTabset() }"
       v-close-popup

@@ -49,8 +49,14 @@ export class DeleteTabCommand implements Command<Tabset> {
     info('tab deleted')
     sendMsg('tab-deleted', { tabsetId: tabset.id })
     const result = await AppEventDispatcher.dispatchEvent('tab-deleted', { url: this.tab.url })
-    console.log('bookmarksToDelete', result)
-    if (result && this.tab.url && useFeaturesStore().hasFeature(FeatureIdent.BOOKMARKS)) {
+    console.log('bookmarksToDelete', result, result['bookmarks' as keyof object] as number)
+    if (
+      result &&
+      (result['bookmarks' as keyof object] as number) > 0 &&
+      this.tab.url &&
+      useFeaturesStore().hasFeature(FeatureIdent.BOOKMARKS)
+    ) {
+      console.log('bookmarksToDelete', result)
       const bookmarksCount = (result['bookmarks' as keyof object] as number) || 0
       useMessagesStore().addMessage(
         new Message(
