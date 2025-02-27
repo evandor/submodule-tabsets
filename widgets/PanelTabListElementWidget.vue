@@ -412,9 +412,17 @@
       @mouseover="hoveredTab = tab.id"
       @mouseleave="hoveredTab = undefined"
       :style="TabService.isCurrentTab(props.tab) ? 'border-right:3px solid #1565C0;border-radius:3px' : ''"
-      style="justify-content: start; width: 30px; max-width: 30px">
+      style="justify-content: start; width: 42px; max-width: 42px">
       <span v-if="props.tabset && props.tabset.type !== TabsetType.SESSION">
-        <q-icon name="more_vert" class="cursor-pointer q-mt-sm" color="black" size="20px" />
+        <!--        <q-icon name="more_vert" class="cursor-pointer q-mt-sm" color="black" size="20px" />-->
+        <q-btn
+          round
+          flat
+          outline
+          text-color="primary"
+          class="cursor-pointer q-mt-sm q-mr-md"
+          icon="more_vert"
+          size="sm" />
         <PanelTabListContextMenu
           v-if="!props.hideMenu"
           :tabset="props.tabset!"

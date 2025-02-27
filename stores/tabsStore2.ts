@@ -21,14 +21,14 @@ function calcOverlapForTabsets(
   tabsets.forEach((ts: Tabset) => {
     const overlap = getOverlap.value(ts)
     if (overlap > maxOverlap) {
-      console.log('overlap!!!', overlap, ts.name)
+      // console.log('overlap!!!', overlap, ts.name)
       maxOverlap = overlap
       maxOverlapTs = level == 0 ? ts : maxOverlapTs
       maxOverlapFolder = level == 0 ? undefined : ts
     }
     const folderRes = calcOverlapForTabsets(ts.folders, getOverlap, maxOverlap, maxOverlapTs, maxOverlapFolder, level++)
     if (folderRes && folderRes.maxOverlap > maxOverlap) {
-      console.log('overlap!!!', overlap, folderRes.maxOverlapFolder?.name)
+      // console.log('overlap!!!', overlap, folderRes.maxOverlapFolder?.name)
       maxOverlap = folderRes.maxOverlap
       maxOverlapTs = folderRes.maxOverlapTs
       maxOverlapFolder = folderRes.maxOverlapFolder
