@@ -1,4 +1,4 @@
-import ChromeApi from 'src/app/BrowserApi'
+import BrowserApi from 'src/app/BrowserApi'
 import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
@@ -18,7 +18,7 @@ export class RestoreTabsetCommand implements Command<string> {
       const tabset = useTabsetsStore().getTabset(this.tabsetId)
       if (tabset) {
         //console.log('found tabset for id', this.tabsetId)
-        ChromeApi.restore(tabset, this.windowName, this.inNewWindow)
+        BrowserApi.restore(tabset, this.windowName, this.inNewWindow)
         return new ExecutionResult('result', 'doneMsg')
       }
       return Promise.reject('could not find tabset')

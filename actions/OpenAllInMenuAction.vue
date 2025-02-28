@@ -18,13 +18,13 @@
             clickable
             v-close-popup
             @click="startAutoSwitchingTab(props.tabset.id)">
-            <q-item-section>switching tab</q-item-section>
+            <q-item-section>switching tab...</q-item-section>
           </q-item>
           <q-item dense clickable v-close-popup @click="restoreInNewWindow(props.tabset.id)">
             <q-item-section>new window</q-item-section>
           </q-item>
           <q-item dense clickable v-close-popup @click="restoreInGroup(props.tabset.id)">
-            <q-item-section>this window</q-item-section>
+            <q-item-section>this window...</q-item-section>
           </q-item>
         </q-list>
       </q-menu>
@@ -41,7 +41,8 @@
   </template>
 </template>
 <script setup lang="ts">
-import { LocalStorage } from 'quasar'
+import { LocalStorage, useQuasar } from 'quasar'
+import BrowserApi from 'src/app/BrowserApi'
 import { FeatureIdent } from 'src/app/models/FeatureIdent'
 import ContextMenuItem from 'src/core/components/helper/ContextMenuItem.vue'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
@@ -55,6 +56,8 @@ import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 const props = defineProps<ActionProps>()
 
 const { inBexMode } = useUtils()
+
+const $q = useQuasar()
 
 const startAutoSwitchingTab = (tabsetId: string) => {
   const tabset = useTabsetsStore().getTabset(tabsetId)
@@ -87,6 +90,25 @@ const startAutoSwitchingTab = (tabsetId: string) => {
 const restoreInNewWindow = (tabsetId: string, windowName: string | undefined = undefined) =>
   useCommandExecutor().execute(new RestoreTabsetCommand(tabsetId, windowName))
 
-const restoreInGroup = (tabsetId: string, windowName: string | undefined = undefined) =>
-  useCommandExecutor().execute(new RestoreTabsetCommand(tabsetId, windowName, false))
+const restoreInGroup = (tabsetId: string, windowName: string | undefined = undefined) => {
+  $q.dialog({
+    title: 'Open tabset in this window',
+    message: 'Should the current tabs be closed? (Pinned tabs will be kept)',
+    options: {
+      type: 'checkbox',
+      model: [],
+      items: [{ label: 'close current tabs', value: 'true', color: 'secondary' }],
+    },
+    cancel: true,
+  }).onOk((data: any) => {
+    if (data![0] === 'true') {
+      console.log('data', data)
+      BrowserApi.closeAllTabs(false).then(() => {
+        useCommandExecutor().execute(new RestoreTabsetCommand(tabsetId, windowName, false))
+      })
+    } else {
+      useCommandExecutor().execute(new RestoreTabsetCommand(tabsetId, windowName, false))
+    }
+  })
+}
 </script>
