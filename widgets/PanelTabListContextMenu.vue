@@ -20,7 +20,10 @@
         <q-item-section> Edit Tab</q-item-section>
       </q-item>
 
-      <template v-if="props.tabset?.type.toString() !== TabsetType.DYNAMIC.toString()">
+      <template
+        v-if="
+          useFeaturesStore().hasFeature('DEV_MODE') && props.tabset?.type.toString() !== TabsetType.DYNAMIC.toString()
+        ">
         <q-item clickable v-close-popup @click.stop="addCommentDialog()">
           <q-item-section style="padding-right: 0; min-width: 25px; max-width: 25px">
             <q-icon size="xs" name="o_note" color="info" />

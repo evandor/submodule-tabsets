@@ -5,6 +5,8 @@ import AppEventDispatcher from 'src/app/AppEventDispatcher'
 import BrowserApi from 'src/app/BrowserApi'
 import { ContentItem } from 'src/content/models/ContentItem'
 import { useContentService } from 'src/content/services/ContentService'
+import { Notebook } from 'src/notes/models/Notebook'
+import { useNotesStore } from 'src/notes/stores/NotesStore'
 import { Space } from 'src/spaces/models/Space'
 import { useSpacesStore } from 'src/spaces/stores/spacesStore'
 import { Tab, UrlExtension } from 'src/tabsets/models/Tab'
@@ -149,7 +151,7 @@ class TabsetService {
     return Promise.reject('could not find tab ' + tabId)
   }
 
-  exportData(exportAs: string, appVersion: string = '0.0.0'): Promise<any> {
+  async exportData(exportAs: string, appVersion: string = '0.0.0'): Promise<any> {
     console.log('exporting as ', exportAs)
 
     const spacesStore = useSpacesStore()
@@ -162,6 +164,7 @@ class TabsetService {
       data = JSON.stringify({
         tabsets: tabsets.filter((ts: Tabset) => ts.status !== TabsetStatus.DELETED),
         spaces: [...spacesStore.spaces.values()],
+        notebooks: await useNotesStore().getNotebookList(),
       })
       return this.createFile(data, filename)
     } else if (exportAs === 'csv') {
@@ -216,6 +219,7 @@ class TabsetService {
     let data = JSON.parse(json)
     let tabsets = data.tabsets || data
     let spaces = data.spaces || []
+    let notebooks = data.notebooks || []
 
     _.forEach(spaces, (space: Space) => {
       useSpacesStore().addSpace(space)
@@ -237,6 +241,10 @@ class TabsetService {
           favIconUrl: tab.favIconUrl || '',
         })
       })
+    })
+
+    _.forEach(notebooks, (notebook: Notebook) => {
+      useNotesStore().saveNotebook(notebook)
     })
   }
 

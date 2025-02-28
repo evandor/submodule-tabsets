@@ -50,10 +50,6 @@ const exportAs = ref('json')
 const hideWarning = ref(false)
 const warning = ref('')
 
-const props = defineProps({
-  inSidePanel: { type: Boolean, default: false },
-})
-
 watchEffect(() => {
   if (exportAs.value === 'bookmarks') {
     warning.value = "Warning! This will replace the bookmarks at '/tabsets'!"
