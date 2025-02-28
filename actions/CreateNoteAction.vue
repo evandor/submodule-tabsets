@@ -16,8 +16,8 @@
 <script setup lang="ts">
 import { FeatureIdent } from 'src/app/models/FeatureIdent'
 import ContextMenuItem from 'src/core/components/helper/ContextMenuItem.vue'
+import { useNavigationService } from 'src/core/services/NavigationService'
 import { useFeaturesStore } from 'src/features/stores/featuresStore'
-import NavigationService from 'src/services/NavigationService'
 import { ActionProps } from 'src/tabsets/actions/models/ActionProps'
 
 const props = defineProps<ActionProps>()
@@ -27,6 +27,7 @@ const clicked = () => {
     chrome && chrome.runtime && chrome.runtime.getURL
       ? chrome.runtime.getURL('www/index.html') + '#/mainpanel/notes/?tsId=' + props.tabset.id + '&edit=true'
       : '#/mainpanel/notes/?tsId=' + props.tabset.id + '&edit=true'
-  NavigationService.openOrCreateTab([url])
+  //  NavigationService.openOrCreateTab([url])
+  useNavigationService().browserTabFor(url)
 }
 </script>
