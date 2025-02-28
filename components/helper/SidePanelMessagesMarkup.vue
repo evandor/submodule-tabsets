@@ -35,13 +35,11 @@
 
 <script lang="ts" setup>
 import { formatDistance } from 'date-fns'
-import { deleteDoc, doc } from 'firebase/firestore'
 import { useQuasar } from 'quasar'
 import { useMessagesStore } from 'src/messages/stores/messagesStore'
 import useSidePanelMessagesMarkupView from 'src/tabsets/components/helper/sidePanelMessagesMarkupView'
 import DeleteBookmarksByUrlDialog from 'src/tabsets/components/messageDialogs/DeleteBookmarksByUrlDialog.vue'
 import { Message } from 'src/tabsets/models/Message'
-import { useAuthStore } from 'stores/authStore'
 import { ref, watchEffect } from 'vue'
 
 const $q = useQuasar()

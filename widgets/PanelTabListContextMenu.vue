@@ -22,7 +22,8 @@
 
       <template
         v-if="
-          useFeaturesStore().hasFeature('DEV_MODE') && props.tabset?.type.toString() !== TabsetType.DYNAMIC.toString()
+          useFeaturesStore().hasFeature(FeatureIdent.DEV_MODE) &&
+          props.tabset?.type.toString() !== TabsetType.DYNAMIC.toString()
         ">
         <q-item clickable v-close-popup @click.stop="addCommentDialog()">
           <q-item-section style="padding-right: 0; min-width: 25px; max-width: 25px">
