@@ -512,7 +512,7 @@ const placeholders = ref<Object[]>([])
 const suggestion = ref<Suggestion | undefined>(undefined)
 const pngs = ref<SavedBlob[]>([])
 const opensearchterm = ref<string | undefined>(undefined)
-const sendComment = ref('')
+const sendComment = ref<string>('')
 const newCommentIds = ref<string[]>([])
 
 onMounted(() => {
