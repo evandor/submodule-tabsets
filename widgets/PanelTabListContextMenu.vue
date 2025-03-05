@@ -70,6 +70,18 @@
       <!--      </template>-->
 
       <q-item
+        v-if="useFeaturesStore().hasFeature(FeatureIdent.MONITOR)"
+        clickable
+        v-close-popup
+        @click.stop="openMonitoringDialog()">
+        <q-item-section style="padding-right: 0; min-width: 25px; max-width: 25px">
+          <q-icon size="xs" name="o_notifications" color="accent" />
+        </q-item-section>
+        <q-item-section v-if="isMonitoring()">Stop Monitoring</q-item-section>
+        <q-item-section v-else>Monitor Changes</q-item-section>
+      </q-item>
+
+      <q-item
         v-if="useFeaturesStore().hasFeature(FeatureIdent.REMINDER)"
         clickable
         v-close-popup
@@ -102,13 +114,14 @@ import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import { useFeaturesStore } from 'src/features/stores/featuresStore'
 import NavigationService from 'src/services/NavigationService'
 import { DeleteTabCommand } from 'src/tabsets/commands/DeleteTabCommand'
+import { MonitorCommand } from 'src/tabsets/commands/MonitorCommand'
 import { UpdateTabColorCommand } from 'src/tabsets/commands/UpdateTabColor'
 import CommentDialog from 'src/tabsets/dialogues/CommentDialog.vue'
 import EditUrlDialog from 'src/tabsets/dialogues/EditUrlDialog.vue'
 import ReminderDialog from 'src/tabsets/dialogues/ReminderDialog.vue'
 import { PlaceholdersType } from 'src/tabsets/models/Placeholders'
 import { Tab } from 'src/tabsets/models/Tab'
-import { Tabset, TabsetType } from 'src/tabsets/models/Tabset'
+import { MonitoredTab, Tabset, TabsetType } from 'src/tabsets/models/Tabset'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { PropType, ref } from 'vue'
 import { useRouter } from 'vue-router'
@@ -187,4 +200,22 @@ const openReminderDialog = () =>
     component: ReminderDialog,
     componentProps: { tabId: props.tab.id, date: props.tab.reminder, comment: props.tab?.reminderComment },
   })
+const openMonitoringDialog = () => {
+  const monitored = isMonitoring()
+  $q.dialog({
+    title: 'Check for changes',
+    message: monitored
+      ? 'Stop monitoring website for changes'
+      : 'Click ok to start periodical checks if this website has changed.',
+    cancel: true,
+    persistent: true,
+  }).onOk(() => {
+    useCommandExecutor().executeFromUi(new MonitorCommand(props.tab.id, !monitored))
+  })
+}
+
+const isMonitoring = () => {
+  const ts = useTabsetsStore().getCurrentTabset
+  return ts && ts.monitoredTabs && ts.monitoredTabs.find((mt: MonitoredTab) => mt.tabId === props.tab.id)
+}
 </script>

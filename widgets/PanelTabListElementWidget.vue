@@ -46,12 +46,22 @@
       {{ props.tab.httpStatus }}
       <q-tooltip class="tooltip">Tabsets has problems accessing this site.</q-tooltip>
     </div>
-    <div v-if="props.tab.reminder" class="text-center">
-      <q-icon name="o_alarm" @click="openReminderDialog()">
+    <div v-if="props.tab.reminder || monitor" class="text-center">
+      <q-icon v-if="props.tab.reminder" name="o_alarm" @click="openReminderDialog()" size="14px">
         <q-tooltip class="tooltip-small"
           >Reminder set to {{ date.formatDate(props.tab.reminder, 'DD.MM.YYYY') }}
           {{ props.tab.reminderComment ? ' - ' : '' }} {{ props.tab.reminderComment }}
         </q-tooltip>
+      </q-icon>
+      <q-icon
+        v-if="monitor"
+        :name="monitor.changed ? 'o_notifications_active' : 'o_notifications'"
+        :color="monitor.changed ? 'negative' : ''"
+        size="14px">
+        <q-tooltip v-if="monitor.changed" class="tooltip-small"
+          >Tab's content has changed at {{ date.formatDate(monitor.changed, 'DD.MM.YYYY') }}
+        </q-tooltip>
+        <q-tooltip v-else class="tooltip-small">Tab is being monitored for content changes</q-tooltip>
       </q-icon>
     </div>
   </q-item-section>
@@ -340,38 +350,6 @@
       <h6 v-if="newComments().length > 0">new Message(s)</h6>
       <CommentChatMessages :comments="newComments()" :tab="props.tab" :tabset-id="props.tabsetId" />
 
-      <!--      <q-chat-message-->
-      <!--        v-for="m in props.tab.comments"-->
-      <!--        :name="m.author"-->
-      <!--        @click="selectComment(m.id)"-->
-      <!--        :avatar="'http://www.gravatar.com/avatar/' + sha256(m.authorEmail?.trim().toLowerCase() || '')"-->
-      <!--        :text="[m.comment]"-->
-      <!--        :size="$q.screen.lt.md ? '11' : '6'"-->
-      <!--        :sent="isSender(m)"-->
-      <!--        :bg-color="m.id === selectedCommentId ? 'warning' : isSender(m) ? 'blue' : 'grey-2'"-->
-      <!--        :text-color="isSender(m) ? 'white' : 'black'">-->
-      <!--        <template v-slot:stamp>{{ m.edited ? 'Edited' : '' }} {{ formatDate(m.date) }}</template>-->
-      <!--        <template v-slot:name>-->
-      <!--          <div v-if="m.id === selectedCommentId">-->
-      <!--            <span @click.stop="editSelectedComment(m)" class="q-mr-sm">[edit]</span>-->
-      <!--            <span @click.stop="deleteSelectedComment()">[delete]</span>-->
-      <!--          </div>-->
-      <!--          <div v-else>-->
-      <!--            <div class="q-mt-sm" v-if="newCommentIds.findIndex((id: string) => id === m.id) >= 0">-->
-      <!--              new messages-->
-      <!--              <hr />-->
-      <!--            </div>-->
-      <!--            {{ m.authorEmail === useAuthStore().user.email ? 'me' : m.authorEmail }}-->
-      <!--          </div>-->
-      <!--        </template>-->
-      <!--      </q-chat-message>-->
-      <!--      <div v-for="m in props.tab.comments" @click="selectComment(m.id)">-->
-      <!--        <div class="text-subtitle1 q-ma-none q-pa-none">{{ m.comment }}</div>-->
-      <!--        <div class="col-12 text-right q-mr-lg text-caption q-pa-none q-ma-none" v-if="selectedCommentId === m.id">-->
-      <!--          <span @click.stop="editSelectedComment(m)">Edit</span>&nbsp;-->
-      <!--          <span @click.stop="deleteSelectedComment()">Delete</span>-->
-      <!--        </div>-->
-      <!--      </div>-->
       <div class="row">
         <div class="col-6 text-right">&nbsp;</div>
         <div class="col text-right">
@@ -441,7 +419,7 @@
 <script setup lang="ts">
 import { formatDistance } from 'date-fns'
 import _ from 'lodash'
-import { date, useQuasar } from 'quasar'
+import { useQuasar } from 'quasar'
 import BrowserApi from 'src/app/BrowserApi'
 import TabListIconIndicatorsHook from 'src/app/hooks/tabsets/TabListIconIndicatorsHook.vue'
 import { FeatureIdent } from 'src/app/models/FeatureIdent'
@@ -467,7 +445,7 @@ import { OpenTabCommand } from 'src/tabsets/commands/OpenTabCommand'
 import ReminderDialog from 'src/tabsets/dialogues/ReminderDialog.vue'
 import { PlaceholdersType } from 'src/tabsets/models/Placeholders'
 import { Tab, TabComment, TabFavorite, TabPreview, TabSorting, UrlExtension } from 'src/tabsets/models/Tab'
-import { Tabset, TabsetType } from 'src/tabsets/models/Tabset'
+import { MonitoredTab, Tabset, TabsetType } from 'src/tabsets/models/Tabset'
 import TabsetService from 'src/tabsets/services/TabsetService'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useGroupsStore } from 'src/tabsets/stores/groupsStore'
@@ -514,6 +492,7 @@ const pngs = ref<SavedBlob[]>([])
 const opensearchterm = ref<string | undefined>(undefined)
 const sendComment = ref<string>('')
 const newCommentIds = ref<string[]>([])
+const monitor = ref<MonitoredTab | undefined>(undefined)
 
 onMounted(() => {
   if (new Date().getTime() - props.tab.created < 500) {
@@ -528,6 +507,10 @@ onMounted(() => {
   if (props.tabsetId) {
     newCommentIds.value = useEventsServices().listNewComments(props.tabsetId, props.tab)
   }
+  monitor.value =
+    props.tabset &&
+    props.tabset.monitoredTabs &&
+    props.tabset.monitoredTabs.find((mt: MonitoredTab) => mt.tabId === props.tab.id)
 })
 
 const thumbnailFor = async (tab: Tab): Promise<string> => {
@@ -703,7 +686,17 @@ const switchGroup = (group: chrome.tabGroups.TabGroup): void => {
   }
 }
 
-const gotoTab = () => useCommandExecutor().executeFromUi(new OpenTabCommand(props.tab))
+const gotoTab = () => {
+  if (props.tabset && props.tabset.monitoredTabs) {
+    props.tabset.monitoredTabs.forEach((mt: MonitoredTab) => {
+      if (mt.tabId === props.tab.id) {
+        delete mt.changed
+      }
+    })
+    useTabsetService().saveTabset(props.tabset)
+  }
+  useCommandExecutor().executeFromUi(new OpenTabCommand(props.tab))
+}
 
 const showSuggestion = () => {
   const url = chrome.runtime.getURL('www/index.html') + '#/mainpanel/suggestions/' + suggestion.value?.id

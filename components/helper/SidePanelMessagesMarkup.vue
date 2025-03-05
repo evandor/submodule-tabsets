@@ -36,10 +36,13 @@
 <script lang="ts" setup>
 import { formatDistance } from 'date-fns'
 import { useQuasar } from 'quasar'
+import { useNavigationService } from 'src/core/services/NavigationService'
 import { useMessagesStore } from 'src/messages/stores/messagesStore'
 import useSidePanelMessagesMarkupView from 'src/tabsets/components/helper/sidePanelMessagesMarkupView'
 import DeleteBookmarksByUrlDialog from 'src/tabsets/components/messageDialogs/DeleteBookmarksByUrlDialog.vue'
 import { Message } from 'src/tabsets/models/Message'
+import { MonitoredTab } from 'src/tabsets/models/Tabset'
+import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { ref, watchEffect } from 'vue'
 
 const $q = useQuasar()
@@ -92,6 +95,28 @@ const handleActionPath = (m: Message) => {
         .onCancel(() => {
           useMessagesStore().deleteMessage(m.id)
         })
+    } else if (m.actionPath.startsWith('tab://')) {
+      $q.dialog({
+        title: "Tab's content changed",
+        message: 'Open tab',
+      }).onOk(() => {
+        const params = m.actionPath!.split('tab://')
+        const tabId = params[1]
+        if (tabId) {
+          const tabAndTsId = useTabsetsStore().getTabAndTabsetId(tabId)
+          if (tabAndTsId && tabAndTsId.tab.url) {
+            useNavigationService().browserTabFor(tabAndTsId.tab.url)
+            const ts = useTabsetsStore().getTabset(tabAndTsId.tabsetId)
+            if (ts) {
+              ts.monitoredTabs.forEach((tm: MonitoredTab) => {
+                if (tm.tabId === tabAndTsId.tab.id) {
+                  delete tm.changed
+                }
+              })
+            }
+          }
+        }
+      })
     } else {
       console.warn('unknown action path ', m)
     }
