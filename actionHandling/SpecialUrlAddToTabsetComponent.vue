@@ -30,6 +30,7 @@
       style="border-radius: 5px"
       :label="handler.defaultAction()!.label"
       :class="{ shake: animateAddtabButton, 'cursor-pointer': !alreadyInTabset() }"
+      :color="alreadyInTabset() ? 'grey-5' : tsBadges.length > 0 ? 'positive' : ''"
       v-close-popup
       @click.stop="
         emits(
@@ -63,11 +64,13 @@
     </q-btn-dropdown>
     <q-tooltip
       class="tooltip-small"
-      v-if="alreadyInTabset()"
+      :delay="1000"
+      v-if="!alreadyInTabset() && tsBadges.length > 0"
       anchor="center left"
       self="center right"
       :offset="[10, 10]">
-      click the dropdown icon for more options
+      click the dropdown icon for more options... A green button indicates the current tab already exists in another
+      tabset
     </q-tooltip>
   </template>
 </template>

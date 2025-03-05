@@ -1,4 +1,5 @@
 import { FeatureIdent } from 'src/app/models/FeatureIdent'
+import { useContentStore } from 'src/content/stores/contentStore'
 import { useFeaturesStore } from 'src/features/stores/featuresStore'
 import { ComponentWithContext } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import ArchiveTabsetAction from 'src/tabsets/actions/ArchiveTabsetAction.vue'
@@ -11,8 +12,11 @@ import DeleteTabsetAction from 'src/tabsets/actions/DeleteTabsetAction.vue'
 import EditFolderAction from 'src/tabsets/actions/EditFolderAction.vue'
 import EditTabsetAction from 'src/tabsets/actions/EditTabsetAction.vue'
 import OpenAllInMenuAction from 'src/tabsets/actions/OpenAllInMenuAction.vue'
+import OpenTabsetAction from 'src/tabsets/actions/OpenTabsetAction.vue'
 import ShowGalleryAction from 'src/tabsets/actions/ShowGalleryAction.vue'
 import { Tabset, TabsetStatus, TabsetType } from 'src/tabsets/models/Tabset'
+import TabsetService from 'src/tabsets/services/TabsetService'
+import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { Component } from 'vue'
 
 export class DefaultActions {
@@ -38,8 +42,35 @@ export class DefaultActions {
     if (currentTabset && currentTabset.type === TabsetType.SESSION) {
       actions.push(ConvertToCollectionAction)
     }
-    actions.push(OpenAllInMenuAction, DeleteTabsetAction, DeleteFolderAction)
+
+    actions.push(OpenAllInMenuAction)
+
+    // open existing tabset for url
+    if (!DefaultActions.alreadyInTabset() && DefaultActions.tabsetsForUrl().length > 0) {
+      actions.push(OpenTabsetAction)
+    }
+
+    actions.push(DeleteTabsetAction, DeleteFolderAction)
     // console.log('action', actions)
     return actions
+  }
+
+  static alreadyInTabset = () => {
+    return useTabsetService().urlExistsInCurrentTabset(useContentStore().getCurrentTabUrl)
+  }
+
+  static tabsetsForUrl = () => {
+    const url = useContentStore().getCurrentTabUrl
+    if (url) {
+      return useTabsetService()
+        .tabsetsFor(url)
+        .map((tsId: string) => {
+          return {
+            label: TabsetService.nameForTabsetId(tsId),
+            tabsetId: tsId,
+          }
+        })
+    }
+    return []
   }
 }

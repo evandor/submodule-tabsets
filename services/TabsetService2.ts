@@ -898,7 +898,7 @@ export function useTabsetService() {
       }
     }
 
-    console.log(`checking current urls using HEAD requests for tabset ${selectedTabset.id}, folder ${folderId}`)
+    //console.log(`checking current urls using HEAD requests for tabset ${selectedTabset.id}, folder ${folderId}`)
     let missed = 0
     for (const t of useTabset.tabs) {
       throttleOne50Millis(async () => {

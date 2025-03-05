@@ -86,7 +86,7 @@ export const useTabsetsUiStore = defineStore('tabsetsUi', () => {
     const currentBrowserTab = useTabsStore2().currentChromeTab
     const currentUrl = currentBrowserTab?.url
     if (currentUrl) {
-      //console.log('updating extension icon', currentUrl, tabId)
+      // console.log('updating extension icon', currentUrl, tabId)
       chrome.action.setBadgeText({ text: '' })
       chrome.action.setTitle({ title: 'Tabsets' })
       setMatchingTabsFor(currentUrl)
@@ -98,7 +98,9 @@ export const useTabsetsUiStore = defineStore('tabsetsUi', () => {
           .getCurrentTabsetId()
           .then((currentTabsetId: string | undefined) => {
             if (currentTabsetId) {
+              // console.log('updating extension icon II', currentTabsetId, matchingTabs.value)
               if (matchingTabs.value.map((ts: TabAndTabsetId) => ts.tabsetId).indexOf(currentTabsetId || '') >= 0) {
+                // console.log('updating extension icon III', tabId)
                 chrome.action.setBadgeBackgroundColor({ tabId, color: 'green' })
                 chrome.action.setTitle({
                   tabId,

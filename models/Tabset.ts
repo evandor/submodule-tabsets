@@ -1,4 +1,5 @@
 // 4 expected diffs to localstorage
+// 4 expected diffs to localstorage
 import { STRIP_CHARS_IN_USER_INPUT } from 'src/boot/constants'
 import { RestApiIdent } from 'src/rest/RestApi'
 import { useAuthStore } from 'src/stores/authStore'
@@ -58,6 +59,11 @@ export class ChangeInfo {
     this.changedBy = useAuthStore().user.email || ''
     this.event = this.element + '-' + this.change
   }
+}
+
+export interface MonitoredTab {
+  tabId: string
+  changed?: number
 }
 
 export const TABSET_NAME_MAX_LENGTH = 32
@@ -122,6 +128,8 @@ export class Tabset {
   lastChange?: ChangeInfo | undefined = undefined
 
   restDefinition?: RestApiIdent | undefined = undefined
+
+  monitoredTabs: MonitoredTab[] = []
 
   constructor(id: string, name: string, tabs: Tab[] = [], columns: TabsetColumn[] = [], spaces: string[] = []) {
     // some guards
