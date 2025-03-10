@@ -256,7 +256,7 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
   }
 
   private async loadFromReference(r: { reference: DocumentReference; readonly: boolean; sharedAt: number }) {
-    console.warn('found ref', r)
+    //console.warn('found ref', r)
     //console.log('r', r.path)
     const refDoc = await getDoc(r.reference)
     const referencedTabset = refDoc.data() as Tabset
@@ -268,7 +268,7 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
     }
     referencedTabset.augmentedData.sharedAt = r.sharedAt || 0
     referencedTabset.augmentedData.readonly = r.readonly
-    console.log('referencedTabset:', referencedTabset)
+    //console.log('referencedTabset:', referencedTabset)
     useTabsetsStore().setTabset(referencedTabset)
     return referencedTabset
   }

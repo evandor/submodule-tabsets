@@ -46,6 +46,7 @@ watchEffect(() => {
         autofocus: true,
         readOnly: false,
         data: (tabset.value.page || {}) as OutputData,
+        // @ts-expect-error xxx
         tools: EditorJsConfig.toolsconfig,
       })
     }

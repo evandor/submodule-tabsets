@@ -13,6 +13,7 @@ import EditFolderAction from 'src/tabsets/actions/EditFolderAction.vue'
 import EditTabsetAction from 'src/tabsets/actions/EditTabsetAction.vue'
 import OpenAllInMenuAction from 'src/tabsets/actions/OpenAllInMenuAction.vue'
 import OpenTabsetAction from 'src/tabsets/actions/OpenTabsetAction.vue'
+import ShareTabsetAction from 'src/tabsets/actions/ShareTabsetAction.vue'
 import ShowGalleryAction from 'src/tabsets/actions/ShowGalleryAction.vue'
 import { Tabset, TabsetStatus, TabsetType } from 'src/tabsets/models/Tabset'
 import TabsetService from 'src/tabsets/services/TabsetService'
@@ -44,6 +45,7 @@ export class DefaultActions {
     }
 
     actions.push(OpenAllInMenuAction)
+    actions.push(ShareTabsetAction)
 
     // open existing tabset for url
     if (!DefaultActions.alreadyInTabset() && DefaultActions.tabsetsForUrl().length > 0) {

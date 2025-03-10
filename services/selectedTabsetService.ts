@@ -58,6 +58,9 @@ export function useSelectedTabsetService() {
   }
 
   const setCurrentTabsetId = async (tabsetId: string | undefined) => {
+    if (!chrome || !chrome.windows) {
+      return Promise.resolve()
+    }
     const w: chrome.windows.Window = await chrome.windows.getCurrent()
     // chrome.windows.getCurrent((w: chrome.windows.Window) => {
     const oldTabsets = LocalStorage.getItem(CURRENT_TABSETS_STORAGE_ID) as string | undefined

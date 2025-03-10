@@ -23,11 +23,14 @@ import { ListDetailLevel, useUiStore } from 'src/ui/stores/uiStore'
 import JsUtils from 'src/utils/JsUtils'
 import throttledQueue from 'throttled-queue'
 import { v5 as uuidv5 } from 'uuid'
+import { ref } from 'vue'
 
 export function useTabsetService() {
   const throttleOne50Millis = throttledQueue(1, 50, true)
 
-  const init = async (doNotInitSearchIndex: boolean = false) => {
+  const initialized = ref(false)
+
+  const init = async () => {
     function selectFirstAvailableTabset() {
       const ts = [...useTabsetsStore().tabsets.values()] as Tabset[]
       if (ts.length > 0) {
@@ -35,18 +38,19 @@ export function useTabsetService() {
       }
     }
 
-    // console.debug(' ...initializing tabsetService2 as (TODO)')
+    //console.debug(' ...initializing tabsetService2 as (TODO)')
     await useTabsetsStore().loadTabsets()
     const selectedTabsetId = await useSelectedTabsetService().getFromStorage()
     if (selectedTabsetId) {
       //console.debug(` ...config: setting selected tabset from storage: ${selectedTabsetId}`)
-      const selectedTabset = useTabsetsStore().selectCurrentTabset(selectedTabsetId)
+      const selectedTabset = await useTabsetsStore().selectCurrentTabset(selectedTabsetId)
       if (!selectedTabset) {
         selectFirstAvailableTabset()
       }
     } else {
       selectFirstAvailableTabset()
     }
+    initialized.value = true
   }
 
   /**
@@ -1014,5 +1018,6 @@ export function useTabsetService() {
     handleHeadRequests,
     rename,
     markAs,
+    initialized,
   }
 }
