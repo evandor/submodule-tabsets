@@ -82,7 +82,6 @@ import { useActionHandlers } from 'src/tabsets/actionHandling/ActionHandlers'
 import { AddUrlToTabsetHandler } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { NoopAddUrlToTabsetHandler } from 'src/tabsets/actionHandling/handler/NoopAddUrlToTabsetHandler'
 import { ActionHandlerButtonClickedHolder } from 'src/tabsets/actionHandling/model/ActionHandlerButtonClickedHolder'
-import TabsetService from 'src/tabsets/services/TabsetService'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { useUiStore } from 'src/ui/stores/uiStore'
@@ -122,7 +121,7 @@ watchEffect(() => {
   tsBadges.value = []
   _.forEach(tabsetIds, (tsId: string) => {
     tsBadges.value.push({
-      label: TabsetService.nameForTabsetId(tsId),
+      label: useTabsetService().nameForTabsetId(tsId),
       tabsetId: tsId,
       encodedUrl: btoa(props.currentChromeTab.url || ''),
     })
