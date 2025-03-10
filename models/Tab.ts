@@ -179,6 +179,8 @@ export class Tab {
 
   readingTime: number = 0
 
+  useInIframe: boolean = true
+
   constructor(
     public id: string,
     chromeTab: chrome.tabs.Tab,

@@ -1,4 +1,4 @@
-// 7 expected diffs to localstorage
+// ? expected diffs to localstorage
 import _, { forEach } from 'lodash'
 import { defineStore } from 'pinia'
 import { uid } from 'quasar'
@@ -45,7 +45,10 @@ export const useTabsetsStore = defineStore('tabsets', () => {
   const reminderTabset = ref<Tabset>(new Tabset('reminders', 'reminder'))
 
   const getCurrentTabsetId = async (): Promise<string | undefined> => {
+    if (chrome && chrome.windows) {
     return useSelectedTabsetService().getSelectedTabsetId()
+  }
+    return currentTabsetId.value
   }
 
   watch(
@@ -68,9 +71,6 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     await storage.init()
     // TODO remove after version 0.5.0
     await storage.migrate()
-
-    // console.debug(' ...initialized tabsets: Store', '✅')
-    //await storage.loadTabsets()
   }
 
   function setTabset(ts: Tabset) {
@@ -204,8 +204,9 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     })
   }
 
-  function selectCurrentTabset(tabsetId: string, stop: boolean = false): Tabset | undefined {
-    useSelectedTabsetService().setCurrentTabsetId(tabsetId)
+  async function selectCurrentTabset(tabsetId: string): Promise<Tabset | undefined> {
+    //console.log('selectCurrentTabset', tabsetId)
+    await useSelectedTabsetService().setCurrentTabsetId(tabsetId)
 
     const found = _.find([...tabsets.value.values()] as Tabset[], (k: any) => {
       const ts = k || new Tabset('', '', [])
@@ -217,26 +218,19 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       currentTabsetFolderId.value = found.folderActive
       return found
     } else {
-      if (!stop) {
-        console.debug(`did not find tabset ${tabsetId}, resorting to reload`)
-        useTabsetsStore()
-          .loadTabsets()
-          .then(() => {
-            selectCurrentTabset(tabsetId, true)
-          })
-      } else {
+      // if (!stop) {
+      //   console.debug(`did not find tabset ${tabsetId}, resorting to reload`)
+      //   useTabsetsStore()
+      //     .loadTabsets()
+      //     .then(() => {
+      //       selectCurrentTabset(tabsetId, true)
+      //     })
+      // } else {
         console.debug(`did not find tabset ${tabsetId}, not trying to reload`)
-      }
+      // }
     }
     return undefined
   }
-
-  // function unsetCurrentTabset(): void {
-  //   currentTabsetId.value = undefined
-  //   chrome.windows.getCurrent((w: chrome.windows.Window) =>
-  //     currentTabsetToWindowMap.value.delete('' + w.id || w.sessionId || '-'),
-  //   )
-  // }
 
   function share(tabset: Tabset, sharing: TabsetSharing, sharedId: string | undefined, sharedBy: string) {
     return storage.share(tabset, sharing, sharedId, sharedBy)
@@ -366,7 +360,10 @@ export const useTabsetsStore = defineStore('tabsets', () => {
   const getAllUrls = (): string[] => {
     return _.map(
       _.flatMap([...useTabsetsStore().tabsets.values()] as Tabset[], (ts: Tabset) => ts.tabs),
-      (t: Tab) => t.url || '',
+      (t: Tab) => {
+        //console.log('t', t)
+        return t.url || ''
+      },
     )
   }
 

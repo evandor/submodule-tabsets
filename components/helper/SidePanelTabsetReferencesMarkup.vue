@@ -48,7 +48,9 @@
 </template>
 
 <script lang="ts" setup>
+import { useMessagesStore } from 'src/messages/stores/messagesStore'
 import { Tabset } from 'src/tabsets/models/Tabset'
+import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { ref, watchEffect } from 'vue'
 
 const tabset = ref<Tabset | undefined>(undefined)
@@ -56,6 +58,11 @@ const sharedBy = ref<string>('')
 const sharedWith = ref<string>('')
 const showDetails = ref(true)
 const shared = ref<object[]>([])
+const currentTabsetId = ref<string | undefined>(undefined)
+
+watchEffect(async () => {
+  currentTabsetId.value = await useTabsetsStore().getCurrentTabsetId()
+})
 
 const updateSharedInfo = async () => {
   // no op
@@ -63,6 +70,14 @@ const updateSharedInfo = async () => {
 
 watchEffect(async () => {
   await updateSharedInfo()
+})
+
+watchEffect(() => {
+  if (useMessagesStore().getUnreadMessages.length > 0) {
+    //console.debug('got msgs', msgs.length) // needed for side effect?
+    // changing messages means potential updates of shared info
+    updateSharedInfo()
+  }
 })
 
 const removeShare = async (email: string) => {

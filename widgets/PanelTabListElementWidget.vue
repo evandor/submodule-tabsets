@@ -49,7 +49,7 @@
     <div v-if="props.tab.reminder || monitor" class="text-center">
       <q-icon v-if="props.tab.reminder" name="o_alarm" @click="openReminderDialog()" size="14px">
         <q-tooltip class="tooltip-small"
-          >Reminder set to {{ date.formatDate(props.tab.reminder, 'DD.MM.YYYY') }}
+          >Reminder set to {{ quasarDate.formatDate(props.tab.reminder, 'DD.MM.YYYY') }}
           {{ props.tab.reminderComment ? ' - ' : '' }} {{ props.tab.reminderComment }}
         </q-tooltip>
       </q-icon>
@@ -59,7 +59,7 @@
         :color="monitor.changed ? 'negative' : ''"
         size="14px">
         <q-tooltip v-if="monitor.changed" class="tooltip-small"
-          >Tab's content has changed at {{ date.formatDate(monitor.changed, 'DD.MM.YYYY') }}
+          >Tab's content has changed at {{ quasarDate.formatDate(monitor.changed, 'DD.MM.YYYY') }}
         </q-tooltip>
         <q-tooltip v-else class="tooltip-small">Tab is being monitored for content changes</q-tooltip>
       </q-icon>
@@ -419,7 +419,7 @@
 <script setup lang="ts">
 import { formatDistance } from 'date-fns'
 import _ from 'lodash'
-import { useQuasar } from 'quasar'
+import { date as quasarDate, useQuasar } from 'quasar'
 import BrowserApi from 'src/app/BrowserApi'
 import TabListIconIndicatorsHook from 'src/app/hooks/tabsets/TabListIconIndicatorsHook.vue'
 import { FeatureIdent } from 'src/app/models/FeatureIdent'
