@@ -446,7 +446,6 @@ import ReminderDialog from 'src/tabsets/dialogues/ReminderDialog.vue'
 import { PlaceholdersType } from 'src/tabsets/models/Placeholders'
 import { Tab, TabComment, TabFavorite, TabPreview, TabSorting, UrlExtension } from 'src/tabsets/models/Tab'
 import { MonitoredTab, Tabset, TabsetType } from 'src/tabsets/models/Tabset'
-import TabsetService from 'src/tabsets/services/TabsetService'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useGroupsStore } from 'src/tabsets/stores/groupsStore'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
@@ -559,7 +558,7 @@ watchEffect(() => {
     tsBadges.value = []
     _.forEach(tabsetIds, (tsId: string) =>
       tsBadges.value.push({
-        label: TabsetService.nameForTabsetId(tsId),
+        label: useTabsetService().nameForTabsetId(tsId),
         tabsetId: tsId,
         encodedUrl: btoa(url || ''),
       }),
