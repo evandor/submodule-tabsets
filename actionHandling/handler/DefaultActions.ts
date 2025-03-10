@@ -15,7 +15,6 @@ import OpenAllInMenuAction from 'src/tabsets/actions/OpenAllInMenuAction.vue'
 import OpenTabsetAction from 'src/tabsets/actions/OpenTabsetAction.vue'
 import ShowGalleryAction from 'src/tabsets/actions/ShowGalleryAction.vue'
 import { Tabset, TabsetStatus, TabsetType } from 'src/tabsets/models/Tabset'
-import TabsetService from 'src/tabsets/services/TabsetService'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { Component } from 'vue'
 
@@ -66,7 +65,7 @@ export class DefaultActions {
         .tabsetsFor(url)
         .map((tsId: string) => {
           return {
-            label: TabsetService.nameForTabsetId(tsId),
+            label: '', //useTabsetService().nameForTabsetId(tsId),
             tabsetId: tsId,
           }
         })

@@ -979,6 +979,10 @@ export function useTabsetService() {
     return Promise.reject('could not change status : ' + tabsetId)
   }
 
+  const nameForTabsetId = (tsId: string): string => {
+    return useTabsetsStore().tabsets.get(tsId)?.name || 'unknown'
+  }
+
   return {
     init,
     saveOrReplaceFromChromeTabs,
@@ -1014,5 +1018,6 @@ export function useTabsetService() {
     handleHeadRequests,
     rename,
     markAs,
+    nameForTabsetId,
   }
 }
