@@ -258,9 +258,9 @@ class TabsetService {
     return Promise.resolve('done')
   }
 
-  nameForTabsetId(tsId: string): string {
-    return useTabsetsStore().tabsets.get(tsId)?.name || 'unknown'
-  }
+  // nameForTabsetId(tsId: string): string {
+  //   return useTabsetsStore().tabsets.get(tsId)?.name || 'unknown'
+  // }
 
   async trackedTabsCount(): Promise<number> {
     if (!chrome.tabs) {
