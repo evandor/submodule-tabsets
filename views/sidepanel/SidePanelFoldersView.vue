@@ -28,9 +28,7 @@
       v-ripple
       class="q-ma-none q-pa-sm"
       @dragstart="startDrag($event, folder)"
-      @dragenter="enterDrag($event, folder)"
       @dragover="overDrag($event, folder)"
-      @dragend="endDrag($event, folder)"
       @drop="drop($event, folder)"
       :key="'panelfolderlist_' + folder.id">
       <q-item-section
@@ -44,7 +42,7 @@
       <q-item-section @click="selectFolder(tabset, folder as Tabset)">
         <q-item-label>
           <div class="text-subtitle2 ellipsis">
-            {{ folder.name.substring(0, 20) }}
+            <Highlight :filter="props.filter" :text="folder.name" />
           </div>
         </q-item-label>
         <q-item-label class="text-caption text-secondary">
@@ -82,10 +80,11 @@ import SpecialUrlAddToTabsetComponent from 'src/tabsets/actionHandling/SpecialUr
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { useTabsStore2 } from 'src/tabsets/stores/tabsStore2'
+import Highlight from 'src/tabsets/widgets/Highlight.vue'
 import { useUiStore } from 'src/ui/stores/uiStore'
 import { useWindowsStore } from 'src/windows/stores/windowsStore'
 
-const props = defineProps<{ tabset: Tabset }>()
+const props = defineProps<{ tabset: Tabset; filter: string }>()
 
 const currentChromeTab = ref<chrome.tabs.Tab | undefined>(undefined)
 const hoveredTabset = ref<string | undefined>(undefined)
@@ -99,10 +98,14 @@ const calcFolders = (tabset: Tabset): Tabset[] => {
   if (tabset.folderActive) {
     const af = useTabsetService().findFolder(tabset.folders, tabset.folderActive)
     if (af && af.folderParent) {
-      return af.folders
+      return af.folders.filter(
+        (f: Tabset) => !props.filter || f.name.toLowerCase().indexOf(props.filter.toLowerCase()) >= 0,
+      )
     }
   }
-  return tabset.folders
+  return tabset.folders.filter(
+    (f: Tabset) => !props.filter || f.name.toLowerCase().indexOf(props.filter.toLowerCase()) >= 0,
+  )
 }
 
 const startDrag = (evt: any, folder: Tabset) => {
@@ -115,22 +118,15 @@ const startDrag = (evt: any, folder: Tabset) => {
   }
   console.log("evt.dataTransfer.getData('text/plain')", evt.dataTransfer.getData('text/plain'))
 }
-const enterDrag = (evt: any, folder: Tabset) => {
-  //console.log("enter drag", evt, folder)
-}
+
 const overDrag = (event: any, folder: Tabset) => {
-  //console.log("enter drag", event, folder)
   event.preventDefault()
 }
 
 const overDrag2 = (event: any) => {
-  //console.log("enter drag2")
   event.preventDefault()
 }
 
-const endDrag = (evt: any, folder: Tabset) => {
-  // console.log("end drag", evt, folder)
-}
 const drop = (evt: any, folder: Tabset) => {
   console.log('drop', evt, folder)
   const tabToDrag = useUiStore().tabBeingDragged
