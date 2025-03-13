@@ -17,7 +17,7 @@
       :preventDragAndDrop="props.preventDragAndDrop"
       :tabset="props.tabset!"
       :hide-menu="props.hideMenu"
-      :filter="props.filter" />
+      :filter="props.filter || ''" />
   </q-item>
 </template>
 
