@@ -7,6 +7,7 @@
         <!-- there's only one (default) column now -->
 
         <vue-draggable-next
+          v-if="tabsForColumn().length > 0"
           class="q-ma-none"
           :list="tabsForColumn() as Array<IndexedTab>"
           :group="{ name: 'tabs', pull: 'clone' }"
@@ -23,6 +24,10 @@
             :hide-menu="props.hideMenu"
             :filter="props.filter || ''" />
         </vue-draggable-next>
+        <div v-else class="q-ma-md text-caption">
+          Filter <em>'{{ props.filter }}'</em> did not match anything inside this collection. Click 'Enter' to search in
+          all your collections.
+        </div>
       </template>
 
       <!-- no drag & drop on mobile -->
@@ -123,7 +128,7 @@ const getColumns = () => {
 
 const tabsForColumn = (): IndexedTab[] => {
   function filterMatches(property: string | undefined) {
-    return property && property.indexOf(props.filter!) >= 0
+    return property && property.toLowerCase().indexOf(props.filter!.toLowerCase()!) >= 0
   }
 
   return (tabs.value as Tab[])
@@ -131,7 +136,7 @@ const tabsForColumn = (): IndexedTab[] => {
       if (!props.filter || props.filter.trim() === '') {
         return true
       }
-      return !!(filterMatches(t.url) || filterMatches(t.description))
+      return !!(filterMatches(t.url) || filterMatches(t.description) || filterMatches(t.name) || filterMatches(t.title))
     })
     .sort((a: Tab, b: Tab) => {
       return props.tabset && props.tabset.type === TabsetType.RSS_FOLDER ? b.created - a.created : 0

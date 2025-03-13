@@ -203,7 +203,7 @@
               @click.stop="gotoTab()"
               :url="props.tab.url"
               :hostname-only="!useUiStore().showFullUrls"
-              :filter="props.filter" />
+              :filter="props.filter || ''" />
             <q-icon
               v-if="props.tab.matcher && useFeaturesStore().hasFeature(FeatureIdent.ADVANCED_TAB_MANAGEMENT)"
               @click.stop="openTabAssignmentPage(props.tab)"
@@ -226,7 +226,9 @@
                       )
                     "
                     :label="placeholder['name' as keyof object]"
-                    :url="placeholder['url' as keyof object]" />
+                    :url="placeholder['url' as keyof object]"
+                    :hostname-only="true"
+                    :filter="props.filter" />
                 </li>
               </div>
             </ul>
@@ -487,7 +489,6 @@ const thumbnail = ref<string | undefined>(undefined)
 const hoveredTab = ref<string | undefined>(undefined)
 const tsBadges = ref<object[]>([])
 const newState = ref(false)
-// const showAnnotationList = ref(false)
 const showCommentList = ref(false)
 const groupName = ref<string | undefined>(undefined)
 const groups = ref<Map<string, chrome.tabGroups.TabGroup>>(new Map())
@@ -536,12 +537,6 @@ watchEffect(() => {
   }
 })
 
-// watchEffect(() => {
-//   if (selectedAnnotation.value && newComment.value && newComment.value.trim() !== '') {
-//     selectedAnnotation.value.comments.push(new HTMLSelectionComment('author', newComment.value))
-//     useTabsetService().saveCurrentTabset()
-//   }
-// })
 watchEffect(() => {
   groups.value = useGroupsStore().tabGroups
 })
