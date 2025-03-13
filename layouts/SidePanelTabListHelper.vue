@@ -16,7 +16,8 @@
       :show-tabsets="props.showTabsets"
       :preventDragAndDrop="props.preventDragAndDrop"
       :tabset="props.tabset!"
-      :hide-menu="props.hideMenu" />
+      :hide-menu="props.hideMenu"
+      :filter="props.filter" />
   </q-item>
 </template>
 
@@ -38,6 +39,7 @@ const props = defineProps({
   tabset: { type: Object as PropType<Tabset>, required: false },
   showTabsets: { type: Boolean, default: false },
   preventDragAndDrop: { type: Boolean, default: false },
+  filter: { type: String, required: false },
 })
 
 const startDrag = (evt: any, tab: Tab) => {

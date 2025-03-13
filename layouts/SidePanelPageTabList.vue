@@ -20,7 +20,8 @@
             :preventDragAndDrop="false"
             :tabset="props.tabset!"
             :show-tabsets="props.showTabsets"
-            :hide-menu="props.hideMenu" />
+            :hide-menu="props.hideMenu"
+            :filter="props.filter || ''" />
         </vue-draggable-next>
       </template>
 
@@ -35,7 +36,8 @@
           :preventDragAndDrop="true"
           :tabset="props.tabset!"
           :show-tabsets="props.showTabsets"
-          :hide-menu="props.hideMenu" />
+          :hide-menu="props.hideMenu"
+          :filter="props.filter || ''" />
       </template>
     </q-list>
 
@@ -67,6 +69,7 @@ const props = defineProps({
   tabset: { type: Object as PropType<Tabset>, required: false },
   tabsCount: { type: Number, default: -1 },
   activeFolder: { type: String, required: false },
+  filter: { type: String, required: false },
 })
 
 const tabs = ref<Tab[]>([])
@@ -119,9 +122,18 @@ const getColumns = () => {
 }
 
 const tabsForColumn = (): IndexedTab[] => {
+  function filterMatches(property: string | undefined) {
+    return property && property.indexOf(props.filter!) >= 0
+  }
+
   return (tabs.value as Tab[])
+    .filter((t: Tab) => {
+      if (!props.filter || props.filter.trim() === '') {
+        return true
+      }
+      return !!(filterMatches(t.url) || filterMatches(t.description))
+    })
     .sort((a: Tab, b: Tab) => {
-      // console.log("comparing", props.)
       return props.tabset && props.tabset.type === TabsetType.RSS_FOLDER ? b.created - a.created : 0
     })
     .map((t: Tab, index: number) => new IndexedTab(index, t))
