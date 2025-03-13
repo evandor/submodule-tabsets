@@ -90,7 +90,7 @@
               class="q-ma-mone">
               <q-tooltip class="tooltip_small">This tab is marked as favorite</q-tooltip>
             </q-icon>
-            {{ nameOrTitle(props.tab as Tab) }}
+            <Highlight :filter="props.filter" :text="nameOrTitle(props.tab as Tab) || ''" />
           </span>
         </div>
       </div>
@@ -108,7 +108,7 @@
           class="ellipsis-2-lines text-body2 darkColors lightColors"
           :class="props.tab?.extension === UrlExtension.RSS ? 'ellipsis-3-lines' : 'ellipsis-2-lines'"
           @click.stop="gotoTab()">
-          {{ props.tab.longDescription || props.tab.description }}
+          <Highlight :filter="props.filter" :text="props.tab.longDescription || props.tab.description || ''" />
         </q-item-label>
       </template>
       <template v-else>
@@ -199,7 +199,11 @@
           </span>
 
           <template v-if="props.tab.extension !== UrlExtension.RSS">
-            <short-url @click.stop="gotoTab()" :url="props.tab.url" :hostname-only="!useUiStore().showFullUrls" />
+            <short-url
+              @click.stop="gotoTab()"
+              :url="props.tab.url"
+              :hostname-only="!useUiStore().showFullUrls"
+              :filter="props.filter" />
             <q-icon
               v-if="props.tab.matcher && useFeaturesStore().hasFeature(FeatureIdent.ADVANCED_TAB_MANAGEMENT)"
               @click.stop="openTabAssignmentPage(props.tab)"
@@ -450,6 +454,7 @@ import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useGroupsStore } from 'src/tabsets/stores/groupsStore'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import CommentChatMessages from 'src/tabsets/widgets/CommentChatMessages.vue'
+import Highlight from 'src/tabsets/widgets/Highlight.vue'
 import PanelTabListContextMenu from 'src/tabsets/widgets/PanelTabListContextMenu.vue'
 import TabFaviconWidget from 'src/tabsets/widgets/TabFaviconWidget.vue'
 import { useThumbnailsService } from 'src/thumbnails/services/ThumbnailsService'
@@ -470,6 +475,7 @@ const props = defineProps({
   preventDragAndDrop: { type: Boolean, default: false },
   tabset: { type: Object as PropType<Tabset>, required: false },
   tabsetId: { type: String, required: false },
+  filter: { type: String, required: false },
 })
 
 const $q = useQuasar()
