@@ -121,18 +121,17 @@
             $q.screen.gt.xs
           "
           flat
-          :text-color="useUiStore().tabsFilter ? 'secondary' : 'primary'"
           :disable="tabset?.type === TabsetType.DYNAMIC"
-          :label="useUiStore().tabsFilter"
+          label="???"
           class="cursor-pointer q-ml-lg"
           size="12px"
           icon="o_filter_alt">
-          <q-popup-edit
-            :model-value="useUiStore().tabsFilter"
-            v-slot="scope"
-            @update:model-value="(val: string) => setFilter(val)">
-            <q-input v-model="scope.value" dense autofocus counter @keyup.enter="scope.set" />
-          </q-popup-edit>
+          <!--          <q-popup-edit-->
+          <!--            :model-value="useUiStore().tabsFilter"-->
+          <!--            v-slot="scope"-->
+          <!--            @update:model-value="(val: string) => setFilter(val)">-->
+          <!--            <q-input v-model="scope.value" dense autofocus counter @keyup.enter="scope.set" />-->
+          <!--          </q-popup-edit>-->
           <q-tooltip class="tooltip" :delay="200" anchor="center left" self="center right">
             Filter this tabset
           </q-tooltip>
@@ -298,7 +297,7 @@ const setNewName = async (newValue: string) => {
 const setFilter = (newValue: string) => {
   console.log('filter', newValue)
   const useValue = newValue && newValue.trim().length > 0 ? newValue.trim() : undefined
-  useUiStore().tabsFilter = useValue
+  // useUiStore().tabsFilter = useValue
   useUiStore().setHighlightTerm(useValue)
   JsUtils.runCssHighlight()
 }

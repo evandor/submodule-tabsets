@@ -309,14 +309,14 @@ class TabsetService {
     const currentTabset = useTabsetsStore().getCurrentTabset!
     const activeFolder = useTabsetsStore().getActiveFolder(currentTabset)
     let tabs = activeFolder ? activeFolder.tabs : currentTabset.tabs
-    console.log(
-      'tabs before',
-      _.map(tabs, (t: any) => t.url),
-    )
+    // console.log(
+    //   'tabs before',
+    //   _.map(tabs, (t: any) => t.url),
+    // )
     //tabs = _.filter(tabs, (t: Tab) => t.columnId === column.id)
     const oldIndex = _.findIndex(tabs, (t: any) => t.id === tabId)
     if (oldIndex >= 0) {
-      console.log('found old index', oldIndex)
+      // console.log('found old index', oldIndex)
       const tab = tabs.splice(oldIndex, 1)[0]
       tabs.splice(newIndex, 0, tab!)
 

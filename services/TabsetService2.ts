@@ -595,23 +595,6 @@ export function useTabsetService() {
     })
   }
 
-  const tabsToShow = (tabset: Tabset): Tab[] => {
-    let tabs: Tab[] = tabset.tabs
-
-    // TODO order??
-    const filter = useUiStore().tabsFilter
-    if (!filter || filter.trim() === '') {
-      return tabs
-    }
-    return _.filter(tabs, (t: Tab) => {
-      return (
-        (t.url || '')?.indexOf(filter) >= 0 ||
-        (t.title || '')?.indexOf(filter) >= 0 ||
-        t.description?.indexOf(filter) >= 0
-      )
-    })
-  }
-
   const findFolder = (folders: Tabset[], folderId: string): Tabset | undefined => {
     for (const f of folders || []) {
       if (f.id === folderId) {
@@ -1005,7 +988,6 @@ export function useTabsetService() {
     saveBlob,
     getBlob,
     reloadTabset,
-    tabsToShow,
     deleteTabsetDescription,
     findTabInFolder,
     moveTabToFolder,
