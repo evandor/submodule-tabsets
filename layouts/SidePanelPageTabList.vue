@@ -7,13 +7,13 @@
         <!-- there's only one (default) column now -->
 
         <vue-draggable-next
-          v-if="tabsForColumn().length > 0"
+          v-if="tabs.length > 0"
           class="q-ma-none"
-          :list="tabsForColumn() as Array<IndexedTab>"
+          :list="tabs"
           :group="{ name: 'tabs', pull: 'clone' }"
           @change="(event: any) => handleDragAndDrop(event, column)">
           <SidePanelTabListHelper
-            v-for="tab in tabsForColumn() as Array<IndexedTab>"
+            v-for="tab in tabs"
             :tab="tab.tab as Tab"
             :index="tab.index"
             :type="props.type"
@@ -24,16 +24,17 @@
             :hide-menu="props.hideMenu"
             :filter="props.filter || ''" />
         </vue-draggable-next>
-        <div v-else class="q-ma-md text-caption">
+        <div v-else-if="props.filter" class="q-ma-md text-caption">
           Filter <em>'{{ props.filter }}'</em> did not match anything inside this collection. Click 'Enter' to search in
           all your collections.
         </div>
+        <div v-else-if="props.tabset?.folders.length === 0" class="q-ma-md text-caption">Empty Collection</div>
       </template>
 
       <!-- no drag & drop on mobile -->
       <template v-else>
         <SidePanelTabListHelper
-          v-for="tab in tabsForColumn() as Array<IndexedTab>"
+          v-for="tab in tabs"
           :tab="tab.tab as Tab"
           :index="0"
           :type="props.type"
@@ -53,7 +54,6 @@
 </template>
 
 <script setup lang="ts">
-import _ from 'lodash'
 import { SPECIAL_ID_FOR_NO_GROUP_ASSIGNED } from 'src/boot/constants'
 import SidePanelTabListHelper from 'src/tabsets/layouts/SidePanelTabListHelper.vue'
 import { IndexedTab } from 'src/tabsets/models/IndexedTab'
@@ -62,7 +62,7 @@ import { Tabset, TabsetType } from 'src/tabsets/models/Tabset'
 import { TabsetColumn } from 'src/tabsets/models/TabsetColumn'
 import TabsetService from 'src/tabsets/services/TabsetService'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
-import { PropType, ref, watchEffect } from 'vue'
+import { PropType, ref, watch } from 'vue'
 import { VueDraggableNext } from 'vue-draggable-next'
 
 const props = defineProps({
@@ -77,7 +77,14 @@ const props = defineProps({
   filter: { type: String, required: false },
 })
 
-const tabs = ref<Tab[]>([])
+const tabs = ref<IndexedTab[]>([])
+
+watch(
+  () => props.filter,
+  (a: string | undefined, b: string | undefined) => {
+    tabs.value = tabsForColumn()
+  },
+)
 
 const handleDragAndDrop = async (event: any, column: TabsetColumn) => {
   console.log('SidePanelPageTabList d&d event:', event)
@@ -87,16 +94,8 @@ const handleDragAndDrop = async (event: any, column: TabsetColumn) => {
     const tabsInColumn = tabsForColumn()
     const movedElement: Tab = tabsInColumn[moved.oldIndex]!.tab
     const realNewIndex = tabsInColumn[moved.newIndex]!.index
-    console.log(`             '${movedElement.id}' ${moved.oldIndex} -> ${realNewIndex}`)
+    // console.log(`             '${movedElement.id}' ${moved.oldIndex} -> ${realNewIndex}`)
     await TabsetService.moveTo(movedElement.id, realNewIndex, column)
-    console.log('hier: ', props.tabset)
-    if (props.tabset) {
-      tabs.value = useTabsetService().tabsToShow(props.tabset)
-      console.log(
-        'tabs.value',
-        _.map(tabs.value, (t: Tab) => t.url),
-      )
-    }
   }
   if (added) {
     console.log(
@@ -111,17 +110,6 @@ const handleDragAndDrop = async (event: any, column: TabsetColumn) => {
   }
 }
 
-watchEffect(() => {
-  // TODO why was this done in the first place? Updates from where?
-  //const tabset = useTabsStore().useTabsetsStore(props.tabset?.id || "")
-  if (props.tabset) {
-    tabs.value = useTabsetService().tabsToShow(props.tabset)
-  } else {
-    console.warn('could not determine tabset...')
-    tabs.value = []
-  }
-})
-
 const getColumns = () => {
   return [new TabsetColumn(SPECIAL_ID_FOR_NO_GROUP_ASSIGNED, '')]
 }
@@ -131,7 +119,7 @@ const tabsForColumn = (): IndexedTab[] => {
     return property && property.toLowerCase().indexOf(props.filter!.toLowerCase()!) >= 0
   }
 
-  return (tabs.value as Tab[])
+  return (props.tabset?.tabs as Tab[])
     .filter((t: Tab) => {
       if (!props.filter || props.filter.trim() === '') {
         return true
@@ -142,8 +130,9 @@ const tabsForColumn = (): IndexedTab[] => {
       return props.tabset && props.tabset.type === TabsetType.RSS_FOLDER ? b.created - a.created : 0
     })
     .map((t: Tab, index: number) => new IndexedTab(index, t))
-  //return   _.map(tabs.value as Tab[], (t: Tab, index: number) => new IndexedTab(index, t))
 }
+
+tabs.value = tabsForColumn()
 </script>
 
 <style>

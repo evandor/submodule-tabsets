@@ -77,20 +77,20 @@ watchEffect(() => {
 
 function currentTabs(): Tab[] {
   //console.log("got", props.tabset.tabs)
-  const filter = useUiStore().tabsFilter
-  if (filter && filter.trim() !== '') {
-    return _.orderBy(
-      _.filter(props.tabsetFolder.tabs, (t: Tab) => {
-        return (
-          (t.url || '')?.indexOf(filter) >= 0 ||
-          (t.title || '')?.indexOf(filter) >= 0 ||
-          t.description.indexOf(filter) >= 0
-        )
-      }),
-      getOrder(),
-      [orderDesc.value ? 'desc' : 'asc'],
-    )
-  }
+  // const filter = useUiStore().tabsFilter
+  // if (filter && filter.trim() !== '') {
+  //   return _.orderBy(
+  //     _.filter(props.tabsetFolder.tabs, (t: Tab) => {
+  //       return (
+  //         (t.url || '')?.indexOf(filter) >= 0 ||
+  //         (t.title || '')?.indexOf(filter) >= 0 ||
+  //         t.description.indexOf(filter) >= 0
+  //       )
+  //     }),
+  //     getOrder(),
+  //     [orderDesc.value ? 'desc' : 'asc'],
+  //   )
+  // }
   return _.orderBy(props.tabsetFolder.tabs, getOrder(), [orderDesc.value ? 'desc' : 'asc'])
 }
 
