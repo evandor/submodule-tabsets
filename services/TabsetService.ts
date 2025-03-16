@@ -300,7 +300,6 @@ class TabsetService {
   }
 
   async closeAllTabs() {
-    // TODO long-Running action
     //ChromeApi.closeAllTabs()
   }
 
