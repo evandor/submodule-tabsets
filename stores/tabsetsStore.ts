@@ -23,7 +23,8 @@ import { computed, ref, watch } from 'vue'
  * Elements are persisted to the storage provided in the initialize function
  */
 export const useTabsetsStore = defineStore('tabsets', () => {
-  let loaded = ref(false)
+  const loaded = ref(false)
+  const lastUpdate = ref(new Date().getTime())
 
   /**
    * the (internal) storage for this store to use
@@ -191,7 +192,9 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     ts.lastChange = changeInfo
     const tabsetWithType: Tabset = JSON.parse(JSON.stringify(ts))
     //console.log('--- storing tabset! ---', tabsetWithType.lastChange)
-    return await storage.saveTabset(tabsetWithType)
+    const res = await storage.saveTabset(tabsetWithType)
+    lastUpdate.value = new Date().getTime()
+    return res
   }
 
   function deleteTabset(tsId: string) {
@@ -436,5 +439,6 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     removeReminder,
     activeReminders,
     loaded,
+    lastUpdate,
   }
 })

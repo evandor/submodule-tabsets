@@ -86,6 +86,14 @@ watch(
   },
 )
 
+watch(
+  () => props.tabset?.tabs || [],
+  (a: Tab[], b: Tab[]) => {
+    console.log('--------', a)
+    tabs.value = tabsForColumn()
+  },
+)
+
 const handleDragAndDrop = async (event: any, column: TabsetColumn) => {
   console.log('SidePanelPageTabList d&d event:', event)
   const { moved, added } = event

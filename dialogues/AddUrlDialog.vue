@@ -23,6 +23,13 @@
           :disable="url.trim().length === 0"
           v-close-popup
           @click="createNewUrl()" />
+        <DialogButton
+          label="Add URL"
+          color="primary"
+          @was-clicked="createNewUrl()"
+          :disable="url.trim().length === 0"
+          v-close-popup
+          data-testid="add_url_submit" />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -31,6 +38,7 @@
 <script lang="ts" setup>
 import { uid, useDialogPluginComponent } from 'quasar'
 import ChromeApi from 'src/app/BrowserApi'
+import DialogButton from 'src/core/dialog/buttons/DialogButton.vue'
 import { useUtils } from 'src/core/services/Utils'
 import { useAuthStore } from 'src/stores/authStore'
 import { Tab } from 'src/tabsets/models/Tab'
