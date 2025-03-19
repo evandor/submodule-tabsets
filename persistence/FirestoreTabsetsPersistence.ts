@@ -1,6 +1,15 @@
-import { DocumentReference } from '@firebase/firestore'
 import { APP_INSTALLATION_ID } from 'boot/constants'
-import { addDoc, collection, deleteDoc, doc, Firestore, getDoc, getDocs, setDoc } from 'firebase/firestore'
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  DocumentReference,
+  Firestore,
+  getDoc,
+  getDocs,
+  setDoc,
+} from 'firebase/firestore'
 import { sha256 } from 'js-sha256'
 import { LocalStorage, uid } from 'quasar'
 import { useNotificationHandler } from 'src/core/services/ErrorHandler'
