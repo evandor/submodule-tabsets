@@ -15,7 +15,6 @@ import { useFeaturesStore } from 'src/features/stores/featuresStore'
 import { useRequestsService } from 'src/requests/services/RequestsService'
 import { useRequestsStore } from 'src/requests/stores/requestsStore'
 import { useLogger } from 'src/services/Logger'
-import { useAuthStore } from 'src/stores/authStore'
 import { Tab } from 'src/tabsets/models/Tab'
 import { ChangeInfo, Tabset, TabsetSharing } from 'src/tabsets/models/Tabset'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
@@ -107,15 +106,6 @@ export class AddTabToTabsetCommand implements Command<any> {
 
       Analytics.fireEvent('tabset_tab_added', { tabsCount: tabset.tabs.length })
 
-      // Analysis not needed, remove
-      if (useAuthStore().user.uid && this.tab.url?.startsWith('https://')) {
-        const userId = useAuthStore().user.uid
-        // setDoc(doc(FirebaseServices.getFirestore(), 'users', userId, 'queue', uid()), {
-        //   event: 'new-tab',
-        //   url: this.tab.url,
-        // })
-      }
-
       // Sharing
       if (tabset.sharing?.sharedId && tabset.sharing.sharing === TabsetSharing.PUBLIC_LINK && !this.activeFolder) {
         tabset.sharing.sharing = TabsetSharing.PUBLIC_LINK_OUTDATED
@@ -162,7 +152,7 @@ export class AddTabToTabsetCommand implements Command<any> {
       }
 
       // add to search index via App Dispatcher
-      AppEventDispatcher.dispatchEvent('add-to-search', {
+      await AppEventDispatcher.dispatchEvent('add-to-search', {
         name: this.tab.name || '',
         title: this.tab.title || '',
         url: this.tab.url || '',

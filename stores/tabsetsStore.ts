@@ -22,7 +22,8 @@ import { computed, ref, watch } from 'vue'
  * Elements are persisted to the storage provided in the initialize function
  */
 export const useTabsetsStore = defineStore('tabsets', () => {
-  let loaded = ref(false)
+  const loaded = ref(false)
+  const lastUpdate = ref(new Date().getTime())
 
   /**
    * the (internal) storage for this store to use
@@ -46,8 +47,8 @@ export const useTabsetsStore = defineStore('tabsets', () => {
 
   const getCurrentTabsetId = async (): Promise<string | undefined> => {
     if (chrome && chrome.windows) {
-    return useSelectedTabsetService().getSelectedTabsetId()
-  }
+      return useSelectedTabsetService().getSelectedTabsetId()
+    }
     return currentTabsetId.value
   }
 
@@ -190,7 +191,9 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     ts.lastChange = changeInfo
     const tabsetWithType: Tabset = JSON.parse(JSON.stringify(ts))
     //console.log('--- storing tabset! ---', tabsetWithType.lastChange)
-    return await storage.saveTabset(tabsetWithType)
+    const res = await storage.saveTabset(tabsetWithType)
+    lastUpdate.value = new Date().getTime()
+    return res
   }
 
   function deleteTabset(tsId: string) {
@@ -226,7 +229,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       //       selectCurrentTabset(tabsetId, true)
       //     })
       // } else {
-        console.debug(`did not find tabset ${tabsetId}, not trying to reload`)
+      console.debug(`did not find tabset ${tabsetId}, not trying to reload`)
       // }
     }
     return undefined
@@ -435,5 +438,6 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     removeReminder,
     activeReminders,
     loaded,
+    lastUpdate,
   }
 })
