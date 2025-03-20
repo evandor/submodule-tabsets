@@ -19,7 +19,6 @@ import PublicPageTabListHelper from 'src/tabsets/layouts/PublicPageTabListHelper
 import { IndexedTab } from 'src/tabsets/models/IndexedTab'
 import { Tab, TabSorting } from 'src/tabsets/models/Tab'
 import { Tabset, TabsetType } from 'src/tabsets/models/Tabset'
-import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { PropType, ref, watchEffect } from 'vue'
 
 const props = defineProps({
@@ -35,7 +34,7 @@ const tabs = ref<Tab[]>([])
 
 watchEffect(() => {
   if (props.tabset) {
-    tabs.value = useTabsetService().tabsToShow(props.tabset)
+    tabs.value = props.tabset.tabs // useTabsetService().tabsToShow(props.tabset)
   } else {
     console.warn('could not determine tabset...')
     tabs.value = []
