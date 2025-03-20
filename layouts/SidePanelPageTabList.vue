@@ -28,7 +28,9 @@
           Filter <em>'{{ props.filter }}'</em> did not match anything inside this collection. Click 'Enter' to search in
           all your collections.
         </div>
-        <div v-else-if="props.tabset?.folders.length === 0" class="q-ma-md text-caption">Empty Collection</div>
+        <div v-else-if="props.tabset?.folders.length === 0" class="q-ma-md text-caption text-center">
+          Empty Collection
+        </div>
       </template>
 
       <!-- no drag & drop on mobile -->
