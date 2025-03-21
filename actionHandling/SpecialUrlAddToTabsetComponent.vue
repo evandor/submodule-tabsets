@@ -31,6 +31,7 @@
       :label="handler.defaultAction()!.label"
       :class="{ shake: animateAddtabButton, 'cursor-pointer': !alreadyInTabset() }"
       :color="alreadyInTabset() ? 'grey-5' : tsBadges.length > 0 ? 'positive' : ''"
+      data-testid="saveInTabsetBtn"
       v-close-popup
       @click.stop="
         emits(
