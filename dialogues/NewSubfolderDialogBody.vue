@@ -37,8 +37,8 @@
         </q-card-section>
 
         <q-card-actions align="right">
-          <DialogButton label="Cancel" color="primary" v-close-popup />
-          <DialogButton label="Add" type="submit" :disable="!isValid" v-close-popup />
+          <DialogButton label="Cancel" />
+          <DialogButton label="Add" type="submit" :disable="!isValid" :default-action="true" />
         </q-card-actions>
       </q-card>
     </q-form>

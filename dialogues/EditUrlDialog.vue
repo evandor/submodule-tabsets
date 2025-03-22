@@ -62,8 +62,8 @@
       </template>
 
       <q-card-actions align="right">
-        <DialogButton label="Cancel" color="accent" v-close-popup />
-        <DialogButton label="Update" @was-clicked="updateTab()" v-close-popup />
+        <DialogButton label="Cancel" />
+        <DialogButton label="Update" @was-clicked="updateTab()" :default-action="true" />
       </q-card-actions>
     </q-card>
   </q-dialog>

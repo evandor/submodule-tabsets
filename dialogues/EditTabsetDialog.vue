@@ -61,14 +61,22 @@
       </q-card-section>
 
       <q-card-actions align="right" class="text-primary">
-        <q-btn label="Cancel" size="sm" color="accent" @click="onDialogCancel" />
-        <q-btn
+        <!--        <q-btn label="Cancel" size="sm" color="accent" @click="onDialogCancel" />-->
+        <DialogButton label="Cancel" @was-clicked="onDialogCancel()" color="primary" />
+        <DialogButton
           label="Update"
-          size="sm"
-          color="warning"
-          :disable="disableSubmit()"
-          v-close-popup
-          @click="updateTabset()" />
+          @was-clicked="updateTabset()"
+          color="primary"
+          :default-action="true"
+          :disable="disableSubmit()" />
+
+        <!--        <q-btn-->
+        <!--          label="Update"-->
+        <!--          size="sm"-->
+        <!--          color="warning"-->
+        <!--          :disable="disableSubmit()"-->
+        <!--          v-close-popup-->
+        <!--          @click="updateTabset()" />-->
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -78,6 +86,7 @@
 import { useDialogPluginComponent } from 'quasar'
 import { FeatureIdent } from 'src/app/models/FeatureIdent'
 import { STRIP_CHARS_IN_USER_INPUT } from 'src/boot/constants'
+import DialogButton from 'src/core/dialog/buttons/DialogButton.vue'
 import ColorSelector from 'src/core/dialog/ColorSelector.vue'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import { useFeaturesStore } from 'src/features/stores/featuresStore'
