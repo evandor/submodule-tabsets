@@ -18,7 +18,7 @@
           </div>
         </q-card-section>
         <q-card-actions align="right">
-          <DialogButton label="Cancel" color="accent" v-close-popup />
+          <DialogButton label="Cancel" />
           <DialogButton
             label="Delete"
             type="submit"
@@ -26,7 +26,7 @@
             :autofocus="true"
             @keyup.enter="deleteTabset()"
             @wasClicked="deleteTabset()"
-            v-close-popup />
+            :default-action="true" />
         </q-card-actions>
       </q-card>
     </div>

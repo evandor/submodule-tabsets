@@ -14,12 +14,11 @@
       </q-card-section>
 
       <q-card-actions align="right">
-        <q-btn flat label="Cancel" @click="onDialogCancel" />
-        <q-btn
-          flat
+        <DialogButton label="Cancel" @click="onDialogCancel" />
+        <DialogButton
           :label="props.sharedId ? 'Publish Comment' : props.comment ? 'Update Comment' : 'Save Comment'"
-          v-close-popup
-          @click="publishComment()" />
+          @was-clicked="publishComment()"
+          :default-action="true" />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -27,6 +26,7 @@
 
 <script lang="ts" setup>
 import { useDialogPluginComponent } from 'quasar'
+import DialogButton from 'src/core/dialog/buttons/DialogButton.vue'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import { AddCommentCommand } from 'src/tabsets/commands/AddCommentCommand'
 import { UpdateCommentCommand } from 'src/tabsets/commands/UpdateCommentCommand'

@@ -5,7 +5,7 @@
       outline
       @click.stop="emits('buttonClicked', new ActionHandlerButtonClickedHolder(handler, handler.defaultAction()))"
       class="q-ma-none q-px-sm q-py-none"
-      :class="{ shake: animateAddtabButton, 'cursor-pointer': !alreadyInTabset() }"
+      :class="{ shakeWithColor: animateAddtabButton, 'cursor-pointer': !alreadyInTabset() }"
       :color="alreadyInTabset() ? 'grey-5' : tsBadges.length > 0 ? 'positive' : ''"
       :size="props.level === 'root' ? 'sm' : 'xs'"
       data-testid="saveInTabsetBtn">
@@ -29,7 +29,7 @@
     <q-btn-dropdown
       style="border-radius: 5px"
       :label="handler.defaultAction()!.label"
-      :class="{ shake: animateAddtabButton, 'cursor-pointer': !alreadyInTabset() }"
+      :class="{ shakeWithColor: animateAddtabButton, 'cursor-pointer': !alreadyInTabset() }"
       :color="alreadyInTabset() ? 'grey-5' : tsBadges.length > 0 ? 'positive' : ''"
       data-testid="saveInTabsetBtn"
       v-close-popup

@@ -77,13 +77,13 @@
         <!--        </q-card-section>-->
 
         <q-card-actions align="right">
-          <DialogButton label="Cancel" color="primary" v-close-popup />
+          <DialogButton label="Cancel" />
           <DialogButton
             :label="isNotArchived(newTabsetName) ? 'Add' : 'Restore Tabset'"
             type="submit"
             data-testid="newTabsetNameSubmit"
             :disable="!isValid"
-            v-close-popup />
+            :default-action="true" />
         </q-card-actions>
       </q-card>
     </q-form>
