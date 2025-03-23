@@ -1,4 +1,9 @@
 // 2 expected diffs to localstorage
+// 2 expected diffs to localstorage
+// 2 expected diffs to localstorage
+// 2 expected diffs to localstorage
+// 2 expected diffs to localstorage
+// 2 expected diffs to localstorage
 import _ from 'lodash'
 import { uid } from 'quasar'
 import AppEventDispatcher from 'src/app/AppEventDispatcher'
@@ -273,6 +278,60 @@ class TabsetService {
         trackedTabs++
       }
     })
+    return trackedTabs
+  }
+
+  async trackedIgnoredCount(): Promise<number> {
+    return this.iterateOverIgnoredUrl(0, (tab: chrome.tabs.Tab, ignoredUrls: string[], counter: number) => {
+      const url = new URL(tab.url!)
+      const normalizedUrl = url.protocol + '//' + url.hostname + url.pathname
+      if (ignoredUrls.indexOf(normalizedUrl) >= 0) {
+        counter++
+      }
+      return counter
+    })
+  }
+
+  async closeIgnoredTabs() {
+    return this.iterateOverIgnoredUrl(0, (tab: chrome.tabs.Tab, ignoredUrls: string[], counter: number) => {
+      const url = new URL(tab.url!)
+      const normalizedUrl = url.protocol + '//' + url.hostname + url.pathname
+      if (ignoredUrls.indexOf(normalizedUrl) >= 0 && tab.id) {
+        console.log('removing', tab.id, tab.url)
+        chrome.tabs.remove(tab.id)
+        counter++
+      }
+      return counter
+    })
+  }
+
+  private async iterateOverIgnoredUrl(
+    start: number,
+    fkt: (t: chrome.tabs.Tab, ignoredUrls: string[], counter: number) => number,
+  ): Promise<number> {
+    console.log('her')
+    if (!chrome.tabs) {
+      return Promise.resolve(0)
+    }
+    const result: chrome.tabs.Tab[] = await chrome.tabs.query({})
+    let trackedTabs = start
+    const ignoredTabset = useTabsetsStore().getTabset('IGNORED')
+    if (!ignoredTabset) {
+      return start
+    }
+    for (const tab of result) {
+      const ignoredUrls = ignoredTabset.tabs
+        .map((t: Tab) => t.url)
+        .filter((url: string | undefined) => url !== undefined)
+      if (!tab.url) {
+        continue
+      }
+      try {
+        trackedTabs = fkt(tab, ignoredUrls, trackedTabs)
+      } catch (err) {
+        console.log('error when interating over ignored URLS', err)
+      }
+    }
     return trackedTabs
   }
 
