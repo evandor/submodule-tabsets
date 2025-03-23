@@ -1,7 +1,10 @@
 <template>
   <q-menu :offset="[0, 0]" @click.stop="">
     <q-list dense style="min-width: 200px">
-      <PanelTabListContextMenuHook :tab="props.tab" :tabset="props.tabset!" />
+      <PanelTabListContextMenuHook
+        :tab="props.tab"
+        :tabset="props.tabset!"
+        v-if="props.tabset!.type !== TabsetType.SPECIAL" />
 
       <template v-if="showTabDetailsMenuEntry(props['tab' as keyof object])">
         <q-item clickable v-close-popup @click.stop="showTabDetails(props['tab' as keyof object])">
@@ -33,7 +36,11 @@
         </q-item>
       </template>
 
-      <template v-if="useFeaturesStore().hasFeature(FeatureIdent.ADVANCED_TAB_MANAGEMENT)">
+      <template
+        v-if="
+          useFeaturesStore().hasFeature(FeatureIdent.ADVANCED_TAB_MANAGEMENT) &&
+          props.tabset!.type !== TabsetType.SPECIAL
+        ">
         <q-separator inset />
         <q-item clickable v-close-popup @click.stop="assignTab(props['tab' as keyof object])">
           <q-item-section style="padding-right: 0; min-width: 25px; max-width: 25px">
@@ -43,7 +50,8 @@
         </q-item>
       </template>
 
-      <template v-if="useFeaturesStore().hasFeature(FeatureIdent.COLOR_TAGS)">
+      <template
+        v-if="useFeaturesStore().hasFeature(FeatureIdent.COLOR_TAGS) && props.tabset!.type !== TabsetType.SPECIAL">
         <q-separator inset />
         <q-item clickable v-close-popup @click.stop="setColor(props['tab' as keyof object])">
           <q-item-section style="padding-right: 0; min-width: 25px; max-width: 25px">
@@ -70,7 +78,7 @@
       <!--      </template>-->
 
       <q-item
-        v-if="useFeaturesStore().hasFeature(FeatureIdent.MONITOR)"
+        v-if="useFeaturesStore().hasFeature(FeatureIdent.MONITOR) && props.tabset!.type !== TabsetType.SPECIAL"
         clickable
         v-close-popup
         @click.stop="openMonitoringDialog()">
@@ -82,7 +90,7 @@
       </q-item>
 
       <q-item
-        v-if="useFeaturesStore().hasFeature(FeatureIdent.REMINDER)"
+        v-if="useFeaturesStore().hasFeature(FeatureIdent.REMINDER) && props.tabset!.type !== TabsetType.SPECIAL"
         clickable
         v-close-popup
         @click.stop="openReminderDialog()">
