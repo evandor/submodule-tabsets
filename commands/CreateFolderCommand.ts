@@ -3,7 +3,7 @@ import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import Analytics from 'src/core/utils/google-analytics'
 import { useLogger } from 'src/services/Logger'
 import { Tab } from 'src/tabsets/models/Tab'
-import { Tabset, TabsetType } from 'src/tabsets/models/Tabset'
+import { Tabset, TABSET_NAME_MAX_LENGTH, TabsetType } from 'src/tabsets/models/Tabset'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 
@@ -20,7 +20,11 @@ export class CreateFolderCommand implements Command<Tabset> {
     public parentFolder?: string,
     public dynamicUrl?: string,
     private type?: TabsetType,
-  ) {}
+  ) {
+    if (folderName.length > TABSET_NAME_MAX_LENGTH) {
+      this.folderName = folderName.substring(0, TABSET_NAME_MAX_LENGTH - 3) + '...'
+    }
+  }
 
   async execute(): Promise<ExecutionResult<Tabset>> {
     try {
