@@ -23,9 +23,12 @@ import { ListDetailLevel, useUiStore } from 'src/ui/stores/uiStore'
 import JsUtils from 'src/utils/JsUtils'
 import throttledQueue from 'throttled-queue'
 import { v5 as uuidv5 } from 'uuid'
+import { ref } from 'vue'
 
 export function useTabsetService() {
   const throttleOne50Millis = throttledQueue(1, 50, true)
+
+  const initialized = ref(false)
 
   const init = async () => {
     function selectFirstAvailableTabset() {
@@ -47,6 +50,7 @@ export function useTabsetService() {
     } else {
       selectFirstAvailableTabset()
     }
+    initialized.value = true
   }
 
   /**
