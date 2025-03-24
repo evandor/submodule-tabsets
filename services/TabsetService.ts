@@ -309,7 +309,6 @@ class TabsetService {
     start: number,
     fkt: (t: chrome.tabs.Tab, ignoredUrls: string[], counter: number) => number,
   ): Promise<number> {
-    console.log('her')
     if (!chrome.tabs) {
       return Promise.resolve(0)
     }
