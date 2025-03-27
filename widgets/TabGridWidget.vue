@@ -10,15 +10,21 @@
         </q-img>
         <q-img
           v-else-if="props.tab.image && props.tab.image.startsWith('blob://')"
+          no-spinner
           style="border: 0 dotted white; border-radius: 5px"
           :src="imgFromBlob">
           <q-tooltip class="tooltip">Custom Screenshot</q-tooltip>
         </q-img>
-        <q-img v-else-if="props.tab.image" style="border: 0 dotted white; border-radius: 5px" :src="props.tab.image">
+        <q-img
+          v-else-if="props.tab.image"
+          style="border: 0 dotted white; border-radius: 5px"
+          :src="props.tab.image"
+          no-spinner>
           <q-tooltip class="tooltip">Custom Screenshot</q-tooltip>
         </q-img>
         <q-img
           v-else
+          no-spinner
           style="border: 0 dotted white; border-radius: 3px; cursor: move"
           :ratio="16 / 9"
           src="https://placehold.co/600x400?text=no+thumbnail" />

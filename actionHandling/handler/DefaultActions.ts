@@ -11,6 +11,7 @@ import DeleteFolderAction from 'src/tabsets/actions/DeleteFolderAction.vue'
 import DeleteTabsetAction from 'src/tabsets/actions/DeleteTabsetAction.vue'
 import EditFolderAction from 'src/tabsets/actions/EditFolderAction.vue'
 import EditTabsetAction from 'src/tabsets/actions/EditTabsetAction.vue'
+import ExportTabsetAction from 'src/tabsets/actions/ExportTabsetAction.vue'
 import OpenAllInMenuAction from 'src/tabsets/actions/OpenAllInMenuAction.vue'
 import OpenTabsetAction from 'src/tabsets/actions/OpenTabsetAction.vue'
 import ShareTabsetAction from 'src/tabsets/actions/ShareTabsetAction.vue'
@@ -45,6 +46,10 @@ export class DefaultActions {
 
     actions.push(OpenAllInMenuAction)
     actions.push(ShareTabsetAction)
+
+    if (useFeaturesStore().hasFeature(FeatureIdent.DEV_MODE)) {
+      actions.push(ExportTabsetAction)
+    }
 
     // open existing tabset for url
     if (!DefaultActions.alreadyInTabset() && DefaultActions.tabsetsForUrl().length > 0) {

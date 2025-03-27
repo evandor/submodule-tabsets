@@ -1,4 +1,6 @@
 // ? expected diffs to localstorage
+// ? expected diffs to localstorage
+// ? expected diffs to localstorage
 import _, { forEach } from 'lodash'
 import { defineStore } from 'pinia'
 import { uid } from 'quasar'
@@ -155,8 +157,8 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     return Promise.resolve(ts)
   }
 
-  function addTabset(ts: Tabset) {
-    console.log('adding tabset (new)', ts)
+  async function addTabset(ts: Tabset) {
+    console.log('adding tabset (new)', ts.name)
     ts.tabs = _.filter(ts.tabs, (t: Tab) => t !== null)
 
     // this part is meant to be used to update tabs in case properties
@@ -174,7 +176,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       }
     })
     if (foundSomething) {
-      useTabsetService().saveTabset(ts)
+      await useTabsetService().saveTabset(ts)
     }
 
     useWindowsStore().addToWindowSet(ts.window)
@@ -397,6 +399,35 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     return undefined
   }
 
+  const getFolderChain = (
+    folderId: string,
+    tabsetOrFolders: Tabset[] = [...useTabsetsStore().tabsets.values()],
+    chain: string[] = [],
+    level = 0,
+  ): string[] => {
+    //console.log(`get active folder: root# ${root.id}, folderActive: ${folderActive}, level: ${level}`)
+    if (level > 10) {
+      console.warn('runaway method')
+      return []
+    }
+
+    console.log(`  searching for folder '${folderId}', level ${level}`)
+    for (const f of tabsetOrFolders) {
+      if (f.id === folderId) {
+        return chain.concat(folderId)
+      } else {
+        if (f.folders.length > 0) {
+          const subChain = getFolderChain(folderId, f.folders, chain, level + 1)
+          console.log('subchain', subChain)
+          if (subChain.length > 0) {
+            return subChain.concat(f.id)
+          }
+        }
+      }
+    }
+    return chain
+  }
+
   const loadPublicTabset = (sharedId: string) => storage.loadPublicTabset(sharedId)
 
   const removeReminder = (tab: Tab) =>
@@ -430,6 +461,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     getAllUrls,
     loadTabsets,
     getActiveFolder,
+    getFolderChain,
     share,
     shareWith,
     loadPublicTabset,

@@ -503,10 +503,11 @@ const monitor = ref<MonitoredTab | undefined>(undefined)
 onMounted(() => {
   if (new Date().getTime() - props.tab.created < 500) {
     newState.value = true
+    let playPromise: Promise<any> | undefined = undefined
     const audio = document.getElementById('myAudio')
-    if (audio) {
+    if (audio && !playPromise) {
       // @ts-expect-error TODO
-      audio.play()
+      audio.play().catch((err) => {})
     }
     setTimeout(() => (newState.value = false), 2000)
   }

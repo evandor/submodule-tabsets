@@ -4,6 +4,7 @@
 // 2 expected diffs to localstorage
 // 2 expected diffs to localstorage
 // 2 expected diffs to localstorage
+// 2 expected diffs to localstorage
 import _ from 'lodash'
 import { uid } from 'quasar'
 import AppEventDispatcher from 'src/app/AppEventDispatcher'
@@ -14,6 +15,7 @@ import { Notebook } from 'src/notes/models/Notebook'
 import { useNotesStore } from 'src/notes/stores/NotesStore'
 import { Space } from 'src/spaces/models/Space'
 import { useSpacesStore } from 'src/spaces/stores/spacesStore'
+import { NoteEvent, SpaceEvent, TabEvent, TabsetEvent } from 'src/tabsets/commands/github/GithubWriteEventCommand'
 import { Tab, UrlExtension } from 'src/tabsets/models/Tab'
 import { Tabset, TabsetSharing, TabsetStatus } from 'src/tabsets/models/Tabset'
 import { TabsetColumn } from 'src/tabsets/models/TabsetColumn'
@@ -23,6 +25,35 @@ import { useTabsStore2 } from 'src/tabsets/stores/tabsStore2'
 import PlaceholderUtils from 'src/tabsets/utils/PlaceholderUtils'
 
 const { saveTabset, saveCurrentTabset, tabsetsFor, addToTabset } = useTabsetService()
+
+async function eventsFor(tabsets: Tabset[], parentId: string | undefined = undefined): Promise<string[]> {
+  const lines: string[] = []
+  for (const ts of tabsets) {
+    const event = new TabsetEvent('added', ts.id, parentId, ts.name, ts.spaces)
+    lines.push(event.format())
+    for (const tab of ts.tabs) {
+      const event = new TabEvent('added', ts.id, tab.id, tab.title || tab.name || '???', tab.url)
+      lines.push(event.format())
+    }
+    const notes = await useNotesStore().getNotesFor(ts.id)
+    for (const note of notes) {
+      const event = new NoteEvent('added', ts.id, note.title, note)
+      lines.push(event.format())
+    }
+    const folders = await eventsFor(ts.folders, ts.id)
+    folders.forEach((l) => lines.push(l))
+  }
+  return lines
+}
+
+function spacesEventsFor(spaces: Space[]): string[] {
+  const lines: string[] = []
+  for (const space of spaces) {
+    const event = new SpaceEvent('added', space.id, undefined, space.label)
+    lines.push(event.format())
+  }
+  return lines
+}
 
 class TabsetService {
   async saveToCurrentTabset(tab: Tab, useIndex: number | undefined = undefined): Promise<Tabset> {
@@ -42,12 +73,6 @@ class TabsetService {
     )
   }
 
-  chromeTabIdFor(tabUrl: string): number | undefined {
-    const tabsStore = useTabsStore2()
-    const candidates = _.filter(tabsStore.browserTabs, (t: chrome.tabs.Tab) => t?.url === tabUrl)
-    return candidates.length > 0 ? candidates[0]!.id : undefined
-  }
-
   saveSelectedPendingTabs() {
     // this.saveAllPendingTabs(true)
   }
@@ -60,14 +85,6 @@ class TabsetService {
       })
     }
   }
-
-  // async getRequestFor(selectedTab: Tab): Promise<any> {
-  //   if (selectedTab.url) {
-  //     return this.getRequestForUrl(selectedTab.url)
-  //   }
-  //   return Promise.reject("url not provided");
-  // }
-  //
 
   async getContentFor(selectedTab: Tab): Promise<ContentItem | undefined> {
     return this.getContentForUrl(selectedTab.id)
@@ -86,13 +103,6 @@ class TabsetService {
 
   async getMetaLinksForUrl(url: string): Promise<any> {
     return Promise.reject('not implemented N') //db.getMetaLinks(url)
-  }
-
-  async getLinksFor(selectedTab: Tab): Promise<any> {
-    if (selectedTab.url) {
-      return this.getLinksForUrl(selectedTab.url)
-    }
-    return Promise.reject('url not provided')
   }
 
   async getLinksForUrl(url: string): Promise<any> {
@@ -156,26 +166,29 @@ class TabsetService {
     return Promise.reject('could not find tab ' + tabId)
   }
 
-  async exportData(exportAs: string, appVersion: string = '0.0.0'): Promise<any> {
+  async exportData(
+    exportAs: string,
+    tabsets: Tabset[] | undefined,
+    filename: string | undefined = 'tabsets.json',
+  ): Promise<any> {
     console.log('exporting as ', exportAs)
 
     const spacesStore = useSpacesStore()
 
     let data = ''
-    let filename = 'tabsets.' + appVersion + '.json'
     if (exportAs === 'json') {
-      data = useTabsetService().exportDataAsJson()
-      const tabsets = [...useTabsetsStore().tabsets.values()] as Tabset[]
+      tabsets ??= [...useTabsetsStore().tabsets.values()] as Tabset[]
       data = JSON.stringify({
         tabsets: tabsets.filter((ts: Tabset) => ts.status !== TabsetStatus.DELETED),
         spaces: [...spacesStore.spaces.values()],
         notebooks: await useNotesStore().getNotebookList(),
       })
       return this.createFile(data, filename)
-    } else if (exportAs === 'csv') {
-      data = 'not implemented yet'
-      filename = 'tabsets.' + appVersion + '.csv'
-      return this.createFile(data, filename)
+    } else if (exportAs === 'events') {
+      tabsets ??= [...useTabsetsStore().tabsets.values()] as Tabset[]
+      const tabData = await eventsFor(tabsets)
+      const spacesData = spacesEventsFor([...useSpacesStore().spaces.values()] as Space[])
+      return this.createFile(tabData.join('') + spacesData.join(''), 'tabsets-events.txt')
     } else if (exportAs === 'bookmarks') {
       console.log('creating bookmarks...')
 
