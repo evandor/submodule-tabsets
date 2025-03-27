@@ -11,7 +11,7 @@ import NavigationService from 'src/services/NavigationService'
 import { useSpacesStore } from 'src/spaces/stores/spacesStore'
 import { useAuthStore } from 'src/stores/authStore'
 import { useSettingsStore } from 'src/stores/settingsStore'
-import { GithubLogCommand } from 'src/tabsets/commands/github/GithubLogCommand'
+import { GithubWriteEventCommand, TabEvent } from 'src/tabsets/commands/github/GithubWriteEventCommand'
 import { SaveOrReplaceResult } from 'src/tabsets/models/SaveOrReplaceResult'
 import { Tab } from 'src/tabsets/models/Tab'
 import { TabInFolder } from 'src/tabsets/models/TabInFolder'
@@ -482,8 +482,12 @@ export function useTabsetService() {
       }
 
       useCommandExecutor()
-        .execute(new GithubLogCommand('newTab', tab as object))
+        .execute(new GithubWriteEventCommand(new TabEvent('added', ts.id, tab.id, ts.name, tab.url)))
         .catch((err) => console.warn(err))
+
+      // useCommandExecutor()
+      //   .execute(new GithubLogCommand('newTab', tab as object))
+      //   .catch((err) => console.warn(err))
 
       return Promise.resolve(ts)
     }
@@ -530,7 +534,13 @@ export function useTabsetService() {
     }
     useTabsStore2().removeTab(tabset, tab.id)
     console.log('deletion: saving tabset', tabset)
-    return saveTabset(tabset, new ChangeInfo('tab', 'deleted', tab.id)).then(() => tabset)
+    const result = saveTabset(tabset, new ChangeInfo('tab', 'deleted', tab.id)).then(() => tabset)
+
+    useCommandExecutor()
+      .execute(new GithubWriteEventCommand(new TabEvent('deleted', tabset.id, tab.id, tab.name || '', 'url: xxx')))
+      .catch((err) => console.warn(err))
+
+    return result
   }
 
   const getIfAvailable = (metas: object, key: string): string | undefined => {
@@ -819,7 +829,7 @@ export function useTabsetService() {
           !key.startsWith('worker-')
         ) {
           // hs += key +": " + value
-          console.debug('got header', key + ': ' + value)
+          //console.debug('got header', key + ': ' + value)
         }
       })
       // just for logging - end

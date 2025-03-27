@@ -12,9 +12,10 @@
       </q-card-section>
 
       <q-card-section class="q-pt-none">
-        <q-radio v-model="exportAs" val="json" label="as JSON"></q-radio>
+        <q-radio v-model="exportAs" val="json" label="as JSON"></q-radio><br />
         <!--        <q-radio v-model="exportAs" val="csv" label="as CSV (not implemented yet)"></q-radio>-->
-        <q-radio v-model="exportAs" val="bookmarks" label="to Bookmarks Folder"></q-radio>
+        <q-radio v-model="exportAs" val="bookmarks" label="to Bookmarks Folder"></q-radio><br />
+        <q-radio v-model="exportAs" val="events" label="to Events File"></q-radio>
       </q-card-section>
 
       <q-card-section class="q-pt-none text-warning" v-if="warning !== ''">
@@ -32,6 +33,7 @@
 <script lang="ts" setup>
 import { useDialogPluginComponent, useQuasar } from 'quasar'
 import { useSpacesStore } from 'src/spaces/stores/spacesStore'
+import { Tabset } from 'src/tabsets/models/Tabset'
 import TabsetService from 'src/tabsets/services/TabsetService'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { ref, watchEffect } from 'vue'
@@ -43,6 +45,12 @@ defineEmits([
 ])
 
 const { dialogRef, onDialogHide, onDialogCancel } = useDialogPluginComponent()
+
+type Props = { filename?: string; tabset?: Tabset }
+
+const props = withDefaults(defineProps<Props>(), {
+  filename: `tabsets-${import.meta.env.PACKAGE_VERSION}.json`,
+})
 
 const $q = useQuasar()
 
@@ -60,8 +68,8 @@ watchEffect(() => {
 
 const exportData = () => {
   hideWarning.value = true
-  const appVersion = import.meta.env.PACKAGE_VERSION
-  TabsetService.exportData(exportAs.value, appVersion)
+  console.log('exporting', props.filename)
+  TabsetService.exportData(exportAs.value, props.tabset ? [props.tabset] : undefined, props.filename)
     .then(() => {
       //router.push("/tabsets/" + tabsStore.currentTabsetId)
       $q.notify({
