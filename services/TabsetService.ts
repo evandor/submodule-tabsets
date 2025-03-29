@@ -1,10 +1,4 @@
 // 2 expected diffs to localstorage
-// 2 expected diffs to localstorage
-// 2 expected diffs to localstorage
-// 2 expected diffs to localstorage
-// 2 expected diffs to localstorage
-// 2 expected diffs to localstorage
-// 2 expected diffs to localstorage
 import _ from 'lodash'
 import { uid } from 'quasar'
 import AppEventDispatcher from 'src/app/AppEventDispatcher'
@@ -24,42 +18,42 @@ import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { useTabsStore2 } from 'src/tabsets/stores/tabsStore2'
 import PlaceholderUtils from 'src/tabsets/utils/PlaceholderUtils'
 
-const { saveTabset, saveCurrentTabset, tabsetsFor, addToTabset } = useTabsetService()
-
-async function eventsFor(tabsets: Tabset[], parentId: string | undefined = undefined): Promise<string[]> {
-  const lines: string[] = []
-  for (const ts of tabsets) {
-    const event = new TabsetEvent('added', ts.id, parentId, ts.name, ts.spaces)
-    lines.push(event.format())
-    for (const tab of ts.tabs) {
-      const event = new TabEvent('added', ts.id, tab.id, tab.title || tab.name || '???', tab.url)
-      lines.push(event.format())
-    }
-    const notes = await useNotesStore().getNotesFor(ts.id)
-    for (const note of notes) {
-      const event = new NoteEvent('added', ts.id, note.title, note)
-      lines.push(event.format())
-    }
-    const folders = await eventsFor(ts.folders, ts.id)
-    folders.forEach((l) => lines.push(l))
-  }
-  return lines
-}
-
-function spacesEventsFor(spaces: Space[]): string[] {
-  const lines: string[] = []
-  for (const space of spaces) {
-    const event = new SpaceEvent('added', space.id, undefined, space.label)
-    lines.push(event.format())
-  }
-  return lines
-}
+// const { saveTabset, saveCurrentTabset, tabsetsFor, addToTabset } = useTabsetService()
 
 class TabsetService {
+  eventsFor = async (tabsets: Tabset[], parentId: string | undefined = undefined): Promise<string[]> => {
+    const lines: string[] = []
+    for (const ts of tabsets) {
+      const event = new TabsetEvent('added', ts.id, parentId, ts.name, ts.spaces)
+      lines.push(event.format())
+      for (const tab of ts.tabs) {
+        const event = new TabEvent('added', ts.id, tab.id, tab.title || tab.name || '???', tab.url)
+        lines.push(event.format())
+      }
+      const notes = await useNotesStore().getNotesFor(ts.id)
+      for (const note of notes) {
+        const event = new NoteEvent('added', ts.id, note.title, note)
+        lines.push(event.format())
+      }
+      const folders = await this.eventsFor(ts.folders, ts.id)
+      folders.forEach((l) => lines.push(l))
+    }
+    return lines
+  }
+
+  spacesEventsFor = (spaces: Space[]): string[] => {
+    const lines: string[] = []
+    for (const space of spaces) {
+      const event = new SpaceEvent('added', space.id, undefined, space.label)
+      lines.push(event.format())
+    }
+    return lines
+  }
+
   async saveToCurrentTabset(tab: Tab, useIndex: number | undefined = undefined): Promise<Tabset> {
     const currentTs = useTabsetsStore().getCurrentTabset as Tabset | undefined
     if (currentTs) {
-      return addToTabset(currentTs, tab, useIndex)
+      return useTabsetService().addToTabset(currentTs, tab, useIndex)
     }
     return Promise.reject('could not get current tabset')
   }
@@ -112,17 +106,17 @@ class TabsetService {
   setCustomTitle(tab: Tab, title: string, desc: string): Promise<any> {
     tab.name = title
     tab.longDescription = desc
-    return saveCurrentTabset()
+    return useTabsetService().saveCurrentTabset()
   }
 
   setColor(tab: Tab, color: string): Promise<any> {
     tab.color = color
-    return saveCurrentTabset()
+    return useTabsetService().saveCurrentTabset()
   }
 
   setMatcher(tab: Tab, matcher: string | undefined): Promise<any> {
     tab.matcher = matcher
-    return saveCurrentTabset()
+    return useTabsetService().saveCurrentTabset()
   }
 
   setUrl(
@@ -135,7 +129,7 @@ class TabsetService {
     tab.url = url
     tab.extension = extension
     tab = PlaceholderUtils.apply(tab, placeholders, placeholderValues)
-    return saveCurrentTabset()
+    return useTabsetService().saveCurrentTabset()
   }
 
   moveToTabset(tabId: string, toTabsetId: string, copy: boolean = false): Promise<any> {
@@ -146,7 +140,8 @@ class TabsetService {
 
       if (tabIndex >= 0 && targetTabset) {
         targetTabset.tabs.push(tabset.tabs[tabIndex]!)
-        return saveTabset(targetTabset)
+        return useTabsetService()
+          .saveTabset(targetTabset)
           .then(() => {
             if (copy) {
               let tabWithNewId = Object.assign({}, tabset.tabs[tabIndex])
@@ -158,7 +153,7 @@ class TabsetService {
               tabset.tabs.splice(tabIndex, 1)
             }
           })
-          .then(() => saveTabset(tabset))
+          .then(() => useTabsetService().saveTabset(tabset))
       } else {
         return Promise.reject('could not find tab/tabset ' + tabId + '/' + toTabsetId)
       }
@@ -186,8 +181,8 @@ class TabsetService {
       return this.createFile(data, filename)
     } else if (exportAs === 'events') {
       tabsets ??= [...useTabsetsStore().tabsets.values()] as Tabset[]
-      const tabData = await eventsFor(tabsets)
-      const spacesData = spacesEventsFor([...useSpacesStore().spaces.values()] as Space[])
+      const tabData = await this.eventsFor(tabsets)
+      const spacesData = this.spacesEventsFor([...useSpacesStore().spaces.values()] as Space[])
       return this.createFile(tabData.join('') + spacesData.join(''), 'tabsets-events.txt')
     } else if (exportAs === 'bookmarks') {
       console.log('creating bookmarks...')
@@ -245,7 +240,7 @@ class TabsetService {
 
     _.forEach(tabsets, (tabset: Tabset) => {
       useTabsetsStore().addTabset(tabset)
-      saveTabset(tabset)
+      useTabsetService().saveTabset(tabset)
 
       _.forEach(tabset.tabs, (tab: Tab) => {
         AppEventDispatcher.dispatchEvent('add-to-search', {
@@ -287,7 +282,7 @@ class TabsetService {
     const result: chrome.tabs.Tab[] = await chrome.tabs.query({})
     let trackedTabs = 0
     _.forEach(result, (tab: chrome.tabs.Tab) => {
-      if (tab && tab.url && tabsetsFor(tab.url).length > 0) {
+      if (tab && tab.url && useTabsetService().tabsetsFor(tab.url).length > 0) {
         trackedTabs++
       }
     })
@@ -355,7 +350,7 @@ class TabsetService {
     const tabsToClose: chrome.tabs.Tab[] = []
     const tabsToKeep: chrome.tabs.Tab[] = []
     _.forEach(result, (tab: chrome.tabs.Tab) => {
-      if (tab && tab.url && tab.url !== currentTab.url && tabsetsFor(tab.url).length > 0) {
+      if (tab && tab.url && tab.url !== currentTab.url && useTabsetService().tabsetsFor(tab.url).length > 0) {
         tabsToClose.push(tab)
       } else {
         tabsToKeep.push(tab)
@@ -395,7 +390,7 @@ class TabsetService {
         currentTabset.sharing.sharing = TabsetSharing.PUBLIC_LINK_OUTDATED
       }
 
-      await saveCurrentTabset()
+      await useTabsetService().saveCurrentTabset()
     }
   }
 
@@ -404,7 +399,7 @@ class TabsetService {
     const tabset = useTabsetsStore().getTabset(tabsetId)
     if (tabset) {
       tabset.view = view
-      saveTabset(tabset)
+      useTabsetService().saveTabset(tabset)
     }
   }
 
@@ -424,7 +419,7 @@ class TabsetService {
         default:
           tabset.sorting = 'custom'
       }
-      saveTabset(tabset)
+      useTabsetService().saveTabset(tabset)
       return tabset.sorting
     }
     return undefined
@@ -464,7 +459,7 @@ class TabsetService {
         // TODO
         //useSearchStore().update(tab.url, 'note', note)
       }
-      return saveCurrentTabset()
+      return useTabsetService().saveCurrentTabset()
     }
     return Promise.reject('did not find tab with id ' + tabId)
   }

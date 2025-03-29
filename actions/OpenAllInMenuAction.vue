@@ -6,6 +6,7 @@
       inBexMode() &&
       (!props.tabset.window || props.tabset.window === 'current')
     ">
+    <q-separator inset />
     <ContextMenuItem icon="open_in_new" label="Open all in...">
       <q-item-section side>
         <q-icon name="keyboard_arrow_right" />
