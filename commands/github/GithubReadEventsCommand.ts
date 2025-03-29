@@ -16,6 +16,7 @@ import {
 } from 'src/tabsets/commands/github/GithubWriteEventCommand'
 import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset } from 'src/tabsets/models/Tabset'
+import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { useUiStore } from 'src/ui/stores/uiStore'
 
@@ -76,33 +77,42 @@ export class GithubReadEventsCommand extends GithubCommands<string> {
                     parts[5]!,
                     parts[6] ? parts[6].split(',') : [],
                   )
-                  if (tabsetEvent.event === 'added') {
-                    if (tabsetEvent.parentId) {
-                      // console.log('processing line', line)
-                      const folderChain = useTabsetsStore().getFolderChain(tabsetEvent.parentId)
-                      // console.log('folderChain', folderChain)
-                      if (folderChain.length > 0) {
-                        const rootTabset = useTabsetsStore().getTabset(folderChain[folderChain.length - 1]!)
-                        //console.log('found root tabset', rootTabset)
-                        const tabsetOrFolder = useTabsetsStore().getActiveFolder(rootTabset!, tabsetEvent.parentId)
-                        //console.log('tabsetOrfolder', tabsetOrFolder)
-                        if (tabsetOrFolder) {
-                          const newTabset = new Tabset(
-                            tabsetEvent.tabsetId,
-                            tabsetEvent.name,
-                            [],
-                            [],
-                            tabsetEvent.spaces,
-                          )
-                          tabsetOrFolder.folders.push(newTabset)
-                          await useTabsetsStore().saveTabset(rootTabset!)
+                  switch (tabsetEvent.event) {
+                    case 'added':
+                      if (tabsetEvent.parentId) {
+                        // console.log('processing line', line)
+                        const folderChain = useTabsetsStore().getFolderChain(tabsetEvent.parentId)
+                        // console.log('folderChain', folderChain)
+                        if (folderChain.length > 0) {
+                          const rootTabset = useTabsetsStore().getTabset(folderChain[folderChain.length - 1]!)
+                          //console.log('found root tabset', rootTabset)
+                          const tabsetOrFolder = useTabsetsStore().getActiveFolder(rootTabset!, tabsetEvent.parentId)
+                          //console.log('tabsetOrfolder', tabsetOrFolder)
+                          if (tabsetOrFolder) {
+                            const newTabset = new Tabset(
+                              tabsetEvent.tabsetId,
+                              tabsetEvent.name,
+                              [],
+                              [],
+                              tabsetEvent.spaces,
+                            )
+                            tabsetOrFolder.folders.push(newTabset)
+                            await useTabsetsStore().saveTabset(rootTabset!)
+                          }
                         }
+                      } else {
+                        console.log('processing line II', line)
+                        const newTabset = new Tabset(tabsetEvent.tabsetId, tabsetEvent.name, [], [], tabsetEvent.spaces)
+                        await useTabsetsStore().addTabset(newTabset)
                       }
-                    } else {
-                      console.log('processing line II', line)
-                      const newTabset = new Tabset(tabsetEvent.tabsetId, tabsetEvent.name, [], [], tabsetEvent.spaces)
-                      await useTabsetsStore().addTabset(newTabset)
-                    }
+                      break
+                    case 'deleted':
+                      await useTabsetsStore().deleteTabset(tabsetEvent.tabsetId)
+                      break
+                    default:
+                      console.log(`unknown event ${tabsetEvent.event}`)
+                  }
+                  if (tabsetEvent.event === 'added') {
                   }
                 }
                 break
@@ -114,11 +124,24 @@ export class GithubReadEventsCommand extends GithubCommands<string> {
                     console.log('could not find tabset for id', tabsetEvent.tabsetId)
                     break
                   }
-                  if (tabsetEvent.event === 'added') {
-                    ts.tabs.push(
-                      new Tab(tabsetEvent.tabId!, BrowserApi.createChromeTabObject(tabsetEvent.name, tabsetEvent.url!)),
-                    )
-                    await useTabsetsStore().saveTabset(ts)
+                  switch (tabsetEvent.event) {
+                    case 'added':
+                      const newTab = new Tab(
+                        tabsetEvent.tabId!,
+                        BrowserApi.createChromeTabObject(tabsetEvent.name, tabsetEvent.url!),
+                      )
+                      ts.tabs.push(newTab)
+                      await useTabsetsStore().saveTabset(ts)
+                      break
+                    case 'deleted':
+                      const tabset = useTabsetsStore().getTabset(tabsetEvent.tabsetId)
+                      const tab = useTabsetsStore().getTabAndTabsetId(tabsetEvent.tabId!)?.tab
+                      if (tab && tabset) {
+                        await useTabsetService().deleteTab(tab, tabset, true)
+                      }
+                      break
+                    default:
+                      console.log(`unknown event ${tabsetEvent.event}`)
                   }
                 }
                 break
@@ -128,7 +151,7 @@ export class GithubReadEventsCommand extends GithubCommands<string> {
                   if (spaceEvent.event === 'added') {
                     // useTabsetsStore().addTabset(new Tabset(tabsetEvent.tabsetId!, tabsetEvent.name, []))
                     const space = new Space(spaceEvent.spaceId, spaceEvent.name)
-                    console.log('space', space)
+                    //console.log('space', space)
                     await useSpacesStore().addSpace(space)
                   }
                 }

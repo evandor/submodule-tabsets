@@ -1,6 +1,15 @@
 <template>
   <template v-if="props.level === 'root'">
-    <ContextMenuItem v-close-popup @was-clicked="clicked()" icon="add" color="primary" label="New Collection" />
+    <ContextMenuItem
+      v-close-popup
+      @was-clicked="clicked()"
+      icon="o_featured_play_list"
+      color="primary"
+      label="New Collection">
+      <!--      <template v-slot:after-icon>-->
+      <!--        -->
+      <!--      </template>-->
+    </ContextMenuItem>
   </template>
 </template>
 <script setup lang="ts">

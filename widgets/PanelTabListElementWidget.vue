@@ -82,7 +82,7 @@
           </span>
 
           <span v-if="props.tab?.extension === UrlExtension.NOTE" v-html="nameOrTitle(props.tab as Tab)" />
-          <span v-else :class="TabService.isCurrentTab(props.tab) ? 'text-bold' : ''">
+          <span v-else :class="TabService.isCurrentTab(props.tab) ? 'text-bold' : ''" @click.stop="handleNameClick">
             <q-icon
               v-if="props.tab?.favorite && props.tab?.favorite !== TabFavorite.NONE"
               :color="props.tab.favorite === TabFavorite.TABSET ? 'warning' : 'positive'"
@@ -90,7 +90,20 @@
               class="q-ma-mone">
               <q-tooltip class="tooltip_small">This tab is marked as favorite</q-tooltip>
             </q-icon>
-            <Highlight :filter="props.filter" :text="nameOrTitle(props.tab as Tab) || ''" />
+            <Highlight :filter="props.filter" :text="nameOrTitle(props.tab as Tab) || ''">
+              <template v-slot:popup>
+                <q-popup-edit
+                  v-if="popupEdit"
+                  ref="popupRef"
+                  @hide="popupEdit = false"
+                  :model-value="nameOrTitle(props.tab as Tab)"
+                  @update:model-value="(val: string) => setCustomTitle(tab, val)"
+                  v-slot="scope"
+                  anchor="center middle">
+                  <q-input v-model="scope.value" dense autofocus counter @keyup.enter="scope.set" />
+                </q-popup-edit>
+              </template>
+            </Highlight>
           </span>
         </div>
       </div>
@@ -368,8 +381,11 @@
     </q-item-label>
 
     <!-- === snippets === -->
-    <q-item-label v-if="TabService.isCurrentTab(props.tab)" class="text-grey-10" text-subtitle1>
-      <div v-for="s in props.tab.snippets" class="ellipsis-2-lines q-my-xs text-body2">
+    <q-item-label class="text-grey-10" text-subtitle1>
+      <div
+        v-if="TabService.isCurrentTab(props.tab)"
+        v-for="s in props.tab.snippets"
+        class="ellipsis-2-lines q-my-xs text-body2">
         {{ s.text }}
       </div>
     </q-item-label>
@@ -425,7 +441,7 @@
 <script setup lang="ts">
 import { formatDistance } from 'date-fns'
 import _ from 'lodash'
-import { date as quasarDate, useQuasar } from 'quasar'
+import { QPopupEdit, date as quasarDate, useQuasar } from 'quasar'
 import BrowserApi from 'src/app/BrowserApi'
 import TabListIconIndicatorsHook from 'src/app/hooks/tabsets/TabListIconIndicatorsHook.vue'
 import { FeatureIdent } from 'src/app/models/FeatureIdent'
@@ -448,6 +464,7 @@ import { AddCommentCommand } from 'src/tabsets/commands/AddCommentCommand'
 import { DeleteChromeGroupCommand } from 'src/tabsets/commands/DeleteChromeGroupCommand'
 import { DeleteTabCommand } from 'src/tabsets/commands/DeleteTabCommand'
 import { OpenTabCommand } from 'src/tabsets/commands/OpenTabCommand'
+import { UpdateTabNameCommand } from 'src/tabsets/commands/UpdateTabName'
 import ReminderDialog from 'src/tabsets/dialogues/ReminderDialog.vue'
 import { PlaceholdersType } from 'src/tabsets/models/Placeholders'
 import { Tab, TabComment, TabFavorite, TabPreview, TabSorting, UrlExtension } from 'src/tabsets/models/Tab'
@@ -461,11 +478,11 @@ import PanelTabListContextMenu from 'src/tabsets/widgets/PanelTabListContextMenu
 import TabFaviconWidget from 'src/tabsets/widgets/TabFaviconWidget.vue'
 import { useThumbnailsService } from 'src/thumbnails/services/ThumbnailsService'
 import { useUiStore } from 'src/ui/stores/uiStore'
-import { onMounted, PropType, ref, watchEffect } from 'vue'
+import { nextTick, onMounted, PropType, ref, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 
 const { handleError } = useNotificationHandler()
-const { inBexMode } = useUtils()
+const { inBexMode, useDblClickHandler } = useUtils()
 
 const props = defineProps({
   tab: { type: Object as PropType<Tab>, required: true },
@@ -499,6 +516,8 @@ const opensearchterm = ref<string | undefined>(undefined)
 const sendComment = ref<string>('')
 const newCommentIds = ref<string[]>([])
 const monitor = ref<MonitoredTab | undefined>(undefined)
+const popupEdit = ref(false)
+const popupRef = ref<any>(undefined)
 
 onMounted(() => {
   if (new Date().getTime() - props.tab.created < 500) {
@@ -845,6 +864,36 @@ const callRestApi = (tab: Tab) => {
   console.log(`about to call ${restTab.api} with ${JSON.stringify(restTab.params)}`)
   useNavigationService().browserTabFor(chrome.runtime.getURL('www/index.html/#/mainpanel/restapi/' + restTab.id))
 }
+
+const setCustomTitle = (tab: Tab, newValue: string) =>
+  useCommandExecutor().executeFromUi(new UpdateTabNameCommand(tab, newValue))
+
+const handleNameClick = useDblClickHandler(
+  () => gotoTab(),
+  () => {
+    popupEdit.value = true
+    nextTick().then(() => {
+      if (popupRef?.value) {
+        popupRef.value.show()
+      }
+    })
+  },
+)
+
+// const handleNameClick = async (evt: MouseEvent) => {
+//   console.log('evt: ', evt.detail, evt)
+//   if (evt.detail === 2) {
+//     popupEdit.value = true
+//     nextTick().then(() => {
+//       if (popupRef?.value) {
+//         popupRef.value.show()
+//       }
+//     })
+//   } else {
+//     console.log('goto...')
+//     gotoTab()
+//   }
+// }
 </script>
 
 <!--https://stackoverflow.com/questions/41078478/css-animated-checkmark -->

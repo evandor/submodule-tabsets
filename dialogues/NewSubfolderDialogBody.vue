@@ -27,11 +27,15 @@
 
           <template v-if="inBexMode()">
             <q-checkbox data-testid="newTabsetAutoAdd" v-model="addAllOpenTabs">
-              <slot><span>Add all open tabs</span></slot>
+              <slot
+                ><span>Add all {{ openTabsCount }} open tabs</span></slot
+              >
             </q-checkbox>
             &nbsp;
-            <q-icon name="help" color="primary" size="1em">
-              <q-tooltip>If you select this option, all currently open tabs will be added to the new folder</q-tooltip>
+            <q-icon name="sym_o_help" color="primary" size="1em">
+              <q-tooltip class="tooltip-small"
+                >If you select this option, all currently open tabs will be added to the new folder</q-tooltip
+              >
             </q-icon>
           </template>
         </q-card-section>
@@ -56,7 +60,7 @@ import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset, TabsetStatus } from 'src/tabsets/models/Tabset'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { useTabsStore2 } from 'src/tabsets/stores/tabsStore2'
-import { ref } from 'vue'
+import { ref, watchEffect } from 'vue'
 
 const { dialogRef, onDialogHide, onDialogCancel } = useDialogPluginComponent()
 const { inBexMode } = useUtils()
@@ -71,6 +75,11 @@ const newFolderName = ref(props.name)
 const isValid = ref(false)
 const addAllOpenTabs = ref(false)
 const theForm = ref<QForm>(null as unknown as QForm)
+const openTabsCount = ref(0)
+
+watchEffect(() => {
+  openTabsCount.value = useTabsStore2().browserTabs.length
+})
 
 const checkIsValid = () => {
   if (theForm.value) {

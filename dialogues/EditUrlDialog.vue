@@ -1,76 +1,80 @@
 <template>
   <q-dialog ref="dialogRef" @hide="onDialogHide">
-    <q-card class="q-dialog-plugin">
-      <q-card-section>
-        <div class="text-h6">Edit Tab</div>
-      </q-card-section>
-      <q-card-section>
-        <div class="text-body">
-          <div class="text-body"><b>Tab Name:</b></div>
-          <q-input type="text" dense v-model="newTabName" />
-        </div>
-      </q-card-section>
+    <div>
+      <q-form @submit.prevent="updateTab()" ref="theForm">
+        <q-card class="q-dialog-plugin" style="max-width: 100%">
+          <q-card-section>
+            <div class="text-h6">Edit Tab</div>
+          </q-card-section>
+          <q-card-section>
+            <div class="text-body">
+              <div class="text-body"><b>Tab Name:</b></div>
+              <q-input type="text" dense v-model="newTabName" />
+            </div>
+          </q-card-section>
 
-      <q-card-section>
-        <div class="text-body">
-          <div class="text-body"><b>Tab Description:</b></div>
-          <q-input type="textarea" autogrow dense v-model="newTabDescription" />
-        </div>
-      </q-card-section>
+          <q-card-section>
+            <div class="text-body">
+              <div class="text-body"><b>Tab Description:</b></div>
+              <q-input type="textarea" autogrow dense v-model="newTabDescription" />
+            </div>
+          </q-card-section>
 
-      <q-card-section class="q-pt-none">
-        <div class="text-body"><b>URL:</b></div>
-        <q-input
-          type="url"
-          dense
-          v-model="newTabUrl"
-          autofocus
-          @keydown.enter="updateTab()"
-          error-message="not a valid URL"
-          :error="!newTabUrlIsValid" />
-        <div class="text-body2 text-warning">{{ newTabsetDialogWarning() }}</div>
-      </q-card-section>
+          <q-card-section class="q-pt-none">
+            <div class="text-body"><b>URL:</b></div>
+            <q-input
+              type="url"
+              dense
+              v-model="newTabUrl"
+              autofocus
+              @keydown.enter="updateTab()"
+              error-message="not a valid URL"
+              :error="!newTabUrlIsValid" />
+            <div class="text-body2 text-warning">{{ newTabsetDialogWarning() }}</div>
+          </q-card-section>
 
-      <q-card-section class="q-pt-none" v-if="placeholders.length > 0">
-        <b>Substitutions for</b>
-      </q-card-section>
-      <!--      <q-card-section class="q-pt-none text-caption" v-else>-->
-      <!--        You can use placeholder like this as well: https://dax.de/${wkn}-->
-      <!--      </q-card-section>-->
+          <q-card-section class="q-pt-none" v-if="placeholders.length > 0">
+            <b>Substitutions for</b>
+          </q-card-section>
+          <!--      <q-card-section class="q-pt-none text-caption" v-else>-->
+          <!--        You can use placeholder like this as well: https://dax.de/${wkn}-->
+          <!--      </q-card-section>-->
 
-      <q-card-section class="q-pt-none" v-for="placeholder in placeholders">
-        <div class="text-body">
-          Placeholder <i>{{ placeholder }}</i>
-        </div>
-        <q-input
-          dense
-          :model-value="modelFor(placeholder)"
-          @update:model-value="(val: any) => updatePlaceholder(placeholder, val)" />
-      </q-card-section>
+          <q-card-section class="q-pt-none" v-for="placeholder in placeholders">
+            <div class="text-body">
+              Placeholder <i>{{ placeholder }}</i>
+            </div>
+            <q-input
+              dense
+              :model-value="modelFor(placeholder)"
+              @update:model-value="(val: any) => updatePlaceholder(placeholder, val)" />
+          </q-card-section>
 
-      <template v-if="useFeaturesStore().hasFeature(FeatureIdent.DEV_MODE)">
-        <q-card-section>
-          <q-select
-            label="Treat tab as"
-            filled
-            v-model="extensionOption"
-            :options="extensionOptions"
-            map-options
-            emit-value
-            style="width: 250px" />
-        </q-card-section>
-      </template>
+          <template v-if="useFeaturesStore().hasFeature(FeatureIdent.DEV_MODE)">
+            <q-card-section>
+              <q-select
+                label="Treat tab as"
+                filled
+                v-model="extensionOption"
+                :options="extensionOptions"
+                map-options
+                emit-value
+                style="width: 250px" />
+            </q-card-section>
+          </template>
 
-      <q-card-actions align="right">
-        <DialogButton label="Cancel" />
-        <DialogButton label="Update" @was-clicked="updateTab()" :default-action="true" />
-      </q-card-actions>
-    </q-card>
+          <q-card-actions align="right">
+            <DialogButton label="Cancel" />
+            <DialogButton label="Update" type="submit" @was-clicked="updateTab()" :default-action="true" />
+          </q-card-actions>
+        </q-card>
+      </q-form>
+    </div>
   </q-dialog>
 </template>
 
 <script lang="ts" setup>
-import { useDialogPluginComponent } from 'quasar'
+import { QForm, useDialogPluginComponent } from 'quasar'
 import { FeatureIdent } from 'src/app/models/FeatureIdent'
 import DialogButton from 'src/core/dialog/buttons/DialogButton.vue'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'

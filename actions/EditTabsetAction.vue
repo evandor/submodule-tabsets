@@ -3,10 +3,10 @@
     v-if="props.level === 'root'"
     v-close-popup
     @was-clicked="clicked()"
-    icon="o_tab"
+    icon="o_featured_play_list"
     color="primary"
     :disable="props.tabset.sharing?.sharedId !== undefined"
-    :label="props.tabset.type === TabsetType.SESSION ? 'Edit Session' : 'Edit Tabset'">
+    :label="props.tabset.type === TabsetType.SESSION ? 'Edit Session' : 'Edit Collection'">
     <!--    <q-tooltip class="tooltip-small" v-if="props.tabset.sharing?.sharedId !== undefined">-->
     <!--      Stop sharing first if you want to delete this tabset-->
     <!--    </q-tooltip>-->
