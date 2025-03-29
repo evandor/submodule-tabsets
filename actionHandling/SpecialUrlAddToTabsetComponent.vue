@@ -28,9 +28,8 @@
     <!-- :disable="!handler.actions()[0]!.active(props.currentChromeTab)"-->
     <q-btn-dropdown
       style="border-radius: 5px"
-      :label="handler.defaultAction()!.label"
       :class="{ shakeWithColor: animateAddtabButton, 'cursor-pointer': !alreadyInTabset() }"
-      :color="alreadyInTabset() ? 'grey-5' : tsBadges.length > 0 ? 'positive' : ''"
+      :color="alreadyInTabset() ? 'primary' : tsBadges.length > 0 ? 'positive' : ''"
       data-testid="saveInTabsetBtn"
       v-close-popup
       @click.stop="
@@ -46,6 +45,10 @@
       :dense="handler.defaultAction()!.label.length > 15"
       split
       outline>
+      <template v-slot:label>
+        <span v-if="alreadyInTabset()" style="color: #bfbfbf">{{ handler.defaultAction()!.label }}</span>
+        <span v-else>{{ handler.defaultAction()!.label }}</span>
+      </template>
       <q-list dense style="min-width: 200px">
         <template v-for="l in handler.actions(currentTabsetId)">
           <template v-if="'context' in l">
