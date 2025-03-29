@@ -11,7 +11,7 @@ import NavigationService from 'src/services/NavigationService'
 import { useSpacesStore } from 'src/spaces/stores/spacesStore'
 import { useAuthStore } from 'src/stores/authStore'
 import { useSettingsStore } from 'src/stores/settingsStore'
-import { GithubWriteEventCommand, TabEvent } from 'src/tabsets/commands/github/GithubWriteEventCommand'
+import { GithubWriteEventCommand, TabEvent, TabsetEvent } from 'src/tabsets/commands/github/GithubWriteEventCommand'
 import { SaveOrReplaceResult } from 'src/tabsets/models/SaveOrReplaceResult'
 import { Tab } from 'src/tabsets/models/Tab'
 import { TabInFolder } from 'src/tabsets/models/TabInFolder'
@@ -232,6 +232,11 @@ export function useTabsetService() {
       const nextKey: string | undefined = useTabsetsStore().tabsets.keys().next().value
       console.log('setting next key to', nextKey)
       selectTabset(nextKey)
+
+      useCommandExecutor()
+        .execute(new GithubWriteEventCommand(new TabsetEvent('deleted', tabsetId, undefined, '', [])))
+        .catch((err) => console.warn(err))
+
       return Promise.resolve('ok')
     }
     return Promise.reject('could not get tabset for id')
@@ -520,7 +525,7 @@ export function useTabsetService() {
     return useContentService().deleteContent(tabId)
   }
 
-  const deleteTab = async (tab: Tab, tabset: Tabset): Promise<Tabset> => {
+  const deleteTab = async (tab: Tab, tabset: Tabset, skipSync = false): Promise<Tabset> => {
     console.log('deleting tab', tab) //.id, tab.chromeTabId, tabset.id)
     const tabUrl = tab.url || ''
     if (tabsetsFor(tabUrl).length <= 1) {
@@ -536,9 +541,11 @@ export function useTabsetService() {
     console.log('deletion: saving tabset', tabset)
     const result = saveTabset(tabset, new ChangeInfo('tab', 'deleted', tab.id)).then(() => tabset)
 
-    useCommandExecutor()
-      .execute(new GithubWriteEventCommand(new TabEvent('deleted', tabset.id, tab.id, tab.name || '', 'url: xxx')))
-      .catch((err) => console.warn(err))
+    if (!skipSync) {
+      useCommandExecutor()
+        .execute(new GithubWriteEventCommand(new TabEvent('deleted', tabset.id, tab.id, tab.name || '', 'url: xxx')))
+        .catch((err) => console.warn(err))
+    }
 
     return result
   }
