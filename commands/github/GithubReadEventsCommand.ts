@@ -101,7 +101,7 @@ export class GithubReadEventsCommand extends GithubCommands<string> {
                           }
                         }
                       } else {
-                        console.log('processing line II', line)
+                        // console.log('processing line II', line)
                         const newTabset = new Tabset(tabsetEvent.tabsetId, tabsetEvent.name, [], [], tabsetEvent.spaces)
                         await useTabsetsStore().addTabset(newTabset)
                       }
