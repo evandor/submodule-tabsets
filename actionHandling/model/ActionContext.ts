@@ -10,7 +10,7 @@ export class ActionContext {
 
   public ok?: (payload: any) => ClickedHandler
 
-  public colorFkt?: () => string
+  public colorFkt: () => string = () => ''
 
   $q?: QVueGlobals
 
