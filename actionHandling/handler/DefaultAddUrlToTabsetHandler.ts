@@ -13,6 +13,7 @@ import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset } from 'src/tabsets/models/Tabset'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+import { useAuthStore } from 'stores/authStore'
 import { Component } from 'vue'
 
 export class DefaultAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
@@ -27,7 +28,23 @@ export class DefaultAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   }
 
   defaultAction(): ActionContext {
-    return new ActionContext('Add Tab').onClicked(this.clicked)
+    const limitReached = useAuthStore().limitExceeded('TABS', useTabsetsStore().allTabsCount).exceeded
+    return new ActionContext('Add Tab')
+      .setColor(() => {
+        const tabUrl = useContentStore().getCurrentTabUrl
+        if (tabUrl) {
+          if (limitReached) {
+            return 'negative'
+          }
+          const tabsetsCount = useTabsetService().tabsetsFor(tabUrl).length
+          if (useTabsetService().urlExistsInCurrentTabset(tabUrl)) {
+            return 'primary'
+          }
+          return tabsetsCount > 0 ? 'positive' : ''
+        }
+        return 'black'
+      })
+      .onClicked(this.clicked)
   }
 
   actions(currentTabsetId: string | undefined): Component[] {
