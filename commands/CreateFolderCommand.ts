@@ -68,6 +68,7 @@ export class CreateFolderCommand implements Command<Tabset> {
         Analytics.fireEvent('tabset_subfolder_created', {})
         return Promise.resolve(new ExecutionResult<Tabset>(newFolder, 'Subfolder created'))
       }
+      console.log(`missed subfolder for tabset '${tabset.name}', #${tabset.id}`)
       return Promise.reject('could not find subfolder')
     } catch (err) {
       return Promise.reject(err)

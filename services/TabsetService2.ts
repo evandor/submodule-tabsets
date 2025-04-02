@@ -447,12 +447,13 @@ export function useTabsetService() {
    * @param ts
    * @param tab
    * @param useIndex
+   * @param allowDuplicates
    */
   const addToTabset = async (
     ts: Tabset,
     tab: Tab,
     useIndex: number | undefined = undefined,
-    allowDuplicates = false,
+    allowDuplicates = false, // used eg at Excalidraw Handler
   ): Promise<Tabset> => {
     if (tab.url) {
       const exceedInfo = useAuthStore().limitExceeded('TABS', useTabsetsStore().allTabsCount)

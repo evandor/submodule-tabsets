@@ -52,9 +52,6 @@ export class OpenTabCommand implements Command<string> {
       if (this.tab.httpStatus === 0) {
         this.tab.httpStatus = 200 // ok "for now"
       }
-      // if (useTabsStore2().browserTabs.length > 7 && !useFeaturesStore().hasFeature(FeatureIdent.OPEN_TABS)) {
-      //   useSuggestionsStore().addSuggestion(Suggestion.getStaticSuggestion('TRY_OPENTABS_FEATURE'))
-      // }
       Analytics.fireEvent('tabset_tab_opened', {})
       return Promise.resolve(new ExecutionResult('', 'opened'))
     } catch (err: any) {
