@@ -1,13 +1,12 @@
 <template>
   <!-- left part: icon plus various -->
   <q-item-section
-    v-if="useUiStore().listDetailLevelGreaterEqual('SOME', props.tabset?.details)"
     @mouseover="hoveredTab = tab.id"
     @mouseleave="hoveredTab = undefined"
-    class="q-mr-sm q-mt-sm text-right"
-    style="justify-content: start; width: 30px; max-width: 30px">
-    <div class="bg-grey-3 q-pa-none" :style="iconStyle()">
-      <transition name="fade" mode="out-in">
+    class="q-mr-none q-mt-xs text-left"
+    style="justify-content: start; width: 36px; max-width: 36px; max-height: 24px">
+    <div class="q-pa-none" style="border: 0 solid white; border-radius: 3px">
+      <transition name="fade" mode="out-in" v-once>
         <div v-if="newState" key="newState">
           <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20.8 20.8">
             <circle class="checkmark__circle" cx="10.4" cy="10.4" r="10" fill="none" />
@@ -22,6 +21,7 @@
             width="30px" />
           <TabFaviconWidget
             v-else
+            v-once
             style="margin: auto; display: block"
             @dblclick="togglePreview()"
             :preventDragAndDrop="props.preventDragAndDrop"
@@ -31,50 +31,52 @@
         </div>
       </transition>
     </div>
-    <div
-      v-if="props.tab?.httpInfo === 'UPDATED'"
-      class="q-my-xs q-mx-none q-pa-none text-white bg-positive items-center justify-center"
-      style="border-radius: 3px; max-height: 15px; font-size: 8px; text-align: center">
-      NEW
-      <q-tooltip class="tooltip">This page indicates that its content has changed in the meantime.</q-tooltip>
-    </div>
-    <div
-      v-else-if="(props.tab?.httpStatus >= 300 || props.tab?.httpStatus === 0) && !props.tab?.placeholders"
-      class="q-my-xs q-mx-none q-pa-none text-white items-center justify-center"
-      :class="props.tab?.httpStatus >= 500 ? 'bg-red' : 'bg-warning'"
-      style="border-radius: 3px; max-height: 15px; font-size: 8px; text-align: center">
-      {{ props.tab.httpStatus }}
-      <q-tooltip class="tooltip">Tabsets has problems accessing this site.</q-tooltip>
-    </div>
-    <div v-if="props.tab.reminder || monitor" class="text-center">
-      <q-icon v-if="props.tab.reminder" name="o_alarm" @click="openReminderDialog()" size="14px">
-        <q-tooltip class="tooltip-small"
-          >Reminder set to {{ quasarDate.formatDate(props.tab.reminder, 'DD.MM.YYYY') }}
-          {{ props.tab.reminderComment ? ' - ' : '' }} {{ props.tab.reminderComment }}
-        </q-tooltip>
-      </q-icon>
-      <q-icon
-        v-if="monitor"
-        :name="monitor.changed ? 'o_notifications_active' : 'o_notifications'"
-        :color="monitor.changed ? 'negative' : ''"
-        size="14px">
-        <q-tooltip v-if="monitor.changed" class="tooltip-small"
-          >Tab's content has changed at {{ quasarDate.formatDate(monitor.changed, 'DD.MM.YYYY') }}
-        </q-tooltip>
-        <q-tooltip v-else class="tooltip-small">Tab is being monitored for content changes</q-tooltip>
-      </q-icon>
-    </div>
+    <template v-if="useUiStore().listDetailLevelGreaterEqual('SOME', props.tabset?.details)">
+      <div
+        v-if="props.tab?.httpInfo === 'UPDATED'"
+        class="q-my-xs q-mx-none q-pa-none text-white bg-positive items-center justify-center"
+        style="border-radius: 3px; max-height: 15px; font-size: 8px; text-align: center">
+        NEW
+        <q-tooltip class="tooltip">This page indicates that its content has changed in the meantime.</q-tooltip>
+      </div>
+      <div
+        v-else-if="(props.tab?.httpStatus >= 300 || props.tab?.httpStatus === 0) && !props.tab?.placeholders"
+        class="q-my-xs q-mx-none q-pa-none text-white items-center justify-center"
+        :class="props.tab?.httpStatus >= 500 ? 'bg-red' : 'bg-warning'"
+        style="border-radius: 3px; max-height: 15px; font-size: 8px; text-align: center">
+        {{ props.tab.httpStatus }}
+        <q-tooltip class="tooltip">Tabsets has problems accessing this site.</q-tooltip>
+      </div>
+      <div v-if="props.tab.reminder || monitor" class="text-center">
+        <q-icon v-if="props.tab.reminder" name="o_alarm" @click="openReminderDialog()" size="14px">
+          <q-tooltip class="tooltip-small"
+            >Reminder set to {{ quasarDate.formatDate(props.tab.reminder, 'DD.MM.YYYY') }}
+            {{ props.tab.reminderComment ? ' - ' : '' }} {{ props.tab.reminderComment }}
+          </q-tooltip>
+        </q-icon>
+        <q-icon
+          v-if="monitor"
+          :name="monitor.changed ? 'o_notifications_active' : 'o_notifications'"
+          :color="monitor.changed ? 'negative' : ''"
+          size="14px">
+          <q-tooltip v-if="monitor.changed" class="tooltip-small"
+            >Tab's content has changed at {{ quasarDate.formatDate(monitor.changed, 'DD.MM.YYYY') }}
+          </q-tooltip>
+          <q-tooltip v-else class="tooltip-small">Tab is being monitored for content changes</q-tooltip>
+        </q-icon>
+      </div>
+    </template>
   </q-item-section>
 
   <!-- middle part: name, title, description, url && note -->
   <q-item-section
-    class="q-mb-sm q-mt-sm q-mx-none q-pa-none"
+    class="q-mb-xs q-mt-xs q-mx-none q-pa-none"
     @mouseover="hoveredTab = tab.id"
     @mouseleave="hoveredTab = undefined">
     <!-- === name or title === -->
     <q-item-label @click.stop="gotoTab()">
       <div class="row">
-        <div class="col-11 q-pr-lg cursor-pointer ellipsis">
+        <div class="col-11 q-pr-none q-mr-none cursor-pointer ellipsis fit">
           <span v-if="props.header" class="text-caption">{{ props.header }}<br /></span>
           <!--          <span v-if="useTabsStore().getCurrentTabset?.sorting === 'alphabeticalTitle'">-->
           <span v-if="props.sorting === TabSorting.TITLE">
@@ -142,7 +144,8 @@
     </div>
 
     <!-- === open search === -->
-    <q-item-label v-if="showOpenSearchInput()">
+    <q-item-label
+      v-if="showOpenSearchInput() && useUiStore().listDetailLevelGreaterEqual('SOME', props.tabset?.details)">
       <div class="row q-ma-none q-pa-none q-my-xs">
         <div class="col-5 text-body2" style="font-size: smaller">
           <em>Direct Search:</em>
@@ -200,7 +203,7 @@
     <!-- === url(s) === -->
     <q-item-label
       style="width: 100%"
-      v-if="props.tab?.url"
+      v-if="props.tab?.url && useUiStore().listDetailLevelGreaterEqual('SOME', props.tabset?.details)"
       caption
       class="ellipsis-2-lines text-accent q-pt-xs"
       @mouseover="showButtonsProp = true"
@@ -253,7 +256,7 @@
     <!-- === group, last active & icons === -->
     <q-item-label
       style="width: 100%; margin-top: 0"
-      v-if="props.tab?.url"
+      v-if="props.tab?.url && useUiStore().listDetailLevelGreaterEqual('SOME', props.tabset?.details)"
       caption
       class="ellipsis-2-lines text-accent"
       @mouseover="showButtonsProp = true"
@@ -381,7 +384,10 @@
     </q-item-label>
 
     <!-- === snippets === -->
-    <q-item-label class="text-grey-10" text-subtitle1>
+    <q-item-label
+      v-if="useUiStore().listDetailLevelGreaterEqual('SOME', props.tabset?.details)"
+      class="text-grey-10"
+      text-subtitle1>
       <div
         v-if="TabService.isCurrentTab(props.tab)"
         v-for="s in props.tab.snippets"
@@ -408,11 +414,11 @@
   <!-- right part -->
   <slot name="actionPart">
     <q-item-section
-      class="q-ma-none q-pa-none"
+      class="q-ma-none q-pa-none text-right"
       @mouseover="hoveredTab = tab.id"
       @mouseleave="hoveredTab = undefined"
       :style="TabService.isCurrentTab(props.tab) ? 'border-right:3px solid #1565C0;border-radius:3px' : ''"
-      style="justify-content: start; width: 42px; max-width: 42px">
+      style="justify-content: start; width: 30px; max-width: 30px">
       <span v-if="props.tabset && props.tabset.type !== TabsetType.SESSION">
         <!--        <q-icon name="more_vert" class="cursor-pointer q-mt-sm" color="black" size="20px" />-->
         <q-btn
@@ -420,7 +426,7 @@
           flat
           outline
           text-color="primary"
-          class="cursor-pointer q-mt-sm q-mr-md"
+          class="cursor-pointer q-mt-none q-mr-none"
           icon="more_vert"
           size="sm" />
         <PanelTabListContextMenu
@@ -430,7 +436,10 @@
           :tab="tab" />
       </span>
       <span v-else @click="removeSessionTab(tab)"> x </span>
-      <span v-if="tab.readingTime > 0" class="text-grey-5 q-mt-sm" style="font-size: x-small">
+      <span
+        v-if="tab.readingTime > 0 && useUiStore().listDetailLevelGreaterEqual('SOME', props.tabset?.details)"
+        class="text-grey-5 q-mt-sm"
+        style="font-size: x-small">
         {{ formatReadingTime(tab.readingTime) }}
         <q-tooltip class="tooltip-small">cumulated reading time</q-tooltip>
       </span>
@@ -626,14 +635,6 @@ const nameOrTitle = (tab: Tab) => (tab.name ? tab.name : tab.title)
 const formatDate = (timestamp: number | undefined) =>
   timestamp ? formatDistance(timestamp, new Date(), { addSuffix: true }) : ''
 
-const iconStyle = () => {
-  if (TabService.isCurrentTab(props.tab)) {
-    return 'border:1px solid #bfbfbf;border-radius:3px'
-  } else {
-    return 'border:0px solid white;border-radius:3px'
-  }
-}
-
 const openTabset = (badge: any) => {
   console.log('clicked badge', badge)
   useTabsetService().selectTabset(badge.tabsetId)
@@ -708,12 +709,16 @@ const switchGroup = (group: chrome.tabGroups.TabGroup): void => {
 
 const gotoTab = () => {
   if (props.tabset && props.tabset.monitoredTabs) {
+    let found = false
     props.tabset.monitoredTabs.forEach((mt: MonitoredTab) => {
       if (mt.tabId === props.tab.id) {
         delete mt.changed
+        found = true
       }
     })
-    useTabsetService().saveTabset(props.tabset)
+    if (found) {
+      useTabsetService().saveTabset(props.tabset)
+    }
   }
   useCommandExecutor().executeFromUi(new OpenTabCommand(props.tab))
 }
@@ -904,6 +909,10 @@ const handleNameClick = useDblClickHandler(
 
 .body--light .lightColors {
   color: $grey-9;
+}
+
+.q-item__section--main {
+  margin-left: 2px;
 }
 
 .checkmark__circle {

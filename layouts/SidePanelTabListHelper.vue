@@ -4,7 +4,7 @@
   <q-item
     clickable
     v-ripple
-    class="q-mt-xs q-mx-xs q-mb-none q-pr-none q-pl-sm q-pb-none q-pt-none darkColors lightColors"
+    class="q-mt-xs q-mx-xs q-mb-none q-pr-none q-pl-none q-pb-none q-pt-none darkColors lightColors"
     :style="itemStyle()"
     @dragstart="startDrag($event, tab)"
     :key="'paneltablist_' + tab.id">
@@ -71,5 +71,9 @@ const itemStyle = () => {
 .body--light .lightColors {
   background-color: $grey-2;
   border: 1px solid $grey-3;
+}
+
+.q-item {
+  min-height: 30px;
 }
 </style>

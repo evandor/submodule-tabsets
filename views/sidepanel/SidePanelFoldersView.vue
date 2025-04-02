@@ -23,7 +23,7 @@
   <q-list>
     <q-item
       v-if="props.tabset"
-      v-for="folder in calcFolders(props.tabset)"
+      v-for="folder in folders"
       clickable
       v-ripple
       class="q-ma-none q-pa-sm"
@@ -70,7 +70,7 @@
 
 <script lang="ts" setup>
 import { Tabset, TabsetType } from 'src/tabsets/models/Tabset'
-import { ref, watchEffect } from 'vue'
+import { onMounted, ref, watchEffect } from 'vue'
 import '@he-tree/vue/style/default.css'
 import '@he-tree/vue/style/material-design.css'
 import { QVueGlobals } from 'quasar'
@@ -84,10 +84,22 @@ import Highlight from 'src/tabsets/widgets/Highlight.vue'
 import { useUiStore } from 'src/ui/stores/uiStore'
 import { useWindowsStore } from 'src/windows/stores/windowsStore'
 
-const props = defineProps<{ tabset: Tabset; filter: string }>()
+type Props = {
+  tabset: Tabset
+  filter?: string
+}
+
+const props = defineProps<Props>()
+
+const emits = defineEmits(['folders-found', 'folder-selected'])
 
 const currentChromeTab = ref<chrome.tabs.Tab | undefined>(undefined)
 const hoveredTabset = ref<string | undefined>(undefined)
+const folders = ref<Tabset[]>([])
+
+onMounted(() => {
+  folders.value = calcFolders(props.tabset)
+})
 
 watchEffect(() => {
   const windowId = useWindowsStore().currentBrowserWindow?.id || 0
@@ -107,6 +119,13 @@ const calcFolders = (tabset: Tabset): Tabset[] => {
     (f: Tabset) => !props.filter || f.name.toLowerCase().indexOf(props.filter.toLowerCase()) >= 0,
   )
 }
+
+watchEffect(() => {
+  if (props.filter || props.tabset.folderActive) {
+    folders.value = calcFolders(props.tabset)
+    emits('folders-found', folders.value.length)
+  }
+})
 
 const startDrag = (evt: any, folder: Tabset) => {
   console.log('start dragging', evt, folder)
@@ -154,9 +173,9 @@ const dropAtBreadcrumb = (evt: any, f?: any) => {
 const selectFolder = (tabset: Tabset, folder?: Tabset) => {
   console.log(`selecting folder '${folder?.id}' (${folder?.name}) in tabset ${tabset.id} (${tabset.name})`)
   tabset.folderActive = folder ? (tabset.id === folder.id ? undefined : folder.id) : undefined
-
   useTabsetService().saveTabset(tabset)
   useTabsetService().handleHeadRequests(tabset, folder?.id)
+  emits('folder-selected')
 }
 
 const folderCaption = (folder: Tabset): string => {

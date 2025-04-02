@@ -1,13 +1,13 @@
 <template>
-  <q-icon v-if="UrlExtension.IMAGE === tab?.extension" :size="props.width" name="image" />
-  <!--  <q-icon v-else-if="UrlExtension.RSS === tab?.extension"-->
-  <!--          size="22px"-->
-  <!--          name="rss_feed"/>-->
-  <q-icon v-else-if="UrlExtension.PDF === tab?.extension" size="22px" name="pdf" />
-  <q-icon v-else-if="UrlExtension.NOTE === tab?.extension" size="22px" name="o_note" />
+  <!--  <q-icon v-if="UrlExtension.IMAGE === tab?.extension" :size="props.width" name="image" />-->
+  <!--  <q-icon v-else-if="UrlExtension.PDF === tab?.extension" size="22px" name="pdf" />-->
+  <!--  <q-icon v-else-if="UrlExtension.NOTE === tab?.extension" size="22px" name="o_note" />-->
   <q-img
-    v-else
+    v-once
     class="rounded-borders"
+    no-spinner
+    no-transition
+    :draggable="!props.preventDragAndDrop"
     :style="props.preventDragAndDrop ? '' : 'cursor: move'"
     :width="props.width"
     :height="props.height"

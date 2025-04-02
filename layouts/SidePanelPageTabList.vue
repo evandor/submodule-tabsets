@@ -13,7 +13,9 @@
           :group="{ name: 'tabs', pull: 'clone' }"
           @change="(event: any) => handleDragAndDrop(event, column)">
           <SidePanelTabListHelper
-            v-for="tab in tabs"
+            v-for="(tab, index) in tabs"
+            :key="index"
+            v-once
             :tab="tab.tab as Tab"
             :index="tab.index"
             :type="props.type"
@@ -29,14 +31,17 @@
           all your collections.
         </div>
         <div v-else-if="props.tabset?.folders.length === 0" class="q-ma-md text-caption text-center">
-          Empty Collection
+          Empty Tabset<br />
+          check the action menu<br />
         </div>
       </template>
 
       <!-- no drag & drop on mobile -->
       <template v-else>
         <SidePanelTabListHelper
-          v-for="tab in tabs"
+          v-for="(tab, index) in tabs"
+          :key="index"
+          v-once
           :tab="tab.tab as Tab"
           :index="0"
           :type="props.type"
@@ -79,20 +84,23 @@ const props = defineProps({
   filter: { type: String, required: false },
 })
 
+const emits = defineEmits(['tabs-found'])
+
 const tabs = ref<IndexedTab[]>([])
 
 watch(
   () => props.filter,
   (a: string | undefined, b: string | undefined) => {
     tabs.value = tabsForColumn()
+    emits('tabs-found', tabs.value.length)
   },
 )
 
 watch(
   () => props.tabset?.tabs || [],
   (a: Tab[], b: Tab[]) => {
-    console.log('--------', a)
     tabs.value = tabsForColumn()
+    emits('tabs-found', tabs.value.length)
   },
 )
 

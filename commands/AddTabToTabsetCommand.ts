@@ -36,8 +36,8 @@ export class AddTabToTabsetCommand implements Command<any> {
     public tab: Tab,
     public tabset: Tabset | undefined = undefined,
     public activeFolder: string | undefined = undefined,
-    public allowDuplicates: boolean = false,
-    public ignoreDuplicates: boolean = false,
+    public allowDuplicates: boolean = false, // used eg at Excalidraw Handler
+    public ignoreDuplicates: boolean = false, // used eg. at RssFolderHandler
   ) {
     if (!tabset) {
       this.tabset = useTabsetsStore().getCurrentTabset

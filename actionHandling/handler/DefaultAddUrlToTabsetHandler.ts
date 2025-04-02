@@ -42,7 +42,7 @@ export class DefaultAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
           }
           return tabsetsCount > 0 ? 'positive' : ''
         }
-        return 'black'
+        return ''
       })
       .onClicked(this.clicked)
   }

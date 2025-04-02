@@ -1,5 +1,6 @@
 import { DialogChainObject, QVueGlobals, uid } from 'quasar'
 import { TabReference, TabReferenceType } from 'src/content/models/TabReference'
+import { useContentStore } from 'src/content/stores/contentStore'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import { RestParam, RestTab } from 'src/rest/models/RestTab'
@@ -9,11 +10,13 @@ import {
   AddUrlToTabsetHandlerAdditionalData,
   ClickedHandler,
 } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
+import { DefaultActions } from 'src/tabsets/actionHandling/handler/DefaultActions'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
 import { AddTabToTabsetCommand } from 'src/tabsets/commands/AddTabToTabsetCommand'
 import { CreateFolderCommand } from 'src/tabsets/commands/CreateFolderCommand'
 import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset } from 'src/tabsets/models/Tabset'
+import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { useTabsStore2 } from 'src/tabsets/stores/tabsStore2'
 import { Component } from 'vue'
@@ -35,9 +38,25 @@ export class RapidApiAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
       .onOk(this.onOk)
   }
 
-  actions(): Component[] {
-    // new ActionContext('Add Rapid API', ButtonActions.Save)
-    return []
+  actions(currentTabsetId: string | undefined): Component[] {
+    const url = useContentStore().getCurrentTabUrl
+    const currentTabset = useTabsetsStore().getCurrentTabset
+
+    const actions = DefaultActions.getDefaultActions(currentTabset)
+
+    if (url) {
+      // TODO folders?
+      const tabsetIds = useTabsetService()
+        .tabsetsFor(url)
+        .filter((tsId: string) => tsId !== currentTabsetId)
+
+      if (tabsetIds.length > 0) {
+        tabsetIds.forEach((tabsetId: string) => {
+          //actions.push(new ActionContext('Open', undefined, undefined, { tabsetId }).onClicked(this.clicked))
+        })
+      }
+    }
+    return actions
   }
 
   async clicked(
