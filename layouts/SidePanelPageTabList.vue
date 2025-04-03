@@ -32,7 +32,8 @@
         </div>
         <div v-else-if="props.tabset?.folders.length === 0" class="q-ma-md text-caption text-center">
           Empty Tabset<br />
-          check the action menu<br />
+          check the <span class="cursor-pointer" @click="useUiStore().startButtonAnimation('addtab')">action menu</span
+          ><br />
         </div>
       </template>
 
@@ -69,6 +70,7 @@ import { Tabset, TabsetType } from 'src/tabsets/models/Tabset'
 import { TabsetColumn } from 'src/tabsets/models/TabsetColumn'
 import TabsetService from 'src/tabsets/services/TabsetService'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
+import { useUiStore } from 'src/ui/stores/uiStore'
 import { PropType, ref, watch } from 'vue'
 import { VueDraggableNext } from 'vue-draggable-next'
 
