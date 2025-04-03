@@ -2,6 +2,7 @@ import { QVueGlobals, uid } from 'quasar'
 import { useContentStore } from 'src/content/stores/contentStore'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
+import { useAuthStore } from 'src/stores/authStore'
 import {
   AddUrlToTabsetHandler,
   AddUrlToTabsetHandlerAdditionalData,
@@ -13,7 +14,6 @@ import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset } from 'src/tabsets/models/Tabset'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
-import { useAuthStore } from 'stores/authStore'
 import { Component } from 'vue'
 
 export class DefaultAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
