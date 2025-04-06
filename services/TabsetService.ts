@@ -27,7 +27,7 @@ class TabsetService {
       const event = new TabsetEvent('added', ts.id, parentId, ts.name, ts.spaces)
       lines.push(event.format())
       for (const tab of ts.tabs) {
-        const event = new TabEvent('added', ts.id, tab.id, tab.title || tab.name || '???', tab.url)
+        const event = new TabEvent('added', ts.id, tab.id, tab.title || tab.name || '???', tab.url, tab.favIconUrl)
         lines.push(event.format())
       }
       const notes = await useNotesStore().getNotesFor(ts.id)

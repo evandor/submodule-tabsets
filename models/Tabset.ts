@@ -131,6 +131,8 @@ export class Tabset {
 
   monitoredTabs: MonitoredTab[] = []
 
+  newTabSource: boolean = false // used as source for newtab extension (to display URLs in browsers newtab view)
+
   constructor(id: string, name: string, tabs: Tab[] = [], columns: TabsetColumn[] = [], spaces: string[] = []) {
     // some guards
     if (!Tabset.newTabsetNameIsValid(name)) {

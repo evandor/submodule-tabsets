@@ -1,5 +1,5 @@
 import { LocalStorage } from 'quasar'
-import { GITHUB_AUTO_SYNC } from 'src/boot/constants'
+import { GITHUB_AUTO_SYNC, GITHUB_AUTO_SYNC_READONLY } from 'src/boot/constants'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { NotesPage } from 'src/notes/models/NotesPage'
 import { GithubCommands } from 'src/tabsets/commands/github/GithubCommands'
@@ -44,13 +44,14 @@ export class TabEvent {
     public tabId: string | undefined,
     public name: string,
     public url: string | undefined,
+    public favIconUrl: string | undefined,
   ) {
     this.timestamp = new Date().getTime()
     this.name = this.name.trim()
     this.clazz = 'tab'
   }
   format() {
-    return `${this.timestamp}|${this.clazz}|${this.event}|${this.tabsetId}|${this.tabId}|${this.name.replaceAll('|', '').replace(/\s/g, ' ').trim()}|${this.url}\n`
+    return `${this.timestamp}|${this.clazz}|${this.event}|${this.tabsetId}|${this.tabId}|${this.name.replaceAll('|', '').replace(/\s/g, ' ').trim()}|${this.url}|${this.favIconUrl}\n`
   }
 }
 
@@ -103,7 +104,7 @@ export class GithubWriteEventCommand extends GithubCommands<string> {
     const githubPath = 'events'
     const useData = this.event.format()
     console.log('useData', useData, this.event)
-    if (!LocalStorage.getItem(GITHUB_AUTO_SYNC)) {
+    if (!LocalStorage.getItem(GITHUB_AUTO_SYNC) || LocalStorage.getItem(GITHUB_AUTO_SYNC_READONLY)) {
       return Promise.resolve(new ExecutionResult('done', 'not active'))
     }
     try {

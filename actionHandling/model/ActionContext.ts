@@ -11,6 +11,10 @@ export class ActionContext {
   public ok?: (payload: any) => ClickedHandler
 
   public colorFkt: () => string = () => ''
+  public styleFkt: (t: chrome.tabs.Tab, folder: Tabset | undefined) => string = (
+    t: chrome.tabs.Tab,
+    folder: Tabset | undefined,
+  ) => ''
 
   $q?: QVueGlobals
 
@@ -47,6 +51,11 @@ export class ActionContext {
 
   setColor(fkt: () => string) {
     this.colorFkt = fkt
+    return this
+  }
+
+  setStyle(fkt: (tab: chrome.tabs.Tab, folder: Tabset | undefined) => string) {
+    this.styleFkt = fkt
     return this
   }
 }
