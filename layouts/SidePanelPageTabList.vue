@@ -3,9 +3,7 @@
   <div style="width: 100%; max-width: 100%">
     <q-list class="q-ma-none">
       <!-- supporting drag & drop when not on mobile -->
-      <template v-if="!props.preventDragAndDrop" v-for="column in getColumns()">
-        <!-- there's only one (default) column now -->
-
+      <template v-for="column in getColumns()">
         <vue-draggable-next
           v-if="tabs.length > 0"
           class="q-ma-none"
@@ -36,27 +34,10 @@
           ><br />
         </div>
       </template>
-
-      <!-- no drag & drop on mobile -->
-      <template v-else>
-        <SidePanelTabListHelper
-          v-for="(tab, index) in tabs"
-          :key="index"
-          v-once
-          :tab="tab.tab as Tab"
-          :index="0"
-          :type="props.type"
-          :sorting="props.tabset?.type === TabsetType.RSS_FOLDER ? TabSorting.TITLE : props.sorting"
-          :preventDragAndDrop="true"
-          :tabset="props.tabset!"
-          :show-tabsets="props.showTabsets"
-          :hide-menu="props.hideMenu"
-          :filter="props.filter || ''" />
-      </template>
     </q-list>
 
     <audio id="myAudio">
-      <source src="mp3/click.mp3" type="audio/mp3" />
+      <source src="/mp3/click.mp3" type="audio/mp3" />
     </audio>
   </div>
 </template>
@@ -79,7 +60,6 @@ const props = defineProps({
   sorting: { type: String as PropType<TabSorting>, default: TabSorting.CUSTOM },
   type: { type: String, default: 'sidepanel' },
   showTabsets: { type: Boolean, default: false },
-  preventDragAndDrop: { type: Boolean, default: false },
   tabset: { type: Object as PropType<Tabset>, required: false },
   tabsCount: { type: Number, default: -1 },
   activeFolder: { type: String, required: false },
