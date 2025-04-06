@@ -8,9 +8,12 @@
 import { useQuasar } from 'quasar'
 import { useContentStore } from 'src/content/stores/contentStore'
 import ContextMenuItem from 'src/core/components/helper/ContextMenuItem.vue'
+import { ActionProps } from 'src/tabsets/actions/models/ActionProps'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 
 const $q = useQuasar()
+
+defineProps<ActionProps>()
 
 const clicked = () => {
   const tabsets: { label: string; tabsetId: string }[] = tabsetsForUrl()

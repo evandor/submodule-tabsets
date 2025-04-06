@@ -46,8 +46,7 @@
       split
       outline>
       <template v-slot:label>
-        <span v-if="alreadyInTabset" style="color: #bfbfbf">{{ defaultAction!.label }}</span>
-        <span v-else>{{ defaultAction!.label }}</span>
+        <span :style="defaultAction!.styleFkt(props.currentChromeTab, props.folder)">{{ defaultAction!.label }}</span>
       </template>
       <q-list dense style="min-width: 200px">
         <template v-for="l in handler.actions(currentTabsetId)">

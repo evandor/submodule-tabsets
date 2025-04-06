@@ -118,7 +118,14 @@ export class GithubReadEventsCommand extends GithubCommands<string> {
                 break
               case 'tab':
                 if (parts[3] && parts[6]) {
-                  const tabsetEvent = new TabEvent(parts[2] as TabsetEventType, parts[3], parts[4], parts[5]!, parts[6])
+                  const tabsetEvent = new TabEvent(
+                    parts[2] as TabsetEventType,
+                    parts[3],
+                    parts[4],
+                    parts[5]!,
+                    parts[6],
+                    parts[7],
+                  )
                   const ts = useTabsetsStore().getTabset(tabsetEvent.tabsetId)
                   if (!ts) {
                     console.log('could not find tabset for id', tabsetEvent.tabsetId)
@@ -128,7 +135,7 @@ export class GithubReadEventsCommand extends GithubCommands<string> {
                     case 'added':
                       const newTab = new Tab(
                         tabsetEvent.tabId!,
-                        BrowserApi.createChromeTabObject(tabsetEvent.name, tabsetEvent.url!),
+                        BrowserApi.createChromeTabObject(tabsetEvent.name, tabsetEvent.url!, tabsetEvent.favIconUrl),
                       )
                       ts.tabs.push(newTab)
                       await useTabsetsStore().saveTabset(ts)

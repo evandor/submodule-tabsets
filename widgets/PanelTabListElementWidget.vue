@@ -4,8 +4,8 @@
     @mouseover="hoveredTab = tab.id"
     @mouseleave="hoveredTab = undefined"
     class="q-mr-none q-mt-xs text-left"
-    style="justify-content: start; width: 36px; max-width: 36px; max-height: 24px">
-    <div class="q-pa-none" style="border: 0 solid white; border-radius: 3px">
+    style="justify-content: start; width: 36px; max-width: 36px">
+    <div class="q-pa-none column" style="border: 0 solid white; border-radius: 3px">
       <transition name="fade" mode="out-in" v-once>
         <div v-if="newState" key="newState">
           <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20.8 20.8">
@@ -41,7 +41,7 @@
       </div>
       <div
         v-else-if="(props.tab?.httpStatus >= 300 || props.tab?.httpStatus === 0) && !props.tab?.placeholders"
-        class="q-my-xs q-mx-none q-pa-none text-white items-center justify-center"
+        class="q-my-xs q-mx-sm q-pa-none text-white items-center justify-center column"
         :class="props.tab?.httpStatus >= 500 ? 'bg-red' : 'bg-warning'"
         style="border-radius: 3px; max-height: 15px; font-size: 8px; text-align: center">
         {{ props.tab.httpStatus }}
@@ -92,6 +92,32 @@
               class="q-ma-mone">
               <q-tooltip class="tooltip_small">This tab is marked as favorite</q-tooltip>
             </q-icon>
+            <!-- small icons in minimal view -->
+            <template v-if="useUiStore().listDetailLevelEquals('MINIMAL', props.tabset?.details)">
+              <span v-if="(props.tab as Tab).comments && (props.tab as Tab).comments.length > 0">
+                <q-icon
+                  name="o_chat"
+                  size="12px"
+                  color="warning"
+                  style="position: relative; top: -4px"
+                  class="q-mr-xs"
+                  @click.stop="toggleShowWith('comments')">
+                  <q-tooltip class="tooltip-small">There are comments for this tab</q-tooltip>
+                </q-icon>
+              </span>
+              <!--              <span v-if="showRssReferencesInfo()">-->
+              <!--                <q-icon-->
+              <!--                  name="rss_feed"-->
+              <!--                  size="12px"-->
+              <!--                  color="primary"-->
+              <!--                  style="position: relative; top: -5px"-->
+              <!--                  class="q-mr-xs"-->
+              <!--                  @click.stop="toggleShowWith('comments')">-->
+              <!--                  <q-tooltip class="tooltip-small">There are comments for this tab</q-tooltip>-->
+              <!--                </q-icon>-->
+              <!--              </span>-->
+            </template>
+
             <Highlight :filter="props.filter" :text="nameOrTitle(props.tab as Tab) || ''">
               <template v-slot:popup>
                 <q-popup-edit
@@ -117,7 +143,7 @@
     </q-item-label>
 
     <!-- === description === -->
-    <template v-if="useUiStore().listDetailLevelGreaterEqual('SOME', props.tabset?.details)">
+    <template v-if="showWithMinDetails('SOME')">
       <template v-if="props.tab?.extension !== UrlExtension.NOTE">
         <q-item-label
           class="ellipsis-2-lines text-body2 darkColors lightColors"
@@ -144,8 +170,7 @@
     </div>
 
     <!-- === open search === -->
-    <q-item-label
-      v-if="showOpenSearchInput() && useUiStore().listDetailLevelGreaterEqual('SOME', props.tabset?.details)">
+    <q-item-label v-if="showOpenSearchInput() && showWithMinDetails('SOME')">
       <div class="row q-ma-none q-pa-none q-my-xs">
         <div class="col-5 text-body2" style="font-size: smaller">
           <em>Direct Search:</em>
@@ -186,10 +211,7 @@
           <div class="col-1 text-body2" style="font-size: smaller">
             <q-icon name="rss_feed" class="q-ma-none q-pa-none" color="warning" size="xs" />
           </div>
-          <div
-            class="col-7 ellipsis"
-            style="font-size: smaller"
-            @click="useNavigationService().browserTabFor(ref.href!)">
+          <div class="col-7 ellipsis" style="font-size: smaller" @click="openRssLink(ref)">
             {{ ref.title }}
           </div>
           <div class="col text-right">
@@ -203,7 +225,7 @@
     <!-- === url(s) === -->
     <q-item-label
       style="width: 100%"
-      v-if="props.tab?.url && useUiStore().listDetailLevelGreaterEqual('SOME', props.tabset?.details)"
+      v-if="props.tab?.url && showWithMinDetails('SOME')"
       caption
       class="ellipsis-2-lines text-accent q-pt-xs"
       @mouseover="showButtonsProp = true"
@@ -256,7 +278,7 @@
     <!-- === group, last active & icons === -->
     <q-item-label
       style="width: 100%; margin-top: 0"
-      v-if="props.tab?.url && useUiStore().listDetailLevelGreaterEqual('SOME', props.tabset?.details)"
+      v-if="props.tab?.url && showWithMinDetails('SOME')"
       caption
       class="ellipsis-2-lines text-accent"
       @mouseover="showButtonsProp = true"
@@ -350,11 +372,7 @@
 
             <span>
               <TabListIconIndicatorsHook :tabId="props.tab.id" :tabUrl="props.tab.url" />
-              <span
-                v-if="
-                  props.tab.extension !== UrlExtension.RSS &&
-                  useUiStore().listDetailLevelGreaterEqual('MAXIMAL', props.tabset?.details)
-                "
+              <span v-if="props.tab.extension !== UrlExtension.RSS && showWithMinDetails('MAXIMAL')"
                 >last active: {{ formatDate(props.tab.lastActive) }}</span
               >
               <span v-else-if="props.tab.extension === UrlExtension.RSS"
@@ -384,10 +402,7 @@
     </q-item-label>
 
     <!-- === snippets === -->
-    <q-item-label
-      v-if="useUiStore().listDetailLevelGreaterEqual('SOME', props.tabset?.details)"
-      class="text-grey-10"
-      text-subtitle1>
+    <q-item-label v-if="showWithMinDetails('SOME')" class="text-grey-10" text-subtitle1>
       <div
         v-if="TabService.isCurrentTab(props.tab)"
         v-for="s in props.tab.snippets"
@@ -437,7 +452,7 @@
       </span>
       <span v-else @click="removeSessionTab(tab)"> x </span>
       <span
-        v-if="tab.readingTime > 0 && useUiStore().listDetailLevelGreaterEqual('SOME', props.tabset?.details)"
+        v-if="tab.readingTime > 0 && showWithMinDetails('SOME')"
         class="text-grey-5 q-mt-sm"
         style="font-size: x-small">
         {{ formatReadingTime(tab.readingTime) }}
@@ -486,7 +501,7 @@ import Highlight from 'src/tabsets/widgets/Highlight.vue'
 import PanelTabListContextMenu from 'src/tabsets/widgets/PanelTabListContextMenu.vue'
 import TabFaviconWidget from 'src/tabsets/widgets/TabFaviconWidget.vue'
 import { useThumbnailsService } from 'src/thumbnails/services/ThumbnailsService'
-import { useUiStore } from 'src/ui/stores/uiStore'
+import { ListDetailLevel, useUiStore } from 'src/ui/stores/uiStore'
 import { nextTick, onMounted, PropType, ref, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -527,6 +542,7 @@ const newCommentIds = ref<string[]>([])
 const monitor = ref<MonitoredTab | undefined>(undefined)
 const popupEdit = ref(false)
 const popupRef = ref<any>(undefined)
+const doShowDetails = ref(false)
 
 onMounted(() => {
   if (new Date().getTime() - props.tab.created < 500) {
@@ -603,7 +619,6 @@ watchEffect(() => {
     if (t.placeholders && t.placeholders.type === PlaceholdersType.URL_SUBSTITUTION) {
       const subs = t.placeholders.config
       Object.entries(subs).forEach((e) => {
-        console.log('got e', e)
         const name = e[0]
         const val = e[1]
         val.split(',').forEach((v: string) => {
@@ -733,7 +748,7 @@ const openImage = () =>
 
 const showComments = () =>
   showCommentList.value &&
-  useUiStore().listDetailLevelGreaterEqual('SOME', props.tabset?.details) &&
+  showWithMinDetails('SOME') &&
   (props.tab as Tab).comments &&
   (props.tab as Tab).comments.length > 0
 
@@ -810,7 +825,17 @@ const openSearch = () => {
   }
 }
 
-const openRssLink = (rss: TabReference) => useNavigationService().browserTabFor(rss.href!)
+const openRssLink = (rss: TabReference) => {
+  let useUrl = rss.href!
+  if (useUrl.startsWith('/')) {
+    try {
+      const url = new URL(props.tab.url!)
+      useUrl = url.protocol + '//' + url.hostname + rss.href!
+    } catch (err) {}
+  }
+  //console.log('useUrl', useUrl)
+  useNavigationService().browserTabFor(useUrl)
+}
 
 const ignore = (rss: TabReference) => {
   const tabReference = props.tab!.tabReferences.find((tr: TabReference) => tr.id === rss.id)
@@ -885,20 +910,15 @@ const handleNameClick = useDblClickHandler(
   },
 )
 
-// const handleNameClick = async (evt: MouseEvent) => {
-//   console.log('evt: ', evt.detail, evt)
-//   if (evt.detail === 2) {
-//     popupEdit.value = true
-//     nextTick().then(() => {
-//       if (popupRef?.value) {
-//         popupRef.value.show()
-//       }
-//     })
-//   } else {
-//     console.log('goto...')
-//     gotoTab()
-//   }
-// }
+const showWithMinDetails = (level: ListDetailLevel) =>
+  doShowDetails.value || useUiStore().listDetailLevelGreaterEqual(level, props.tabset?.details)
+
+const toggleShowWith = (ident: string | undefined) => {
+  doShowDetails.value = !doShowDetails.value
+  if (ident) {
+    toggleLists(ident)
+  }
+}
 </script>
 
 <!--https://stackoverflow.com/questions/41078478/css-animated-checkmark -->

@@ -442,10 +442,10 @@ export function useTabsetService() {
   /**
    * adds the (new) Tab 'tab' to the tabset given in 'ts' (- but does not persist to db).
    *
-   * proceeds only if tab.url exists and the tab is not already contained in the tabset.
+   * proceeds only if tab.url exists and the tab is not already contained in the tabset (if allowDuplicates is false)
    *
-   * @param ts
-   * @param tab
+   * @param ts The Tabset to add to
+   * @param tab the tab being added
    * @param useIndex
    * @param allowDuplicates
    */
@@ -455,49 +455,19 @@ export function useTabsetService() {
     useIndex: number | undefined = undefined,
     allowDuplicates = false, // used eg at Excalidraw Handler
   ): Promise<Tabset> => {
-    if (tab.url) {
-      const exceedInfo = useAuthStore().limitExceeded('TABS', useTabsetsStore().allTabsCount)
-      if (exceedInfo.exceeded) {
-        await NavigationService.openOrCreateTab([
-          chrome.runtime.getURL(
-            `/www/index.html#/mainpanel/settings?tab=account&exceeded=tabs&limit=${exceedInfo.limit}`,
-          ),
-        ])
-        return Promise.reject('Tabs Limit was Exceeded')
-      }
-
-      if (!allowDuplicates) {
-        const indexInTabset = _.findIndex(ts.tabs, (t: any) => t.url === tab.url)
-        if (indexInTabset >= 0 && !tab.image) {
-          return Promise.reject('tab exists already')
-        }
-      }
-
-      // add tabset's name to tab's tags
-      Tab.addTags(tab, [ts.name])
-      try {
-        Tab.addTags(tab, [new URL(tab.url).hostname.replace('www.', '')])
-      } catch (err) {
-        // ignore
-      }
-
-      if (useIndex !== undefined && useIndex >= 0) {
-        ts.tabs.splice(useIndex, 0, tab)
-      } else {
-        ts.tabs.push(tab)
-      }
-
-      useCommandExecutor()
-        .execute(new GithubWriteEventCommand(new TabEvent('added', ts.id, tab.id, ts.name, tab.url)))
-        .catch((err) => console.warn(err))
-
-      // useCommandExecutor()
-      //   .execute(new GithubLogCommand('newTab', tab as object))
-      //   .catch((err) => console.warn(err))
-
-      return Promise.resolve(ts)
+    const reject: string | undefined = await checkAddToTabsetConstraints(ts, tab, allowDuplicates)
+    if (reject) {
+      return Promise.reject(reject)
     }
-    return Promise.reject('tab.url undefined')
+
+    handleTags(ts, tab)
+    addToTabsetWithIndex(ts, tab, useIndex)
+
+    useCommandExecutor()
+      .execute(new GithubWriteEventCommand(new TabEvent('added', ts.id, tab.id, ts.name, tab.url, tab.favIconUrl)))
+      .catch((err) => console.warn(err))
+
+    return Promise.resolve(ts)
   }
 
   const saveBlob = (tab: chrome.tabs.Tab | undefined, blob: Blob): Promise<string> => {
@@ -544,7 +514,11 @@ export function useTabsetService() {
 
     if (!skipSync) {
       useCommandExecutor()
-        .execute(new GithubWriteEventCommand(new TabEvent('deleted', tabset.id, tab.id, tab.name || '', 'url: xxx')))
+        .execute(
+          new GithubWriteEventCommand(
+            new TabEvent('deleted', tabset.id, tab.id, tab.name || '', 'url: xxx', tab.favIconUrl),
+          ),
+        )
         .catch((err) => console.warn(err))
     }
 
@@ -571,19 +545,27 @@ export function useTabsetService() {
     }
     return false
   }
-  const urlExistsInCurrentTabset = (url: string | undefined): boolean => {
+  const urlExistsInCurrentTabset = (url: string | undefined, folderId: string | undefined = undefined): boolean => {
     const currentTabset = useTabsetsStore().getCurrentTabset
-    // console.log("testing exists in current tabset", currentTabset.id, url)
-    if (currentTabset && url) {
-      if (
-        _.find(currentTabset.tabs, (t: any) => {
-          return t.matcher ? JsUtils.match(t.matcher, url) : t.url === url
-        })
-      ) {
-        return true
+    if (!currentTabset || !url) {
+      return false
+    }
+    let useTabset = currentTabset
+    if (folderId && currentTabset) {
+      const folder = useTabsetService().findFolder([currentTabset], folderId)
+      if (folder) {
+        useTabset = folder
       }
     }
-    return false
+    return useTabset.tabs.findIndex((t: Tab) => (t.matcher ? JsUtils.match(t.matcher, url) : t.url === url)) >= 0
+    // console.log("testing exists in current tabset", currentTabset.id, url)
+    // if (
+    //   _.find(useTabset.tabs, (t: any) => {
+    //     return t.matcher ? JsUtils.match(t.matcher, url) : t.url === url
+    //   })
+    // ) {
+    //   return true
+    // }
   }
 
   const urlWasActivated = (url: string | undefined): void => {
@@ -986,6 +968,56 @@ export function useTabsetService() {
 
   const nameForTabsetId = (tsId: string): string => {
     return useTabsetsStore().tabsets.get(tsId)?.name || 'unknown'
+  }
+
+  const limitExceeded = async () => {
+    const exceedInfo = useAuthStore().limitExceeded('TABS', useTabsetsStore().allTabsCount)
+    if (exceedInfo.exceeded) {
+      await NavigationService.openOrCreateTab([
+        chrome.runtime.getURL(
+          `/www/index.html#/mainpanel/settings?tab=account&exceeded=tabs&limit=${exceedInfo.limit}`,
+        ),
+      ])
+      return true
+    }
+    return false
+  }
+
+  const checkAddToTabsetConstraints = async (
+    ts: Tabset,
+    tab: Tab,
+    allowDuplicates: boolean,
+  ): Promise<string | undefined> => {
+    if (!tab.url) {
+      return Promise.resolve('tab.url undefined')
+    }
+    if (await limitExceeded()) {
+      return Promise.resolve('Tabs Limit was Exceeded')
+    }
+    if (!allowDuplicates) {
+      const indexInTabset = _.findIndex(ts.tabs, (t: any) => t.url === tab.url)
+      if (indexInTabset >= 0) {
+        return Promise.resolve('tab exists already')
+      }
+    }
+    return Promise.resolve(undefined)
+  }
+
+  const handleTags = (ts: Tabset, tab: Tab) => {
+    Tab.addTags(tab, [ts.name])
+    try {
+      Tab.addTags(tab, [new URL(tab.url!).hostname.replace('www.', '')])
+    } catch (err) {
+      // ignore
+    }
+  }
+
+  const addToTabsetWithIndex = (ts: Tabset, tab: Tab, useIndex: number | undefined) => {
+    if (useIndex !== undefined && useIndex >= 0) {
+      ts.tabs.splice(useIndex, 0, tab)
+    } else {
+      ts.tabs.push(tab)
+    }
   }
 
   return {

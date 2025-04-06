@@ -26,7 +26,7 @@
       v-for="folder in folders"
       clickable
       v-ripple
-      class="q-ma-none q-pa-sm"
+      class="q-ma-none q-pa-xs"
       @dragstart="startDrag($event, folder)"
       @dragover="overDrag($event, folder)"
       @drop="drop($event, folder)"
@@ -59,9 +59,6 @@
             :tabset="tabset"
             :level="'folder'"
             :folder="folder" />
-
-          <!--          <q-icon class="cursor-pointer" name="more_vert" size="16px" />-->
-          <!--          <SidePanelSubfolderContextMenu :tabset="tabset" :folder="folder" />-->
         </q-item-label>
       </q-item-section>
     </q-item>
@@ -230,3 +227,9 @@ const currentFolderPath = (): Tabset[] => {
   return res ? res.reverse() : []
 }
 </script>
+
+<style scoped>
+.q-item__label {
+  margin-top: 0;
+}
+</style>

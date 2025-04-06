@@ -44,6 +44,9 @@ export class DefaultAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
         }
         return ''
       })
+      .setStyle((t: chrome.tabs.Tab, folder: Tabset | undefined) => {
+        return useTabsetService().urlExistsInCurrentTabset(t.url, folder?.id) ? 'color: #bfbfbf' : ''
+      })
       .onClicked(this.clicked)
   }
 

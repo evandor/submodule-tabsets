@@ -45,15 +45,18 @@
 
     <div class="row q-pa-md" v-if="username && reponame">
       <div class="col-3"><b>Save</b></div>
-      <div class="col-3">
+      <div class="col-5">
         <q-checkbox :disable="!githubToken" v-model="autobackup" label="Automatic daily backup" />
         <br />
-        <q-checkbox :disable="!githubToken" v-model="autosync" label="Automatic sync" />
+        <q-checkbox :disable="!githubToken" v-model="autosync" label="Automatic sync" />&nbsp;<q-checkbox
+          :disable="!githubToken || !autosync"
+          v-model="autosync_readonly"
+          label="Readonly" />
         <br />
         <q-checkbox :disable="!githubToken" v-model="githubLog" label="Keep action log" />
       </div>
       <div class="col-1"></div>
-      <div class="col-5">
+      <div class="col-3">
         <q-btn
           class="q-px-md q-pr-md"
           dense
@@ -78,6 +81,7 @@ import { LocalStorage } from 'quasar'
 import {
   GITHUB_AUTO_BACKUP,
   GITHUB_AUTO_SYNC,
+  GITHUB_AUTO_SYNC_READONLY,
   GITHUB_LOG,
   GITHUB_PATH,
   GITHUB_REPONAME,
@@ -96,6 +100,7 @@ const reponame = ref<string>(LocalStorage.getItem(GITHUB_REPONAME) as string)
 const githubToken = ref<string>(LocalStorage.getItem(GITHUB_TOKEN) as string)
 const autobackup = ref<boolean>(LocalStorage.getItem(GITHUB_AUTO_BACKUP) || false)
 const autosync = ref<boolean>(LocalStorage.getItem(GITHUB_AUTO_SYNC) || false)
+const autosync_readonly = ref<boolean>(LocalStorage.getItem(GITHUB_AUTO_SYNC) || false)
 const githubLog = ref<boolean>(LocalStorage.getItem(GITHUB_LOG) || false)
 const githubPath = ref<string>(LocalStorage.getItem(GITHUB_PATH) as string)
 
@@ -104,6 +109,7 @@ function clearIncluding(idenfier: string) {
   githubLog.value = false
   autobackup.value = false
   autosync.value = false
+  autosync_readonly.value = false
 }
 
 watchEffect(() => {
@@ -140,6 +146,7 @@ watchEffect(() => {
 
 watchEffect(() => LocalStorage.set(GITHUB_AUTO_BACKUP, autobackup.value))
 watchEffect(() => LocalStorage.set(GITHUB_AUTO_SYNC, autosync.value))
+watchEffect(() => LocalStorage.set(GITHUB_AUTO_SYNC_READONLY, autosync_readonly.value))
 
 watchEffect(() => LocalStorage.set(GITHUB_LOG, githubLog.value))
 
