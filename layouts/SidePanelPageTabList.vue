@@ -3,37 +3,35 @@
   <div style="width: 100%; max-width: 100%">
     <q-list class="q-ma-none">
       <!-- supporting drag & drop when not on mobile -->
-      <template v-for="column in getColumns()">
-        <vue-draggable-next
-          v-if="tabs.length > 0"
-          class="q-ma-none"
-          :list="tabs"
-          :group="{ name: 'tabs', pull: 'clone' }"
-          @change="(event: any) => handleDragAndDrop(event, column)">
-          <SidePanelTabListHelper
-            v-for="(tab, index) in tabs"
-            :key="index"
-            v-once
-            :tab="tab.tab as Tab"
-            :index="tab.index"
-            :type="props.type"
-            :sorting="props.sorting"
-            :preventDragAndDrop="false"
-            :tabset="props.tabset!"
-            :show-tabsets="props.showTabsets"
-            :hide-menu="props.hideMenu"
-            :filter="props.filter || ''" />
-        </vue-draggable-next>
-        <div v-else-if="props.filter" class="q-ma-md text-caption">
-          Filter <em>'{{ props.filter }}'</em> did not match anything inside this collection. Click 'Enter' to search in
-          all your collections.
-        </div>
-        <div v-else-if="props.tabset?.folders.length === 0" class="q-ma-md text-caption text-center">
-          Empty Tabset<br />
-          check the <span class="cursor-pointer" @click="useUiStore().startButtonAnimation('addtab')">action menu</span
-          ><br />
-        </div>
-      </template>
+      <vue-draggable-next
+        v-if="tabs.length > 0"
+        class="q-ma-none"
+        :list="tabs"
+        :group="{ name: 'tabs', pull: 'clone' }"
+        @change="(event: any) => handleDragAndDrop(event)">
+        <SidePanelTabListHelper
+          v-for="(tab, index) in tabs"
+          :key="index"
+          v-once
+          :tab="tab.tab as Tab"
+          :index="tab.index"
+          :type="props.type"
+          :sorting="props.sorting"
+          :preventDragAndDrop="false"
+          :tabset="props.tabset!"
+          :show-tabsets="props.showTabsets"
+          :hide-menu="props.hideMenu"
+          :filter="props.filter || ''" />
+      </vue-draggable-next>
+      <div v-else-if="props.filter" class="q-ma-md text-caption">
+        Filter <em>'{{ props.filter }}'</em> did not match anything inside this collection. Click 'Enter' to search in
+        all your collections.
+      </div>
+      <div v-else-if="props.tabset?.folders.length === 0" class="q-ma-md text-caption text-center">
+        Empty Tabset<br />
+        check the <span class="cursor-pointer" @click="useUiStore().startButtonAnimation('addtab')">action menu</span
+        ><br />
+      </div>
     </q-list>
 
     <audio id="myAudio">
@@ -42,13 +40,11 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { SPECIAL_ID_FOR_NO_GROUP_ASSIGNED } from 'src/boot/constants'
+<script lang="ts" setup>
 import SidePanelTabListHelper from 'src/tabsets/layouts/SidePanelTabListHelper.vue'
 import { IndexedTab } from 'src/tabsets/models/IndexedTab'
 import { Tab, TabSorting } from 'src/tabsets/models/Tab'
 import { Tabset, TabsetType } from 'src/tabsets/models/Tabset'
-import { TabsetColumn } from 'src/tabsets/models/TabsetColumn'
 import TabsetService from 'src/tabsets/services/TabsetService'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useUiStore } from 'src/ui/stores/uiStore'
@@ -86,7 +82,7 @@ watch(
   },
 )
 
-const handleDragAndDrop = async (event: any, column: TabsetColumn) => {
+const handleDragAndDrop = async (event: any) => {
   console.log('SidePanelPageTabList d&d event:', event)
   const { moved, added } = event
   if (moved) {
@@ -95,23 +91,17 @@ const handleDragAndDrop = async (event: any, column: TabsetColumn) => {
     const movedElement: Tab = tabsInColumn[moved.oldIndex]!.tab
     const realNewIndex = tabsInColumn[moved.newIndex]!.index
     // console.log(`             '${movedElement.id}' ${moved.oldIndex} -> ${realNewIndex}`)
-    await TabsetService.moveTo(movedElement.id, realNewIndex, column)
+    await TabsetService.moveTo(movedElement.id, realNewIndex)
   }
   if (added) {
-    console.log(
-      `added event: '${added.element.tab.id}' ${added.oldIndex} -> ${added.newIndex}, ${column.title || column.id}`,
-    )
+    console.log(`added event: '${added.element.tab.id}' ${added.oldIndex} -> ${added.newIndex}`)
     const tabsInColumn = tabsForColumn()
     const movedElement: Tab = added.element.tab
     const realNewIndex = added.newIndex < tabsInColumn.length ? tabsInColumn[added.newIndex]!.index : 0
     console.log(`             '${added.element.tab.id}' ${added.oldIndex} -> ${realNewIndex}`)
-    movedElement.columnId = column.id
+    //movedElement.columnId = column.id
     useTabsetService().saveCurrentTabset()
   }
-}
-
-const getColumns = () => {
-  return [new TabsetColumn(SPECIAL_ID_FOR_NO_GROUP_ASSIGNED, '')]
 }
 
 const tabsForColumn = (): IndexedTab[] => {
@@ -137,11 +127,11 @@ tabs.value = tabsForColumn()
 
 <style>
 .q-expansion-item--popup > .q-expansion-item__container {
-  border: 0px solid rgba(0, 0, 0, 0.12) !important;
+  border: 0 solid rgba(0, 0, 0, 0.12) !important;
 }
 
 .q-list--separator > .q-item-type + .q-item-type,
 .q-list--separator > .q-virtual-scroll__content > .q-item-type + .q-item-type {
-  border-top: 0px solid rgba(100, 0, 0, 0.12) !important;
+  border-top: 0 solid rgba(100, 0, 0, 0.12) !important;
 }
 </style>

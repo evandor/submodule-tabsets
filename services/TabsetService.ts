@@ -12,7 +12,6 @@ import { useSpacesStore } from 'src/spaces/stores/spacesStore'
 import { NoteEvent, SpaceEvent, TabEvent, TabsetEvent } from 'src/tabsets/commands/github/GithubWriteEventCommand'
 import { Tab, UrlExtension } from 'src/tabsets/models/Tab'
 import { Tabset, TabsetSharing, TabsetStatus } from 'src/tabsets/models/Tabset'
-import { TabsetColumn } from 'src/tabsets/models/TabsetColumn'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { useTabsStore2 } from 'src/tabsets/stores/tabsStore2'
@@ -369,8 +368,8 @@ class TabsetService {
     //ChromeApi.closeAllTabs()
   }
 
-  async moveTo(tabId: string, newIndex: number, column: TabsetColumn) {
-    console.log(`moving tabId ${tabId} to new index ${newIndex} with columnId ${column.id}`)
+  async moveTo(tabId: string, newIndex: number) {
+    console.log(`moving tabId ${tabId} to new index ${newIndex}`)
     const currentTabset = useTabsetsStore().getCurrentTabset!
     const activeFolder = useTabsetsStore().getActiveFolder(currentTabset)
     let tabs = activeFolder ? activeFolder.tabs : currentTabset.tabs

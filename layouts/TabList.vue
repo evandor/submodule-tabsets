@@ -35,7 +35,6 @@ import { useQuasar } from 'quasar'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import { CreateTabFromOpenTabsCommand } from 'src/tabsets/commands/CreateTabFromOpenTabs'
 import { Tab, TabSorting } from 'src/tabsets/models/Tab'
-import { TabsetColumn } from 'src/tabsets/models/TabsetColumn'
 import TabListHelper from 'src/tabsets/pages/pwa/TabListHelper.vue'
 import TabsetService from 'src/tabsets/services/TabsetService'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
@@ -105,7 +104,7 @@ const handleDragAndDrop = (event: any) => {
         }
         break
     }
-    TabsetService.moveTo(moved.element.id, useIndex, null as unknown as TabsetColumn)
+    TabsetService.moveTo(moved.element.id, useIndex)
   }
   if (added) {
     useCommandExecutor().executeFromUi(new CreateTabFromOpenTabsCommand(added.element, added.newIndex))

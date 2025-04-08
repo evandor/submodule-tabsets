@@ -46,7 +46,6 @@ import { CreateTabFromOpenTabsCommand } from 'src/tabsets/commands/CreateTabFrom
 import SidePanelTabListHelper from 'src/tabsets/layouts/SidePanelTabListHelper.vue'
 import { Tab, TabSorting } from 'src/tabsets/models/Tab'
 import { Tabset, TabsetType } from 'src/tabsets/models/Tabset'
-import { TabsetColumn } from 'src/tabsets/models/TabsetColumn'
 import TabsetService from 'src/tabsets/services/TabsetService'
 import { PropType } from 'vue'
 import { VueDraggableNext } from 'vue-draggable-next'
@@ -68,7 +67,7 @@ const handleDragAndDrop = (event: any) => {
   if (moved) {
     console.log('d&d tabs moved', moved.element.id, moved.newIndex)
     let useIndex = moved.newIndex
-    TabsetService.moveTo(moved.element.id, useIndex, null as unknown as TabsetColumn)
+    TabsetService.moveTo(moved.element.id, useIndex)
   }
   if (added) {
     useCommandExecutor().executeFromUi(new CreateTabFromOpenTabsCommand(added.element, added.newIndex))
