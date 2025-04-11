@@ -83,15 +83,15 @@ watch(
 )
 
 const handleDragAndDrop = async (event: any) => {
-  console.log('SidePanelPageTabList d&d event:', event)
+  console.log('SidePanelPageTabList d&d event:', event, props)
   const { moved, added } = event
   if (moved) {
     console.log(`moved event: '${moved.element.tab.id}' ${moved.oldIndex} -> ${moved.newIndex} (${props.activeFolder})`)
     const tabsInColumn = tabsForColumn()
     const movedElement: Tab = tabsInColumn[moved.oldIndex]!.tab
     const realNewIndex = tabsInColumn[moved.newIndex]!.index
-    // console.log(`             '${movedElement.id}' ${moved.oldIndex} -> ${realNewIndex}`)
-    await TabsetService.moveTo(movedElement.id, realNewIndex)
+    console.log(`             '${movedElement.id}' ${moved.oldIndex} -> ${realNewIndex}`)
+    await TabsetService.moveTo(movedElement.id, realNewIndex, props.activeFolder)
   }
   if (added) {
     console.log(`added event: '${added.element.tab.id}' ${added.oldIndex} -> ${added.newIndex}`)
@@ -100,7 +100,7 @@ const handleDragAndDrop = async (event: any) => {
     const realNewIndex = added.newIndex < tabsInColumn.length ? tabsInColumn[added.newIndex]!.index : 0
     console.log(`             '${added.element.tab.id}' ${added.oldIndex} -> ${realNewIndex}`)
     //movedElement.columnId = column.id
-    useTabsetService().saveCurrentTabset()
+    await useTabsetService().saveCurrentTabset()
   }
 }
 

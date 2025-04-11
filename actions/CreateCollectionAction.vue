@@ -5,7 +5,7 @@
       @was-clicked="clicked()"
       icon="o_featured_play_list"
       color="primary"
-      label="New Collection">
+      label="New Tabset">
       <!--      <template v-slot:after-icon>-->
       <!--        -->
       <!--      </template>-->

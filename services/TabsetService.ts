@@ -368,10 +368,11 @@ class TabsetService {
     //ChromeApi.closeAllTabs()
   }
 
-  async moveTo(tabId: string, newIndex: number) {
+  async moveTo(tabId: string, newIndex: number, useActiveFolder: string | undefined = undefined) {
     console.log(`moving tabId ${tabId} to new index ${newIndex}`)
     const currentTabset = useTabsetsStore().getCurrentTabset!
-    const activeFolder = useTabsetsStore().getActiveFolder(currentTabset)
+    const activeFolder = useTabsetsStore().getActiveFolder(currentTabset, useActiveFolder)
+    console.log('activeFolder', activeFolder?.name, activeFolder?.id)
     let tabs = activeFolder ? activeFolder.tabs : currentTabset.tabs
     // console.log(
     //   'tabs before',
