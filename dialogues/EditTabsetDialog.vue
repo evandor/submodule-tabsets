@@ -30,27 +30,27 @@
           style="width: 250px" />
       </q-card-section>
 
-      <q-card-section>
-        <div classs="text-caption text-blue" style="font-size: smaller" v-if="windowMgtSelectionEdited">
-          Press 'Enter' to add the new value
-        </div>
-        <q-select
-          dense
-          options-dense
-          clearable
-          clear-icon="close"
-          label="Open in Window"
-          filled
-          v-model="windowModel"
-          map-options
-          use-input
-          :options="windowOptions"
-          input-debounce="0"
-          @new-value="createWindowOption"
-          @keydown.enter="enterPressed()"
-          @focus="windowMgtSelectionHasFocus = true"
-          @blur="windowMgtSelectionHasFocus = false" />
-      </q-card-section>
+      <!--      <q-card-section>-->
+      <!--        <div classs="text-caption text-blue" style="font-size: smaller" v-if="windowMgtSelectionEdited">-->
+      <!--          Press 'Enter' to add the new value-->
+      <!--        </div>-->
+      <!--        <q-select-->
+      <!--          dense-->
+      <!--          options-dense-->
+      <!--          clearable-->
+      <!--          clear-icon="close"-->
+      <!--          label="Open in Window"-->
+      <!--          filled-->
+      <!--          v-model="windowModel"-->
+      <!--          map-options-->
+      <!--          use-input-->
+      <!--          :options="windowOptions"-->
+      <!--          input-debounce="0"-->
+      <!--          @new-value="createWindowOption"-->
+      <!--          @keydown.enter="enterPressed()"-->
+      <!--          @focus="windowMgtSelectionHasFocus = true"-->
+      <!--          @blur="windowMgtSelectionHasFocus = false" />-->
+      <!--      </q-card-section>-->
 
       <q-card-section v-if="useFeaturesStore().hasFeature(FeatureIdent.COLOR_TAGS)">
         Assign Color (optional)
@@ -127,7 +127,7 @@ const newTabsetName = ref(props.tabsetName)
 const newTabsetNameExists = ref(false)
 const hideWarning = ref(false)
 const windowMgtSelectionHasFocus = ref(false)
-const windowMgtSelectionEdited = ref(false)
+// const windowMgtSelectionEdited = ref(false)
 const theColor = ref<string | undefined>(props.tabsetColor || undefined)
 const windowModel = ref<string>(props.window || 'current')
 const windowOptions = ref<string[]>([])
@@ -143,11 +143,11 @@ watchEffect(() => {
   newTabsetNameExists.value = !!useTabsetsStore().existingInTabset(newTabsetName.value)
 })
 
-watchEffect(() => {
-  if (windowMgtSelectionHasFocus.value && !windowModel.value) {
-    windowMgtSelectionEdited.value = true
-  }
-})
+// watchEffect(() => {
+//   if (windowMgtSelectionHasFocus.value && !windowModel.value) {
+//     windowMgtSelectionEdited.value = true
+//   }
+// })
 
 watchEffect(() => {
   const windows: Set<string> = useWindowsStore().windowSet
@@ -194,11 +194,11 @@ const disableSubmit = (): boolean => {
   )
 }
 
-const createWindowOption = (val: any, done: any) => {
-  const sanitized = val ? val.replace(STRIP_CHARS_IN_USER_INPUT, '') : 'current'
-  windowOptions.value.push(sanitized)
-  done(sanitized, 'add-unique')
-}
+// const createWindowOption = (val: any, done: any) => {
+//   const sanitized = val ? val.replace(STRIP_CHARS_IN_USER_INPUT, '') : 'current'
+//   windowOptions.value.push(sanitized)
+//   done(sanitized, 'add-unique')
+// }
 </script>
 
 <style lang="sass" scoped>
