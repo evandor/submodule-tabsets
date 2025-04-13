@@ -192,9 +192,10 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     }
     ts.lastChange = changeInfo
     const tabsetWithType: Tabset = JSON.parse(JSON.stringify(ts))
-    //console.log('--- storing tabset! ---', tabsetWithType.lastChange)
+    console.log('--- storing tabset! ---', tabsetWithType.name, changeInfo)
     const res = await storage.saveTabset(tabsetWithType)
     lastUpdate.value = new Date().getTime()
+    console.log('--- storing tabset!! ---', res)
     return res
   }
 

@@ -506,7 +506,7 @@ import { nextTick, onMounted, PropType, ref, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 
 const { handleError } = useNotificationHandler()
-const { inBexMode, useDblClickHandler } = useUtils()
+const { inBexMode, useDblClickHandler, formatReadingTime } = useUtils()
 
 const props = defineProps({
   tab: { type: Object as PropType<Tab>, required: true },
@@ -645,7 +645,7 @@ watchEffect(async () => {
   }
 })
 
-const nameOrTitle = (tab: Tab) => (tab.name ? tab.name : tab.title)
+const nameOrTitle = (tab: Tab) => (tab.name ? tab.name + ' ' + tab.tags.length : tab.title + ' ' + tab.tags.length)
 
 const formatDate = (timestamp: number | undefined) =>
   timestamp ? formatDistance(timestamp, new Date(), { addSuffix: true }) : ''
@@ -874,20 +874,6 @@ const openReminderDialog = () =>
     component: ReminderDialog,
     componentProps: { tabId: props.tab.id, date: props.tab.reminder, comment: props.tab?.reminderComment },
   })
-
-const formatReadingTime = (ms: number) => {
-  if (ms < 1000) {
-    return ''
-  } else if (ms < 60000) {
-    return Math.round(ms / 1000) + 's.'
-  } else if (ms < 60 * 60000) {
-    return Math.round(ms / 60000) + 'm.'
-  } else if (ms < 24 * 60 * 60000) {
-    return Math.round((ms / 60) * 60000) + 'h.'
-  } else {
-    return ms
-  }
-}
 
 const callRestApi = (tab: Tab) => {
   const restTab = tab as RestTab
