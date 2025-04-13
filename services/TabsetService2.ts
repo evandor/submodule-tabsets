@@ -593,7 +593,7 @@ export function useTabsetService() {
         })
         if (hit) {
           //console.debug('saving tabset on activated', ts.name)
-          saveTabset(ts as Tabset).catch((err: any) => console.warn(err))
+          saveTabset(ts as Tabset, new ChangeInfo('tabset', 'edited', ts.id)).catch((err: any) => console.warn(err))
         }
       }
     })

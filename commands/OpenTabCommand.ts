@@ -7,6 +7,7 @@ import Analytics from 'src/core/utils/google-analytics'
 import { useActionHandlers } from 'src/tabsets/actionHandling/ActionHandlers'
 import { AddUrlToTabsetHandler } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { Tab } from 'src/tabsets/models/Tab'
+import { ChangeInfo } from 'src/tabsets/models/Tabset'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { ref } from 'vue'
 
@@ -46,7 +47,10 @@ export class OpenTabCommand implements Command<string> {
       if (this.tab.httpInfo && this.tab.httpInfo === 'UPDATED' && this.tab.url) {
         this.tab.httpInfo = ''
         if (useTabsetsStore().getCurrentTabset) {
-          await useTabsetsStore().saveTabset(useTabsetsStore().getCurrentTabset!)
+          await useTabsetsStore().saveTabset(
+            useTabsetsStore().getCurrentTabset!,
+            new ChangeInfo('tab', 'edited', this.tab.id, this.tab.url!),
+          )
         }
       }
       if (this.tab.httpStatus === 0) {
