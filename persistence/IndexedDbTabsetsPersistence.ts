@@ -43,12 +43,12 @@ class IndexedDbTabsetsPersistence implements TabsetsPersistence {
       }
       useTabsetsStore().setTabset(ts)
     })
-    console.log(' ...loaded tabsets, found ', useTabsetsStore().tabsets.size)
+    //console.log(' ...loaded tabsets, found ', useTabsetsStore().tabsets.size)
     return Promise.resolve()
   }
 
   async reloadTabset(tabsetId: string): Promise<Tabset> {
-    console.debug('reloading tabset', tabsetId)
+    console.debug(`reloading tabset ${tabsetId.substring(0, 8)}`)
     return await this.db.get('tabsets', tabsetId)
   }
 

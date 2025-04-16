@@ -6,6 +6,7 @@ import { useUtils } from 'src/core/services/Utils'
 import Analytics from 'src/core/utils/google-analytics'
 import { useFeaturesStore } from 'src/features/stores/featuresStore'
 import { useLogger } from 'src/services/Logger'
+import { useMetrics } from 'src/services/Metrics'
 import { Suggestion } from 'src/suggestions/domain/models/Suggestion'
 import { useSuggestionsStore } from 'src/suggestions/stores/suggestionsStore'
 import { SaveOrReplaceResult } from 'src/tabsets/models/SaveOrReplaceResult'
@@ -73,6 +74,7 @@ export class CreateTabsetCommand implements Command<SaveOrReplaceResult> {
           info('tabset created')
           sendMsg('tabset-added', { tabsetId: res.tabset.id })
           localStorage.setItem('test.tabsetId', res.tabset.id)
+          useMetrics().gauge('a message')
           return res
         })
       let doneMsg = 'Tabset created'

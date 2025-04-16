@@ -97,10 +97,11 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     }
   }
 
-  async function reloadTabset(tabsetId: string): Promise<Tabset> {
-    const updatedTabset = await storage.reloadTabset(tabsetId)
-    console.log('updatedTabset', updatedTabset)
+  async function reloadTabset(tabsetId: string, caller: string | undefined = undefined): Promise<Tabset> {
+    const updatedTabset: Tabset = await storage.reloadTabset(tabsetId)
+    console.log(`updatedTabset ${Tabset.logIdent(updatedTabset)}`, caller)
     tabsets.value.set(tabsetId, updatedTabset)
+    lastUpdate.value = new Date().getTime()
     // console.log('tabsets', tabsets)
     return updatedTabset
   }
@@ -192,10 +193,9 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     }
     ts.lastChange = changeInfo
     const tabsetWithType: Tabset = JSON.parse(JSON.stringify(ts))
-    console.log('--- storing tabset! ---', tabsetWithType.name, changeInfo)
+    console.log(`storing tabset: ${Tabset.logIdent(tabsetWithType)}`) //,  changeInfo.)
     const res = await storage.saveTabset(tabsetWithType)
     lastUpdate.value = new Date().getTime()
-    console.log('--- storing tabset!! ---', res)
     return res
   }
 

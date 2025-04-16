@@ -11,8 +11,8 @@
 </template>
 
 <script lang="ts" setup>
-import { NEW_TAB_EXTENSION_ID } from 'boot/constants'
 import { LocalStorage, useQuasar } from 'quasar'
+import { NEW_TAB_EXTENSION_ID } from 'src/boot/constants'
 import ContextMenuItem from 'src/core/components/helper/ContextMenuItem.vue'
 import { ActionProps } from 'src/tabsets/actions/models/ActionProps'
 import OpenNewTabDialog from 'src/tabsets/dialogues/OpenNewTabDialog.vue'

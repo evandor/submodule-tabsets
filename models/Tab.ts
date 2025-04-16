@@ -275,6 +275,12 @@ export class Tab {
   static addTags(tab: Tab, tags: string[]) {
     Tab.setTags(tab, tags.concat(tags))
   }
+
+  static logIdent(tab: Tab) {
+    let name = tab.title || tab.name || '<unknown>'
+    name = name.length > 9 ? name.substring(0, 9) + '...' : name
+    return `${name} (${tab.id.substring(0, 8)})`
+  }
 }
 
 Tab.prototype.toString = function tabToString() {

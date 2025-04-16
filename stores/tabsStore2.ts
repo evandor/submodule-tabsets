@@ -90,14 +90,14 @@ export const useTabsStore2 = defineStore('browsertabs', () => {
     if (info.status !== 'complete') {
       return
     }
-    console.debug(`==> tabUpdate: ${chromeTab.url?.substring(0, 40)}`)
+    //console.debug(`tabUpdate: ${chromeTab.url?.substring(0, 30)}`)
     browserTabs.value = await queryTabs()
   }
 
   // #endregion snippet
 
   async function onTabRemoved(tabId: number, removeInfo: chrome.tabs.TabRemoveInfo) {
-    console.log('onTabRemoved', tabId, removeInfo)
+    // console.log(`tabRemoved tabId: ${tabId}, windowId: ${removeInfo.windowId}`)
     browserTabs.value = await queryTabs()
   }
 
