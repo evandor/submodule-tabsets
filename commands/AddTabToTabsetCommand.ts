@@ -172,8 +172,8 @@ export class AddTabToTabsetCommand implements Command<any> {
 
       return res
     } catch (err: any) {
-      console.warn('hier: ', err)
-      return Promise.reject('error: ' + err.toString())
+      // console.warn('hier: ', err)
+      return Promise.reject(err.toString())
     }
   }
 }

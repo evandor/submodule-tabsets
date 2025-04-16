@@ -455,9 +455,30 @@ export function useTabsetService() {
     useIndex: number | undefined = undefined,
     allowDuplicates = false, // used eg at Excalidraw Handler
   ): Promise<Tabset> => {
-    const reject: string | undefined = await checkAddToTabsetConstraints(ts, tab, allowDuplicates)
-    if (reject) {
-      return Promise.reject(reject)
+    if (tab.url) {
+      const exceedInfo = useAuthStore().limitExceeded('TABS', useTabsetsStore().allTabsCount + 1)
+      if (exceedInfo.exceeded) {
+        await NavigationService.openOrCreateTab([
+          chrome.runtime.getURL(
+            `/www/index.html#/mainpanel/settings?tab=account&exceeded=tabs&limit=${exceedInfo.limit}`,
+          ),
+        ])
+        return Promise.reject('Tabs Limit was Exceeded')
+      }
+
+      if (!allowDuplicates) {
+        const indexInTabset = _.findIndex(ts.tabs, (t: any) => t.url === tab.url)
+        if (indexInTabset >= 0 && !tab.image) {
+          return Promise.reject('tab exists already')
+        }
+      }
+
+      // add tabset's name to tab's tags
+      Tab.addTags(tab, [ts.name])
+      try {
+        Tab.addTags(tab, [new URL(tab.url).hostname.replace('www.', '')])
+      } catch (err) {
+        // ignore
     }
 
     handleTags(ts, tab)
