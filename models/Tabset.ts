@@ -165,6 +165,9 @@ export class Tabset {
 
   static newTabsetNameIsShortEnough = (val: string) => (val ? val.length <= TABSET_NAME_MAX_LENGTH : true)
 
+  static logIdent(ts: Tabset) {
+    return ts.name + '(' + ts.id.substring(0, 8) + ')'
+  }
   // 'addLog is not a method' when not static !?!
   // static addLog = (ts: Tabset, logMsg: string | undefined) => {
   //   if (logMsg) {

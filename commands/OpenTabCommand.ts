@@ -65,5 +65,5 @@ export class OpenTabCommand implements Command<string> {
 }
 
 OpenTabCommand.prototype.toString = function cmdToString() {
-  return `OpenTabCommand: {tab=${this.tab.id}}`
+  return `OpenTabCommand: {tab=${Tab.logIdent(this.tab)}}`
 }

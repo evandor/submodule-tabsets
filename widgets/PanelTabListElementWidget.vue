@@ -645,7 +645,7 @@ watchEffect(async () => {
   }
 })
 
-const nameOrTitle = (tab: Tab) => (tab.name ? tab.name + ' ' + tab.tags.length : tab.title + ' ' + tab.tags.length)
+const nameOrTitle = (tab: Tab) => (tab.name ? tab.name : tab.title)
 
 const formatDate = (timestamp: number | undefined) =>
   timestamp ? formatDistance(timestamp, new Date(), { addSuffix: true }) : ''
