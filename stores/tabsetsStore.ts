@@ -57,9 +57,8 @@ export const useTabsetsStore = defineStore('tabsets', () => {
   watch(
     () => currentTabsetFolderId.value,
     (newValue: string | undefined, oldValue: string | undefined) => {
-      console.log(`currentTabsetFolderId changed from ${oldValue} -> ${newValue}`)
+      //console.log(`currentTabsetFolderId changed from ${oldValue} -> ${newValue}`)
       const data = { tabsetId: currentTabsetId.value, folderId: newValue }
-      //console.log("data", data)
       // TODO sending too many messages (!?!)
       //sendMsg('tabsets.app.change.currentTabset', data)
     },
