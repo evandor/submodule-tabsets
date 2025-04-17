@@ -113,7 +113,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     spaceId: string | undefined = undefined,
     ignoreDuplicates: boolean = false,
   ): Promise<Tabset> {
-    const exceedInfo = useAuthStore().limitExceeded('TABSETS', tabsets.value.size)
+    const exceedInfo = useAuthStore().limitExceeded('TABSETS', tabsets.value.size + 1)
     if (exceedInfo.exceeded) {
       await NavigationService.openOrCreateTab([
         chrome.runtime.getURL(

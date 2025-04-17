@@ -5,10 +5,8 @@
       @was-clicked="clicked()"
       icon="o_featured_play_list"
       color="primary"
+      :indicate-issue="cannotCreateCollection()"
       label="New Tabset">
-      <!--      <template v-slot:after-icon>-->
-      <!--        -->
-      <!--      </template>-->
     </ContextMenuItem>
   </template>
 </template>
@@ -33,4 +31,6 @@ const clicked = () => {
     },
   })
 }
+
+const cannotCreateCollection = () => false
 </script>
