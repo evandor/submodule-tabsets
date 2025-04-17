@@ -1,7 +1,7 @@
 import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import Analytics from 'src/core/utils/google-analytics'
-import { useLogger } from 'src/services/Logger'
+import { useLogger } from 'src/core/services/Logger'
 import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset, TABSET_NAME_MAX_LENGTH, TabsetType } from 'src/tabsets/models/Tabset'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'

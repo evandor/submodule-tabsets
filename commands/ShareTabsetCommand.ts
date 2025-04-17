@@ -1,6 +1,6 @@
 import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
-import { useLogger } from 'src/services/Logger'
+import { useLogger } from 'src/core/services/Logger'
 import { TabsetSharing } from 'src/tabsets/models/Tabset'
 import TabsetService from 'src/tabsets/services/TabsetService'
 
