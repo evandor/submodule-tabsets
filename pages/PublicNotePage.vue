@@ -26,13 +26,13 @@
 
 <script setup lang="ts">
 import EditorJS, { OutputData } from '@editorjs/editorjs'
+import { useSettingsStore } from 'src/core/stores/settingsStore'
 import Analytics from 'src/core/utils/google-analytics'
 import EditorJsConfig from 'src/notes/editorjs/EditorJsConfig'
 import { Notebook } from 'src/notes/models/Notebook'
 import { NotesPage } from 'src/notes/models/NotesPage'
 import useNotesServices from 'src/notes/services/notesServices'
 import { useNotesStore } from 'src/notes/stores/NotesStore'
-import { useSettingsStore } from 'stores/settingsStore'
 import { onMounted, ref, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 import '../../../src/notes/editorjs/linkTool.css'
