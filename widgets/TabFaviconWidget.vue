@@ -19,7 +19,7 @@
 
 <script lang="ts" setup>
 import { useUtils } from 'src/core/services/Utils'
-import { useSettingsStore } from 'src/stores/settingsStore'
+import { useSettingsStore } from 'src/core/stores/settingsStore'
 import { Tab, UrlExtension } from 'src/tabsets/models/Tab'
 import { PropType } from 'vue'
 
