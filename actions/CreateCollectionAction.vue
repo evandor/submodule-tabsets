@@ -6,7 +6,7 @@
       icon="o_featured_play_list"
       color="primary"
       :indicate-issue="cannotCreateCollection()"
-      label="New Collection">
+      label="New Tabset">
     </ContextMenuItem>
   </template>
 </template>

@@ -11,8 +11,6 @@ import ContextMenuItem from 'src/core/components/helper/ContextMenuItem.vue'
 import { ActionProps } from 'src/tabsets/actions/models/ActionProps'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 
-const props = defineProps<ActionProps>()
-
 const $q = useQuasar()
 
 defineProps<ActionProps>()

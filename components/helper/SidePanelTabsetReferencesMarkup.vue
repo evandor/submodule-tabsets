@@ -68,7 +68,7 @@ watchEffect(async () => {
 })
 
 const updateSharedInfo = async () => {
-  if (currentTabsetId.value) {
+  if (currentTabsetId.value && useAuthStore().user?.uid) {
     const fs = FirebaseServices.getFirestore()
     tabset.value = useTabsetsStore().getCurrentTabset
     sharedBy.value = tabset.value?.sharing?.sharedBy || ''
