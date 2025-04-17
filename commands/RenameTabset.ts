@@ -2,7 +2,7 @@ import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { useUtils } from 'src/core/services/Utils'
 import Analytics from 'src/core/utils/google-analytics'
-import { useLogger } from 'src/services/Logger'
+import { useLogger } from 'src/core/services/Logger'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { ListDetailLevel } from 'src/ui/stores/uiStore'
 
