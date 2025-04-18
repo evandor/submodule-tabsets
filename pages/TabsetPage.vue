@@ -275,9 +275,12 @@ onUpdated(() => {
   JsUtils.runCssHighlight()
 })
 
-watchEffect(async () => {
-  currentTabsetId.value = await useTabsetsStore().getCurrentTabsetId()
+watchEffect(() => {
+  useTabsetsStore()
+    .getCurrentTabsetId()
+    .then((tabsetId: string | undefined) => (currentTabsetId.value = tabsetId))
 })
+
 watchEffect(() => {
   if (!route || !route.params) {
     return

@@ -96,8 +96,10 @@ onMounted(async () => {
   activeTabset.value = await useTabsetsStore().getCurrentTabsetId()
 })
 
-watchEffect(async () => {
-  activeTabset.value = await useTabsetsStore().getCurrentTabsetId()
+watchEffect(() => {
+  useTabsetsStore()
+    .getCurrentTabsetId()
+    .then((tsId: string | undefined) => (activeTabset.value = tsId))
 })
 
 const selectTS = (tabset: Tabset) => {

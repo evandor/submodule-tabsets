@@ -38,8 +38,8 @@
             class="cursor-pointer"
             @click="removeShare(share['email' as keyof object])">
             <q-tooltip class="tooltip-small" anchor="top left" self="center middle"
-              >Stop sharing this collection</q-tooltip
-            >
+              >Stop sharing this collection
+            </q-tooltip>
           </q-icon>
         </div>
       </template>
@@ -60,16 +60,18 @@ const showDetails = ref(true)
 const shared = ref<object[]>([])
 const currentTabsetId = ref<string | undefined>(undefined)
 
-watchEffect(async () => {
-  currentTabsetId.value = await useTabsetsStore().getCurrentTabsetId()
+watchEffect(() => {
+  useTabsetsStore()
+    .getCurrentTabsetId()
+    .then((tsId: string | undefined) => (currentTabsetId.value = tsId))
 })
 
-const updateSharedInfo = async () => {
+const updateSharedInfo = () => {
   // no op
 }
 
-watchEffect(async () => {
-  await updateSharedInfo()
+watchEffect(() => {
+  updateSharedInfo()
 })
 
 watchEffect(() => {

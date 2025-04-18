@@ -111,11 +111,13 @@ const animateAddtabButton = ref(false)
 const currentTabsetId = ref<string | undefined>(undefined)
 const alreadyInTabset = ref(false)
 
-watchEffect(async () => {
-  currentTabsetId.value = await useTabsetsStore().getCurrentTabsetId()
+watchEffect(() => {
+  useTabsetsStore()
+    .getCurrentTabsetId()
+    .then((tsId: string | undefined) => (currentTabsetId.value = tsId))
 })
 
-watchEffect(async () => {
+watchEffect(() => {
   handler.value = getHandler(props.currentChromeTab.url, props.folder)
   defaultAction.value = handler.value.defaultAction()
   // const currentTabsetId = await useTabsetsStore().getCurrentTabsetId()

@@ -47,8 +47,10 @@ import { ref, watchEffect } from 'vue'
 const lastTabsets = ref<Pick<Tabset, 'id' | 'name' | 'status'>[]>([])
 const currentTabsetId = ref<string | undefined>(undefined)
 
-watchEffect(async () => {
-  currentTabsetId.value = await useTabsetsStore().getCurrentTabsetId()
+watchEffect(() => {
+  useTabsetsStore()
+    .getCurrentTabsetId()
+    .then((tsId: string | undefined) => (currentTabsetId.value = tsId))
 })
 
 watchEffect(() => {

@@ -114,8 +114,11 @@ export const useGroupsStore = defineStore('groups', () => {
     if (inBexMode() && chrome && chrome.tabGroups) {
       // console.debug(' ...initializing GroupsStore Listeners')
       chrome.tabGroups.onCreated.addListener((group: chrome.tabGroups.TabGroup) => onCreated(group))
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       chrome.tabGroups.onRemoved.addListener((group: chrome.tabGroups.TabGroup) => init('onRemoved'))
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       chrome.tabGroups.onMoved.addListener((group: chrome.tabGroups.TabGroup) => init('onMoved'))
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       chrome.tabGroups.onUpdated.addListener((group: chrome.tabGroups.TabGroup) => onUpdated(group))
     }
   }

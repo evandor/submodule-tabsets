@@ -639,12 +639,6 @@ watchEffect(() => {
   //console.log("===>", placeholders.value)
 })
 
-watchEffect(async () => {
-  if (props.tab) {
-    //pngs.value = await useSnapshotsService().getPngsForTab(props.tab.id)
-  }
-})
-
 const nameOrTitle = (tab: Tab) => (tab.name ? tab.name : tab.title)
 
 const formatDate = (timestamp: number | undefined) =>

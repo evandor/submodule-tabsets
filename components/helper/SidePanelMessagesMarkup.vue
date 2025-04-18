@@ -53,7 +53,7 @@ const messageCount = ref(0)
 
 const { clearMessage } = useSidePanelMessagesMarkupView()
 
-watchEffect(async () => {
+watchEffect(() => {
   const msgs = useMessagesStore().getUnreadMessages
   messages.value = msgs.slice(0, 20)
   messageCount.value = msgs.length

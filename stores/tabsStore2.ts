@@ -79,8 +79,11 @@ export const useTabsStore2 = defineStore('browsertabs', () => {
     if (inBexMode()) {
       browserTabs.value = await queryTabs()
 
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       addListenerOnce(chrome.tabs.onUpdated, onTabUpdatedListener)
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       addListenerOnce(chrome.tabs.onRemoved, onTabRemovedListener)
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       addListenerOnce(chrome.tabs.onMoved, onTabMovedListener)
     }
   }
