@@ -70,7 +70,9 @@ const tabs = ref<IndexedTab[]>([])
 watch(
   () => props.filter,
   (a: string | undefined, b: string | undefined) => {
+    console.log('got filter', a, b)
     tabs.value = tabsForColumn()
+    console.log('emitting2!', tabs.value.length)
     emits('tabs-found', tabs.value.length)
   },
 )
@@ -78,7 +80,9 @@ watch(
 watch(
   () => props.tabset?.tabs || [],
   (a: Tab[], b: Tab[]) => {
+    console.log('got filter', a, b)
     tabs.value = tabsForColumn()
+    console.log('emitting1!', tabs.value.length)
     emits('tabs-found', tabs.value.length)
   },
 )
@@ -106,16 +110,33 @@ const handleDragAndDrop = async (event: any) => {
 }
 
 const tabsForColumn = (): IndexedTab[] => {
-  function filterMatches(property: string | undefined) {
-    return property && property.toLowerCase().indexOf(props.filter!.toLowerCase()!) >= 0
+  function filterMatches(property: string | undefined): boolean {
+    if (!property) {
+      return false
+    }
+    const match = property.toLowerCase().indexOf(props.filter!.toLowerCase()) >= 0
+    // console.log(`matching ${property} with filter ${props.filter!.toLowerCase()}: ${match}`)
+    return match
   }
 
   return (props.tabset?.tabs as Tab[])
     .filter((t: Tab) => {
+      // console.log('')
+      // console.log('checking tab', t.url)
       if (!props.filter || props.filter.trim() === '') {
         return true
       }
-      return !!(filterMatches(t.url) || filterMatches(t.description) || filterMatches(t.name) || filterMatches(t.title))
+      // console.log('match in url', filterMatches(t.url))
+      // console.log('match in description', filterMatches(t.description))
+      // console.log('match in name', filterMatches(t.name))
+      // console.log('match in title', filterMatches(t.title))
+      const res =
+        filterMatches(t.url) || filterMatches(t.description) || filterMatches(t.name) || filterMatches(t.title)
+
+      // if (res) {
+      //   console.log('found tab', t.url, res)
+      // }
+      return res
     })
     .sort((a: Tab, b: Tab) => {
       return props.tabset && props.tabset.type === TabsetType.RSS_FOLDER ? b.created - a.created : 0
@@ -124,6 +145,8 @@ const tabsForColumn = (): IndexedTab[] => {
 }
 
 tabs.value = tabsForColumn()
+// console.log('---')
+emits('tabs-found', tabs.value.length)
 </script>
 
 <style>
