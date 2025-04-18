@@ -29,8 +29,9 @@
       </div>
       <div v-else-if="props.tabset?.folders.length === 0" class="q-ma-md text-caption text-center">
         Empty Tabset<br />
-        check the <span class="cursor-pointer" @click="useUiStore().startButtonAnimation('addtab')">action menu</span
-        ><br />
+        check the
+        <span class="cursor-pointer" @click="useUiStore().startButtonAnimation('addtab')">action menu</span><br />
+        (Add Tab etc.)<br />
       </div>
     </q-list>
 

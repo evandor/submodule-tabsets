@@ -75,7 +75,7 @@
 <script lang="ts" setup>
 import { uid, useQuasar } from 'quasar'
 import { FeatureIdent } from 'src/app/models/FeatureIdent'
-import SidePanelTabsetsSelectorWidget from 'src/components/widgets/SidePanelTabsetsSelectorWidget.vue'
+import SidePanelTabsetsSelectorWidget from 'src/core/components/widgets/SidePanelTabsetsSelectorWidget.vue'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import { useUtils } from 'src/core/services/Utils'
 import Analytics from 'src/core/utils/google-analytics'

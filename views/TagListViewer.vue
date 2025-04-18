@@ -11,9 +11,9 @@
 </template>
 
 <script setup lang="ts">
-import SearchHit from 'components/layouts/SearchHit.vue'
 import _ from 'lodash'
 import { uid } from 'quasar'
+import SearchHit from 'src/core/components/layouts/SearchHit.vue'
 import Analytics from 'src/core/utils/google-analytics'
 import { Hit } from 'src/search/models/Hit'
 import { Tab } from 'src/tabsets/models/Tab'
