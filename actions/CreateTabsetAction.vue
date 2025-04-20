@@ -3,10 +3,10 @@
     <ContextMenuItem
       v-close-popup
       @was-clicked="clicked()"
-      icon="o_featured_play_list"
+      icon="o_add"
       color="primary"
       :indicate-issue="cannotCreateCollection()"
-      label="New Tabset">
+      label="Create Tabset">
     </ContextMenuItem>
   </template>
 </template>

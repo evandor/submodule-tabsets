@@ -94,6 +94,16 @@
             </q-icon>
             <!-- small icons in minimal view -->
             <template v-if="useUiStore().listDetailLevelEquals('MINIMAL', props.tabset?.details)">
+              <span v-if="(props.tab as Tab).placeholders">
+                <q-icon
+                  name="sym_o_dynamic_feed"
+                  size="12px"
+                  style="position: relative; top: -4px"
+                  class="q-mr-xs"
+                  @click.stop="toggleShowWith('placeholder')">
+                  <q-tooltip class="tooltip-small">There are placeholders defined for this tab</q-tooltip>
+                </q-icon>
+              </span>
               <span v-if="(props.tab as Tab).comments && (props.tab as Tab).comments.length > 0">
                 <q-icon
                   name="o_chat"
@@ -225,17 +235,13 @@
     <!-- === url(s) === -->
     <q-item-label
       style="width: 100%"
-      v-if="props.tab?.url && showWithMinDetails('SOME')"
+      v-if="props.tab?.url && (showWithMinDetails('SOME') || showPlaceholder())"
       caption
       class="ellipsis-2-lines text-accent q-pt-xs"
       @mouseover="showButtonsProp = true"
       @mouseleave="showButtonsProp = false">
       <div class="row q-ma-none">
         <div class="col-12 q-pr-lg q-mb-xs cursor-pointer" @click="gotoTab()">
-          <span v-if="props.sorting === TabSorting.URL">
-            <q-icon name="arrow_right" size="16px" />
-          </span>
-
           <template v-if="props.tab.extension !== UrlExtension.RSS">
             <short-url
               @click.stop="gotoTab()"
@@ -531,6 +537,7 @@ const hoveredTab = ref<string | undefined>(undefined)
 const tsBadges = ref<object[]>([])
 const newState = ref(false)
 const showCommentList = ref(false)
+const showPlaceholderList = ref(false)
 const groupName = ref<string | undefined>(undefined)
 const groups = ref<Map<string, chrome.tabGroups.TabGroup>>(new Map())
 const placeholders = ref<Object[]>([])
@@ -746,6 +753,10 @@ const showComments = () =>
   (props.tab as Tab).comments &&
   (props.tab as Tab).comments.length > 0
 
+const showPlaceholder = () => {
+  return showPlaceholderList.value
+}
+
 const toggleLists = (ident: string) => {
   switch (ident) {
     case 'annotations':
@@ -755,6 +766,10 @@ const toggleLists = (ident: string) => {
     case 'comments':
       //showAnnotationList.value = false
       showCommentList.value = !showCommentList.value
+      break
+    case 'placeholder':
+      //showAnnotationList.value = false
+      showPlaceholderList.value = !showPlaceholderList.value
       break
     default:
       console.log('undefined ident for toggle lists', ident)

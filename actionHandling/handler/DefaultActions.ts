@@ -4,9 +4,9 @@ import { useFeaturesStore } from 'src/features/stores/featuresStore'
 import { ComponentWithContext } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import ArchiveTabsetAction from 'src/tabsets/actions/ArchiveTabsetAction.vue'
 import ConvertToCollectionAction from 'src/tabsets/actions/ConvertToCollectionAction.vue'
-import CreateCollectionAction from 'src/tabsets/actions/CreateCollectionAction.vue'
 import CreateNoteAction from 'src/tabsets/actions/CreateNoteAction.vue'
 import CreateSubfolderAction from 'src/tabsets/actions/CreateSubfolderAction.vue'
+import CreateTabsetAction from 'src/tabsets/actions/CreateTabsetAction.vue'
 import DeleteFolderAction from 'src/tabsets/actions/DeleteFolderAction.vue'
 import DeleteTabsetAction from 'src/tabsets/actions/DeleteTabsetAction.vue'
 import EditFolderAction from 'src/tabsets/actions/EditFolderAction.vue'
@@ -24,9 +24,9 @@ export class DefaultActions {
   static getDefaultActions(currentTabset: Tabset | undefined): (ComponentWithContext | Component)[] {
     const actions: (ComponentWithContext | Component)[] = []
     actions.push(EditTabsetAction)
+    actions.push(CreateTabsetAction)
     actions.push(EditFolderAction)
     actions.push(CreateSubfolderAction)
-    actions.push(CreateCollectionAction)
 
     actions.push(CreateNoteAction)
 

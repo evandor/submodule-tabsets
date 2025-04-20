@@ -40,7 +40,7 @@ class PlaceholderUtils {
   }
 
   apply(tab: Tab, placeholders: string[], placeholderValues: Map<string, string>) {
-    var config: { [k: string]: any } = {}
+    let config: { [k: string]: any } = {}
     for (const p of placeholders) {
       config[p] = placeholderValues.get(p)
     }
@@ -52,6 +52,24 @@ class PlaceholderUtils {
     }
     return tab
   }
+
+  // expand(tab: Tab): string[] {
+  //   if (!tab.placeholders) {
+  //     return tab.url ? [tab.url] : []
+  //   }
+  //   const placeholders = tab.placeholders
+  //   if (placeholders.type !== PlaceholdersType.URL_SUBSTITUTION) {
+  //     return tab.url ? [tab.url] : []
+  //   }
+  //   const urls: string[] = []
+  //   const keys = Object.keys(placeholders.config) // e.g.path, day
+  //   for (const key of keys) {
+  //     // console.log(key, person[key]);
+  //     const v = (placeholders.config[key as keyof object] as string).split(',')
+  //     //matrix.push(key, v)
+  //   }
+  //   return urls
+  // }
 }
 
 export default new PlaceholderUtils()

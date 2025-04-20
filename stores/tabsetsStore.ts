@@ -320,11 +320,12 @@ export const useTabsetsStore = defineStore('tabsets', () => {
   })
 
   const tabsForUrl = computed((): ((url: string) => TabAndTabsetId[]) => {
+    const placeholderPattern = /\${[^}]*}/gm
     return (url: string) => {
       const tabsAndTabsetId: TabAndTabsetId[] = []
       forEach([...tabsets.value.values()] as Tabset[], (ts: Tabset) => {
         forEach(ts.tabs, (t: Tab) => {
-          if (t.url === url) {
+          if (t.url && t.url.replaceAll(placeholderPattern, '') === url) {
             tabsAndTabsetId.push(new TabAndTabsetId(t, ts.id))
           }
         })

@@ -4,17 +4,20 @@
     <q-expansion-item
       v-if="props.tabset"
       v-for="folder in folders"
+      :key="folder.id"
+      :v-model="expanded[folder.id]"
+      @show="expanded[folder.id] = true"
+      @hide="expanded[folder.id] = false"
       dense
       dense-toggle
       header-style="padding: 0px 2px 0px 4px;margin: 0px 0px 0px 0px;border:0 solid red;border-radius:3px;height:32px"
       hide-expand-icon
-      icon="o_folder"
       :label="folder.name">
       <template v-slot:header>
         <div class="row fit q-ma-none q-pa-none darkColors lightColors">
           <div class="col-2 text-center" style="border: 0 solid green; width: 35px; max-width: 35px">
-            <q-icon name="o_folder" color="warning" size="sm" />
-            <span class="tabsCount">{{ tabsAndFoldersCount(folder) }}</span>
+            <q-icon :name="expanded[folder.id] ? 'sym_o_folder_open' : 'folder'" color="warning" size="sm" />
+            <!--            <span class="tabsCount">{{ tabsAndFoldersCount(folder) }}</span>-->
           </div>
           <div class="col-6">
             <div>{{ folder.name }}</div>
@@ -63,12 +66,19 @@ const props = defineProps<Props>()
 
 const emits = defineEmits(['folders-found', 'folder-selected'])
 
+interface ExpandedState {
+  [key: string]: boolean
+}
+
 const currentChromeTab = ref<chrome.tabs.Tab | undefined>(undefined)
-const hoveredTabset = ref<string | undefined>(undefined)
 const folders = ref<Tabset[]>([])
+const expanded = ref<ExpandedState>({})
 
 onMounted(() => {
   folders.value = calcFolders(props.tabset)
+  folders.value.forEach((f: Tabset) => {
+    expanded.value[f.id] = false
+  })
 })
 
 watchEffect(() => {
