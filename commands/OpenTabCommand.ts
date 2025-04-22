@@ -39,7 +39,7 @@ export class OpenTabCommand implements Command<string> {
           break
       }
 
-      const handler = ref<AddUrlToTabsetHandler>(this.getHandler(this.tab.url!))
+      const handler = ref<AddUrlToTabsetHandler>(this.getHandler(this.tab.url))
       const browserTab = await useNavigationService().browserTabFor(this.tab.url!)
       handler.value.handleOpenedTab(browserTab, this.tab)
       //useContentStore().currentTabId = this.tab.id
@@ -49,7 +49,7 @@ export class OpenTabCommand implements Command<string> {
         if (useTabsetsStore().getCurrentTabset) {
           await useTabsetsStore().saveTabset(
             useTabsetsStore().getCurrentTabset!,
-            new ChangeInfo('tab', 'edited', this.tab.id, this.tab.url!),
+            new ChangeInfo('tab', 'edited', this.tab.id, this.tab.url),
           )
         }
       }

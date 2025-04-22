@@ -8,13 +8,15 @@ import { TabReference, TabReferenceType } from 'src/content/models/TabReference'
 import { useContentStore } from 'src/content/stores/contentStore'
 import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
+import { useLogger } from 'src/core/services/Logger'
 import { useUtils } from 'src/core/services/Utils'
 import ContentUtils from 'src/core/utils/ContentUtils'
 import Analytics from 'src/core/utils/google-analytics'
+import StatsUtils from 'src/core/utils/StatsUtils'
 import { useFeaturesStore } from 'src/features/stores/featuresStore'
 import { useRequestsService } from 'src/requests/services/RequestsService'
 import { useRequestsStore } from 'src/requests/stores/requestsStore'
-import { useLogger } from 'src/core/services/Logger'
+import { useMetrics } from 'src/services/Metrics'
 import { Tab } from 'src/tabsets/models/Tab'
 import { ChangeInfo, Tabset, TabsetSharing } from 'src/tabsets/models/Tabset'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
@@ -169,6 +171,11 @@ export class AddTabToTabsetCommand implements Command<any> {
       if (req && req.url === this.tab.url) {
         useRequestsService().logWebRequest(JSON.parse(JSON.stringify(req)))
       }
+
+      const stats = StatsUtils.calcStatsRows()
+      useMetrics().count('tabsets', stats.find((s) => s.name === 'Tabsets')?.count || 0)
+      useMetrics().count('tabs', stats.find((s) => s.name === 'Tabs')?.count || 0)
+      useMetrics().count('spaces', stats.find((s) => s.name === 'Spaces')?.count || 0)
 
       return res
     } catch (err: any) {

@@ -1,4 +1,5 @@
 <template>
+  <!-- TabListHelper -->
   <q-item
     v-if="props.tabs?.length === 0 && inBexMode() && useUiStore().rightDrawer.activeTab === DrawerTabs.UNASSIGNED_TABS">
     <div class="row fit q-ma-lg q-pa-lg text-subtitle2 text-grey-8">
@@ -10,22 +11,27 @@
     clickable
     v-ripple
     v-for="tab in props.tabs"
-    class="q-ma-none q-pa-md"
+    class="q-ma-none q-pa-xs"
     :style="itemStyle(tab)"
-    @click.stop="showDetails(tab)"
     @mouseover="showButtons(tab.id, true)"
     @mouseleave="showButtons(tab.id, false)"
     @dragstart="startDrag($event, tab)"
     :key="props.group + '_' + tab.id">
-    <PanelTabListElementWidget :key="props.group + '__' + tab.id" :tab="tabAsTab(tab)" :tabset-id="props.tabsetId" />
+    <PanelTabListElementWidget
+      :key="props.group + '__' + tab.id"
+      :tab="tabAsTab(tab)"
+      :tabset="props.tabset!"
+      :tabset-id="props.tabsetId"
+      :detailLevel="props.detailLevel as ListDetailLevel" />
   </q-item>
 </template>
 
 <script lang="ts" setup>
 import { useUtils } from 'src/core/services/Utils'
 import { Tab } from 'src/tabsets/models/Tab'
+import { Tabset } from 'src/tabsets/models/Tabset'
 import PanelTabListElementWidget from 'src/tabsets/widgets/PanelTabListElementWidget.vue'
-import { DrawerTabs, useUiStore } from 'src/ui/stores/uiStore'
+import { DrawerTabs, ListDetailLevel, useUiStore } from 'src/ui/stores/uiStore'
 import { PropType, ref } from 'vue'
 
 const props = defineProps({
@@ -35,7 +41,9 @@ const props = defineProps({
   highlightUrl: { type: String, required: false },
   tabsetSharedId: { type: String, required: false },
   tabsetMqttUrl: { type: String, required: false },
+  tabset: { type: Object as PropType<Tabset>, required: false },
   simpleUi: { type: Boolean, default: false },
+  detailLevel: { type: String as PropType<ListDetailLevel>, required: false },
 })
 
 const { inBexMode } = useUtils()

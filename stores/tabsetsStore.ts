@@ -319,17 +319,43 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     }
   })
 
+  // does not consider folders yet
   const tabsForUrl = computed((): ((url: string) => TabAndTabsetId[]) => {
     const placeholderPattern = /\${[^}]*}/gm
     return (url: string) => {
       const tabsAndTabsetId: TabAndTabsetId[] = []
       forEach([...tabsets.value.values()] as Tabset[], (ts: Tabset) => {
+        console.log(`checking ts ${Tabset.logIdent(ts)}:`)
         forEach(ts.tabs, (t: Tab) => {
+          console.log('checking', t.url)
           if (t.url && t.url.replaceAll(placeholderPattern, '') === url) {
+            console.log('checking***', t.url)
             tabsAndTabsetId.push(new TabAndTabsetId(t, ts.id))
           }
         })
       })
+      return tabsAndTabsetId
+    }
+  })
+
+  const tabsForUrlInCurrentTabset = computed((): ((url: string) => TabAndTabsetId[]) => {
+    const placeholderPattern = /\${[^}]*}/gm
+    return (url: string) => {
+      const tabsAndTabsetId: TabAndTabsetId[] = []
+      const currentTabset = useTabsetsStore().getCurrentTabset
+      if (currentTabset) {
+        //forEach([...tabsets.value.values()] as Tabset[], (ts: Tabset) => {
+        console.log(`checking ts ${Tabset.logIdent(currentTabset)}:`)
+        forEach(currentTabset.tabs, (t: Tab) => {
+          console.log('checking', t.url)
+          if (t.url && t.url.replaceAll(placeholderPattern, '') === url) {
+            console.log('checking***', t.url)
+            tabsAndTabsetId.push(new TabAndTabsetId(t, currentTabset.id))
+          }
+        })
+        forEach(currentTabset.folders, (f: Tabset) => {})
+      }
+      // })
       return tabsAndTabsetId
     }
   })
@@ -457,6 +483,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     getTabAndTabsetId,
     tabsetFor,
     tabsForUrl,
+    tabsForUrlInCurrentTabset,
     allTabsCount,
     rssTabs,
     getAllUrls,

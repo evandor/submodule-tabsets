@@ -14,10 +14,11 @@
       <TabListHelper
         :group="group!"
         :tabset-id="tabsetId!"
+        :tabset="props.tabset!"
         :tabset-shared-id="tabsetSharedId!"
-        :tabset-mqtt-url="tabsetMqttUrl!"
         :simpleUi="props.simpleUi"
-        :tabs="props.tabs" />
+        :tabs="props.tabs"
+        :detailLevel="props.detailLevel as ListDetailLevel" />
     </vue-draggable-next>
   </q-list>
 
@@ -25,10 +26,11 @@
     v-else
     :group="group"
     :tabset-id="tabsetId"
+    :tabset="props.tabset!"
     :tabset-shared-id="tabsetSharedId!"
-    :tabset-mqtt-url="tabsetMqttUrl!"
     :simpleUi="props.simpleUi"
-    :tabs="props.tabs" />
+    :tabs="props.tabs"
+    :detailLevel="props.detailLevel as ListDetailLevel" />
 </template>
 
 <script setup lang="ts">
@@ -37,8 +39,10 @@ import { useQuasar } from 'quasar'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import { CreateTabFromOpenTabsCommand } from 'src/tabsets/commands/CreateTabFromOpenTabs'
 import { Tab, TabSorting } from 'src/tabsets/models/Tab'
+import { Tabset } from 'src/tabsets/models/Tabset'
 import TabListHelper from 'src/tabsets/pages/pwa/TabListHelper.vue'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+import { ListDetailLevel } from 'src/ui/stores/uiStore'
 import InfoMessageWidget from 'src/ui/widgets/InfoMessageWidget.vue'
 import { PropType } from 'vue'
 import { VueDraggableNext } from 'vue-draggable-next'
@@ -52,9 +56,10 @@ const props = defineProps({
   group: { type: String, required: true },
   highlightUrl: { type: String, required: false },
   tabsetSharedId: { type: String, required: false },
-  tabsetMqttUrl: { type: String, required: false },
+  tabset: { type: Object as PropType<Tabset>, required: false },
   tabsetSorting: { type: String, required: false },
   simpleUi: { type: Boolean, default: false },
+  detailLevel: { type: String as PropType<ListDetailLevel>, required: false },
 })
 
 function adjustIndex(element: any, tabs: Tab[]) {

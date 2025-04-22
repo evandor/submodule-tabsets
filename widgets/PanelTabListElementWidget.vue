@@ -1,5 +1,5 @@
 <template>
-  <!-- left part: icon plus various -->
+  <!-- PanelTabListElementWidget left part: icon plus various -->
   <q-item-section
     @mouseover="hoveredTab = tab.id"
     @mouseleave="hoveredTab = undefined"
@@ -31,7 +31,7 @@
         </div>
       </transition>
     </div>
-    <template v-if="useUiStore().listDetailLevelGreaterEqual('SOME', props.tabset?.details)">
+    <template v-if="showDetailsForThreshold('SOME')">
       <div
         v-if="props.tab?.httpInfo === 'UPDATED'"
         class="q-my-xs q-mx-none q-pa-none text-white bg-positive items-center justify-center"
@@ -456,7 +456,7 @@
           :tabsetId="props.tabsetId!"
           :tab="tab" />
       </span>
-      <span v-else @click="removeSessionTab(tab)"> x </span>
+      <span v-else @click="removeSessionTab(tab)" class="q-mr-lg"> x </span>
       <span
         v-if="tab.readingTime > 0 && showWithMinDetails('SOME')"
         class="text-grey-5 q-mt-sm"
@@ -525,6 +525,7 @@ const props = defineProps({
   tabset: { type: Object as PropType<Tabset>, required: false },
   tabsetId: { type: String, required: false },
   filter: { type: String, required: false },
+  detailLevel: { type: String as PropType<ListDetailLevel>, required: false },
 })
 
 const $q = useQuasar()
@@ -747,11 +748,7 @@ const showSuggestion = () => {
 const openImage = () =>
   window.open(chrome.runtime.getURL('www/index.html#/mainpanel/png/' + props.tab.id + '/' + pngs.value[0]!.id))
 
-const showComments = () =>
-  showCommentList.value &&
-  showWithMinDetails('SOME') &&
-  (props.tab as Tab).comments &&
-  (props.tab as Tab).comments.length > 0
+const showComments = () => showCommentList.value && showWithMinDetails('SOME') && props.tab.comments.length > 0
 
 const showPlaceholder = () => {
   return showPlaceholderList.value
@@ -818,7 +815,7 @@ const showRssReferencesInfo = () => {
 const openSearch = () => {
   console.log('openSearch clicked')
   try {
-    const ref: object[] = props.tab!.tabReferences.filter((ref) => ref.type === TabReferenceType.OPEN_SEARCH)[0]!.data
+    const ref: object[] = props.tab.tabReferences.filter((ref) => ref.type === TabReferenceType.OPEN_SEARCH)[0]!.data
     const parser = new DOMParser()
     const xml = ref[0]!['xml' as keyof object]
     console.log('using xml', xml)
@@ -847,7 +844,7 @@ const openRssLink = (rss: TabReference) => {
 }
 
 const ignore = (rss: TabReference) => {
-  const tabReference = props.tab!.tabReferences.find((tr: TabReference) => tr.id === rss.id)
+  const tabReference = props.tab.tabReferences.find((tr: TabReference) => tr.id === rss.id)
   if (tabReference && props.tabset) {
     tabReference.status = 'IGNORED'
     useTabsetService().saveTabset(props.tabset)
@@ -905,14 +902,17 @@ const handleNameClick = useDblClickHandler(
   },
 )
 
-const showWithMinDetails = (level: ListDetailLevel) =>
-  doShowDetails.value || useUiStore().listDetailLevelGreaterEqual(level, props.tabset?.details)
+const showWithMinDetails = (level: ListDetailLevel) => doShowDetails.value || showDetailsForThreshold(level)
 
 const toggleShowWith = (ident: string | undefined) => {
   doShowDetails.value = !doShowDetails.value
   if (ident) {
     toggleLists(ident)
   }
+}
+
+const showDetailsForThreshold = (level: ListDetailLevel) => {
+  return useUiStore().listDetailLevelGreaterEqual(level, props.detailLevel || props.tabset?.details)
 }
 </script>
 

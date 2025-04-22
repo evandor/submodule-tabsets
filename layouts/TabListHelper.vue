@@ -29,7 +29,7 @@
 </template>
 
 <script lang="ts" setup>
-import TabListElementWidget from 'components/widgets/TabListElementWidget.vue'
+import TabListElementWidget from 'src/components/widgets/TabListElementWidget.vue'
 import { useUtils } from 'src/core/services/Utils'
 import { Tab } from 'src/tabsets/models/Tab'
 import { DrawerTabs, useUiStore } from 'src/ui/stores/uiStore'
@@ -48,6 +48,7 @@ const { inBexMode } = useUtils()
 
 const showDetails = (tab: Tab) => {
   //useUiStore().setSelectedTab(tab)
+  // console.log('-------_!!!')
   useUiStore().rightDrawerSetActiveTab(DrawerTabs.TAB_DETAILS)
 }
 

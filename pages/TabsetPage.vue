@@ -169,6 +169,7 @@
     narrow-indicator>
     <q-tab name="grid" label="As Grid" />
     <q-tab name="list" label="As List" />
+    <q-tab name="details" label="With Details" />
     <q-tab name="export" label="Export" />
   </q-tabs>
 
@@ -212,13 +213,26 @@
         :simple-ui="false" />
     </q-tab-panel>
 
-    <q-tab-panel class="q-ma-none q-pa-none" name="list">
+    <q-tab-panel class="q-ma-none q-pa-none q-mt-md" name="list">
       <TabList
         group="otherTabs"
         :tabsetId="tabset.id"
+        :tabset="tabset"
         :tabsetSorting="tabset.sorting"
         :tabsetSharedId="tabset.sharing?.sharedId!"
-        :tabs="tabset.tabs" />
+        :tabs="tabset.tabs"
+        :detailLevel="'MINIMAL'" />
+    </q-tab-panel>
+
+    <q-tab-panel class="q-ma-none q-pa-none q-mt-md" name="details">
+      <TabList
+        group="otherTabs"
+        :tabsetId="tabset.id"
+        :tabset="tabset"
+        :tabsetSorting="tabset.sorting"
+        :tabsetSharedId="tabset.sharing?.sharedId!"
+        :tabs="tabset.tabs"
+        :detailLevel="'MAXIMAL'" />
     </q-tab-panel>
 
     <q-tab-panel class="q-ma-none q-pa-none" name="export">
@@ -233,8 +247,8 @@
 </template>
 
 <script setup lang="ts">
-import TabsetsSelectorWidget from 'components/widgets/TabsetsSelectorWidget.vue'
 import { date, uid, useQuasar } from 'quasar'
+import TabsetsSelectorWidget from 'src/core/components/widgets/TabsetsSelectorWidget.vue'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import Analytics from 'src/core/utils/google-analytics'
 import JsUtils from 'src/core/utils/JsUtils'

@@ -50,7 +50,7 @@
       </q-item>
 
       <q-separator v-if="props.tabset.type !== TabsetType.DYNAMIC" />
-      <q-item v-if="props.tabset.type !== TabsetType.DYNAMIC" clickable>
+      <q-item v-if="props.tabset.type !== TabsetType.DYNAMIC && props.tabset.sharing.sharing" clickable>
         <q-item-section>Sharing</q-item-section>
         <q-item-section side>
           <q-icon name="keyboard_arrow_right" />
@@ -132,7 +132,7 @@
 
       <q-separator v-if="props.tabset.tabs.length > 0 && inBexMode()" />
       <q-item v-if="props.tabset.tabs.length > 0 && inBexMode()" clickable>
-        <q-item-section>Open all tabsets tabs...</q-item-section>
+        <q-item-section>Open all tabs...</q-item-section>
         <q-item-section side>
           <q-icon name="keyboard_arrow_right" />
         </q-item-section>
