@@ -119,7 +119,7 @@ const overDrag2 = (event: any) => {
 const drop = (evt: any, folder: Tabset) => {
   console.log('drop', evt, folder)
   const tabToDrag = useUiStore().tabBeingDragged
-  const tabset = useTabsetsStore().getCurrentTabset as Tabset | undefined
+  const tabset = useTabsetsStore().getCurrentTabset
   if (tabToDrag && tabset) {
     // console.log("tabToDrag", tabToDrag)
     const moveToFolderId = folder.id

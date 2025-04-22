@@ -63,8 +63,10 @@ const showDetails = ref(true)
 const shared = ref<object[]>([])
 const currentTabsetId = ref<string | undefined>(undefined)
 
-watchEffect(async () => {
-  currentTabsetId.value = await useTabsetsStore().getCurrentTabsetId()
+watchEffect(() => {
+  useTabsetsStore()
+    .getCurrentTabsetId()
+    .then((tsId: string | undefined) => (currentTabsetId.value = tsId))
 })
 
 const updateSharedInfo = async () => {
@@ -99,8 +101,8 @@ const updateSharedInfo = async () => {
   }
 }
 
-watchEffect(async () => {
-  await updateSharedInfo()
+watchEffect(() => {
+  updateSharedInfo()
 })
 
 watchEffect(() => {

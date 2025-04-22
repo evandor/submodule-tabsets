@@ -133,7 +133,7 @@ export class RapidApiAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
     additionalData?: AddUrlToTabsetHandlerAdditionalData,
   ): Promise<ExecutionResult<any>> {
     // eslint-disable-next-line @typescript-eslint/no-base-to-string
-    console.log(`handleOpenedTab ${browserTab}, ${ts as Tabset}, ${additionalData}`)
+    console.log(`handleOpenedTab ${browserTab}, ${ts}, ${additionalData}`)
 
     const api = RestApiDefinitions.getApi('RAPID_API_WEBSITE_CATEGORIZATION')
     if (api) {
@@ -155,7 +155,7 @@ export class RapidApiAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
       }
 
       return Promise.resolve(
-        $q!.dialog({
+        $q.dialog({
           title: 'Adding Rapid API',
           message: 'This tab contains the definition of an Rapid API',
           options: {

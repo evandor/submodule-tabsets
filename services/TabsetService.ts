@@ -50,7 +50,7 @@ class TabsetService {
   }
 
   async saveToCurrentTabset(tab: Tab, useIndex: number | undefined = undefined): Promise<Tabset> {
-    const currentTs = useTabsetsStore().getCurrentTabset as Tabset | undefined
+    const currentTs = useTabsetsStore().getCurrentTabset
     if (currentTs) {
       return useTabsetService().addToTabset(currentTs, tab, useIndex)
     }
@@ -71,7 +71,7 @@ class TabsetService {
   }
 
   setOnlySelectedTab(tab: Tab) {
-    const currentTabset = useTabsetsStore().getCurrentTabset as Tabset | undefined
+    const currentTabset = useTabsetsStore().getCurrentTabset
     if (currentTabset) {
       _.forEach(currentTabset.tabs, (t: Tab) => {
         //t.selected = t.id === tab.id;

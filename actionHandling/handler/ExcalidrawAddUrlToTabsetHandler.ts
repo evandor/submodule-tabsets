@@ -35,7 +35,7 @@ export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   defaultAction(): ActionContext | undefined {
     const tabset: Tabset | undefined = useTabsetsStore().getCurrentTabset
     if (tabset) {
-      var actions = (tabset.tabs as Tab[])
+      var actions = tabset.tabs
         .filter((t: Tab) => t.url !== undefined)
         .filter((t: Tab) => t.url!.match(this.urlMatcher()))
         .map((t: Tab) => {
@@ -57,7 +57,7 @@ export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   actions(): Component[] {
     const tabset: Tabset | undefined = useTabsetsStore().getCurrentTabset
     if (tabset) {
-      const actions: (ComponentWithContext | Component)[] = (tabset.tabs as Tab[])
+      const actions: (ComponentWithContext | Component)[] = tabset.tabs
         .filter((t: Tab) => t.url !== undefined)
         .filter((t: Tab) => t.url!.match(this.urlMatcher()))
         .map((t: Tab) => {
@@ -101,7 +101,7 @@ export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
 
       const newTab = new Tab(uid(), chromeTab)
 
-      const returned = await ExcalidrawAddUrlToTabsetHandler.queryBrowserTab(chromeTab, newTab.id, filename!)
+      const returned = await ExcalidrawAddUrlToTabsetHandler.queryBrowserTab(chromeTab, newTab.id, filename)
       if (returned.length > 0) {
         newTab.title = filename
 
@@ -213,7 +213,7 @@ export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   }
 
   async newFileDialog($q: QVueGlobals, filename: string = ''): Promise<DialogChainObject> {
-    return $q!.dialog({
+    return $q.dialog({
       title: 'Save as Excalidraw File',
       message: 'Please Provide a name (min 3 characters)',
       prompt: { model: filename, isValid: (val: string) => val.length > 2, type: 'text' },

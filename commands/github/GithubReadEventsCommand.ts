@@ -74,7 +74,7 @@ export class GithubReadEventsCommand extends GithubCommands<string> {
                     parts[2] as TabsetEventType,
                     parts[3],
                     parts[4],
-                    parts[5]!,
+                    parts[5],
                     parts[6] ? parts[6].split(',') : [],
                   )
                   switch (tabsetEvent.event) {
@@ -154,7 +154,7 @@ export class GithubReadEventsCommand extends GithubCommands<string> {
                 break
               case 'space':
                 if (parts[3]) {
-                  const spaceEvent = new SpaceEvent(parts[2] as TabsetEventType, parts[3]!, undefined, parts[5]!)
+                  const spaceEvent = new SpaceEvent(parts[2] as TabsetEventType, parts[3], undefined, parts[5]!)
                   if (spaceEvent.event === 'added') {
                     // useTabsetsStore().addTabset(new Tabset(tabsetEvent.tabsetId!, tabsetEvent.name, []))
                     const space = new Space(spaceEvent.spaceId, spaceEvent.name)
@@ -168,12 +168,7 @@ export class GithubReadEventsCommand extends GithubCommands<string> {
                 if (parts[3]) {
                   const decoded = atob(parts[5]!)
                   //console.log('decoded', decoded)
-                  const noteEvent = new NoteEvent(
-                    parts[2] as TabsetEventType,
-                    parts[3]!,
-                    parts[4]!,
-                    JSON.parse(decoded),
-                  )
+                  const noteEvent = new NoteEvent(parts[2] as TabsetEventType, parts[3], parts[4]!, JSON.parse(decoded))
                   if (noteEvent.event === 'added') {
                     //console.log('noteEvent', noteEvent)
                     // const notebook = new Notebook(uid(), noteEvent.tabsetId, NotebookType.TABSET, noteEvent.name)

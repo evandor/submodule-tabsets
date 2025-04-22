@@ -60,8 +60,10 @@ const onMessageListener = (request: any, sender: chrome.runtime.MessageSender, s
 
 onMounted(() => {
   Analytics.firePageViewEvent('MainPanelTabsetPage', document.location.href)
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   console.log('--- adding/resetting message listener ---', chrome.runtime.onMessage.hasListener(onMessageListener))
   //chrome.runtime.onMessage.removeListener(onMessageListener)
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   chrome.runtime.onMessage.addListener(onMessageListener)
 
   if (!route || !route.params) {
@@ -77,6 +79,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   console.log('--- removing message listener ---')
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   chrome.runtime.onMessage.removeListener(onMessageListener)
 })
 

@@ -123,17 +123,17 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
 
     const firestore: Firestore = FirebaseServices.getFirestore()
 
-    ts.sharing!.sharing = sharingType
-    ts.sharing!.sharedBy = sharedBy
+    ts.sharing.sharing = sharingType
+    ts.sharing.sharedBy = sharedBy
     ts.view = 'list'
 
     if (sharingType === TabsetSharing.UNSHARED) {
       console.log('deleting share for tabset', ts.sharing?.sharedId)
       if (sharedId) {
         await deleteDoc(doc(firestore, 'public-tabsets', sharedId))
-        ts.sharing!.sharedBy = undefined
-        ts.sharing!.sharedById = undefined
-        ts.sharing!.sharedId = undefined
+        ts.sharing.sharedBy = undefined
+        ts.sharing.sharedById = undefined
+        ts.sharing.sharedId = undefined
         await this.saveTabset(ts)
       }
       return
@@ -180,8 +180,8 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
         const publicId = uid()
         console.log('setting shared id to ', publicId)
 
-        ts.sharing!.sharedId = publicId
-        ts.sharing!.sharedById = useAuthStore().user.uid
+        ts.sharing.sharedId = publicId
+        ts.sharing.sharedById = useAuthStore().user.uid
         await this.saveTabset(ts)
 
         // avoid id leakage
@@ -192,7 +192,7 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
         const notesForTabset = await useNotesStore().getNotesFor(ts.id)
         console.log('found notes for tabset', ts.id, notesForTabset)
         for (const note of notesForTabset) {
-          note.sharedById = sha256(ts.sharing!.sharedById!)
+          note.sharedById = sha256(ts.sharing.sharedById)
           note.sharedId = publicId
           await setDoc(doc(firestore, 'public-notes', note.id), JSON.parse(JSON.stringify(note)))
         }
@@ -245,8 +245,8 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
     const invitationEmail = useEmailTemplates().invitationSetup(email, ts.name, sharedBy || 'unknown', tabsToShare)
     //console.log('about to add', invitationEmail)
     await addDoc(collection(firestore, 'emails'), JSON.parse(JSON.stringify(invitationEmail)))
-    ts.sharing!.sharing = TabsetSharing.USER
-    ts.sharing!.sharedBy = useAuthStore().user.email || undefined
+    ts.sharing.sharing = TabsetSharing.USER
+    ts.sharing.sharedBy = useAuthStore().user.email || undefined
     await useTabsetsStore().saveTabset(ts)
   }
 
@@ -269,8 +269,8 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
     //console.log('r', r.path)
     const refDoc = await getDoc(r.reference)
     const referencedTabset = refDoc.data() as Tabset
-    referencedTabset.sharing!.shareReference = r.reference.path
-    referencedTabset.sharing!.sharedById = r.reference.path.split('/')[1]
+    referencedTabset.sharing.shareReference = r.reference.path
+    referencedTabset.sharing.sharedById = r.reference.path.split('/')[1]
     referencedTabset.loaded = new Date().getTime()
     if (!referencedTabset.augmentedData) {
       referencedTabset.augmentedData = new AugmentedData()

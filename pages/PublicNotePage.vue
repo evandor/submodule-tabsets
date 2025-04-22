@@ -59,6 +59,7 @@ let editorJS2: EditorJS = undefined as unknown as EditorJS
 
 const { treeNodeFromNote, executeOnSubPage } = useMainPanelNotePage()
 
+// eslint-disable-next-line @typescript-eslint/no-misused-promises
 watchEffect(async () => {
   if (notebook.value) {
     treeData.value = _.map(notebook.value.subPages, (n: NotesPage) => {
@@ -71,6 +72,7 @@ onMounted(() => {
   Analytics.firePageViewEvent('PublicNotePage', document.location.href)
 })
 
+// eslint-disable-next-line @typescript-eslint/no-misused-promises
 watchEffect(async () => {
   console.log('hier', notebookId.value)
   if (useNotesStore().loaded) {

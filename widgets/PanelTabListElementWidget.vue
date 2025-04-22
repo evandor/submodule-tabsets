@@ -639,7 +639,7 @@ watchEffect(() => {
   //console.log("===>", placeholders.value)
 })
 
-watchEffect(async () => {
+watchEffect(() => {
   if (props.tab) {
     //pngs.value = await useSnapshotsService().getPngsForTab(props.tab.id)
   }
@@ -747,10 +747,7 @@ const openImage = () =>
   window.open(chrome.runtime.getURL('www/index.html#/mainpanel/png/' + props.tab.id + '/' + pngs.value[0]!.id))
 
 const showComments = () =>
-  showCommentList.value &&
-  showWithMinDetails('SOME') &&
-  (props.tab as Tab).comments &&
-  (props.tab as Tab).comments.length > 0
+  showCommentList.value && showWithMinDetails('SOME') && props.tab.comments && props.tab.comments.length > 0
 
 const toggleLists = (ident: string) => {
   switch (ident) {
@@ -809,7 +806,7 @@ const showRssReferencesInfo = () => {
 const openSearch = () => {
   console.log('openSearch clicked')
   try {
-    const ref: object[] = props.tab!.tabReferences.filter((ref) => ref.type === TabReferenceType.OPEN_SEARCH)[0]!.data
+    const ref: object[] = props.tab.tabReferences.filter((ref) => ref.type === TabReferenceType.OPEN_SEARCH)[0]!.data
     const parser = new DOMParser()
     const xml = ref[0]!['xml' as keyof object]
     console.log('using xml', xml)
@@ -838,7 +835,7 @@ const openRssLink = (rss: TabReference) => {
 }
 
 const ignore = (rss: TabReference) => {
-  const tabReference = props.tab!.tabReferences.find((tr: TabReference) => tr.id === rss.id)
+  const tabReference = props.tab.tabReferences.find((tr: TabReference) => tr.id === rss.id)
   if (tabReference && props.tabset) {
     tabReference.status = 'IGNORED'
     useTabsetService().saveTabset(props.tabset)
