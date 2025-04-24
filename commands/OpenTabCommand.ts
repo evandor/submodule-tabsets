@@ -40,7 +40,7 @@ export class OpenTabCommand implements Command<string> {
       }
 
       const handler = ref<AddUrlToTabsetHandler>(this.getHandler(this.tab.url))
-      const browserTab = await useNavigationService().browserTabFor(this.tab.url!)
+      const browserTab = await useNavigationService().browserTabFor(this.tab.url!, this.tab.id)
       handler.value.handleOpenedTab(browserTab, this.tab)
       //useContentStore().currentTabId = this.tab.id
       await chrome.tabs.highlight({ tabs: browserTab.index })

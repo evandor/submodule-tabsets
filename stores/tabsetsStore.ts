@@ -1,6 +1,7 @@
 // ? expected diffs to localstorage
 // ? expected diffs to localstorage
 // ? expected diffs to localstorage
+// ? expected diffs to localstorage
 import _, { forEach } from 'lodash'
 import { defineStore } from 'pinia'
 import { uid } from 'quasar'
@@ -219,20 +220,10 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     })
     if (found) {
       currentTabsetId.value = found.id
-      //console.log("setting folderactive", found.folderActive)
       currentTabsetFolderId.value = found.folderActive
       return found
     } else {
-      // if (!stop) {
-      //   console.debug(`did not find tabset ${tabsetId}, resorting to reload`)
-      //   useTabsetsStore()
-      //     .loadTabsets()
-      //     .then(() => {
-      //       selectCurrentTabset(tabsetId, true)
-      //     })
-      // } else {
       console.debug(`did not find tabset ${tabsetId}, not trying to reload`)
-      // }
     }
     return undefined
   }
@@ -325,11 +316,11 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     return (url: string) => {
       const tabsAndTabsetId: TabAndTabsetId[] = []
       forEach([...tabsets.value.values()] as Tabset[], (ts: Tabset) => {
-        console.log(`checking ts ${Tabset.logIdent(ts)}:`)
+        //console.log(`checking ts ${Tabset.logIdent(ts)}:`)
         forEach(ts.tabs, (t: Tab) => {
-          console.log('checking', t.url)
+          // console.log('checking', t.url)
           if (t.url && t.url.replaceAll(placeholderPattern, '') === url) {
-            console.log('checking***', t.url)
+            // console.log('checking***', t.url)
             tabsAndTabsetId.push(new TabAndTabsetId(t, ts.id))
           }
         })
@@ -338,25 +329,28 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     }
   })
 
-  const tabsForUrlInCurrentTabset = computed((): ((url: string) => TabAndTabsetId[]) => {
+  const tabsFor = (url: string, folders: Tabset[]): TabAndTabsetId[] => {
+    if (folders.length === 0) {
+      return []
+    }
     const placeholderPattern = /\${[^}]*}/gm
+    const hits: TabAndTabsetId[] = []
+    forEach(folders, (f: Tabset) => {
+      const r = f.tabs.filter((t: Tab) => t.url?.replaceAll(placeholderPattern, '') === url)
+      hits.push(...r.map((r: Tab) => new TabAndTabsetId(r, f.id)))
+      hits.push(...tabsFor(url, f.folders))
+    })
+    return hits
+  }
+
+  const tabsForUrlInCurrentTabset = computed((): ((url: string) => TabAndTabsetId[]) => {
     return (url: string) => {
-      const tabsAndTabsetId: TabAndTabsetId[] = []
       const currentTabset = useTabsetsStore().getCurrentTabset
       if (currentTabset) {
-        //forEach([...tabsets.value.values()] as Tabset[], (ts: Tabset) => {
-        console.log(`checking ts ${Tabset.logIdent(currentTabset)}:`)
-        forEach(currentTabset.tabs, (t: Tab) => {
-          console.log('checking', t.url)
-          if (t.url && t.url.replaceAll(placeholderPattern, '') === url) {
-            console.log('checking***', t.url)
-            tabsAndTabsetId.push(new TabAndTabsetId(t, currentTabset.id))
-          }
-        })
-        forEach(currentTabset.folders, (f: Tabset) => {})
+        //console.log(`checking ts ${Tabset.logIdent(currentTabset)}:`)
+        return tabsFor(url, [currentTabset])
       }
-      // })
-      return tabsAndTabsetId
+      return []
     }
   })
 
@@ -463,6 +457,33 @@ export const useTabsetsStore = defineStore('tabsets', () => {
   const activeReminders = (): Tab[] =>
     reminderTabset.value.tabs.filter((t: Tab) => new Date().getTime() >= (t.reminder ?? 0))
 
+  function checkTabsets(tabsets: Tabset[], tabId: string, chain: Tabset[] = []): [Tabset[], Tab | undefined] {
+    console.log(`starting with`, tabsets.map((t) => t.name).join(','), `Level ${chain.length}`)
+    for (const tabset of tabsets) {
+      console.log('checking tabset', tabset.name)
+      for (const t of tabset.tabs) {
+        console.log('checking tab', t.url)
+        if (t.id === tabId) {
+          console.log('found tab!', t.id)
+          chain.push(tabset)
+          return [chain, t]
+        }
+      }
+      chain.push(tabset)
+      const result = checkTabsets(tabset.folders, tabId, chain)
+      if (result[1]) {
+        return result
+      } else {
+        chain.pop()
+      }
+    }
+    return [[], undefined]
+  }
+
+  const getParentChainForTabId = (tabId: string): [Tabset[], Tab | undefined] => {
+    return checkTabsets([...tabsets.value.values()], tabId)
+  }
+
   return {
     initialize,
     tabsets,
@@ -499,5 +520,6 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     activeReminders,
     loaded,
     lastUpdate,
+    getParentChainForTabId,
   }
 })

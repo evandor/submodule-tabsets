@@ -36,7 +36,7 @@ watchEffect(() => {
   tabsetId.value = route.params.tabsetId as string
   if (tabsetId.value) {
     console.debug('got tabset id', tabsetId.value)
-    tabset.value = useTabsetsStore().getTabset(tabsetId.value) as Tabset | undefined
+    tabset.value = useTabsetsStore().getTabset(tabsetId.value)
     useTabsetsStore().selectCurrentTabset(tabsetId.value)
 
     if (tabset.value && !editorJS2) {

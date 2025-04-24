@@ -74,7 +74,7 @@ export class GithubReadEventsCommand extends GithubCommands<string> {
                     parts[2] as TabsetEventType,
                     parts[3],
                     parts[4],
-                    parts[5]!,
+                    parts[5],
                     parts[6] ? parts[6].split(',') : [],
                   )
                   switch (tabsetEvent.event) {
