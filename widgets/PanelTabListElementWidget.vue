@@ -93,7 +93,7 @@
               <q-tooltip class="tooltip_small">This tab is marked as favorite</q-tooltip>
             </q-icon>
             <!-- small icons in minimal view -->
-            <template v-if="useUiStore().listDetailLevelEquals('MINIMAL', props.tabset?.details)">
+            <template v-if="showDetailsForThreshold('MINIMAL')">
               <span v-if="(props.tab as Tab).placeholders">
                 <q-icon
                   name="sym_o_dynamic_feed"
@@ -912,6 +912,7 @@ const toggleShowWith = (ident: string | undefined) => {
 }
 
 const showDetailsForThreshold = (level: ListDetailLevel) => {
+  console.log('--->', level, props.detailLevel, props.tabset?.details)
   return useUiStore().listDetailLevelGreaterEqual(level, props.detailLevel || props.tabset?.details)
 }
 </script>
