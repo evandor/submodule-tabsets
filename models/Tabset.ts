@@ -89,7 +89,7 @@ export class Tabset {
 
   spaces: string[] // got json problems with set<string>
   view: string = 'grid'
-  details: ListDetailLevel | undefined = undefined
+  details: ListDetailLevel | undefined = 'DEFAULT'
   sorting: string = 'custom'
   status: TabsetStatus = TabsetStatus.DEFAULT
   type: TabsetType = TabsetType.DEFAULT

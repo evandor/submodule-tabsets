@@ -112,15 +112,6 @@ const props = withDefaults(defineProps<Props>(), {
   fromPanel: false,
 })
 
-// const props = defineProps({
-//   tabsetId: { type: String, required: true },
-//   tabsetName: { type: String, required: true },
-//   tabsetColor: { type: String, required: false },
-//   window: { type: String, required: false },
-//   details: { type: ListDetailLevel, default: 'MAXIMAL' },
-//   fromPanel: { type: Boolean, default: false },
-// })
-
 const { dialogRef, onDialogHide, onDialogCancel } = useDialogPluginComponent()
 
 const newTabsetName = ref(props.tabsetName)
@@ -129,7 +120,6 @@ const hideWarning = ref(false)
 const windowMgtSelectionHasFocus = ref(false)
 // const windowMgtSelectionEdited = ref(false)
 const theColor = ref<string | undefined>(props.tabsetColor || undefined)
-const windowModel = ref<string>(props.window || 'current')
 const windowOptions = ref<string[]>([])
 const detailOption = ref<ListDetailLevel>(props.details)
 
@@ -137,6 +127,7 @@ const detailOptions = [
   { label: 'Minimal Details', value: 'MINIMAL' },
   { label: 'Some Details', value: 'SOME' },
   { label: 'All Details', value: 'MAXIMAL' },
+  { label: 'Default', value: 'DEFAULT' },
 ]
 
 watchEffect(() => {
@@ -163,7 +154,7 @@ watchEffect(() => {
 
 const updateTabset = () =>
   useCommandExecutor().executeFromUi(
-    new RenameTabsetCommand(props.tabsetId, newTabsetName.value, theColor.value, windowModel.value, detailOption.value),
+    new RenameTabsetCommand(props.tabsetId, newTabsetName.value, theColor.value, 'current', detailOption.value),
   )
 
 const newTabsetDialogWarning = () => {
@@ -178,27 +169,16 @@ const newTabsetNameIsValid = computed(
   () => newTabsetName.value?.length <= 32 && !STRIP_CHARS_IN_USER_INPUT.test(newTabsetName.value),
 )
 
-const enterPressed = () => (windowMgtSelectionHasFocus.value = false)
-
 const disableSubmit = (): boolean => {
-  if (windowModel.value?.trim().length === 0) {
-    return true
-  }
   return (
     newTabsetName.value.trim().length === 0 ||
     (newTabsetName.value.trim() === props.tabsetName &&
-      windowModel.value?.trim() === props.window &&
-      theColor.value?.trim() === props.tabsetColor) ||
+      theColor.value?.trim() === props.tabsetColor &&
+      props.details === detailOption.value) ||
     newTabsetDialogWarning() !== '' ||
     windowMgtSelectionHasFocus.value
   )
 }
-
-// const createWindowOption = (val: any, done: any) => {
-//   const sanitized = val ? val.replace(STRIP_CHARS_IN_USER_INPUT, '') : 'current'
-//   windowOptions.value.push(sanitized)
-//   done(sanitized, 'add-unique')
-// }
 </script>
 
 <style lang="sass" scoped>
