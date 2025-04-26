@@ -112,12 +112,14 @@ const currentTabsetId = ref<string | undefined>(undefined)
 const alreadyInTabset = ref(false)
 
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
-watchEffect(async () => {
-  currentTabsetId.value = await useTabsetsStore().getCurrentTabsetId()
+watchEffect(() => {
+  useTabsetsStore()
+    .getCurrentTabsetId()
+    .then((tsId: string | undefined) => (currentTabsetId.value = tsId))
 })
 
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
-watchEffect(async () => {
+watchEffect(() => {
   handler.value = getHandler(props.currentChromeTab.url, props.folder)
   defaultAction.value = handler.value.defaultAction()
   // const currentTabsetId = await useTabsetsStore().getCurrentTabsetId()

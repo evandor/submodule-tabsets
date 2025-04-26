@@ -1,4 +1,5 @@
 <template>
+  <!-- TabList -->
   <InfoMessageWidget
     v-if="!preventDragAndDrop() && props.tabs?.length > 1"
     :probability="0.3"
@@ -13,7 +14,8 @@
       @change="handleDragAndDrop">
       <TabListHelper
         :group="group"
-        :tabset-id="tabsetId"
+        :tabset-id="props.tabsetId"
+        :tabset="props.tabset!"
         :tabset-shared-id="tabsetSharedId!"
         :simpleUi="props.simpleUi"
         :tabs="props.tabs" />
@@ -23,7 +25,8 @@
   <TabListHelper
     v-else
     :group="group"
-    :tabset-id="tabsetId"
+    :tabset-id="props.tabsetId"
+    :tabset="props.tabset!"
     :tabset-shared-id="tabsetSharedId!"
     :simpleUi="props.simpleUi"
     :tabs="props.tabs" />
@@ -35,6 +38,7 @@ import { useQuasar } from 'quasar'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import { CreateTabFromOpenTabsCommand } from 'src/tabsets/commands/CreateTabFromOpenTabs'
 import { Tab, TabSorting } from 'src/tabsets/models/Tab'
+import { Tabset } from 'src/tabsets/models/Tabset'
 import TabListHelper from 'src/tabsets/pages/pwa/TabListHelper.vue'
 import TabsetService from 'src/tabsets/services/TabsetService'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
@@ -47,6 +51,7 @@ const $q = useQuasar()
 const props = defineProps({
   tabs: { type: Array as PropType<Tab[]>, required: true },
   tabsetId: { type: String, required: true },
+  tabset: { type: Object as PropType<Tabset>, required: false },
   group: { type: String, required: true },
   highlightUrl: { type: String, required: false },
   tabsetSharedId: { type: String, required: false },

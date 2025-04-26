@@ -53,8 +53,7 @@ const messageCount = ref(0)
 
 const { clearMessage } = useSidePanelMessagesMarkupView()
 
-// eslint-disable-next-line @typescript-eslint/no-misused-promises
-watchEffect(async () => {
+watchEffect(() => {
   const msgs = useMessagesStore().getUnreadMessages
   messages.value = msgs.slice(0, 20)
   messageCount.value = msgs.length

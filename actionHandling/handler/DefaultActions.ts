@@ -4,16 +4,11 @@ import { useFeaturesStore } from 'src/features/stores/featuresStore'
 import { ComponentWithContext } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import ArchiveTabsetAction from 'src/tabsets/actions/ArchiveTabsetAction.vue'
 import ConvertToCollectionAction from 'src/tabsets/actions/ConvertToCollectionAction.vue'
-import CreateCollectionAction from 'src/tabsets/actions/CreateCollectionAction.vue'
 import CreateNoteAction from 'src/tabsets/actions/CreateNoteAction.vue'
-import CreateSubfolderAction from 'src/tabsets/actions/CreateSubfolderAction.vue'
 import DeleteFolderAction from 'src/tabsets/actions/DeleteFolderAction.vue'
-import DeleteTabsetAction from 'src/tabsets/actions/DeleteTabsetAction.vue'
 import EditFolderAction from 'src/tabsets/actions/EditFolderAction.vue'
-import EditTabsetAction from 'src/tabsets/actions/EditTabsetAction.vue'
 import ExportTabsetAction from 'src/tabsets/actions/ExportTabsetAction.vue'
 import NewTabAction from 'src/tabsets/actions/NewTabAction.vue'
-import OpenAllInMenuAction from 'src/tabsets/actions/OpenAllInMenuAction.vue'
 import OpenTabsetAction from 'src/tabsets/actions/OpenTabsetAction.vue'
 import ShareTabsetAction from 'src/tabsets/actions/ShareTabsetAction.vue'
 import ShowGalleryAction from 'src/tabsets/actions/ShowGalleryAction.vue'
@@ -24,16 +19,16 @@ import { Component } from 'vue'
 export class DefaultActions {
   static getDefaultActions(currentTabset: Tabset | undefined): (ComponentWithContext | Component)[] {
     const actions: (ComponentWithContext | Component)[] = []
-    actions.push(EditTabsetAction)
+    //actions.push(EditTabsetAction)
+    //actions.push(CreateTabsetAction)
     actions.push(EditFolderAction)
-    actions.push(CreateSubfolderAction)
-    actions.push(CreateCollectionAction)
+    // actions.push(CreateSubfolderAction)
 
     actions.push(CreateNoteAction)
 
-    if (currentTabset && currentTabset.tabs.length > 0 && useFeaturesStore().hasFeature(FeatureIdent.GALLERY)) {
-      actions.push(ShowGalleryAction)
-    }
+    // if (currentTabset && currentTabset.tabs.length > 0 && useFeaturesStore().hasFeature(FeatureIdent.GALLERY)) {
+    //   actions.push(ShowGalleryAction)
+    // }
     if (
       currentTabset &&
       useFeaturesStore().hasFeature(FeatureIdent.ARCHIVE_TABSET) &&
@@ -45,7 +40,7 @@ export class DefaultActions {
       actions.push(ConvertToCollectionAction)
     }
 
-    actions.push(OpenAllInMenuAction)
+    //    actions.push(OpenAllInMenuAction)
     actions.push(ShareTabsetAction)
 
     if (useFeaturesStore().hasFeature(FeatureIdent.DEV_MODE)) {
@@ -59,7 +54,8 @@ export class DefaultActions {
       actions.push(OpenTabsetAction)
     }
 
-    actions.push(DeleteTabsetAction, DeleteFolderAction)
+    // actions.push(DeleteTabsetAction)
+    actions.push(DeleteFolderAction)
     // console.log('action', actions)
     return actions
   }

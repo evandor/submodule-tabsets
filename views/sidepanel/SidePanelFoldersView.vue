@@ -118,10 +118,8 @@ const calcFolders = (tabset: Tabset): Tabset[] => {
 }
 
 watchEffect(() => {
-  if (props.filter || props.tabset.folderActive) {
-    folders.value = calcFolders(props.tabset)
-    emits('folders-found', folders.value.length)
-  }
+  folders.value = calcFolders(props.tabset)
+  emits('folders-found', folders.value.length)
 })
 
 const startDrag = (evt: any, folder: Tabset) => {

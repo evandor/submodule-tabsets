@@ -1,6 +1,6 @@
 <template>
   <q-separator inset />
-  <ContextMenuItem v-close-popup @was-clicked="clicked()" icon="o_folder_open" color="warning" label="New Subfolder" />
+  <ContextMenuItem v-close-popup @was-clicked="clicked()" icon="o_folder_open" color="warning" label="New Folder" />
 </template>
 <script setup lang="ts">
 import { useQuasar } from 'quasar'

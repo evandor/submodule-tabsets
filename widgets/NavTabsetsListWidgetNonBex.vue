@@ -1,5 +1,5 @@
 <template>
-  <div class="q-ma-none q-pa-none" style="max-width: 300px">
+  <div class="q-ma-none q-pa-none" style="max-width: 300px; border: 0 solid green">
     <q-list dense>
       <q-item v-for="(tabset, index) in tabsets" class="darken-on-hover">
         <q-item-section
@@ -44,7 +44,7 @@
           </q-item-label>
         </q-item-section>
         <q-item-section
-          class="text-right q-mx-sm cursor-pointer"
+          class="text-right cursor-pointer"
           @mouseover="hoveredTab = tabset.id"
           @mouseleave="hoveredTab = undefined"
           style="max-width: 25px; font-size: 12px">
@@ -99,7 +99,7 @@ onMounted(async () => {
 watchEffect(() => {
   useTabsetsStore()
     .getCurrentTabsetId()
-    .then((v: string | undefined) => (activeTabset.value = v))
+    .then((tsId: string | undefined) => (activeTabset.value = tsId))
 })
 
 const selectTS = (tabset: Tabset) => {

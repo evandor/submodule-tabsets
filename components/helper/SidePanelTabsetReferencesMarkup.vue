@@ -38,8 +38,8 @@
             class="cursor-pointer"
             @click="removeShare(share['email' as keyof object])">
             <q-tooltip class="tooltip-small" anchor="top left" self="center middle"
-              >Stop sharing this collection</q-tooltip
-            >
+              >Stop sharing this collection
+            </q-tooltip>
           </q-icon>
         </div>
       </template>
@@ -69,7 +69,7 @@ watchEffect(() => {
     .then((tsId: string | undefined) => (currentTabsetId.value = tsId))
 })
 
-const updateSharedInfo = async () => {
+const updateSharedInfo = () => {
   if (currentTabsetId.value && useAuthStore().user?.uid) {
     const fs = FirebaseServices.getFirestore()
     tabset.value = useTabsetsStore().getCurrentTabset

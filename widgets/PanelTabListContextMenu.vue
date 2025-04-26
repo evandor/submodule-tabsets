@@ -39,7 +39,8 @@
       <template
         v-if="
           useFeaturesStore().hasFeature(FeatureIdent.ADVANCED_TAB_MANAGEMENT) &&
-          props.tabset!.type !== TabsetType.SPECIAL
+          props.tabset!.type !== TabsetType.SPECIAL &&
+          !fullpageView
         ">
         <q-separator inset />
         <q-item clickable v-close-popup @click.stop="assignTab(props['tab' as keyof object])">
@@ -132,7 +133,7 @@ import { Tab } from 'src/tabsets/models/Tab'
 import { MonitoredTab, Tabset, TabsetType } from 'src/tabsets/models/Tabset'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { PropType, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 const props = defineProps({
   tab: { type: Object as PropType<Tab>, required: true },
@@ -144,6 +145,8 @@ const emit = defineEmits(['toggleExpand'])
 
 const $q = useQuasar()
 const router = useRouter()
+const route = useRoute()
+const fullpageView = route.fullPath.startsWith('/tabsets/')
 
 const theColor = ref<string | undefined>(undefined)
 
@@ -176,8 +179,7 @@ const showTabDetails = async (tab: Tab) => {
   router.push('/sidepanel/tab/' + useTab.id)
 }
 
-const showTabDetailsMenuEntry = (tab: Tab) => useFeaturesStore().hasFeature(FeatureIdent.DEV_MODE)
-//&& !(tab.placeholders?.type === PlaceholdersType.URL_SUBSTITUTION)
+const showTabDetailsMenuEntry = (tab: Tab) => useFeaturesStore().hasFeature(FeatureIdent.DEV_MODE) && !fullpageView
 
 const deleteTabLabel = (tab: Tab) =>
   tab.placeholders && tab.placeholders.type === PlaceholdersType.URL_SUBSTITUTION ? 'Delete all' : 'Delete Tab'

@@ -3,7 +3,7 @@
     v-if="props.level === 'root'"
     v-close-popup
     @was-clicked="clicked()"
-    icon="o_featured_play_list"
+    icon="o_edit"
     color="primary"
     :disable="props.tabset.sharing?.sharedId !== undefined"
     :label="props.tabset.type === TabsetType.SESSION ? 'Edit Session' : 'Edit Tabset'">
