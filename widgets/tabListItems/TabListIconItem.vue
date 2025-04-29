@@ -75,7 +75,7 @@ import { useAuthStore } from 'stores/authStore'
 import { onMounted, ref, watchEffect } from 'vue'
 
 const props = defineProps<{
-  tabset: Tabset
+  tabset: Tabset | undefined
   tab: Tab
   detailLevel: ListDetailLevel | undefined
   hideMenu?: boolean
@@ -126,7 +126,7 @@ watchEffect(() => {
 })
 
 const showDetailsForThreshold = (level: ListDetailLevel) =>
-  useUiStore().listDetailLevelGreaterEqual(level, props.tabset.details, props.detailLevel)
+  useUiStore().listDetailLevelGreaterEqual(level, props.tabset?.details, props.detailLevel)
 
 const openReminderDialog = () =>
   $q.dialog({

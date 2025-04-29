@@ -28,7 +28,7 @@ export class AddUrlToTabsetHandlers {
   }
 
   handlerFor(url: string, content: string, folder?: Tabset): AddUrlToTabsetHandler {
-    // console.log(`checking handler for ${url}`)
+    //console.log(`checking handler for ${url}`)
     const handler = this.handlers.filter(
       (h: AddUrlToTabsetHandler) => url.match(h.urlMatcher()) || h.contentMatcher(content),
     )

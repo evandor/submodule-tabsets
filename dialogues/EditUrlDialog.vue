@@ -33,12 +33,14 @@
             <div class="text-body2 text-warning">{{ newTabsetDialogWarning() }}</div>
           </q-card-section>
 
-          <q-card-section class="q-pt-none" v-if="placeholders.length > 0">
-            <b>Substitutions for</b>
-          </q-card-section>
-          <q-card-section class="q-pt-none text-caption" v-else>
-            You can use placeholder like this as well: https://dax.de/${wkn}
-          </q-card-section>
+          <template v-if="useFeaturesStore().hasFeature(FeatureIdent.DEV_MODE)">
+            <q-card-section class="q-pt-none" v-if="placeholders.length > 0">
+              <b>Substitutions for</b>
+            </q-card-section>
+            <q-card-section class="q-pt-none text-caption" v-else>
+              You can use placeholder like this as well: https://dax.de/${wkn}
+            </q-card-section>
+          </template>
 
           <q-card-section class="q-pt-none" v-for="placeholder in placeholders">
             <div class="text-body">
@@ -62,8 +64,10 @@
 
 <script lang="ts" setup>
 import { QForm, useDialogPluginComponent } from 'quasar'
+import { FeatureIdent } from 'src/app/models/FeatureIdent'
 import DialogButton from 'src/core/dialog/buttons/DialogButton.vue'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
+import { useFeaturesStore } from 'src/features/stores/featuresStore'
 import { UpdateTabCommand } from 'src/tabsets/commands/UpdateTabCommand'
 import { Tab } from 'src/tabsets/models/Tab'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'

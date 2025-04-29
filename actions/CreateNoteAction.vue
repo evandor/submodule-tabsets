@@ -1,12 +1,6 @@
 <template>
   <template v-if="props.level === 'root'">
-    <ContextMenuItem
-      v-if="useFeaturesStore().hasFeature(FeatureIdent.NOTES)"
-      v-close-popup
-      @was-clicked="clicked()"
-      icon="o_description"
-      color="primary"
-      label="New Note">
+    <ContextMenuItem v-close-popup @was-clicked="clicked()" icon="o_description" color="primary" label="New Note">
       <!--    <q-tooltip class="tooltip-small" v-if="props.tabset.sharing?.sharedId !== undefined">-->
       <!--      Stop sharing first if you want to delete this tabset-->
       <!--    </q-tooltip>-->
@@ -14,10 +8,8 @@
   </template>
 </template>
 <script setup lang="ts">
-import { FeatureIdent } from 'src/app/models/FeatureIdent'
 import ContextMenuItem from 'src/core/components/helper/ContextMenuItem.vue'
 import { useNavigationService } from 'src/core/services/NavigationService'
-import { useFeaturesStore } from 'src/features/stores/featuresStore'
 import { ActionProps } from 'src/tabsets/actions/models/ActionProps'
 
 const props = defineProps<ActionProps>()

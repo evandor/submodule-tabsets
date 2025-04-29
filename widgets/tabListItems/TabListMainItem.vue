@@ -3,8 +3,6 @@
   <q-item-label @click.stop="gotoTab()">
     <div class="row">
       <div class="col-11 q-pr-none q-mr-none cursor-pointer ellipsis fit">
-        <!--        <span v-if="props.header" class="text-caption">{{ props.header }}<br /></span>-->
-
         <span v-if="props.tab?.extension === UrlExtension.NOTE" v-html="nameOrTitle(props.tab as Tab)" />
         <span v-else :class="TabService.isCurrentTab(props.tab) ? 'text-bold' : ''" @click.stop="handleNameClick">
           <q-icon
@@ -37,6 +35,18 @@
                 <q-tooltip class="tooltip-small">There are comments for this tab</q-tooltip>
               </q-icon>
             </span>
+            <span>
+              <q-icon
+                v-if="showReadingMode()"
+                name="o_menu_book"
+                size="12px"
+                color="primary"
+                style="position: relative; top: -5px"
+                class="q-mr-xs"
+                @click.stop="showInReadingMode()">
+                <q-tooltip class="tooltip-small">Click here to open in Reading Mode</q-tooltip>
+              </q-icon>
+            </span>
             <!--              <span v-if="showRssReferencesInfo()">-->
             <!--                <q-icon-->
             <!--                  name="rss_feed"-->
@@ -65,6 +75,7 @@
             </template>
           </Highlight>
         </span>
+        <div v-if="props.header" class="text-caption">{{ props.header }}</div>
       </div>
     </div>
   </q-item-label>
@@ -143,7 +154,7 @@
         <div class="col-1 text-body2" style="font-size: smaller">
           <q-icon name="rss_feed" class="q-ma-none q-pa-none" color="warning" size="xs" />
         </div>
-        <div class="col-7 ellipsis" style="font-size: smaller" @click="openRssLink(ref)">
+        <div class="col-7 ellipsis" style="font-size: smaller" @click="openRssDialog(ref)">
           {{ ref.title }}
         </div>
         <div class="col text-right">
@@ -310,9 +321,9 @@
 
   <!-- === comments === -->
   <q-item-label v-if="showComments()" class="text-grey-5">
-    <CommentChatMessages :comments="oldComments()" :tab="props.tab" :tabset-id="props.tabset.id" />
+    <CommentChatMessages :comments="oldComments()" :tab="props.tab" :tabset-id="props.tabset?.id" />
     <h6 v-if="newComments().length > 0">new Message(s)</h6>
-    <CommentChatMessages :comments="newComments()" :tab="props.tab" :tabset-id="props.tabset.id" />
+    <CommentChatMessages :comments="newComments()" :tab="props.tab" :tabset-id="props.tabset?.id" />
 
     <div class="row">
       <div class="col-6 text-right">&nbsp;</div>
@@ -347,7 +358,7 @@
 
 <script setup lang="ts">
 import { formatDistance } from 'date-fns'
-import { QPopupEdit } from 'quasar'
+import { QPopupEdit, uid, useQuasar } from 'quasar'
 import BrowserApi from 'src/app/BrowserApi'
 import TabListIconIndicatorsHook from 'src/app/hooks/tabsets/TabListIconIndicatorsHook.vue'
 import { FeatureIdent } from 'src/app/models/FeatureIdent'
@@ -365,12 +376,15 @@ import TabService from 'src/services/TabService'
 import { SavedBlob } from 'src/snapshots/models/SavedBlob'
 import { Suggestion } from 'src/suggestions/domain/models/Suggestion'
 import { AddCommentCommand } from 'src/tabsets/commands/AddCommentCommand'
+import { CreateFolderCommand } from 'src/tabsets/commands/CreateFolderCommand'
 import { OpenTabCommand } from 'src/tabsets/commands/OpenTabCommand'
 import { UpdateTabNameCommand } from 'src/tabsets/commands/UpdateTabName'
+import AddRssFeedDialog from 'src/tabsets/dialogues/actions/AddRssFeedDialog.vue'
 import { PlaceholdersType } from 'src/tabsets/models/Placeholders'
 import { Tab, TabComment, TabFavorite, UrlExtension } from 'src/tabsets/models/Tab'
-import { MonitoredTab, Tabset } from 'src/tabsets/models/Tabset'
+import { MonitoredTab, Tabset, TabsetType } from 'src/tabsets/models/Tabset'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
+import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import CommentChatMessages from 'src/tabsets/widgets/CommentChatMessages.vue'
 import Highlight from 'src/tabsets/widgets/Highlight.vue'
 import { ListDetailLevel, useUiStore } from 'src/ui/stores/uiStore'
@@ -381,14 +395,16 @@ import { useRouter } from 'vue-router'
 const { handleError } = useNotificationHandler()
 const { useDblClickHandler, inBexMode } = useUtils()
 
+const $q = useQuasar()
 const router = useRouter()
 
 const props = defineProps<{
-  tabset: Tabset
+  tabset: Tabset | undefined
   tab: Tab
   detailLevel: ListDetailLevel | undefined
   hideMenu?: boolean
-  filter?: string
+  header: string | undefined
+  filter: string | undefined
   showTabsets?: string
 }>()
 
@@ -412,7 +428,7 @@ const popupRef = ref<any>(undefined)
 const doShowDetails = ref(false)
 
 onMounted(() => {
-  if (props.tabset.id) {
+  if (props.tabset?.id) {
     newCommentIds.value = useEventsServices().listNewComments(props.tabset.id, props.tab)
   }
   monitor.value =
@@ -484,7 +500,7 @@ const gotoTab = () => {
 const showWithMinDetails = (level: ListDetailLevel) => /*doShowDetails.value ||*/ showDetailsForThreshold(level)
 
 const showDetailsForThreshold = (level: ListDetailLevel) =>
-  useUiStore().listDetailLevelGreaterEqual(level, props.tabset.details, props.detailLevel)
+  useUiStore().listDetailLevelGreaterEqual(level, props.tabset?.details, props.detailLevel)
 
 const nameOrTitle = (tab: Tab) => (tab.name ? tab.name : tab.title)
 
@@ -575,6 +591,31 @@ const showRssReferencesInfo = () => {
   return props.tab
     ? hasReference(props.tab, TabReferenceType.RSS) && TabService.isCurrentTab(props.tab)
     : false
+}
+
+const openRssDialog = (rss: TabReference) => {
+  console.log('openRssDialog', rss)
+  $q.dialog({
+    component: AddRssFeedDialog,
+    componentProps: { rssTabReference: rss },
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  }).onOk(async (data: any) => {
+    console.log('hier', data)
+    const ts = useTabsetsStore().getCurrentTabset
+    if (ts) {
+      await useCommandExecutor().executeFromUi(
+        new CreateFolderCommand(
+          uid(),
+          'rss feed',
+          [],
+          ts.id,
+          undefined,
+          data['rssUrl' as keyof object],
+          TabsetType.RSS_FOLDER,
+        ),
+      )
+    }
+  })
 }
 
 const openRssLink = (rss: TabReference) => {

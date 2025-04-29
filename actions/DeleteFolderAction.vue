@@ -1,14 +1,12 @@
 <template>
-  <template v-if="props.level === 'folder'">
-    <q-separator inset />
-    <ContextMenuItem
-      v-close-popup
-      @was-clicked="deleteTabsetDialog()"
-      icon="o_delete"
-      color="negative"
-      label="Delete Folder">
-    </ContextMenuItem>
-  </template>
+  <q-separator inset />
+  <ContextMenuItem
+    v-close-popup
+    @was-clicked="deleteTabsetDialog()"
+    icon="o_delete"
+    color="negative"
+    label="Delete Folder">
+  </ContextMenuItem>
 </template>
 <script setup lang="ts">
 import { useQuasar } from 'quasar'

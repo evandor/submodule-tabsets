@@ -171,7 +171,7 @@ export function useTabsetService() {
         tabset = currentTs
         tabs
           .filter((t: Tab) => {
-            const foundIndex = currentTs!.tabs.map((t: Tab) => t.url || '').findIndex((url: string) => t.url === url)
+            const foundIndex = currentTs.tabs.map((t: Tab) => t.url || '').findIndex((url: string) => t.url === url)
             return foundIndex < 0
           })
           .forEach((t: Tab) => tabset!.tabs.push(t))
@@ -307,7 +307,7 @@ export function useTabsetService() {
   }
 
   const saveCurrentTabset = async (changeInfo?: ChangeInfo): Promise<any> => {
-    const currentTabset = useTabsetsStore().getCurrentTabset as Tabset | undefined
+    const currentTabset = useTabsetsStore().getCurrentTabset
     if (currentTabset) {
       return await saveTabset(currentTabset, changeInfo)
     }

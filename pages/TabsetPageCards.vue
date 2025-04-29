@@ -6,6 +6,7 @@
         group="otherTabs"
         :highlightUrl="highlightUrl"
         :tabsetId="props.tabset.id"
+        :tabset="props.tabset"
         :tabsetSorting="props.tabset.sorting"
         :tabsetSharedId="props.tabset.sharing?.sharedId!"
         :simpleUi="props.simpleUi"
@@ -32,6 +33,7 @@
         group="otherTabs"
         :highlightUrl="highlightUrl"
         :tabsetId="props.tabset?.id"
+        :tabset="props.tabset"
         :tabs="currentTabs()" />
     </q-card-section>
   </q-card>

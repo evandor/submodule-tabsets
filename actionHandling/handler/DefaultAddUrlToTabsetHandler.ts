@@ -9,6 +9,7 @@ import {
 } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { DefaultActions } from 'src/tabsets/actionHandling/handler/DefaultActions'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
+import { ActionProps } from 'src/tabsets/actions/models/ActionProps'
 import { AddTabToTabsetCommand } from 'src/tabsets/commands/AddTabToTabsetCommand'
 import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset } from 'src/tabsets/models/Tabset'
@@ -50,11 +51,12 @@ export class DefaultAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
       .onClicked(this.clicked)
   }
 
-  actions(currentTabsetId: string | undefined): Component[] {
+  actions(currentTabsetId: string | undefined, actionProps: ActionProps): Component[] {
     const url = useContentStore().getCurrentTabUrl
     const currentTabset = useTabsetsStore().getCurrentTabset
 
-    const actions = DefaultActions.getDefaultActions(currentTabset)
+    //console.log('actionProps', actionProps)
+    const actions = DefaultActions.getDefaultActions(currentTabset, actionProps)
 
     if (url) {
       // TODO folders?

@@ -1,17 +1,15 @@
 <template>
-  <template v-if="show()">
-    <q-separator inset />
-    <ContextMenuItem
-      v-close-popup
-      @was-clicked="clicked()"
-      icon="sym_o_new_window"
-      color="primary"
-      :label="props.tabset.newTabSource ? 'Update NewTab Page' : 'Use in NewTab Page'" />
-  </template>
+  <q-separator inset />
+  <ContextMenuItem
+    v-close-popup
+    @was-clicked="clicked()"
+    icon="sym_o_new_window"
+    color="primary"
+    :label="props.tabset.newTabSource ? 'Update NewTab Page' : 'Use in NewTab Page'" />
 </template>
 
 <script lang="ts" setup>
-import { LocalStorage, useQuasar } from 'quasar'
+import { useQuasar } from 'quasar'
 import { NEW_TAB_EXTENSION_ID } from 'src/boot/constants'
 import ContextMenuItem from 'src/core/components/helper/ContextMenuItem.vue'
 import { ActionProps } from 'src/tabsets/actions/models/ActionProps'
@@ -22,12 +20,6 @@ import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 const $q = useQuasar()
 const props = defineProps<ActionProps>()
 
-const show = () => {
-  if (LocalStorage.getItem('ui.newtab.installed')) {
-    return props.level === 'root'
-  }
-  return false
-}
 const clicked = () => {
   $q.dialog({
     component: OpenNewTabDialog,

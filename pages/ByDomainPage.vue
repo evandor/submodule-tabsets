@@ -23,7 +23,7 @@
     <template v-slot:header>
       <q-item-section>
         <div>
-          <span class="text-weight-bold">Tabs </span>
+          <span class="text-weight-bold">Tabs</span>
           <div class="text-caption ellipsis"></div>
         </div>
       </q-item-section>

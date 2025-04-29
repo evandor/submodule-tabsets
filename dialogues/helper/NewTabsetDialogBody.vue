@@ -49,22 +49,22 @@
           </template>
         </q-card-section>
 
-        <q-card-section v-if="!props.windowId" :style="isNotArchived(newTabsetName) ? '' : 'opacity: 0.2'">
-          <q-select
-            dense
-            options-dense
-            clearable
-            clear-icon="close"
-            label="Open in Window"
-            filled
-            v-model="windowModel"
-            map-options
-            use-input
-            :options="windowOptions"
-            input-debounce="0"
-            @new-value="createWindowOption"
-            :disable="!isNotArchived(newTabsetName)" />
-        </q-card-section>
+        <!--        <q-card-section v-if="!props.windowId" :style="isNotArchived(newTabsetName) ? '' : 'opacity: 0.2'">-->
+        <!--          <q-select-->
+        <!--            dense-->
+        <!--            options-dense-->
+        <!--            clearable-->
+        <!--            clear-icon="close"-->
+        <!--            label="Open in Window"-->
+        <!--            filled-->
+        <!--            v-model="windowModel"-->
+        <!--            map-options-->
+        <!--            use-input-->
+        <!--            :options="windowOptions"-->
+        <!--            input-debounce="0"-->
+        <!--            @new-value="createWindowOption"-->
+        <!--            :disable="!isNotArchived(newTabsetName)" />-->
+        <!--        </q-card-section>-->
 
         <q-card-section
           v-if="useFeaturesStore().hasFeature(FeatureIdent.COLOR_TAGS)"

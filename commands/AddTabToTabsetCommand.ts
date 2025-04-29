@@ -84,6 +84,11 @@ export class AddTabToTabsetCommand implements Command<any> {
       this.tab.tabReferences = this.tab.tabReferences.concat(useContentStore().currentTabReferences)
 
       // Article (ReaderMode)
+      console.log(
+        'checking artivle',
+        useContentStore().currentTabArticle,
+        useFeaturesStore().hasFeature(FeatureIdent.READING_MODE),
+      )
       if (useFeaturesStore().hasFeature(FeatureIdent.READING_MODE)) {
         const article = useContentStore().currentTabArticle
         if (article && article['title' as keyof object] && article['textContent' as keyof object]) {

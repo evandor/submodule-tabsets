@@ -27,6 +27,7 @@
       <TabList
         group="otherTabs"
         :tabsetId="tabsetFolder.id"
+        :tabset="tabset"
         :tabsetSorting="tabset.sorting"
         :tabsetSharedId="tabset.sharing?.sharedId!"
         :tabs="tabsetFolder.tabs" />

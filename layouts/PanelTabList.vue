@@ -17,7 +17,8 @@
         :tabsetType="props.tabsetType"
         :tabset="props.tabset!"
         :show-tabsets="props.showTabsets"
-        :hide-menu="props.hideMenu" />
+        :hide-menu="props.hideMenu">
+      </SidePanelTabListHelper>
     </vue-draggable-next>
 
     <!-- no drag & drop on mobile -->

@@ -167,7 +167,7 @@ export const useTabsStore2 = defineStore('browsertabs', () => {
   }
 
   function removeTab(tabset: Tabset, tabId: string) {
-    tabset.tabs = _.filter(tabset.tabs as Tab[], (t: Tab) => t.id !== tabId)
+    tabset.tabs = _.filter(tabset.tabs, (t: Tab) => t.id !== tabId)
     // markDuplicates(tabset)
     // if (this.pendingTabset) {
     //   this.pendingTabset.tabs = _.filter(this.pendingTabset.tabs as Tab[], (t: Tab) => t.id !== tabId)

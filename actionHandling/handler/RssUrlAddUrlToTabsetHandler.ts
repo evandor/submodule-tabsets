@@ -8,10 +8,6 @@ import {
   ClickedHandler,
 } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
-import CreateSubfolderAction from 'src/tabsets/actions/CreateSubfolderAction.vue'
-import DeleteTabsetAction from 'src/tabsets/actions/DeleteTabsetAction.vue'
-import EditTabsetAction from 'src/tabsets/actions/EditTabsetAction.vue'
-import OpenAllInMenuAction from 'src/tabsets/actions/OpenAllInMenuAction.vue'
 import { AddTabToTabsetCommand } from 'src/tabsets/commands/AddTabToTabsetCommand'
 import { CreateFolderCommand } from 'src/tabsets/commands/CreateFolderCommand'
 import AddRssFeedDialog from 'src/tabsets/dialogues/actions/AddRssFeedDialog.vue'
@@ -32,14 +28,15 @@ export class RssUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   }
 
   contentMatcher(content: string) {
-    // console.log('content', content.indexOf('<rss '), content.substring(0, 3000))
+    //console.log('content', content.indexOf('<rss '), content.substring(0, 300))
     const request = useRequestsStore().getCurrentTabRequest
+    //console.log('request', request)
     if (request) {
       const contentType =
         request.responseHeaders
           ?.find((rh: chrome.webRequest.HttpHeader) => rh.name.toLowerCase() === 'content-type')
           ?.value?.toLowerCase() || 'text/html'
-      // console.log('found contnt type ', contentType)
+      console.log('found content type ', contentType)
       if (contentType.indexOf('application/xml') >= 0 || contentType.indexOf('application/rss+xml') >= 0) {
         console.log('found application/xml or application/rss+xml content type', request)
         return true
@@ -60,7 +57,7 @@ export class RssUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   }
 
   actions(): Component[] {
-    return [EditTabsetAction, CreateSubfolderAction, OpenAllInMenuAction, DeleteTabsetAction]
+    return []
   }
 
   async clicked(

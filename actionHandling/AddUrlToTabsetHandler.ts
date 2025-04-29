@@ -1,5 +1,6 @@
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
+import { ActionProps } from 'src/tabsets/actions/models/ActionProps'
 import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset } from 'src/tabsets/models/Tabset'
 import { Component } from 'vue'
@@ -39,7 +40,7 @@ export interface AddUrlToTabsetHandler {
 
   defaultAction: () => ActionContext | undefined
 
-  actions: (currentTabsetId: string | undefined) => (ComponentWithContext | Component)[]
+  actions: (currentTabsetId: string | undefined, actionProps: ActionProps) => (ComponentWithContext | Component)[]
 
   clicked: ClickedHandler
 

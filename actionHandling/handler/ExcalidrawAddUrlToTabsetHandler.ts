@@ -14,6 +14,7 @@ import DeleteTabsetAction from 'src/tabsets/actions/DeleteTabsetAction.vue'
 import EditTabsetAction from 'src/tabsets/actions/EditTabsetAction.vue'
 import ExcalidrawSaveAsFileAction from 'src/tabsets/actions/excalidraw/ExcalidrawSaveAsFileAction.vue'
 import ExcalidrawUpdateFileAction from 'src/tabsets/actions/excalidraw/ExcalidrawUpdateFileAction.vue'
+import { ActionProps } from 'src/tabsets/actions/models/ActionProps'
 import OpenAllInMenuAction from 'src/tabsets/actions/OpenAllInMenuAction.vue'
 import { AddTabToTabsetCommand } from 'src/tabsets/commands/AddTabToTabsetCommand'
 import { Tab } from 'src/tabsets/models/Tab'
@@ -35,7 +36,7 @@ export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   defaultAction(): ActionContext | undefined {
     const tabset: Tabset | undefined = useTabsetsStore().getCurrentTabset
     if (tabset) {
-      var actions = (tabset.tabs as Tab[])
+      var actions = tabset.tabs
         .filter((t: Tab) => t.url !== undefined)
         .filter((t: Tab) => t.url!.match(this.urlMatcher()))
         .map((t: Tab) => {
@@ -54,10 +55,10 @@ export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
     return undefined
   }
 
-  actions(): Component[] {
+  actions(currentTabsetId: string | undefined, actionProps: ActionProps): Component[] {
     const tabset: Tabset | undefined = useTabsetsStore().getCurrentTabset
     if (tabset) {
-      const actions: (ComponentWithContext | Component)[] = (tabset.tabs as Tab[])
+      const actions: (ComponentWithContext | Component)[] = tabset.tabs
         .filter((t: Tab) => t.url !== undefined)
         .filter((t: Tab) => t.url!.match(this.urlMatcher()))
         .map((t: Tab) => {
@@ -77,7 +78,7 @@ export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
               { component: ExcalidrawUpdateFileAction, context: { label: 'Add Excalidraw' } },
             ])
       // console.log('list', list)
-      return list.concat(DefaultActions.getDefaultActions(tabset))
+      return list.concat(DefaultActions.getDefaultActions(tabset, actionProps))
     } else {
       return [EditTabsetAction, CreateSubfolderAction, OpenAllInMenuAction, DeleteTabsetAction]
     }
@@ -101,7 +102,7 @@ export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
 
       const newTab = new Tab(uid(), chromeTab)
 
-      const returned = await ExcalidrawAddUrlToTabsetHandler.queryBrowserTab(chromeTab, newTab.id, filename!)
+      const returned = await ExcalidrawAddUrlToTabsetHandler.queryBrowserTab(chromeTab, newTab.id, filename)
       if (returned.length > 0) {
         newTab.title = filename
 
@@ -213,7 +214,7 @@ export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   }
 
   async newFileDialog($q: QVueGlobals, filename: string = ''): Promise<DialogChainObject> {
-    return $q!.dialog({
+    return $q.dialog({
       title: 'Save as Excalidraw File',
       message: 'Please Provide a name (min 3 characters)',
       prompt: { model: filename, isValid: (val: string) => val.length > 2, type: 'text' },
