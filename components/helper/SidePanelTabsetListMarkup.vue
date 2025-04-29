@@ -1,8 +1,8 @@
 <template>
   <div class="row q-py-xs">
     <div class="col-11 ellipsis">
-      <span v-if="lastTabsets.length < 2" style="font-size: smaller; color: grey" class="q-mx-xs"
-        >current tabsets:
+      <span v-if="lastTabsets.length < 2" style="font-size: smaller; color: grey" class="q-mx-xs">
+        current tabsets will be displayed here once you switch
       </span>
       <q-badge
         class="q-ma-none q-ma-xs"

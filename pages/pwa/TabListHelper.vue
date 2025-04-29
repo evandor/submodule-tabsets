@@ -6,7 +6,6 @@
       You can drag and drop items from the "Tabs to add" view to add them to this tabset by clicking on the icons
     </div>
   </q-item>
-
   <q-item
     clickable
     v-ripple
@@ -19,10 +18,9 @@
     :key="props.group + '_' + tab.id">
     <PanelTabListElementWidget
       :key="props.group + '__' + tab.id"
-      :tab="tabAsTab(tab)"
+      :tab="tab"
       :tabset="props.tabset!"
-      :tabset-id="props.tabsetId"
-      :detailLevel="props.detailLevel as ListDetailLevel" />
+      :detail-level="props.detailLevel as ListDetailLevel" />
   </q-item>
 </template>
 

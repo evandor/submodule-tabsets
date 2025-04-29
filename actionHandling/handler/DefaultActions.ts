@@ -1,3 +1,4 @@
+import { LocalStorage } from 'quasar'
 import { FeatureIdent } from 'src/app/models/FeatureIdent'
 import { useContentStore } from 'src/content/stores/contentStore'
 import { useFeaturesStore } from 'src/features/stores/featuresStore'
@@ -8,6 +9,7 @@ import CreateNoteAction from 'src/tabsets/actions/CreateNoteAction.vue'
 import DeleteFolderAction from 'src/tabsets/actions/DeleteFolderAction.vue'
 import EditFolderAction from 'src/tabsets/actions/EditFolderAction.vue'
 import ExportTabsetAction from 'src/tabsets/actions/ExportTabsetAction.vue'
+import { ActionProps } from 'src/tabsets/actions/models/ActionProps'
 import NewTabAction from 'src/tabsets/actions/NewTabAction.vue'
 import OpenTabsetAction from 'src/tabsets/actions/OpenTabsetAction.vue'
 import ShareTabsetAction from 'src/tabsets/actions/ShareTabsetAction.vue'
@@ -17,18 +19,19 @@ import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { Component } from 'vue'
 
 export class DefaultActions {
-  static getDefaultActions(currentTabset: Tabset | undefined): (ComponentWithContext | Component)[] {
+  static getDefaultActions(
+    currentTabset: Tabset | undefined,
+    actionProps: ActionProps,
+  ): (ComponentWithContext | Component)[] {
     const actions: (ComponentWithContext | Component)[] = []
-    //actions.push(EditTabsetAction)
-    //actions.push(CreateTabsetAction)
-    actions.push(EditFolderAction)
-    // actions.push(CreateSubfolderAction)
+    if (actionProps.level === 'folder') {
+      actions.push(EditFolderAction)
+    }
 
-    actions.push(CreateNoteAction)
+    if (useFeaturesStore().hasFeature(FeatureIdent.NOTES)) {
+      actions.push(CreateNoteAction)
+    }
 
-    // if (currentTabset && currentTabset.tabs.length > 0 && useFeaturesStore().hasFeature(FeatureIdent.GALLERY)) {
-    //   actions.push(ShowGalleryAction)
-    // }
     if (
       currentTabset &&
       useFeaturesStore().hasFeature(FeatureIdent.ARCHIVE_TABSET) &&
@@ -47,7 +50,9 @@ export class DefaultActions {
       actions.push(ExportTabsetAction)
     }
 
-    actions.push(NewTabAction)
+    if (LocalStorage.getItem('ui.newtab.installed') && actionProps.level === 'root') {
+      actions.push(NewTabAction)
+    }
 
     // open existing tabset for url
     if (!DefaultActions.alreadyInTabset() && DefaultActions.tabsetsForUrl().length > 0) {
@@ -55,7 +60,9 @@ export class DefaultActions {
     }
 
     // actions.push(DeleteTabsetAction)
-    actions.push(DeleteFolderAction)
+    if (actionProps.level === 'folder') {
+      actions.push(DeleteFolderAction)
+    }
     // console.log('action', actions)
     return actions
   }

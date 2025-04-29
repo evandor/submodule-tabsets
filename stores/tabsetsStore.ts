@@ -458,13 +458,13 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     reminderTabset.value.tabs.filter((t: Tab) => new Date().getTime() >= (t.reminder ?? 0))
 
   function checkTabsets(tabsets: Tabset[], tabId: string, chain: Tabset[] = []): [Tabset[], Tab | undefined] {
-    console.log(`starting with`, tabsets.map((t) => t.name).join(','), `Level ${chain.length}`)
+    //console.log(`starting with`, tabsets.map((t) => t.name).join(','), `Level ${chain.length}`)
     for (const tabset of tabsets) {
-      console.log('checking tabset', tabset.name)
+      //console.log('checking tabset', tabset.name)
       for (const t of tabset.tabs) {
-        console.log('checking tab', t.url)
+        //console.log('checking tab', t.url)
         if (t.id === tabId) {
-          console.log('found tab!', t.id)
+          //console.log('found tab!', t.id)
           chain.push(tabset)
           return [chain, t]
         }

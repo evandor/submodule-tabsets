@@ -13,7 +13,12 @@
     class="q-mb-xs q-mt-xs q-mx-none q-pa-none"
     @mouseover="hoveredTab = tab.id"
     @mouseleave="hoveredTab = undefined">
-    <TabListMainItem :tabset="props.tabset!" :tab="tab" :detail-level="props.detailLevel" />
+    <TabListMainItem
+      :header="props.header"
+      :tabset="props.tabset"
+      :filter="props.filter || undefined"
+      :tab="tab"
+      :detail-level="props.detailLevel" />
   </q-item-section>
 
   <!-- right part -->
@@ -44,6 +49,7 @@ import { PropType, ref, watchEffect } from 'vue'
 const props = defineProps({
   tab: { type: Object as PropType<Tab>, required: true },
   tabset: { type: Object as PropType<Tabset>, required: false },
+  header: { type: String, required: false },
   filter: { type: String, required: false },
   detailLevel: { type: String as PropType<ListDetailLevel>, required: false },
 })

@@ -8,24 +8,19 @@
         <q-card-section>
           <div class="text-body">This file seems to contain an RSS Feed</div>
         </q-card-section>
-        <q-card-section>
-          <div>
-            <q-checkbox v-model="displayFeed" label="Display Feed" />
-          </div>
-          <div>
-            <q-input :disable="!displayFeed" class="q-ml-md" v-model="feedName" label="Feed Name" />
-          </div>
-        </q-card-section>
+        <!--        <q-card-section>-->
+        <!--          <div>-->
+        <!--            <q-input class="q-ml-md" v-model="feedName" label="Feed Name" />-->
+        <!--          </div>-->
+        <!--        </q-card-section>-->
         <q-card-actions align="right">
-          <DialogButton label="Cancel" color="accent" v-close-popup />
+          <DialogButton label="Cancel" color="accent" @click="onDialogCancel()" />
           <DialogButton
             label="Display"
-            :disable="displayFeed && feedName.trim().length === 0"
             type="submit"
             :autofocus="true"
             @keyup.enter="display()"
-            @wasClicked="display()"
-            v-close-popup />
+            @wasClicked="display()" />
         </q-card-actions>
       </q-card>
     </div>
@@ -34,17 +29,31 @@
 
 <script lang="ts" setup>
 import { useDialogPluginComponent } from 'quasar'
+import { TabReference } from 'src/content/models/TabReference'
 import DialogButton from 'src/core/dialog/buttons/DialogButton.vue'
-import { ref } from 'vue'
+import { onMounted } from 'vue'
 
 defineEmits([...useDialogPluginComponent.emits])
 
-const { dialogRef, onDialogHide, onDialogOK } = useDialogPluginComponent()
+const props = defineProps<{
+  rssTabReference?: TabReference
+}>()
 
-const displayFeed = ref(false)
-const feedName = ref<string>('')
+const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent()
+
+// const displayFeed = ref(false)
+// const feedName = ref<string>('')
+
+onMounted(() => {
+  if (props.rssTabReference && props.rssTabReference.href) {
+    console.log('checking', props.rssTabReference.href)
+    fetch(props.rssTabReference.href, {}).then((res) => {
+      console.log('got', res)
+    })
+  }
+})
 
 const display = () => {
-  onDialogOK({ displayFeed: displayFeed.value, feedName: feedName.value })
+  onDialogOK({ displayFeed: true, rssUrl: props.rssTabReference?.href })
 }
 </script>

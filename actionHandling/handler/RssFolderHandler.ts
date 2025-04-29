@@ -12,6 +12,7 @@ import {
 } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { DefaultActions } from 'src/tabsets/actionHandling/handler/DefaultActions'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
+import { ActionProps } from 'src/tabsets/actions/models/ActionProps'
 import { AddTabToTabsetCommand } from 'src/tabsets/commands/AddTabToTabsetCommand'
 import { Tab, UrlExtension } from 'src/tabsets/models/Tab'
 import { Tabset } from 'src/tabsets/models/Tabset'
@@ -35,9 +36,9 @@ export class RssFolderHandler implements AddUrlToTabsetHandler {
     return new ActionContext('(Re-)Load').onClicked(this.clicked)
   }
 
-  actions(): Component[] {
+  actions(currentTabsetId: string | undefined, actionProps: ActionProps): Component[] {
     const currentTabset = useTabsetsStore().getCurrentTabset
-    return DefaultActions.getDefaultActions(currentTabset)
+    return DefaultActions.getDefaultActions(currentTabset, actionProps)
   }
 
   async clicked(

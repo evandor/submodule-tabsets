@@ -11,13 +11,12 @@
     <PanelTabListElementWidget
       :key="'ptlew__' + tab.id"
       :tab="tab"
-      :type="props.type"
-      :sorting="props.sorting!"
-      :show-tabsets="props.showTabsets"
-      :preventDragAndDrop="props.preventDragAndDrop"
       :tabset="props.tabset!"
-      :hide-menu="props.hideMenu"
-      :filter="props.filter || ''" />
+      :filter="props.filter || ''">
+      <template v-slot:actionPart>
+        <span>&nbsp;</span>
+      </template>
+    </PanelTabListElementWidget>
   </q-item>
 </template>
 

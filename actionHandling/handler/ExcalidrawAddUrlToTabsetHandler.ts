@@ -14,6 +14,7 @@ import DeleteTabsetAction from 'src/tabsets/actions/DeleteTabsetAction.vue'
 import EditTabsetAction from 'src/tabsets/actions/EditTabsetAction.vue'
 import ExcalidrawSaveAsFileAction from 'src/tabsets/actions/excalidraw/ExcalidrawSaveAsFileAction.vue'
 import ExcalidrawUpdateFileAction from 'src/tabsets/actions/excalidraw/ExcalidrawUpdateFileAction.vue'
+import { ActionProps } from 'src/tabsets/actions/models/ActionProps'
 import OpenAllInMenuAction from 'src/tabsets/actions/OpenAllInMenuAction.vue'
 import { AddTabToTabsetCommand } from 'src/tabsets/commands/AddTabToTabsetCommand'
 import { Tab } from 'src/tabsets/models/Tab'
@@ -54,7 +55,7 @@ export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
     return undefined
   }
 
-  actions(): Component[] {
+  actions(currentTabsetId: string | undefined, actionProps: ActionProps): Component[] {
     const tabset: Tabset | undefined = useTabsetsStore().getCurrentTabset
     if (tabset) {
       const actions: (ComponentWithContext | Component)[] = tabset.tabs
@@ -77,7 +78,7 @@ export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
               { component: ExcalidrawUpdateFileAction, context: { label: 'Add Excalidraw' } },
             ])
       // console.log('list', list)
-      return list.concat(DefaultActions.getDefaultActions(tabset))
+      return list.concat(DefaultActions.getDefaultActions(tabset, actionProps))
     } else {
       return [EditTabsetAction, CreateSubfolderAction, OpenAllInMenuAction, DeleteTabsetAction]
     }

@@ -4,7 +4,6 @@
     :probability="0.3"
     ident="tablist_dnd"
     hint="You can select the favicon images and drag and drop the entries to reorder the list to your wishes" />
-
   <q-list separator v-if="!preventDragAndDrop()">
     <vue-draggable-next
       class="dragArea list-group w-full"
@@ -56,7 +55,7 @@ const props = defineProps({
   group: { type: String, required: true },
   highlightUrl: { type: String, required: false },
   tabsetSharedId: { type: String, required: false },
-  tabset: { type: Object as PropType<Tabset>, required: false },
+  tabset: { type: Object as PropType<Tabset>, required: true },
   tabsetSorting: { type: String, required: false },
   simpleUi: { type: Boolean, default: false },
   detailLevel: { type: String as PropType<ListDetailLevel>, required: false },

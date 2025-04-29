@@ -29,16 +29,20 @@ import { ListDetailLevel, useUiStore } from 'src/ui/stores/uiStore'
 const { formatReadingTime } = useUtils()
 
 const props = defineProps<{
-  tabset: Tabset
+  tabset: Tabset | undefined
   tab: Tab
   detailLevel: ListDetailLevel | undefined
   hideMenu?: boolean
 }>()
 
-const removeSessionTab = (tab: Tab) => useCommandExecutor().executeFromUi(new DeleteTabCommand(tab, props.tabset))
+const removeSessionTab = (tab: Tab) => {
+  if (props.tabset) {
+    useCommandExecutor().executeFromUi(new DeleteTabCommand(tab, props.tabset))
+  }
+}
 
 const showWithMinDetails = (level: ListDetailLevel) => /*doShowDetails.value ||*/ showDetailsForThreshold(level)
 
 const showDetailsForThreshold = (level: ListDetailLevel) =>
-  useUiStore().listDetailLevelGreaterEqual(level, props.tabset.details, props.detailLevel)
+  useUiStore().listDetailLevelGreaterEqual(level, props.tabset?.details, props.detailLevel)
 </script>

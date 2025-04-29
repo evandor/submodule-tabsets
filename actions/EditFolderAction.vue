@@ -1,11 +1,5 @@
 <template>
-  <ContextMenuItem
-    v-if="props.level === 'folder'"
-    v-close-popup
-    @was-clicked="clicked()"
-    icon="o_folder"
-    color="warning"
-    label="Edit Folder">
+  <ContextMenuItem v-close-popup @was-clicked="clicked()" icon="o_folder" color="warning" label="Edit Folder">
   </ContextMenuItem>
 </template>
 <script setup lang="ts">

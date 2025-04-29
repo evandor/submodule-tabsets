@@ -18,10 +18,10 @@
       <!--        Open in sidePanel-->
       <!--      </q-item>-->
 
-      <q-item v-if="!props.inSidePanel" clickable v-close-popup @click="showDetails(props.tabset.id)">
-        <q-icon name="o_info" class="q-my-xs q-mr-xs" color="grey-5" style="position: relative; top: -1px" />
-        Tabset Details...
-      </q-item>
+      <!--      <q-item v-if="!props.inSidePanel" clickable v-close-popup @click="showDetails(props.tabset.id)">-->
+      <!--        <q-icon name="o_info" class="q-my-xs q-mr-xs" color="grey-5" style="position: relative; top: -1px" />-->
+      <!--        Tabset Details...-->
+      <!--      </q-item>-->
       <!--      <q-item v-if="props.tabset?.status === TabsetStatus.DEFAULT && props.tabset?.type !== TabsetType.SPECIAL"-->
       <!--              clickable v-close-popup @click="markAsFavorite(props.tabset.id)">-->
       <!--        <q-icon name="stars" class="q-my-xs q-mr-xs" color="grey-5" style="position:relative;top:-1px"/>-->

@@ -12,6 +12,7 @@ import {
 } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { DefaultActions } from 'src/tabsets/actionHandling/handler/DefaultActions'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
+import { ActionProps } from 'src/tabsets/actions/models/ActionProps'
 import { AddTabToTabsetCommand } from 'src/tabsets/commands/AddTabToTabsetCommand'
 import { CreateFolderCommand } from 'src/tabsets/commands/CreateFolderCommand'
 import { Tab } from 'src/tabsets/models/Tab'
@@ -38,11 +39,11 @@ export class RapidApiAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
       .onOk(this.onOk)
   }
 
-  actions(currentTabsetId: string | undefined): Component[] {
+  actions(currentTabsetId: string | undefined, actionProps: ActionProps): Component[] {
     const url = useContentStore().getCurrentTabUrl
     const currentTabset = useTabsetsStore().getCurrentTabset
 
-    const actions = DefaultActions.getDefaultActions(currentTabset)
+    const actions = DefaultActions.getDefaultActions(currentTabset, actionProps)
 
     if (url) {
       // TODO folders?

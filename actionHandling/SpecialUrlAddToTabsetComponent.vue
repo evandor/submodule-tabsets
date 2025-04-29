@@ -1,6 +1,8 @@
 <template>
   <!-- SpecialUrlAddToTabsetComponent -->
-  <template v-if="handler.actions(currentTabsetId).length == 0 && defaultAction">
+  <!--  {{ handler.actions(currentTabsetId, { tabset: props.tabset, level: props.level }) }}-->
+  <template
+    v-if="handler.actions(currentTabsetId, { tabset: props.tabset, level: props.level }).length == 0 && defaultAction">
     <q-btn
       outline
       @click.stop="emits('buttonClicked', new ActionHandlerButtonClickedHolder(handler, defaultAction))"
@@ -23,8 +25,34 @@
     </q-tooltip>
   </template>
 
+  <!--  <template v-else-if="handler.actions(currentTabsetId, { tabset: props.tabset, level: props.level }).length == 1">-->
+  <!--    <q-btn-->
+  <!--      outline-->
+  <!--      @click.stop="emits('buttonClicked', new ActionHandlerButtonClickedHolder(handler, defaultAction))"-->
+  <!--      class="q-ma-none q-px-sm q-py-none"-->
+  <!--      :class="{ shakeWithColor: animateAddtabButton, 'cursor-pointer': !alreadyInTabset }"-->
+  <!--      :color="alreadyInTabset ? 'grey-5' : containedInTsCount > 0 ? 'positive' : ''"-->
+  <!--      :size="props.level === 'root' ? 'sm' : 'xs'"-->
+  <!--      data-testid="saveInTabsetBtn">-->
+  <!--      <div>***</div>-->
+  <!--      &lt;!&ndash;                  <q-icon right class="q-ma-none q-pa-none" size="2em" name="o_south" />&ndash;&gt;-->
+  <!--    </q-btn>-->
+  <!--    <q-tooltip class="tooltip-small" v-if="alreadyInTabset">-->
+  <!--      Tab is already contained in tabset '{{ props.tabset?.name }}'...-->
+  <!--    </q-tooltip>-->
+  <!--    <q-tooltip class="tooltip-small" v-else-if="containedInTsCount > 0">-->
+  <!--      {{ tooltipAlreadyInOtherTabsets(props.tabset!.name) }}-->
+  <!--    </q-tooltip>-->
+  <!--    <q-tooltip class="tooltip-small" v-else>-->
+  <!--      Add current Tab to '{{ tabsetNameOrChain(props.tabset as Tabset) }}'...-->
+  <!--    </q-tooltip>-->
+  <!--  </template>-->
+
   <!-- SpecialUrlAddToTabsetComponent handlerDefaultAction -->
-  <template v-else-if="handler.actions(currentTabsetId).length > 0 && defaultAction">
+  <template
+    v-else-if="
+      handler.actions(currentTabsetId, { tabset: props.tabset, level: props.level }).length > 0 && defaultAction
+    ">
     <!-- :disable="!handler.actions()[0]!.active(props.currentChromeTab)"-->
     <q-btn-dropdown
       style="border-radius: 5px"
@@ -49,7 +77,7 @@
         <span :style="defaultAction!.styleFkt(props.currentChromeTab, props.folder)">{{ defaultAction!.label }}</span>
       </template>
       <q-list dense style="min-width: 200px">
-        <template v-for="l in handler.actions(currentTabsetId)">
+        <template v-for="l in handler.actions(currentTabsetId, { tabset: props.tabset, level: props.level })">
           <template v-if="'context' in l">
             <component
               :key="l.component.name"
@@ -122,6 +150,7 @@ watchEffect(() => {
 watchEffect(() => {
   handler.value = getHandler(props.currentChromeTab.url, props.folder)
   defaultAction.value = handler.value.defaultAction()
+  //console.log('***', handler.value.actions('currentTabsetId'))
   // const currentTabsetId = await useTabsetsStore().getCurrentTabsetId()
 })
 
