@@ -24,22 +24,20 @@ const props = defineProps<{ tabset: Tabset; context?: ComponentContext }>()
 const filename = ref('')
 
 const clicked = () => {
-  $q!
-    .dialog({
-      title: 'Save as Excalidraw File',
-      message: 'Please Provide a name (min 3 characters)',
-      prompt: { model: filename.value, isValid: (val: string) => val.length > 2, type: 'text' },
-      cancel: true,
-      persistent: true,
-    })
-    .onOk((filename: string) => {
-      const ts = useTabsetsStore().getCurrentTabset
-      const chromeTab = useTabsStore2().currentChromeTab
-      if (ts && chromeTab) {
-        const folder = useTabsetsStore().getActiveFolder(ts)
-        console.log('saving new excalidraw file', filename, ts, chromeTab)
-        new ExcalidrawAddUrlToTabsetHandler($q).clicked(chromeTab, ts, folder, { dialog: { filename } })
-      }
-    })
+  $q.dialog({
+    title: 'Save as Excalidraw File',
+    message: 'Please Provide a name (min 3 characters)',
+    prompt: { model: filename.value, isValid: (val: string) => val.length > 2, type: 'text' },
+    cancel: true,
+    persistent: true,
+  }).onOk((filename: string) => {
+    const ts = useTabsetsStore().getCurrentTabset
+    const chromeTab = useTabsStore2().currentChromeTab
+    if (ts && chromeTab) {
+      const folder = useTabsetsStore().getActiveFolder(ts)
+      console.log('saving new excalidraw file', filename, ts, chromeTab)
+      new ExcalidrawAddUrlToTabsetHandler($q).clicked(chromeTab, ts, folder, { dialog: { filename } })
+    }
+  })
 }
 </script>

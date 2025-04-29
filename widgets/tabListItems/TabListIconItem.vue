@@ -64,6 +64,7 @@
 
 <script lang="ts" setup>
 import { date, useQuasar } from 'quasar'
+import { useAuthStore } from 'src/stores/authStore'
 import ReminderDialog from 'src/tabsets/dialogues/ReminderDialog.vue'
 import { Tab, TabPreview } from 'src/tabsets/models/Tab'
 import { MonitoredTab, Tabset } from 'src/tabsets/models/Tabset'
@@ -71,7 +72,6 @@ import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import TabFaviconWidget from 'src/tabsets/widgets/TabFaviconWidget.vue'
 import { useThumbnailsService } from 'src/thumbnails/services/ThumbnailsService'
 import { ListDetailLevel, useUiStore } from 'src/ui/stores/uiStore'
-import { useAuthStore } from 'stores/authStore'
 import { onMounted, ref, watchEffect } from 'vue'
 
 const props = defineProps<{
