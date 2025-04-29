@@ -449,7 +449,7 @@ class TabsetService {
 
   saveNote(tabId: string, note: string, scheduledFor: Date | undefined): Promise<void> {
     // console.log("got", tabId, note)
-    const tab = _.find(useTabsetsStore().getCurrentTabset?.tabs, (t: Tab) => t.id === tabId) as Tab | undefined
+    const tab = _.find(useTabsetsStore().getCurrentTabset?.tabs, (t: Tab) => t.id === tabId)
     if (tab) {
       tab.note = note
       if (scheduledFor) {
