@@ -13,8 +13,8 @@
       :tab="tab"
       :tabset="props.tabset!"
       :filter="props.filter || ''">
-      <template v-slot:actionPart>
-        <span>&nbsp;</span>
+      <template v-for="(slot, index) of Object.keys($slots)" :key="index" v-slot:[slot]>
+        <slot :name="slot"></slot>
       </template>
     </PanelTabListElementWidget>
   </q-item>

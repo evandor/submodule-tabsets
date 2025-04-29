@@ -18,6 +18,9 @@
         :tabset="props.tabset!"
         :show-tabsets="props.showTabsets"
         :hide-menu="props.hideMenu">
+        <template v-slot:actionPart>
+          <span>&nbsp;</span>
+        </template>
       </SidePanelTabListHelper>
     </vue-draggable-next>
 
