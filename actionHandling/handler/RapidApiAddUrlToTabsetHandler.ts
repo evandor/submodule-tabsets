@@ -123,7 +123,7 @@ export class RapidApiAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
 
   handleOpenedTab(browserTab: chrome.tabs.Tab, tab: Tab): void {
     // eslint-disable-next-line @typescript-eslint/no-base-to-string
-    console.log(`handleOpenedTab ${browserTab}`)
+    console.log(`handleOpenedTab ${browserTab.toString()}`)
   }
 
   // TODO wrong method !?!
@@ -133,8 +133,7 @@ export class RapidApiAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
     folder?: Tabset,
     additionalData?: AddUrlToTabsetHandlerAdditionalData,
   ): Promise<ExecutionResult<any>> {
-    // eslint-disable-next-line @typescript-eslint/no-base-to-string
-    console.log(`handleOpenedTab ${browserTab}, ${ts}, ${additionalData}`)
+    console.log(`handleOpenedTab ${browserTab.id}, ${ts.name}, ${JSON.stringify(additionalData)}`)
 
     const api = RestApiDefinitions.getApi('RAPID_API_WEBSITE_CATEGORIZATION')
     if (api) {

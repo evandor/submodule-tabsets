@@ -685,7 +685,7 @@ const openTabset = (badge: any) => {
   console.log('clicked badge', badge)
   useTabsetService().selectTabset(badge.tabsetId)
   if (!inBexMode() || !chrome.sidePanel) {
-    router.push('/tabsets/' + badge.tabsetId + '?highlight=' + badge.encodedUrl)
+    router.push('/sidepanel/tabsets/' + badge.tabsetId + '?highlight=' + badge.encodedUrl)
   } else {
     router.push('/sidepanel' + '?highlight=' + badge.encodedUrl)
   }

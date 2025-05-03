@@ -110,6 +110,7 @@ export class GithubReadEventsCommand extends GithubCommands<string> {
                       await useTabsetsStore().deleteTabset(tabsetEvent.tabsetId)
                       break
                     default:
+                      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                       console.log(`unknown event ${tabsetEvent.event}`)
                   }
                   if (tabsetEvent.event === 'added') {
@@ -148,7 +149,8 @@ export class GithubReadEventsCommand extends GithubCommands<string> {
                       }
                       break
                     default:
-                      console.log(`unknown event ${tabsetEvent.event}`)
+                      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+                      console.log(`unknown event '${tabsetEvent.event}'`)
                   }
                 }
                 break

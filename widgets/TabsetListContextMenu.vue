@@ -303,7 +303,7 @@ const deleteDialog = (tabset: Tabset) => {
       tabsetName: tabset.name,
       sidePanelMode: false,
       tabsCount: tabset.tabs.length,
-      redirectTo: '/tabsets',
+      redirectTo: '/sidepanel/tabsets',
     },
   })
 }

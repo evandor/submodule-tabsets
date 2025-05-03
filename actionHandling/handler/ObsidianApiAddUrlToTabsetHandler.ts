@@ -51,8 +51,7 @@ export class ObsidianApiAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   }
 
   handleOpenedTab(browserTab: chrome.tabs.Tab, tab: Tab): void {
-    // eslint-disable-next-line @typescript-eslint/no-base-to-string
-    console.log(`handleOpenedTab ${browserTab}`)
+    console.log(`handleOpenedTab ${browserTab.id}`)
   }
 
   async updateInTabset(

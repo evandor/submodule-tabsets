@@ -27,11 +27,17 @@
         Filter <em>'{{ props.filter }}'</em> did not match anything inside this collection. Click 'Enter' to search in
         all your collections.
       </div>
-      <div v-else-if="props.tabset?.folders.length === 0" class="q-ma-md text-caption text-center text-grey-8">
-        Empty Tabset<br />
-        check the
-        <span class="cursor-pointer" @click="useUiStore().startButtonAnimation('addtab')">action menu</span><br />
-        (Add Tab etc.)<br />
+      <div v-else-if="props.tabset?.folders.length === 0">
+        <div class="q-pa-md fit">
+          <q-card class="my-card fit">
+            <q-card-section class="text-caption text-center">
+              Empty Tabset<br />
+              Click the
+              <span class="cursor-pointer" @click="useUiStore().startButtonAnimation('addtab')">action menu</span>
+              to add a new tab<br />
+            </q-card-section>
+          </q-card>
+        </div>
       </div>
     </q-list>
 
@@ -114,9 +120,7 @@ const tabsForColumn = (): IndexedTab[] => {
     if (!property) {
       return false
     }
-    const match = property.toLowerCase().indexOf(props.filter!.toLowerCase()) >= 0
-    // console.log(`matching ${property} with filter ${props.filter!.toLowerCase()}: ${match}`)
-    return match
+    return property.toLowerCase().indexOf(props.filter!.toLowerCase()) >= 0
   }
 
   return (props.tabset?.tabs as Tab[])

@@ -137,7 +137,7 @@ const selectTS = (tabset: Tabset) => {
           if (tabset.type === TabsetType.DYNAMIC) {
             router.push('/dynamicTs/' + tabset.id)
           } else {
-            router.push('/tabsets/' + tabset.id)
+            router.push('/sidepanel/tabsets/' + tabset.id)
           }
           break
         case 'fullpage':
