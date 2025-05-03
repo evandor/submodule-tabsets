@@ -69,7 +69,7 @@ watchEffect(() => {
     .then((tsId: string | undefined) => (currentTabsetId.value = tsId))
 })
 
-const updateSharedInfo = () => {
+const updateSharedInfo = async () => {
   if (currentTabsetId.value && useAuthStore().user?.uid) {
     const fs = FirebaseServices.getFirestore()
     tabset.value = useTabsetsStore().getCurrentTabset

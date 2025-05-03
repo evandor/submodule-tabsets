@@ -45,7 +45,7 @@
             <Highlight :filter="props.filter" :text="folder.name" />
           </div>
         </q-item-label>
-        <q-item-label class="text-caption text-secondary">
+        <q-item-label class="text-caption">
           {{ folderCaption(folder) }}
         </q-item-label>
       </q-item-section>
