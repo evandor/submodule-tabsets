@@ -109,6 +109,10 @@ export const useTabsetsUiStore = defineStore('tabsetsUi', () => {
               }
             }
           })
+      } else {
+        if (process.env.TABSETS_STAGE === 'DEV') {
+          chrome.action.setBadgeText({ tabId, text: 'D' })
+        }
       }
     }
   }

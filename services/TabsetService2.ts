@@ -464,7 +464,11 @@ export function useTabsetService() {
     addToTabsetWithIndex(ts, tab, useIndex)
 
     useCommandExecutor()
-      .execute(new GithubWriteEventCommand(new TabEvent('added', ts.id, tab.id, ts.name, tab.url, tab.favIconUrl)))
+      .execute(
+        new GithubWriteEventCommand(
+          new TabEvent('added', ts.id, tab.id, tab.name || tab.title || '', tab.url, tab.favIconUrl),
+        ),
+      )
       .catch((err) => console.warn(err))
 
     return Promise.resolve(ts)
