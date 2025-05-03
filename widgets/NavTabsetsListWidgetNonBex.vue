@@ -60,7 +60,7 @@
             :tabset="tabset!"
             :index="index!"
             :hoveredTab="hoveredTab!"
-            :in-side-panel="props.fromPanel"
+            :viewPort="props.viewPort"
             @toggleExpand="(index: number) => toggleExpand(index)" />
         </q-item-section>
       </q-item>
@@ -69,6 +69,7 @@
 </template>
 
 <script lang="ts" setup>
+import { ViewPort } from 'src/core/models/ViewPort'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import { useSpacesStore } from 'src/spaces/stores/spacesStore'
 import { MoveToTabsetCommand } from 'src/tabsets/commands/MoveToTabset'
@@ -78,7 +79,7 @@ import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { useTabsetsUiStore } from 'src/tabsets/stores/tabsetsUiStore'
 import TabsetListContextMenu from 'src/tabsets/widgets/TabsetListContextMenu.vue'
 import { useUiStore } from 'src/ui/stores/uiStore'
-import { onMounted, PropType, ref, watchEffect } from 'vue'
+import { onMounted, ref, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -86,11 +87,21 @@ const router = useRouter()
 const activeTabset = ref<string | undefined>(undefined)
 const hoveredTab = ref<string | undefined>(undefined)
 
-const props = defineProps({
-  tabsets: { type: Array as PropType<Array<Tabset>>, required: true },
-  spaceId: { type: String, required: false },
-  fromPanel: { type: Boolean, default: false },
+type Props = {
+  tabsets: Tabset[]
+  spaceId?: string | undefined
+  viewPort: ViewPort
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  viewPort: 'sidepanel',
 })
+
+// const props = defineProps({
+//   tabsets: { type: Array as PropType<Array<Tabset>>, required: true },
+//   spaceId: { type: String, required: false },
+//   viewPort: { type: Object as PropType<ViewPort>, default: false },
+// })
 
 onMounted(async () => {
   activeTabset.value = await useTabsetsStore().getCurrentTabsetId()
@@ -112,21 +123,40 @@ const selectTS = (tabset: Tabset) => {
       useTabsetsUiStore().addTabsetToLastUsedList(tabset.id)
     })
     .then(() => {
-      console.log('tabset was selected', tabset.id, tabset.type, props.fromPanel)
+      console.log('tabset was selected', tabset.id, tabset.type, props.viewPort)
       activeTabset.value = tabset.id
-      if (!props.fromPanel) {
-        if (tabset.type === TabsetType.DYNAMIC) {
-          router.push('/dynamicTs/' + tabset.id)
-        } else {
-          router.push('/tabsets/' + tabset.id)
-        }
-      } else {
-        if (tabset.type === TabsetType.DYNAMIC) {
-          router.push('/sidepanel/dynamicTs/' + tabset.id)
-        } else {
-          router.push('/sidepanel')
-        }
+      switch (props.viewPort) {
+        case 'sidepanel':
+          if (tabset.type === TabsetType.DYNAMIC) {
+            router.push('/sidepanel/dynamicTs/' + tabset.id)
+          } else {
+            router.push('/sidepanel')
+          }
+          break
+        case 'mainpanel':
+          if (tabset.type === TabsetType.DYNAMIC) {
+            router.push('/dynamicTs/' + tabset.id)
+          } else {
+            router.push('/tabsets/' + tabset.id)
+          }
+          break
+        case 'fullpage':
+          router.push('/fullpage/tabsets/' + tabset.id)
       }
+
+      // if (!props.fromPanel) {
+      //   if (tabset.type === TabsetType.DYNAMIC) {
+      //     router.push('/dynamicTs/' + tabset.id)
+      //   } else {
+      //     router.push('/tabsets/' + tabset.id)
+      //   }
+      // } else {
+      //   if (tabset.type === TabsetType.DYNAMIC) {
+      //     router.push('/sidepanel/dynamicTs/' + tabset.id)
+      //   } else {
+      //     router.push('/sidepanel')
+      //   }
+      // }
     })
 }
 

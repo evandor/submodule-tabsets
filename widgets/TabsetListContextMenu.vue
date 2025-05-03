@@ -169,6 +169,7 @@ import { openURL, useQuasar } from 'quasar'
 import { FeatureIdent } from 'src/app/models/FeatureIdent'
 import { CopyToClipboardCommand } from 'src/core/domain/commands/CopyToClipboard'
 import { SpaceInfo } from 'src/core/models/SpaceInfo'
+import { ViewPort } from 'src/core/models/ViewPort'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import { useUtils } from 'src/core/services/Utils'
 import { useEntityRegistryStore } from 'src/core/stores/entityRegistryStore'
@@ -192,7 +193,7 @@ const props = defineProps({
   tabset: { type: Object as PropType<Tabset>, required: true },
   index: { type: Number, required: true },
   hoveredTab: { type: String, required: false },
-  inSidePanel: { type: Boolean, default: false },
+  viewPort: { type: Object as PropType<ViewPort>, required: true },
 })
 
 // const emit = defineEmits(['toggleExpand']);
