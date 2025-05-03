@@ -11,7 +11,7 @@
       <q-item-section side>
         <q-icon name="keyboard_arrow_right" />
       </q-item-section>
-      <q-menu anchor="top end" self="top start">
+      <q-menu :offset="[-182, -32]">
         <q-list>
           <q-item
             v-if="useFeaturesStore().hasFeature(FeatureIdent.AUTO_TAB_SWITCHER)"

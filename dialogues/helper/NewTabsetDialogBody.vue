@@ -34,11 +34,7 @@
               :disable="!isNotArchived(newTabsetName)"
               data-testid="newTabsetAutoAdd"
               v-model="addAllOpenTabs">
-              <slot
-                ><span :style="isNotArchived(newTabsetName) ? '' : 'opacity: 0.2'"
-                  >Add all {{ openTabsCount }} open tabs</span
-                ></slot
-              >
+              <slot><span :style="isNotArchived(newTabsetName) ? '' : 'opacity: 0.2'">Add all open tabs</span></slot>
             </q-checkbox>
             &nbsp;
             <q-icon v-if="!props.windowId" name="sym_o_help" color="primary" size="1em">
@@ -216,7 +212,7 @@ const submit = () => {
         //   useTabsetService().saveTabset(ts)
         // }
         if (!props.fromPanel) {
-          router.push('/tabsets/' + res.result?.tabsetId)
+          router.push('/sidepanel/tabsets/' + res.result?.tabsetId)
         } else {
           useUiStore().sidePanelSetActiveView(SidePanelViews.MAIN)
           router.push('/sidepanel?first=')

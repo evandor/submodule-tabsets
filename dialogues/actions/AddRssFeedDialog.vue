@@ -18,7 +18,7 @@
           <DialogButton
             label="Display"
             type="submit"
-            :autofocus="true"
+            :default-action="true"
             @keyup.enter="display()"
             @wasClicked="display()" />
         </q-card-actions>

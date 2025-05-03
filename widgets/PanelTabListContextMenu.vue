@@ -146,7 +146,7 @@ const emit = defineEmits(['toggleExpand'])
 const $q = useQuasar()
 const router = useRouter()
 const route = useRoute()
-const fullpageView = route.fullPath.startsWith('/tabsets/')
+const fullpageView = route.fullPath.startsWith('/sidepanel/tabsets/')
 
 const theColor = ref<string | undefined>(undefined)
 

@@ -19,16 +19,16 @@
         <div class="text-body2 text-warning">{{ newTabsetDialogWarning() }}</div>
       </q-card-section>
 
-      <q-card-section v-if="useUiStore().showDetailsPerTabset">
-        <q-select
-          label="Tabset's Detail Level"
-          filled
-          v-model="detailOption"
-          :options="detailOptions"
-          map-options
-          emit-value
-          style="width: 250px" />
-      </q-card-section>
+      <!--      <q-card-section v-if="useUiStore().showDetailsPerTabset">-->
+      <!--        <q-select-->
+      <!--          label="Tabset's Detail Level"-->
+      <!--          filled-->
+      <!--          v-model="detailOption"-->
+      <!--          :options="detailOptions"-->
+      <!--          map-options-->
+      <!--          emit-value-->
+      <!--          style="width: 250px" />-->
+      <!--      </q-card-section>-->
 
       <!--      <q-card-section>-->
       <!--        <div classs="text-caption text-blue" style="font-size: smaller" v-if="windowMgtSelectionEdited">-->
@@ -92,7 +92,7 @@ import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import { useFeaturesStore } from 'src/features/stores/featuresStore'
 import { RenameTabsetCommand } from 'src/tabsets/commands/RenameTabset'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
-import { ListDetailLevel, useUiStore } from 'src/ui/stores/uiStore'
+import { ListDetailLevel } from 'src/ui/stores/uiStore'
 import { useWindowsStore } from 'src/windows/stores/windowsStore'
 import { computed, ref, watchEffect } from 'vue'
 
