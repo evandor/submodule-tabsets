@@ -2,7 +2,19 @@
   <!-- SidePanelPageTabList -->
   <div style="width: 100%; max-width: 100%">
     <q-list class="q-ma-none">
-      <!-- supporting drag & drop when not on mobile -->
+      <template v-if="useUiStore().folderStyle === 'goInto'">
+        <SidePanelTabListHelper
+          v-for="(tab, index) in pinnedTabs"
+          :key="index"
+          v-once
+          :tab="tab.tab as Tab"
+          :index="tab.index"
+          :tabset="props.tabset!"
+          :filter="props.filter || ''" />
+
+        <q-separator v-if="pinnedTabs.length > 0" class="q-mt-xs" />
+      </template>
+
       <vue-draggable-next
         v-if="tabs.length > 0"
         class="q-ma-none"
@@ -15,11 +27,7 @@
           v-once
           :tab="tab.tab as Tab"
           :index="tab.index"
-          :type="props.type"
-          :sorting="props.sorting"
-          :preventDragAndDrop="false"
           :tabset="props.tabset!"
-          :show-tabsets="props.showTabsets"
           :hide-menu="props.hideMenu"
           :filter="props.filter || ''" />
       </vue-draggable-next>
@@ -54,6 +62,7 @@ import { Tab, TabSorting } from 'src/tabsets/models/Tab'
 import { Tabset, TabsetType } from 'src/tabsets/models/Tabset'
 import TabsetService from 'src/tabsets/services/TabsetService'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
+import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { useUiStore } from 'src/ui/stores/uiStore'
 import { PropType, ref, watch } from 'vue'
 import { VueDraggableNext } from 'vue-draggable-next'
@@ -72,6 +81,7 @@ const props = defineProps({
 const emits = defineEmits(['tabs-found'])
 
 const tabs = ref<IndexedTab[]>([])
+const pinnedTabs = ref<IndexedTab[]>([])
 
 watch(
   () => props.filter,
@@ -148,7 +158,37 @@ const tabsForColumn = (): IndexedTab[] => {
     .map((t: Tab, index: number) => new IndexedTab(index, t))
 }
 
+const calcPinnedTabs = (): IndexedTab[] => {
+  const result: IndexedTab[] = []
+  if (!props.tabset) {
+    return result
+  }
+  const activeFolder = useTabsetsStore().getActiveFolder(props.tabset)
+  if (!activeFolder) {
+    return result
+  }
+  const folderChain = useTabsetsStore().getFolderChain(activeFolder.id)
+  console.log('folderChain', folderChain)
+  if (folderChain.length > 0) {
+    const rootTabset = useTabsetsStore().getTabset(folderChain[folderChain.length - 1]!)
+    for (var i = 1; i < folderChain.length; i++) {
+      console.log('checking', folderChain[i])
+      const parentFolder = useTabsetsStore().getActiveFolder(rootTabset!, folderChain[i])
+      console.log('parentFolder', parentFolder)
+      const pinnedInListTabs = parentFolder?.tabs
+        .filter((t: Tab) => t.pinnedInList)
+        .map((t: Tab, index: number) => new IndexedTab(index, t))
+      if (pinnedInListTabs) {
+        result.push(...pinnedInListTabs)
+      }
+    }
+  }
+  return result
+}
+
 tabs.value = tabsForColumn()
+pinnedTabs.value = calcPinnedTabs()
+
 // console.log('---')
 emits('tabs-found', tabs.value.length)
 </script>

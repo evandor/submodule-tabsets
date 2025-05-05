@@ -47,6 +47,17 @@
                 <q-tooltip class="tooltip-small">Click here to open in Reading Mode</q-tooltip>
               </q-icon>
             </span>
+            <span>
+              <q-icon
+                v-if="props.tab.pinnedInList && useUiStore().folderStyle === 'goInto'"
+                name="sym_o_keep"
+                size="12px"
+                color="primary"
+                style="position: relative; top: -5px"
+                class="q-mr-xs">
+                <q-tooltip class="tooltip-small">This tab is pinned, i.e. it appears in all subfolders</q-tooltip>
+              </q-icon>
+            </span>
             <!--              <span v-if="showRssReferencesInfo()">-->
             <!--                <q-icon-->
             <!--                  name="rss_feed"-->
@@ -416,13 +427,9 @@ const props = defineProps<{
 }>()
 
 const showButtonsProp = ref<boolean>(false)
-const hoveredTab = ref<string | undefined>(undefined)
 const tsBadges = ref<object[]>([])
-const newState = ref(false)
 const showCommentList = ref(false)
 const showPlaceholderList = ref(false)
-const groupName = ref<string | undefined>(undefined)
-const groups = ref<Map<string, chrome.tabGroups.TabGroup>>(new Map())
 const placeholders = ref<Object[]>([])
 const suggestion = ref<Suggestion | undefined>(undefined)
 const pngs = ref<SavedBlob[]>([])

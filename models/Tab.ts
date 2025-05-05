@@ -111,6 +111,8 @@ export class Tab {
   pinned: boolean
   groupId: number
 
+  pinnedInList: boolean = false // appears in subfolders
+
   // from tabsets' columns
   columnId: string | undefined
 
