@@ -1,10 +1,9 @@
 import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
+import { useLogger } from 'src/core/services/Logger'
 import { useUtils } from 'src/core/services/Utils'
 import Analytics from 'src/core/utils/google-analytics'
-import { useLogger } from 'src/core/services/Logger'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
-import { ListDetailLevel } from 'src/ui/stores/uiStore'
 
 const { sendMsg } = useUtils()
 const { info } = useLogger()
@@ -31,12 +30,11 @@ export class RenameTabsetCommand implements Command<any> {
     public newName: string,
     public newColor: string | undefined = undefined,
     public window: string = 'current',
-    public details: ListDetailLevel = 'MAXIMAL',
   ) {}
 
   async execute(): Promise<ExecutionResult<string>> {
     return useTabsetService()
-      .rename(this.tabsetId, this.newName, this.newColor, this.window, this.details)
+      .rename(this.tabsetId, this.newName, this.newColor, this.window)
       .then((res) => {
         info('renamed tabset')
         sendMsg('tabset-renamed', {

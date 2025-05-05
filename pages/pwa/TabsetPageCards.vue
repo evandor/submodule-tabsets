@@ -1,9 +1,9 @@
 <template>
   <!-- TabsetPageCards -->
 
-  <InfoMessageWidget :probability="1" ident="tabsetpagecards_taggridinfo">
-    Click the image to move your tabs to your liking; right-click to create or remove favorites and click on the URL to
-    open the page.
+  <InfoMessageWidget :probability="1" ident="tabsetpagecards_taggridinfo" class="q-ma-md">
+    Click the image to move your tabs to your liking; right-click to (re-)create thumbnails and click on the URL to open
+    the page.
   </InfoMessageWidget>
 
   <TabGrid2

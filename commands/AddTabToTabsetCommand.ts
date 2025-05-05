@@ -1,5 +1,4 @@
 // 6 expected diffs to localstorage
-// 6 expected diffs to localstorage
 import _ from 'lodash'
 import { uid } from 'quasar'
 import AppEventDispatcher from 'src/app/AppEventDispatcher'
@@ -12,15 +11,12 @@ import { useLogger } from 'src/core/services/Logger'
 import { useUtils } from 'src/core/services/Utils'
 import ContentUtils from 'src/core/utils/ContentUtils'
 import Analytics from 'src/core/utils/google-analytics'
-import StatsUtils from 'src/core/utils/StatsUtils'
 import { useFeaturesStore } from 'src/features/stores/featuresStore'
 import { useRequestsService } from 'src/requests/services/RequestsService'
 import { useRequestsStore } from 'src/requests/stores/requestsStore'
-import { useMetrics } from 'src/services/Metrics'
 import { Tab } from 'src/tabsets/models/Tab'
-import { ChangeInfo, Tabset, TabsetSharing } from 'src/tabsets/models/Tabset'
+import { ChangeInfo, Tabset } from 'src/tabsets/models/Tabset'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
-import { useGroupsStore } from 'src/tabsets/stores/groupsStore'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import PlaceholderUtils from 'src/tabsets/utils/PlaceholderUtils'
 import { useThumbnailsService } from 'src/thumbnails/services/ThumbnailsService'
@@ -54,7 +50,6 @@ export class AddTabToTabsetCommand implements Command<any> {
 
     let tabsetOrFolder = this.tabset!
     if (this.activeFolder) {
-      //const folder = useTabsetService().findFolder(this.tabset!.folders, this.activeFolder)
       const folder = useTabsetsStore().getActiveFolder(this.tabset!, this.activeFolder)
       if (folder) {
         tabsetOrFolder = folder
@@ -63,7 +58,6 @@ export class AddTabToTabsetCommand implements Command<any> {
 
     if (!this.allowDuplicates) {
       const exists = _.findIndex(tabsetOrFolder.tabs, (t: any) => t.url === this.tab.url) >= 0
-      //console.debug("checking 'tab exists' yields", exists)
       if (exists && !this.ignoreDuplicates) {
         return Promise.reject('tab already exists in this tabset')
       } else if (exists) {
@@ -74,21 +68,17 @@ export class AddTabToTabsetCommand implements Command<any> {
     try {
       // manage (chrome) Group
       // console.log('updating tab group for group id', this.tab.groupId)
-      const currentGroup = useGroupsStore().currentGroupForId(this.tab.groupId)
-      this.tab.groupName = currentGroup?.title || undefined
-      if (currentGroup) {
-        await useGroupsStore().persistGroup(currentGroup)
-      }
+      // const currentGroup = useGroupsStore().currentGroupForId(this.tab.groupId)
+      // this.tab.groupName = currentGroup?.title || undefined
+      // if (currentGroup) {
+      //   await useGroupsStore().persistGroup(currentGroup)
+      // }
 
       // TabReferences
       this.tab.tabReferences = this.tab.tabReferences.concat(useContentStore().currentTabReferences)
 
       // Article (ReaderMode)
-      console.log(
-        'checking artivle',
-        useContentStore().currentTabArticle,
-        useFeaturesStore().hasFeature(FeatureIdent.READING_MODE),
-      )
+      console.log('checking article', useContentStore().currentTabArticle)
       if (useFeaturesStore().hasFeature(FeatureIdent.READING_MODE)) {
         const article = useContentStore().currentTabArticle
         if (article && article['title' as keyof object] && article['textContent' as keyof object]) {
@@ -103,7 +93,6 @@ export class AddTabToTabsetCommand implements Command<any> {
                 this.tab.url,
               ),
             )
-            //this.tab.url = chrome.runtime.getURL(`/www/index.html#/mainpanel/readingmode/${this.tab.id}`)
             useContentStore().resetCurrentTabArticle()
           }
         }
@@ -114,10 +103,10 @@ export class AddTabToTabsetCommand implements Command<any> {
       Analytics.fireEvent('tabset_tab_added', { tabsCount: tabset.tabs.length })
 
       // Sharing
-      if (tabset.sharing?.sharedId && tabset.sharing.sharing === TabsetSharing.PUBLIC_LINK && !this.activeFolder) {
-        tabset.sharing.sharing = TabsetSharing.PUBLIC_LINK_OUTDATED
-        tabset.sharing.sharedAt = new Date().getTime()
-      }
+      // if (tabset.sharing?.sharedId && tabset.sharing.sharing === TabsetSharing.PUBLIC_LINK && !this.activeFolder) {
+      //   tabset.sharing.sharing = TabsetSharing.PUBLIC_LINK_OUTDATED
+      //   tabset.sharing.sharedAt = new Date().getTime()
+      // }
 
       // Placeholder Defaults Application
       this.tab = PlaceholderUtils.applyForDefaultDomains(this.tab)
@@ -126,16 +115,6 @@ export class AddTabToTabsetCommand implements Command<any> {
       let res: any = null
       let content: any = undefined
       if (this.tab.chromeTabId) {
-        // saving content excerpt and meta data
-        // try {
-        //   const contentResult = await chrome.tabs.sendMessage(this.tab.chromeTabId, 'getExcerpt')
-        //   const tokens = ContentUtils.html2tokens(contentResult.html)
-        //   content = [...tokens].join(" ")
-        //   await useTabsetService().saveText(this.tab, content, contentResult.metas)
-        // } catch (err) {
-        //   console.warn("got error when saving content and metadata:", err, this.tab?.url)
-        // }
-
         const tabContent = useContentStore().getCurrentTabContent
         const tabMetas = useContentStore().getCurrentTabMetas
         if (tabContent) {
@@ -144,7 +123,6 @@ export class AddTabToTabsetCommand implements Command<any> {
           await useTabsetService().saveText(this.tab, content, tabMetas)
         }
 
-        //res = new ExecutionResult("result", "Link was added")
         const res2 = await useTabsetService().saveTabset(
           this.tabset!,
           new ChangeInfo('tab', 'added', this.tab.id, this.tabset!.id),
@@ -177,11 +155,7 @@ export class AddTabToTabsetCommand implements Command<any> {
         useRequestsService().logWebRequest(JSON.parse(JSON.stringify(req)))
       }
 
-      const stats = StatsUtils.calcStatsRows()
-      useMetrics().count('tabsets', stats.find((s) => s.name === 'Tabsets')?.count || 0)
-      useMetrics().count('tabs', stats.find((s) => s.name === 'Tabs')?.count || 0)
-      useMetrics().count('spaces', stats.find((s) => s.name === 'Spaces')?.count || 0)
-
+      AppEventDispatcher.dispatchEvent('run-metrics')
       return res
     } catch (err: any) {
       console.warn('hier: ', err)

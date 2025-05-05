@@ -110,7 +110,6 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     tabsetName: string,
     tabs: Tab[],
     color: string | undefined = undefined,
-    dynamicUrl: URL | undefined = undefined,
     spaceId: string | undefined = undefined,
     ignoreDuplicates: boolean = false,
   ): Promise<Tabset> {
@@ -142,7 +141,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     let ts: Tabset = null as unknown as Tabset
     ts = new Tabset(uid(), trustedName, tabs, [])
     ts.color = trustedColor
-    ts.dynamicUrl = dynamicUrl?.toString()
+    ts.dynamicUrl = undefined
     if (spaceId) {
       ts.spaces = [spaceId]
     }

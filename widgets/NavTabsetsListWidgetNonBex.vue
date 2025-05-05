@@ -60,7 +60,7 @@
             :tabset="tabset!"
             :index="index!"
             :hoveredTab="hoveredTab!"
-            :viewPort="props.viewPort"
+            :viewPort="props.viewPort as ViewPort"
             @toggleExpand="(index: number) => toggleExpand(index)" />
         </q-item-section>
       </q-item>
