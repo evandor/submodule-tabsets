@@ -35,7 +35,7 @@
         </div>
       </template>
       <q-card class="q-pl-md">
-        <SidePanelPageContent2 :tabset="folder" />
+        <SidePanelPageContentExpand :tabset="folder" />
       </q-card>
     </q-expansion-item>
   </q-list>
@@ -47,7 +47,7 @@ import { onMounted, ref, watchEffect } from 'vue'
 import '@he-tree/vue/style/default.css'
 import '@he-tree/vue/style/material-design.css'
 import { QVueGlobals } from 'quasar'
-import SidePanelPageContent2 from 'src/core/pages/SidePanelPageContent2.vue'
+import SidePanelPageContentExpand from 'src/core/pages/SidePanelPageContentExpand.vue'
 import { useActionHandlers } from 'src/tabsets/actionHandling/ActionHandlers'
 import { ActionHandlerButtonClickedHolder } from 'src/tabsets/actionHandling/model/ActionHandlerButtonClickedHolder'
 import SpecialUrlAddToTabsetComponent from 'src/tabsets/actionHandling/SpecialUrlAddToTabsetComponent.vue'

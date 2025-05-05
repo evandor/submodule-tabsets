@@ -1,3 +1,4 @@
+import AppEventDispatcher from 'src/app/AppEventDispatcher'
 import { FeatureIdent } from 'src/app/models/FeatureIdent'
 import { STRIP_CHARS_IN_USER_INPUT } from 'src/boot/constants'
 import Command from 'src/core/domain/Command'
@@ -5,13 +6,10 @@ import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { useLogger } from 'src/core/services/Logger'
 import { useUtils } from 'src/core/services/Utils'
 import Analytics from 'src/core/utils/google-analytics'
-import StatsUtils from 'src/core/utils/StatsUtils'
 import { useFeaturesStore } from 'src/features/stores/featuresStore'
-import { useMetrics } from 'src/services/Metrics'
 import { Suggestion } from 'src/suggestions/domain/models/Suggestion'
 import { useSuggestionsStore } from 'src/suggestions/stores/suggestionsStore'
 import { SaveOrReplaceResult } from 'src/tabsets/models/SaveOrReplaceResult'
-import { TabsetType } from 'src/tabsets/models/Tabset'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { useWindowsStore } from 'src/windows/stores/windowsStore'
@@ -28,58 +26,42 @@ export class CreateTabsetCommand implements Command<SaveOrReplaceResult> {
     public spaceId: string | undefined = undefined,
     public windowToOpen: string = 'current',
     public color: string | undefined = undefined,
-    public dynamicSource: string | undefined = undefined,
   ) {}
 
   async execute(): Promise<ExecutionResult<SaveOrReplaceResult>> {
+    function checkSpacesSuggestion() {
+      if (
+        useTabsetsStore().tabsets.size >= 15 &&
+        !useFeaturesStore().hasFeature(FeatureIdent.SPACES) &&
+        process.env.MODE === 'bex'
+      ) {
+        useSuggestionsStore().addSuggestion(Suggestion.getStaticSuggestion('TRY_SPACES_FEATURE'))
+      }
+    }
+
+    function checkBookmarksSuggestion() {
+      if (
+        useTabsetsStore().tabsets.size > 2 &&
+        !useFeaturesStore().hasFeature(FeatureIdent.BOOKMARKS) &&
+        process.env.MODE === 'bex'
+      ) {
+        useSuggestionsStore().addSuggestion(Suggestion.getStaticSuggestion('TRY_BOOKMARKS_FEATURE'))
+      }
+    }
+
     try {
-      //const trustedWindowName = this.windowToOpen.replace(STRIP_CHARS_IN_USER_INPUT, '')
       const windowId = this.windowToOpen ? this.windowToOpen.replace(STRIP_CHARS_IN_USER_INPUT, '') : 'current'
       useWindowsStore().addToWindowSet(windowId)
       const result: SaveOrReplaceResult = await useTabsetService()
-        .saveOrReplaceFromChromeTabs(
-          this.tabsetName,
-          this.tabsToUse,
-          this.merge,
-          windowId,
-          TabsetType.DEFAULT,
-          this.color,
-          this.dynamicSource,
-          this.spaceId,
-        )
+        .saveOrReplaceFromChromeTabs(this.tabsetName, this.tabsToUse, this.color, this.spaceId)
         .then((res) => {
-          //JsUtils.gaEvent('tabset-created', {"tabsCount": this.tabsToUse.length})
           Analytics.fireEvent('tabset_created', { tabsCount: this.tabsToUse.length })
-          return res
-        })
-        .then((res) => {
-          if (
-            useTabsetsStore().tabsets.size > 1 &&
-            !useFeaturesStore().hasFeature(FeatureIdent.BOOKMARKS) &&
-            process.env.MODE === 'bex'
-          ) {
-            useSuggestionsStore().addSuggestion(Suggestion.getStaticSuggestion('TRY_BOOKMARKS_FEATURE'))
-          }
-          if (
-            useTabsetsStore().tabsets.size >= 15 &&
-            !useFeaturesStore().hasFeature(FeatureIdent.SPACES) &&
-            process.env.MODE === 'bex'
-          ) {
-            useSuggestionsStore().addSuggestion(Suggestion.getStaticSuggestion('TRY_SPACES_FEATURE'))
-            // } else if (useTabsetsStore().tabsets.size >= 3 &&
-            //     useTabsetsStore().allTabsCount > 10 &&
-            //     !useFeaturesStore().hasFeature(FeatureIdent.NEWEST_TABS) &&
-            //     process.env.MODE === 'bex') {
-            //     useSuggestionsStore().addSuggestion(Suggestion.getStaticSuggestion(StaticSuggestionIdent.TRY_NEWEST_TABS_FEATURE))
-          }
+          checkBookmarksSuggestion()
+          checkSpacesSuggestion()
           info('tabset created')
           sendMsg('tabset-added', { tabsetId: res.tabset.id })
           localStorage.setItem('test.tabsetId', res.tabset.id)
-
-          const stats = StatsUtils.calcStatsRows()
-          useMetrics().count('tabsets', stats.find((s) => s.name === 'Tabsets')?.count || 0)
-          useMetrics().count('tabs', stats.find((s) => s.name === 'Tabs')?.count || 0)
-          useMetrics().count('spaces', stats.find((s) => s.name === 'Spaces')?.count || 0)
+          AppEventDispatcher.dispatchEvent('run-metrics')
           return res
         })
       let doneMsg = 'Tabset created'

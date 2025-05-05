@@ -47,6 +47,17 @@
                 <q-tooltip class="tooltip-small">Click here to open in Reading Mode</q-tooltip>
               </q-icon>
             </span>
+            <span>
+              <q-icon
+                v-if="props.tab.pinnedInList && useUiStore().folderStyle === 'goInto'"
+                name="sym_o_keep"
+                size="12px"
+                color="primary"
+                style="position: relative; top: -5px"
+                class="q-mr-xs">
+                <q-tooltip class="tooltip-small">This tab is pinned, i.e. it appears in all subfolders</q-tooltip>
+              </q-icon>
+            </span>
             <!--              <span v-if="showRssReferencesInfo()">-->
             <!--                <q-icon-->
             <!--                  name="rss_feed"-->
@@ -146,16 +157,13 @@
   <!-- === RSS Links === -->
   <Transition name="fade" mode="out-in">
     <q-item-label v-if="showRssReferencesInfo()">
-      <div
-        class="row q-ma-none q-pa-none q-my-xs"
-        v-for="ref in props.tab?.tabReferences.filter(
-          (r: TabReference) => r.type === TabReferenceType.RSS && r.status !== 'IGNORED',
-        )">
+      <div class="row q-ma-none q-pa-none q-my-xs" v-for="ref in rssTabReferences">
         <div class="col-1 text-body2" style="font-size: smaller">
           <q-icon name="rss_feed" class="q-ma-none q-pa-none" color="warning" size="xs" />
         </div>
         <div class="col-7 ellipsis" style="font-size: smaller" @click="openRssDialog(ref)">
           {{ ref.title }}
+          <q-tooltip v-if="ref.title.length > 20" class="tooltip-small">{{ ref.title }}</q-tooltip>
         </div>
         <div class="col text-right">
           <q-btn icon="o_open_in_new" flat size="xs" class="q-ma-none q-pa-none" @click="openRssLink(ref)" />
@@ -164,6 +172,15 @@
       </div>
     </q-item-label>
   </Transition>
+  <q-item-label v-if="rssTabReferences.length > 2">
+    <div class="row q-ma-none q-pa-none q-my-xs">
+      <div class="col-1 text-body2" style="font-size: smaller"></div>
+      <div class="col-7 ellipsis" style="font-size: smaller">Hide all</div>
+      <div class="col text-right">
+        <q-btn icon="check" flat size="xs" color="positive" class="q-ma-none q-pa-none" @click="hideAll()" />
+      </div>
+    </div>
+  </q-item-label>
 
   <!-- === url(s) === -->
   <q-item-label
@@ -357,6 +374,7 @@
 </template>
 
 <script setup lang="ts">
+import { STRIP_CHARS_IN_USER_INPUT } from 'boot/constants'
 import { formatDistance } from 'date-fns'
 import { QPopupEdit, uid, useQuasar } from 'quasar'
 import BrowserApi from 'src/app/BrowserApi'
@@ -409,13 +427,9 @@ const props = defineProps<{
 }>()
 
 const showButtonsProp = ref<boolean>(false)
-const hoveredTab = ref<string | undefined>(undefined)
 const tsBadges = ref<object[]>([])
-const newState = ref(false)
 const showCommentList = ref(false)
 const showPlaceholderList = ref(false)
-const groupName = ref<string | undefined>(undefined)
-const groups = ref<Map<string, chrome.tabGroups.TabGroup>>(new Map())
 const placeholders = ref<Object[]>([])
 const suggestion = ref<Suggestion | undefined>(undefined)
 const pngs = ref<SavedBlob[]>([])
@@ -426,6 +440,9 @@ const monitor = ref<MonitoredTab | undefined>(undefined)
 const popupEdit = ref(false)
 const popupRef = ref<any>(undefined)
 const doShowDetails = ref(false)
+const rssTabReferences = ref<TabReference[]>(
+  props.tab?.tabReferences.filter((r: TabReference) => r.type === TabReferenceType.RSS && r.status !== 'IGNORED'),
+)
 
 onMounted(() => {
   if (props.tabset?.id) {
@@ -606,7 +623,7 @@ const openRssDialog = (rss: TabReference) => {
       await useCommandExecutor().executeFromUi(
         new CreateFolderCommand(
           uid(),
-          'rss feed',
+          data['feedName' as keyof object].replace(STRIP_CHARS_IN_USER_INPUT, ''),
           [],
           ts.id,
           undefined,
@@ -637,6 +654,8 @@ const ignore = (rss: TabReference) => {
     useTabsetService().saveTabset(props.tabset)
   }
 }
+
+const hideAll = () => rssTabReferences.value.forEach((r: TabReference) => ignore(r))
 
 const send = () => {
   if (sendComment.value.trim() !== '') {

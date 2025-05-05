@@ -42,53 +42,57 @@
       </q-item>
 
       <q-item
-        v-if="props.tabset.type === TabsetType.DEFAULT && props.tabset.status !== TabsetStatus.DELETED"
+        v-if="
+          useFeaturesStore().hasFeature(FeatureIdent.ARCHIVE_TABSET) &&
+          props.tabset.type === TabsetType.DEFAULT &&
+          props.tabset.status !== TabsetStatus.DELETED
+        "
         clickable
         v-close-popup
         @click="archiveTabset(props.tabset.id)">
         Archive Tabset
       </q-item>
 
-      <q-separator v-if="props.tabset.type !== TabsetType.DYNAMIC" />
-      <q-item v-if="props.tabset.type !== TabsetType.DYNAMIC && props.tabset.sharing.sharing" clickable>
-        <q-item-section>Sharing</q-item-section>
-        <q-item-section side>
-          <q-icon name="keyboard_arrow_right" />
-        </q-item-section>
+      <!--      <q-separator v-if="props.tabset.type !== TabsetType.DYNAMIC" />-->
+      <!--      <q-item v-if="props.tabset.type !== TabsetType.DYNAMIC && props.tabset.sharing.sharing" clickable>-->
+      <!--        <q-item-section>Sharing</q-item-section>-->
+      <!--        <q-item-section side>-->
+      <!--          <q-icon name="keyboard_arrow_right" />-->
+      <!--        </q-item-section>-->
 
-        <q-menu anchor="top end" self="top start">
-          <q-list dense>
-            <q-item
-              v-if="props.tabset.sharing.sharing === TabsetSharing.UNSHARED || !props.tabset.sharing"
-              clickable
-              v-close-popup
-              @click="sharePublicly(props.tabset.id)">
-              <q-item-section>Share publicly</q-item-section>
-            </q-item>
-            <q-item
-              v-if="props.tabset.sharing.sharing === TabsetSharing.PUBLIC_LINK"
-              @click="openPublicShare(props.tabset.id)"
-              clickable
-              v-close-popup>
-              <q-item-section>Open public page</q-item-section>
-            </q-item>
-            <q-item
-              v-if="props.tabset.sharing.sharing === TabsetSharing.PUBLIC_LINK"
-              @click="copyPublicShareToClipboard(props.tabset.id)"
-              clickable
-              v-close-popup>
-              <q-item-section>Copy public page link</q-item-section>
-            </q-item>
-            <q-item
-              v-if="props.tabset.sharing.sharing === TabsetSharing.PUBLIC_LINK"
-              clickable
-              v-close-popup
-              @click="removePublicShare(props.tabset.id)">
-              <q-item-section>Remove public share</q-item-section>
-            </q-item>
-          </q-list>
-        </q-menu>
-      </q-item>
+      <!--        <q-menu anchor="top end" self="top start">-->
+      <!--          <q-list dense>-->
+      <!--            <q-item-->
+      <!--              v-if="props.tabset.sharing.sharing === TabsetSharing.UNSHARED || !props.tabset.sharing"-->
+      <!--              clickable-->
+      <!--              v-close-popup-->
+      <!--              @click="sharePublicly(props.tabset.id)">-->
+      <!--              <q-item-section>Share publicly</q-item-section>-->
+      <!--            </q-item>-->
+      <!--            <q-item-->
+      <!--              v-if="props.tabset.sharing.sharing === TabsetSharing.PUBLIC_LINK"-->
+      <!--              @click="openPublicShare(props.tabset.id)"-->
+      <!--              clickable-->
+      <!--              v-close-popup>-->
+      <!--              <q-item-section>Open public page</q-item-section>-->
+      <!--            </q-item>-->
+      <!--            <q-item-->
+      <!--              v-if="props.tabset.sharing.sharing === TabsetSharing.PUBLIC_LINK"-->
+      <!--              @click="copyPublicShareToClipboard(props.tabset.id)"-->
+      <!--              clickable-->
+      <!--              v-close-popup>-->
+      <!--              <q-item-section>Copy public page link</q-item-section>-->
+      <!--            </q-item>-->
+      <!--            <q-item-->
+      <!--              v-if="props.tabset.sharing.sharing === TabsetSharing.PUBLIC_LINK"-->
+      <!--              clickable-->
+      <!--              v-close-popup-->
+      <!--              @click="removePublicShare(props.tabset.id)">-->
+      <!--              <q-item-section>Remove public share</q-item-section>-->
+      <!--            </q-item>-->
+      <!--          </q-list>-->
+      <!--        </q-menu>-->
+      <!--      </q-item>-->
 
       <q-separator v-if="useFeaturesStore().hasFeature(FeatureIdent.SPACES)" />
       <q-item v-if="useFeaturesStore().hasFeature(FeatureIdent.SPACES)" clickable>
@@ -181,20 +185,30 @@ import { RestoreTabsetCommand } from 'src/tabsets/commands/RestoreTabset'
 import DeleteTabsetDialog from 'src/tabsets/dialogues/DeleteTabsetDialog.vue'
 import RestoreTabsetDialog from 'src/tabsets/dialogues/RestoreTabsetDialog.vue'
 import { Tab } from 'src/tabsets/models/Tab'
-import { Tabset, TabsetSharing, TabsetStatus, TabsetType } from 'src/tabsets/models/Tabset'
+import { Tabset, TabsetStatus, TabsetType } from 'src/tabsets/models/Tabset'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { DrawerTabs, useUiStore } from 'src/ui/stores/uiStore'
-import { PropType } from 'vue'
 
 const { inBexMode } = useUtils()
 
-const props = defineProps({
-  tabset: { type: Object as PropType<Tabset>, required: true },
-  index: { type: Number, required: true },
-  hoveredTab: { type: String, required: false },
-  viewPort: { type: Object as PropType<ViewPort>, required: true },
+type Props = {
+  tabset: Tabset
+  index: number
+  hoveredTab?: string
+  viewPort: ViewPort
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  // viewPort: 'sidepanel',
 })
+
+// const props = defineProps({
+//   tabset: { type: Object as PropType<Tabset>, required: true },
+//   index: { type: Number, required: true },
+//   hoveredTab: { type: String, required: false },
+//   viewPort: { type: Object as PropType<ViewPort>, required: true },
+// })
 
 // const emit = defineEmits(['toggleExpand']);
 

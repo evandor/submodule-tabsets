@@ -71,13 +71,6 @@
           </div>
         </q-card-section>
 
-        <!--        <q-card-section v-if="useFeaturesStore().hasFeature(FeatureIdent.DYNAMIC_TABSET)">-->
-        <!--          Source for Dynamic Tabset (optinal)-->
-        <!--          <div class="row q-pa-xs q-mt-none q-pl-sm q-gutter-sm">-->
-        <!--            <q-input type="url" v-model="dynamicSource" />-->
-        <!--          </div>-->
-        <!--        </q-card-section>-->
-
         <q-card-actions align="right">
           <DialogButton label="Cancel" />
           <DialogButton
@@ -93,10 +86,9 @@
 </template>
 
 <script lang="ts" setup>
-import { QForm, useDialogPluginComponent } from 'quasar'
+import { EventBus, QForm, useDialogPluginComponent } from 'quasar'
 import { FeatureIdent } from 'src/app/models/FeatureIdent'
 import { SidePanelViews } from 'src/app/models/SidePanelViews'
-import { STRIP_CHARS_IN_USER_INPUT } from 'src/boot/constants'
 import DialogButton from 'src/core/dialog/buttons/DialogButton.vue'
 import ColorSelector from 'src/core/dialog/ColorSelector.vue'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
@@ -110,11 +102,13 @@ import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { useTabsStore2 } from 'src/tabsets/stores/tabsStore2'
 import { useUiStore } from 'src/ui/stores/uiStore'
 import { useWindowsStore } from 'src/windows/stores/windowsStore'
-import { ref, watchEffect } from 'vue'
+import { inject, ref, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 
 const { dialogRef, onDialogHide, onDialogCancel } = useDialogPluginComponent()
 const { inBexMode } = useUtils()
+
+const bus = inject('bus') as EventBus
 
 const props = defineProps({
   spaceId: { type: String, required: false },
@@ -134,7 +128,6 @@ const windowModel = ref<string>(null as unknown as string)
 const windowOptions = ref<string[]>([])
 const theColor = ref<string | undefined>(undefined)
 const windowsStore = useWindowsStore()
-const dynamicSource = ref<string | undefined>(undefined)
 const openTabsCount = ref(0)
 
 watchEffect(() => {
@@ -196,16 +189,10 @@ const submit = () => {
     }
     useCommandExecutor()
       .executeFromUi(
-        new CreateTabsetCommand(
-          newTabsetName.value,
-          tabsToUse,
-          props.spaceId,
-          windowModel.value,
-          theColor.value,
-          dynamicSource.value,
-        ),
+        new CreateTabsetCommand(newTabsetName.value, tabsToUse, props.spaceId, windowModel.value, theColor.value),
       )
       .then((res) => {
+        //bus.emit('run-metrics')
         // if (props.spaceId) {
         //   const ts: Tabset = res.result?.tabset
         //   ts.spaces.push(props.spaceId)
@@ -219,13 +206,6 @@ const submit = () => {
         }
       })
   }
-}
-
-const createWindowOption = (val: any, done: any) => {
-  const sanitized = val ? val.replace(STRIP_CHARS_IN_USER_INPUT, '') : 'current'
-  windowOptions.value.push(sanitized)
-  console.log('calling done with', sanitized)
-  done(sanitized, 'add-unique')
 }
 
 const unarchiveTabset = () => {

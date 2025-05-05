@@ -7,7 +7,6 @@ import { ContentItem } from 'src/content/models/ContentItem'
 import { useContentService } from 'src/content/services/ContentService'
 import { TabPredicate } from 'src/core/domain/Types'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
-import { useSettingsStore } from 'src/core/stores/settingsStore'
 import JsUtils from 'src/core/utils/JsUtils'
 import NavigationService from 'src/services/NavigationService'
 import { useSpacesStore } from 'src/spaces/stores/spacesStore'
@@ -20,7 +19,7 @@ import { ChangeInfo, Tabset, TabsetStatus, TabsetType } from 'src/tabsets/models
 import { useSelectedTabsetService } from 'src/tabsets/services/selectedTabsetService' // let db: TabsetsPersistence = null as unknown as TabsetsPersistence
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { useTabsStore2 } from 'src/tabsets/stores/tabsStore2'
-import { ListDetailLevel, useUiStore } from 'src/ui/stores/uiStore'
+import { useUiStore } from 'src/ui/stores/uiStore'
 import throttledQueue from 'throttled-queue'
 import { v5 as uuidv5 } from 'uuid'
 import { ref } from 'vue'
@@ -53,6 +52,14 @@ export function useTabsetService() {
     initialized.value = true
   }
 
+  function updateTags(chromeTabs: chrome.tabs.Tab[], name: string) {
+    return _.map(chromeTabs, (t: chrome.tabs.Tab) => {
+      const tab = new Tab(uid(), t)
+      Tab.addTags(tab, [name])
+      return tab
+    })
+  }
+
   /**
    * Will create a new tabset (or update an existing one with matching name) from
    * the provided Chrome tabs.
@@ -60,43 +67,25 @@ export function useTabsetService() {
    * Use case: https://skysail.atlassian.net/wiki/spaces/TAB/pages/807927852/Creating+a+Tabset
    *
    * The tabset is created or updated in the store, and the new data is persisted.
-   * If merge is false, potentially existing tabs will be removed first.
    *
    * @param name the tabset's name
    * @param chromeTabs an array of Chrome tabs
-   * @param merge if true, the old values (if existent) and the new ones will be merged.
-   * @param type
+   * @param color
+   * @param spaceId
    */
   const saveOrReplaceFromChromeTabs = async (
     name: string,
     chromeTabs: chrome.tabs.Tab[],
-    merge: boolean = false,
-    windowId: string = 'current',
-    tsType: TabsetType = TabsetType.DEFAULT,
     color: string | undefined = undefined,
-    dynamicSource: string | undefined = undefined,
     spaceId: string | undefined = undefined,
   ): Promise<SaveOrReplaceResult> => {
     const trustedName = name.replace(STRIP_CHARS_IN_USER_INPUT, '').substring(0, 31)
     const trustedColor = color ? color.replace(STRIP_CHARS_IN_COLOR_INPUT, '').substring(0, 31) : undefined
-    const tabs: Tab[] = _.filter(
-      _.map(chromeTabs, (t: chrome.tabs.Tab) => {
-        const tab = new Tab(uid(), t)
-        Tab.addTags(tab, [name])
-        return tab
-      }),
-      (t: Tab) => {
-        if (!useSettingsStore().isEnabled('extensionsAsTabs')) {
-          return !t.url?.startsWith('chrome-extension://')
-        }
-        return true
-      },
-    )
-    try {
-      const dynUrl = dynamicSource ? new URL(dynamicSource) : undefined
-      const tabset = await useTabsetsStore().createTabset(trustedName, tabs, trustedColor, dynUrl, spaceId)
-      await useTabsetsStore().saveTabset(tabset)
+    const tabs: Tab[] = updateTags(chromeTabs, name)
 
+    try {
+      const tabset = await useTabsetsStore().createTabset(trustedName, tabs, trustedColor, spaceId)
+      await useTabsetsStore().saveTabset(tabset)
       selectTabset(tabset.id)
       useTabsetService().addToSearchIndex(tabset.id, tabs)
       return new SaveOrReplaceResult(false, tabset, false)
@@ -178,14 +167,7 @@ export function useTabsetService() {
       }
     }
     if (!tabset) {
-      tabset = await useTabsetsStore().createTabset(
-        trustedName,
-        tabs,
-        undefined,
-        undefined,
-        undefined,
-        ignoreDuplicates,
-      )
+      tabset = await useTabsetsStore().createTabset(trustedName, tabs, undefined, undefined, ignoreDuplicates)
     }
     if (!dryRun) {
       await saveTabset(tabset)
@@ -680,7 +662,7 @@ export function useTabsetService() {
           content: content.content || '',
           tabsets: [tabset.id],
           favIconUrl: tab.favIconUrl || '',
-          tags: tab.tags ? tab.tags.join(' ') : '',
+          tags: tab.tags && Array.isArray(tab.tags) ? tab.tags.join(' ') : '',
         }
         // console.log("adding", addToIndex)
         minimalIndex.push(addToIndex)
@@ -753,15 +735,12 @@ export function useTabsetService() {
             content: '',
             tabsets: [tsId],
             favIconUrl: tab.favIconUrl || '',
-            tags: tab.tags.join(' '),
+            tags: tab.tags && Array.isArray(tab.tags) ? tab.tags.join(' ') : '',
           })
           urlSet.add(tab.url)
         }
       }
     })
-    // if (fuse.value) {
-    //   minimalIndex.forEach((doc: SearchDoc) => fuse.value.add(doc))
-    // }
     minimalIndex.forEach((e) => {
       AppEventDispatcher.dispatchEvent('add-to-search', e)
     })
@@ -929,7 +908,6 @@ export function useTabsetService() {
     tabsetName: string,
     newColor: string | undefined,
     window: string = 'current',
-    details: ListDetailLevel = 'MAXIMAL',
   ): Promise<object> => {
     const trustedName = tabsetName.replace(STRIP_CHARS_IN_USER_INPUT, '')
     let trustedColor = newColor ? newColor.replace(STRIP_CHARS_IN_COLOR_INPUT, '') : undefined
@@ -942,7 +920,6 @@ export function useTabsetService() {
       tabset.name = trustedName
       tabset.color = trustedColor
       tabset.window = window
-      tabset.details = details
       //console.log("saving tabset", tabset)
       return saveTabset(tabset).then(() =>
         Promise.resolve({

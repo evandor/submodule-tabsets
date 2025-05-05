@@ -6,7 +6,7 @@
       @was-clicked="clicked()"
       icon="calendar_view_month"
       color="primary"
-      label="Show Gallery">
+      label="Show in Gallery">
     </ContextMenuItem>
   </template>
 </template>

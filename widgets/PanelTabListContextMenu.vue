@@ -36,6 +36,17 @@
         </q-item>
       </template>
 
+      <template v-if="(hasSubfolder() && useUiStore().folderStyle === 'goInto') || props.tab?.pinnedInList">
+        <q-separator inset />
+        <q-item clickable v-close-popup @click.stop="togglePin()">
+          <q-item-section style="padding-right: 0; min-width: 25px; max-width: 25px">
+            <q-icon size="xs" :name="props.tab?.pinnedInList ? 'sym_o_keep_off' : 'sym_o_keep'" color="warning" />
+          </q-item-section>
+          <q-item-section v-if="props.tab?.pinnedInList">Unpin Tab</q-item-section>
+          <q-item-section v-else>Pin Tab</q-item-section>
+        </q-item>
+      </template>
+
       <template
         v-if="
           useFeaturesStore().hasFeature(FeatureIdent.ADVANCED_TAB_MANAGEMENT) &&
@@ -132,6 +143,7 @@ import { PlaceholdersType } from 'src/tabsets/models/Placeholders'
 import { Tab } from 'src/tabsets/models/Tab'
 import { MonitoredTab, Tabset, TabsetType } from 'src/tabsets/models/Tabset'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+import { useUiStore } from 'src/ui/stores/uiStore'
 import { PropType, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -227,5 +239,21 @@ const openMonitoringDialog = () => {
 const isMonitoring = () => {
   const ts = useTabsetsStore().getCurrentTabset
   return ts && ts.monitoredTabs && ts.monitoredTabs.find((mt: MonitoredTab) => mt.tabId === props.tab.id)
+}
+
+const hasSubfolder = () => {
+  if (!props.tabset) {
+    return false
+  }
+  const activeFolder = useTabsetsStore().getActiveFolder(props.tabset)
+  return activeFolder ? activeFolder.folders.length > 0 : false
+}
+
+const togglePin = () => {
+  if (!props.tabset) {
+    return
+  }
+  props.tab.pinnedInList = props.tab.pinnedInList ? !props.tab.pinnedInList : true
+  useTabsetsStore().saveTabset(props.tabset)
 }
 </script>

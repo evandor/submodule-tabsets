@@ -23,7 +23,7 @@
 <script setup lang="ts">
 import { FeatureIdent } from 'src/app/models/FeatureIdent'
 import { useFeaturesStore } from 'src/features/stores/featuresStore'
-import { Tab, TabSorting } from 'src/tabsets/models/Tab'
+import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset } from 'src/tabsets/models/Tabset'
 import PanelTabListElementWidget from 'src/tabsets/widgets/PanelTabListElementWidget.vue'
 import { useUiStore } from 'src/ui/stores/uiStore'
@@ -32,12 +32,7 @@ import { PropType } from 'vue'
 const props = defineProps({
   tab: { type: Object as PropType<Tab>, required: true },
   index: { type: Number, required: true },
-  hideMenu: { type: Boolean, default: false },
-  sorting: { type: String as PropType<TabSorting>, default: TabSorting.CUSTOM },
-  type: { type: String, default: 'sidepanel' },
   tabset: { type: Object as PropType<Tabset>, required: false },
-  showTabsets: { type: Boolean, default: false },
-  preventDragAndDrop: { type: Boolean, default: false },
   filter: { type: String, required: false },
 })
 

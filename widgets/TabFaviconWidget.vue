@@ -42,7 +42,7 @@ const getFaviconUrl = (tab: Tab) => {
   if (tab && tab.favIconUrl) {
     return tab.favIconUrl
   }
-  if (!useSettingsStore().isEnabled('noDDG') && tab && tab.url) {
+  if (useSettingsStore().isDisabled('noDDG') && tab && tab.url) {
     return favIconFromUrl(tab.url)
   }
   return ''

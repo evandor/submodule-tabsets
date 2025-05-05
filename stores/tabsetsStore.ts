@@ -110,7 +110,6 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     tabsetName: string,
     tabs: Tab[],
     color: string | undefined = undefined,
-    dynamicUrl: URL | undefined = undefined,
     spaceId: string | undefined = undefined,
     ignoreDuplicates: boolean = false,
   ): Promise<Tabset> {
@@ -142,7 +141,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     let ts: Tabset = null as unknown as Tabset
     ts = new Tabset(uid(), trustedName, tabs, [])
     ts.color = trustedColor
-    ts.dynamicUrl = dynamicUrl?.toString()
+    ts.dynamicUrl = undefined
     if (spaceId) {
       ts.spaces = [spaceId]
     }
@@ -398,7 +397,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     folderActive: string | undefined = root.folderActive,
     level = 0,
   ): Tabset | undefined => {
-    //console.log(`get active folder: root# ${root.id}, folderActive: ${folderActive}, level: ${level}`)
+    console.log(`get active folder: root# ${root.id}, folderActive: ${folderActive}, level: ${level}`)
     if (level > 10) {
       console.warn('runaway method')
       return undefined

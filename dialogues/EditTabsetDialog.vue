@@ -90,7 +90,7 @@ import DialogButton from 'src/core/dialog/buttons/DialogButton.vue'
 import ColorSelector from 'src/core/dialog/ColorSelector.vue'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import { useFeaturesStore } from 'src/features/stores/featuresStore'
-import { RenameTabsetCommand } from 'src/tabsets/commands/RenameTabset'
+import { RenameTabsetCommand } from 'src/tabsets/commands/RenameTabsetCommand'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { ListDetailLevel } from 'src/ui/stores/uiStore'
 import { useWindowsStore } from 'src/windows/stores/windowsStore'
@@ -154,7 +154,7 @@ watchEffect(() => {
 
 const updateTabset = () =>
   useCommandExecutor().executeFromUi(
-    new RenameTabsetCommand(props.tabsetId, newTabsetName.value, theColor.value, 'current', detailOption.value),
+    new RenameTabsetCommand(props.tabsetId, newTabsetName.value, theColor.value, 'current'),
   )
 
 const newTabsetDialogWarning = () => {

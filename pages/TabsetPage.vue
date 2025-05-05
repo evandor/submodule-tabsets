@@ -252,7 +252,7 @@ import TabsetsSelectorWidget from 'src/core/components/widgets/TabsetsSelectorWi
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import Analytics from 'src/core/utils/google-analytics'
 import JsUtils from 'src/core/utils/JsUtils'
-import { RenameTabsetCommand } from 'src/tabsets/commands/RenameTabset'
+import { RenameTabsetCommand } from 'src/tabsets/commands/RenameTabsetCommand'
 import { ToggleSortingCommand } from 'src/tabsets/commands/ToggleSorting'
 import AddUrlDialog from 'src/tabsets/dialogues/AddUrlDialog.vue'
 import { Tabset, TabsetType } from 'src/tabsets/models/Tabset'
