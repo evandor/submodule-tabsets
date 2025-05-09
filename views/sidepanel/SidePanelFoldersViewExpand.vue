@@ -19,16 +19,25 @@
             <q-icon :name="expanded[folder.id] ? 'sym_o_folder_open' : 'folder'" color="warning" size="sm" />
             <!--            <span class="tabsCount">{{ tabsAndFoldersCount(folder) }}</span>-->
           </div>
-          <div class="col-6">
+          <div class="col-9 ellipsis q-ml-sm">
             <div>{{ folder.name }}</div>
             <!--            <div class="text-caption" style="font-size: xx-small">{{ folderCaption(folder) }}</div>-->
           </div>
           <div class="col text-right">
-            <SpecialUrlAddToTabsetComponent
-              v-if="currentChromeTab"
+            <q-btn
+              round
+              flat
+              outline
+              text-color="primary"
+              class="cursor-pointer q-mt-none q-mr-none"
+              icon="more_vert"
+              size="sm" />
+            <PanelTabListFolderContextMenu
               @button-clicked="(args: ActionHandlerButtonClickedHolder) => handleButtonClicked(tabset, args, folder)"
-              :currentChromeTab="currentChromeTab"
+              v-if="currentChromeTab"
               :tabset="tabset"
+              :currentChromeTab="currentChromeTab"
+              :tabsetId="props.tabset.id!"
               :level="'folder'"
               :folder="folder" />
           </div>
@@ -50,10 +59,10 @@ import { QVueGlobals } from 'quasar'
 import SidePanelPageContentExpand from 'src/core/pages/SidePanelPageContentExpand.vue'
 import { useActionHandlers } from 'src/tabsets/actionHandling/ActionHandlers'
 import { ActionHandlerButtonClickedHolder } from 'src/tabsets/actionHandling/model/ActionHandlerButtonClickedHolder'
-import SpecialUrlAddToTabsetComponent from 'src/tabsets/actionHandling/SpecialUrlAddToTabsetComponent.vue'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { useTabsStore2 } from 'src/tabsets/stores/tabsStore2'
+import PanelTabListFolderContextMenu from 'src/tabsets/widgets/PanelTabListFolderContextMenu.vue'
 import { useUiStore } from 'src/ui/stores/uiStore'
 import { useWindowsStore } from 'src/windows/stores/windowsStore'
 

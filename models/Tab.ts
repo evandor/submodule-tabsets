@@ -5,6 +5,7 @@ import { useUtils } from 'src/core/services/Utils'
 import { ExcalidrawStorage } from 'src/tabsets/actionHandling/model/ExcalidrawStorage'
 import { Placeholders } from 'src/tabsets/models/Placeholders'
 import { TabLog } from 'src/tabsets/models/TabLog'
+import { ListDetailLevel } from 'src/ui/stores/uiStore'
 
 const { sanitizeAsText, sanitizeAsHtml } = useUtils()
 
@@ -182,6 +183,8 @@ export class Tab {
   readingTime: number = 0
 
   useInIframe: boolean = true
+
+  details: ListDetailLevel = 'DEFAULT'
 
   constructor(
     public id: string,

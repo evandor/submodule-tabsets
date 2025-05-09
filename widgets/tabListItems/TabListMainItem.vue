@@ -24,40 +24,6 @@
                 <q-tooltip class="tooltip-small">There are placeholders defined for this tab</q-tooltip>
               </q-icon>
             </span>
-            <span v-if="(props.tab as Tab).comments && (props.tab as Tab).comments.length > 0">
-              <q-icon
-                name="o_chat"
-                size="12px"
-                color="warning"
-                style="position: relative; top: -4px"
-                class="q-mr-xs"
-                @click.stop="toggleShowWith('comments')">
-                <q-tooltip class="tooltip-small">There are comments for this tab</q-tooltip>
-              </q-icon>
-            </span>
-            <span>
-              <q-icon
-                v-if="showReadingMode()"
-                name="o_menu_book"
-                size="12px"
-                color="primary"
-                style="position: relative; top: -5px"
-                class="q-mr-xs"
-                @click.stop="showInReadingMode()">
-                <q-tooltip class="tooltip-small">Click here to open in Reading Mode</q-tooltip>
-              </q-icon>
-            </span>
-            <span>
-              <q-icon
-                v-if="props.tab.pinnedInList && useUiStore().folderStyle === 'goInto'"
-                name="sym_o_keep"
-                size="12px"
-                color="primary"
-                style="position: relative; top: -5px"
-                class="q-mr-xs">
-                <q-tooltip class="tooltip-small">This tab is pinned, i.e. it appears in all subfolders</q-tooltip>
-              </q-icon>
-            </span>
             <!--              <span v-if="showRssReferencesInfo()">-->
             <!--                <q-icon-->
             <!--                  name="rss_feed"-->
@@ -170,17 +136,15 @@
           <q-btn icon="o_close" flat size="xs" class="q-ma-none q-pa-none" @click="ignore(ref)" />
         </div>
       </div>
+      <q-item-label v-if="rssTabReferences?.length > 2">
+        <div class="row q-ma-none q-pa-none q-my-xs">
+          <div class="col-1 text-body2" style="font-size: smaller"></div>
+          <div class="col-7 cursor-pointer text-blue-8" style="font-size: smaller" @click="hideAll()">Hide all</div>
+          <div class="col text-right"></div>
+        </div>
+      </q-item-label>
     </q-item-label>
   </Transition>
-  <q-item-label v-if="rssTabReferences.length > 2">
-    <div class="row q-ma-none q-pa-none q-my-xs">
-      <div class="col-1 text-body2" style="font-size: smaller"></div>
-      <div class="col-7 ellipsis" style="font-size: smaller">Hide all</div>
-      <div class="col text-right">
-        <q-btn icon="check" flat size="xs" color="positive" class="q-ma-none q-pa-none" @click="hideAll()" />
-      </div>
-    </div>
-  </q-item-label>
 
   <!-- === url(s) === -->
   <q-item-label
@@ -421,9 +385,10 @@ const props = defineProps<{
   tab: Tab
   detailLevel: ListDetailLevel | undefined
   hideMenu?: boolean
-  header: string | undefined
-  filter: string | undefined
+  header?: string | undefined
+  filter?: string | undefined
   showTabsets?: string
+  showCommentsForMinimalDetails?: boolean | undefined
 }>()
 
 const showButtonsProp = ref<boolean>(false)
@@ -441,7 +406,7 @@ const popupEdit = ref(false)
 const popupRef = ref<any>(undefined)
 const doShowDetails = ref(false)
 const rssTabReferences = ref<TabReference[]>(
-  props.tab?.tabReferences.filter((r: TabReference) => r.type === TabReferenceType.RSS && r.status !== 'IGNORED'),
+  props.tab?.tabReferences?.filter((r: TabReference) => r.type === TabReferenceType.RSS && r.status !== 'IGNORED'),
 )
 
 onMounted(() => {
@@ -678,7 +643,7 @@ const showSuggestion = () => {
 const openImage = () =>
   window.open(chrome.runtime.getURL('www/index.html#/mainpanel/png/' + props.tab.id + '/' + pngs.value[0]!.id))
 
-const showComments = () => showCommentList.value && props.tab.comments.length > 0
+const showComments = () => props.showCommentsForMinimalDetails && props.tab.comments.length > 0
 
 const showInReadingMode = () =>
   useNavigationService().browserTabFor(chrome.runtime.getURL(`/www/index.html#/mainpanel/readingmode/${props.tab.id}`))

@@ -14,7 +14,6 @@
 
         <q-separator v-if="pinnedTabs.length > 0" class="q-mt-xs" />
       </template>
-
       <vue-draggable-next
         v-if="tabs.length > 0"
         class="q-ma-none"
@@ -28,15 +27,14 @@
           :tab="tab.tab as Tab"
           :index="tab.index"
           :tabset="props.tabset!"
-          :hide-menu="props.hideMenu"
           :filter="props.filter || ''" />
       </vue-draggable-next>
       <div v-else-if="props.filter" class="q-ma-md text-caption">
         Filter <em>'{{ props.filter }}'</em> did not match anything inside this collection. Click 'Enter' to search in
         all your collections.
       </div>
-      <div v-else-if="props.tabset?.folders.length === 0">
-        <div class="q-pa-md fit">
+      <div v-else-if="props.tabset?.folders.length === 0 && useTabsetsStore().allTabsCount > 0">
+        <div class="q-pa-sm fit">
           <q-card class="my-card fit">
             <q-card-section class="text-caption text-center">
               Empty Tabset<br />
@@ -56,6 +54,8 @@
 </template>
 
 <script lang="ts" setup>
+import { FeatureIdent } from 'src/app/models/FeatureIdent'
+import { useFeaturesStore } from 'src/features/stores/featuresStore'
 import SidePanelTabListHelper from 'src/tabsets/layouts/SidePanelTabListHelper.vue'
 import { IndexedTab } from 'src/tabsets/models/IndexedTab'
 import { Tab, TabSorting } from 'src/tabsets/models/Tab'
@@ -86,9 +86,7 @@ const pinnedTabs = ref<IndexedTab[]>([])
 watch(
   () => props.filter,
   (a: string | undefined, b: string | undefined) => {
-    console.log('got filter', a, b)
     tabs.value = tabsForColumn()
-    console.log('emitting2!', tabs.value.length)
     emits('tabs-found', tabs.value.length)
   },
 )
@@ -96,30 +94,28 @@ watch(
 watch(
   () => props.tabset?.tabs || [],
   (a: Tab[], b: Tab[]) => {
-    console.log('got filter', a, b)
     tabs.value = tabsForColumn()
-    console.log('emitting1!', tabs.value.length)
     emits('tabs-found', tabs.value.length)
   },
 )
 
 const handleDragAndDrop = async (event: any) => {
-  console.log('SidePanelPageTabList d&d event:', event, props)
+  //console.log('SidePanelPageTabList d&d event:', event, props)
   const { moved, added } = event
   if (moved) {
-    console.log(`moved event: '${moved.element.tab.id}' ${moved.oldIndex} -> ${moved.newIndex} (${props.activeFolder})`)
+    //console.log(`moved event: '${moved.element.tab.id}' ${moved.oldIndex} -> ${moved.newIndex} (${props.activeFolder})`)
     const tabsInColumn = tabsForColumn()
     const movedElement: Tab = tabsInColumn[moved.oldIndex]!.tab
     const realNewIndex = tabsInColumn[moved.newIndex]!.index
-    console.log(`             '${movedElement.id}' ${moved.oldIndex} -> ${realNewIndex}`)
+    //console.log(`             '${movedElement.id}' ${moved.oldIndex} -> ${realNewIndex}`)
     await TabsetService.moveTo(movedElement.id, realNewIndex, props.activeFolder)
   }
   if (added) {
-    console.log(`added event: '${added.element.tab.id}' ${added.oldIndex} -> ${added.newIndex}`)
+    //console.log(`added event: '${added.element.tab.id}' ${added.oldIndex} -> ${added.newIndex}`)
     const tabsInColumn = tabsForColumn()
     const movedElement: Tab = added.element.tab
     const realNewIndex = added.newIndex < tabsInColumn.length ? tabsInColumn[added.newIndex]!.index : 0
-    console.log(`             '${added.element.tab.id}' ${added.oldIndex} -> ${realNewIndex}`)
+    //console.log(`             '${added.element.tab.id}' ${added.oldIndex} -> ${realNewIndex}`)
     //movedElement.columnId = column.id
     await useTabsetService().saveCurrentTabset()
   }
@@ -135,21 +131,11 @@ const tabsForColumn = (): IndexedTab[] => {
 
   return (props.tabset?.tabs as Tab[])
     .filter((t: Tab) => {
-      // console.log('')
-      // console.log('checking tab', t.url)
       if (!props.filter || props.filter.trim() === '') {
         return true
       }
-      // console.log('match in url', filterMatches(t.url))
-      // console.log('match in description', filterMatches(t.description))
-      // console.log('match in name', filterMatches(t.name))
-      // console.log('match in title', filterMatches(t.title))
       const res =
         filterMatches(t.url) || filterMatches(t.description) || filterMatches(t.name) || filterMatches(t.title)
-
-      // if (res) {
-      //   console.log('found tab', t.url, res)
-      // }
       return res
     })
     .sort((a: Tab, b: Tab) => {
@@ -160,7 +146,7 @@ const tabsForColumn = (): IndexedTab[] => {
 
 const calcPinnedTabs = (): IndexedTab[] => {
   const result: IndexedTab[] = []
-  if (!props.tabset) {
+  if (!props.tabset || !useFeaturesStore().hasFeature(FeatureIdent.PIN_TAB)) {
     return result
   }
   const activeFolder = useTabsetsStore().getActiveFolder(props.tabset)
@@ -168,13 +154,11 @@ const calcPinnedTabs = (): IndexedTab[] => {
     return result
   }
   const folderChain = useTabsetsStore().getFolderChain(activeFolder.id)
-  console.log('folderChain', folderChain)
+  //console.log('folderChain', folderChain)
   if (folderChain.length > 0) {
     const rootTabset = useTabsetsStore().getTabset(folderChain[folderChain.length - 1]!)
     for (var i = 1; i < folderChain.length; i++) {
-      console.log('checking', folderChain[i])
       const parentFolder = useTabsetsStore().getActiveFolder(rootTabset!, folderChain[i])
-      console.log('parentFolder', parentFolder)
       const pinnedInListTabs = parentFolder?.tabs
         .filter((t: Tab) => t.pinnedInList)
         .map((t: Tab, index: number) => new IndexedTab(index, t))

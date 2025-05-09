@@ -4,14 +4,14 @@
   <template
     v-if="handler.actions(currentTabsetId, { tabset: props.tabset, level: props.level }).length == 0 && defaultAction">
     <q-btn
-      outline
       @click.stop="emits('buttonClicked', new ActionHandlerButtonClickedHolder(handler, defaultAction))"
       class="q-ma-none q-px-sm q-py-none"
+      :icon="defaultAction.icon"
       :class="{ shakeWithColor: animateAddtabButton, 'cursor-pointer': !alreadyInTabset }"
-      :color="alreadyInTabset ? 'grey-5' : containedInTsCount > 0 ? 'positive' : ''"
+      :color="alreadyInTabset ? 'grey-5' : containedInTsCount > 0 ? 'primary' : 'secondary'"
       :size="props.level === 'root' ? 'sm' : 'xs'"
       data-testid="saveInTabsetBtn">
-      <div>{{ defaultAction.label }}</div>
+      <!--      <div>{{ defaultAction.label }}</div>-->
       <!--                  <q-icon right class="q-ma-none q-pa-none" size="2em" name="o_south" />-->
     </q-btn>
     <q-tooltip class="tooltip-small" v-if="alreadyInTabset">

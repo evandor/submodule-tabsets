@@ -1,5 +1,5 @@
 <template>
-  <q-menu :offset="[0, 0]" @click.stop="">
+  <q-menu :offset="[0, 7]" @click.stop="">
     <q-list dense style="min-width: 200px">
       <PanelTabListContextMenuHook
         :tab="props.tab"
@@ -36,7 +36,13 @@
         </q-item>
       </template>
 
-      <template v-if="(hasSubfolder() && useUiStore().folderStyle === 'goInto') || props.tab?.pinnedInList">
+      <template
+        v-if="
+          (useFeaturesStore().hasFeature(FeatureIdent.PIN_TAB) &&
+            hasSubfolder() &&
+            useUiStore().folderStyle === 'goInto') ||
+          props.tab?.pinnedInList
+        ">
         <q-separator inset />
         <q-item clickable v-close-popup @click.stop="togglePin()">
           <q-item-section style="padding-right: 0; min-width: 25px; max-width: 25px">

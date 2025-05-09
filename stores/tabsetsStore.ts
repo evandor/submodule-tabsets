@@ -397,7 +397,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     folderActive: string | undefined = root.folderActive,
     level = 0,
   ): Tabset | undefined => {
-    console.log(`get active folder: root# ${root.id}, folderActive: ${folderActive}, level: ${level}`)
+    //console.log(`get active folder: root# ${root.id}, folderActive: ${folderActive}, level: ${level}`)
     if (level > 10) {
       console.warn('runaway method')
       return undefined

@@ -33,7 +33,7 @@ export class RssFolderHandler implements AddUrlToTabsetHandler {
   }
 
   defaultAction(): ActionContext {
-    return new ActionContext('(Re-)Load').onClicked(this.clicked)
+    return new ActionContext('(Re-)Load', 'o_refresh').onClicked(this.clicked)
   }
 
   actions(currentTabsetId: string | undefined, actionProps: ActionProps): Component[] {

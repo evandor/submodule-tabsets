@@ -26,7 +26,7 @@
       v-for="folder in folders"
       clickable
       v-ripple
-      class="q-ma-none q-pa-xs"
+      class="q-my-none q-mx-xs q-pa-none darkColors lightColors q-mt-xs"
       @dragstart="startDrag($event, folder)"
       @dragover="overDrag($event, folder)"
       @drop="drop($event, folder)"
@@ -35,8 +35,8 @@
         @click="selectFolder(tabset, folder as Tabset)"
         class="q-mx-sm"
         style="justify-content: start; width: 25px; max-width: 25px">
-        <div class="q-pa-none q-pl-none">
-          <q-icon :name="folder.type === TabsetType.RSS_FOLDER ? 'o_rss_feed' : 'o_folder'" color="warning" size="sm" />
+        <div class="q-pa-none q-pl-sm">
+          <q-icon :name="folder.type === TabsetType.RSS_FOLDER ? 'o_rss_feed' : 'folder'" color="warning" size="sm" />
         </div>
       </q-item-section>
       <q-item-section @click="selectFolder(tabset, folder as Tabset)">
@@ -45,24 +45,44 @@
             <Highlight :filter="props.filter" :text="folder.name" />
           </div>
         </q-item-label>
-        <q-item-label class="text-caption text-secondary">
-          {{ folderCaption(folder) }}
-        </q-item-label>
+        <!--        <q-item-label class="text-caption text-secondary">-->
+        <!--          {{ folderCaption(folder) }}-->
+        <!--        </q-item-label>-->
       </q-item-section>
 
       <q-item-section side @mouseover="hoveredTabset = tabset?.id" @mouseleave="hoveredTabset = undefined">
         <q-item-label>
-          <SpecialUrlAddToTabsetComponent
-            v-if="currentChromeTab"
+          <span class="text-caption">{{ folderCaption(folder) }}</span>
+          <q-btn
+            round
+            flat
+            outline
+            text-color="primary"
+            class="cursor-pointer q-mt-none q-mr-none"
+            icon="more_vert"
+            size="sm" />
+          <PanelTabListFolderContextMenu
             @button-clicked="(args: ActionHandlerButtonClickedHolder) => handleButtonClicked(tabset, args, folder)"
-            :currentChromeTab="currentChromeTab"
+            v-if="currentChromeTab"
             :tabset="tabset"
+            :currentChromeTab="currentChromeTab"
+            :tabsetId="props.tabset.id!"
             :level="'folder'"
             :folder="folder" />
+
+          <!--          <SpecialUrlAddToTabsetComponent-->
+          <!--            v-if="currentChromeTab"-->
+          <!--            @button-clicked="(args: ActionHandlerButtonClickedHolder) => handleButtonClicked(tabset, args, folder)"-->
+          <!--            :currentChromeTab="currentChromeTab"-->
+          <!--            :tabset="tabset"-->
+          <!--            :level="'folder'"-->
+          <!--            :folder="folder" />-->
         </q-item-label>
       </q-item-section>
     </q-item>
   </q-list>
+
+  <q-separator class="q-ma-sm q-mx-xl" v-if="folders.length > 0" />
 </template>
 
 <script lang="ts" setup>
@@ -73,11 +93,11 @@ import '@he-tree/vue/style/material-design.css'
 import { QVueGlobals } from 'quasar'
 import { useActionHandlers } from 'src/tabsets/actionHandling/ActionHandlers'
 import { ActionHandlerButtonClickedHolder } from 'src/tabsets/actionHandling/model/ActionHandlerButtonClickedHolder'
-import SpecialUrlAddToTabsetComponent from 'src/tabsets/actionHandling/SpecialUrlAddToTabsetComponent.vue'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { useTabsStore2 } from 'src/tabsets/stores/tabsStore2'
 import Highlight from 'src/tabsets/widgets/Highlight.vue'
+import PanelTabListFolderContextMenu from 'src/tabsets/widgets/PanelTabListFolderContextMenu.vue'
 import { useUiStore } from 'src/ui/stores/uiStore'
 import { useWindowsStore } from 'src/windows/stores/windowsStore'
 
@@ -229,5 +249,9 @@ const currentFolderPath = (): Tabset[] => {
 <style scoped>
 .q-item__label {
   margin-top: 0;
+}
+
+.q-item {
+  min-height: 30px;
 }
 </style>

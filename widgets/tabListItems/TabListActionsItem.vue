@@ -1,20 +1,9 @@
 <template>
   <span v-if="props.tabset && props.tabset.type !== TabsetType.SESSION">
-    <q-btn
-      round
-      flat
-      outline
-      text-color="primary"
-      class="cursor-pointer q-mt-none q-mr-none"
-      icon="more_vert"
-      size="sm" />
+    <q-btn flat outline text-color="primary" class="cursor-pointer q-pa-none q-ma-none" icon="more_vert" size="sm" />
     <PanelTabListContextMenu v-if="!props.hideMenu" :tabset="props.tabset!" :tabsetId="props.tabset.id!" :tab="tab" />
   </span>
   <span v-else @click="removeSessionTab(tab)" class="q-mr-lg"> x </span>
-  <span v-if="tab.readingTime > 0 && showWithMinDetails('SOME')" class="text-grey-5 q-mt-sm" style="font-size: x-small">
-    {{ formatReadingTime(tab.readingTime) }}
-    <q-tooltip class="tooltip-small">cumulated reading time</q-tooltip>
-  </span>
 </template>
 
 <script setup lang="ts">

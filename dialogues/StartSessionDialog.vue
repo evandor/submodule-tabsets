@@ -20,7 +20,7 @@
           </div>
         </q-card-section>
         <q-card-actions align="right">
-          <DialogButton label="Cancel" color="accent" v-close-popup />
+          <DialogButton label="Cancel" v-close-popup />
           <DialogButton
             label="Start"
             type="submit"
