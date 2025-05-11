@@ -46,11 +46,11 @@
 </template>
 
 <script setup lang="ts">
-import { STRIP_CHARS_IN_USER_INPUT } from 'boot/constants'
 import { formatDistance } from 'date-fns'
 import { QPopupEdit, uid, useQuasar } from 'quasar'
 import BrowserApi from 'src/app/BrowserApi'
 import { FeatureIdent } from 'src/app/models/FeatureIdent'
+import { STRIP_CHARS_IN_USER_INPUT } from 'src/boot/constants'
 import { TabReference, TabReferenceType } from 'src/content/models/TabReference'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import { NotificationType, useNotificationHandler } from 'src/core/services/ErrorHandler'
