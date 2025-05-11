@@ -1,7 +1,7 @@
 <template>
   <!-- === name or title === -->
   <div class="row">
-    <div class="col-11 q-pr-none q-mr-xs cursor-pointer ellipsis fit q-mt-xs">
+    <div class="q-pr-none q-mr-xs cursor-pointer ellipsis fit q-mt-xs">
       <span v-if="props.tab?.extension === UrlExtension.NOTE" v-html="nameOrTitle(props.tab as Tab)" />
       <span v-else :class="TabService.isCurrentTab(props.tab) ? 'text-bold' : ''" @click.stop="handleNameClick">
         <q-icon
@@ -338,14 +338,6 @@ const oldComments = () =>
   props.tab.comments.filter((c: TabComment) => newCommentIds.value.findIndex((id: string) => id === c.id) < 0)
 const newComments = () =>
   props.tab.comments.filter((c: TabComment) => newCommentIds.value.findIndex((id: string) => id === c.id) >= 0)
-
-const showSuggestion = () => {
-  const url = chrome.runtime.getURL('www/index.html') + '#/mainpanel/suggestions/' + suggestion.value?.id
-  NavigationService.openOrCreateTab([url])
-}
-
-const openImage = () =>
-  window.open(chrome.runtime.getURL('www/index.html#/mainpanel/png/' + props.tab.id + '/' + pngs.value[0]!.id))
 
 const showComments = () => props.showCommentsForMinimalDetails && props.tab.comments.length > 0
 

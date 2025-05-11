@@ -234,7 +234,7 @@ const openMonitoringDialog = () => {
     title: 'Check for changes',
     message: monitored
       ? 'Stop monitoring website for changes'
-      : 'Click ok to start periodical checks if this website has changed.',
+      : 'Click ok to start periodical checks if this website has changed. This information is not reliable and may not work for all websites.',
     cancel: true,
     persistent: true,
   }).onOk(() => {

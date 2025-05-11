@@ -4,7 +4,7 @@
     <div class="row fit">
       <div class="col-8 q-mt-xs">
         <q-toolbar-title>
-          Overview of <em>{{ toolbarTitle() }}</em>
+          Gallery <em>{{ toolbarTitle() }}</em>
         </q-toolbar-title>
       </div>
       <div class="col-4 text-right"></div>

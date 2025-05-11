@@ -60,6 +60,8 @@ const setReminder = (clear: boolean) =>
     new SetReminderCommand(props.tabId, clear ? undefined : reminderDate.value, clear ? undefined : editor.value),
   )
 
-const futureDatesOnly = (d: string) =>
-  date.extractDate(d, 'YYYY/MM/DD').getTime() >= new Date().getTime() - 1000 * 24 * 60 * 60 * 10
+const futureDatesOnly = (d: string) => {
+  // console.log('===', d, date.extractDate(d, 'YYYY/MM/DD').getTime(), new Date().getTime() - 1000 * 24 * 60 * 60)
+  return date.extractDate(d, 'YYYY/MM/DD').getTime() >= new Date().getTime() - 1000 * 24 * 60 * 60
+}
 </script>
