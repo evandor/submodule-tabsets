@@ -431,7 +431,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       return []
     }
 
-    console.log(`  searching for folder '${folderId}', level ${level}`)
+    //console.log(`  searching for folder '${folderId}', level ${level}`)
     for (const f of tabsetOrFolders) {
       if (f.id === folderId) {
         return chain.concat(folderId)

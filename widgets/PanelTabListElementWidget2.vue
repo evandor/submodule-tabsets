@@ -1,6 +1,7 @@
 <template>
   <!-- PanelTabListElementWidget2 -->
   <div class="q-pa-none fit" style="width: 100%">
+    <!-- Main Line, always shown -->
     <div class="row" style="border: 0 solid blue; width: 100%">
       <div class="col-1 q-ml-sm q-mt-xs">
         <TabListIconItem2 :tabset="props.tabset!" :tab="tab" :detail-level="props.detailLevel" />
@@ -40,6 +41,29 @@
               </q-icon>
 
               <q-icon
+                v-if="props.tab.reminder"
+                color="primary"
+                name="o_alarm"
+                @click="openReminderDialog()"
+                size="16px">
+                <q-tooltip class="tooltip-small"
+                  >Reminder set to {{ date.formatDate(props.tab.reminder, 'DD.MM.YYYY') }}
+                  {{ props.tab.reminderComment ? ' - ' : '' }} {{ props.tab.reminderComment }}
+                </q-tooltip>
+              </q-icon>
+
+              <q-icon
+                v-if="monitor"
+                :name="monitor.changed ? 'o_notifications_active' : 'o_notifications'"
+                :color="monitor.changed ? 'negative' : 'primary'"
+                size="16px">
+                <q-tooltip v-if="monitor.changed" class="tooltip-small"
+                  >Tab's content has changed, checked {{ date.formatDate(monitor.changed, 'DD.MM.YYYY hh:mm') }}
+                </q-tooltip>
+                <q-tooltip v-else class="tooltip-small">Tab is being monitored for content changes</q-tooltip>
+              </q-icon>
+
+              <q-icon
                 v-if="props.tab.pinnedInList && useUiStore().folderStyle === 'goInto'"
                 name="sym_o_keep"
                 size="16px"
@@ -55,9 +79,10 @@
       </div>
     </div>
 
+    <!-- description -->
     <div
       class="row fit"
-      v-if="showWithMinDetails('SOME') || props.tab?.details !== 'DEFAULT'"
+      v-if="showWithMinDetails('SOME') || props.tab?.details === 'SOME' || props.tab?.details === 'MAXIMAL'"
       style="border: 0 solid brown">
       <div class="col-1 q-ml-sm q-mt-xs">
         <div
@@ -67,14 +92,7 @@
           NEW
           <q-tooltip class="tooltip">This page indicates that its content has changed in the meantime.</q-tooltip>
         </div>
-        <div
-          v-else-if="(props.tab?.httpStatus >= 300 || props.tab?.httpStatus === 0) && !props.tab?.placeholders"
-          class="q-my-xs q-mx-sm q-pa-none text-white items-center justify-center column"
-          :class="props.tab?.httpStatus >= 500 ? 'bg-red' : 'bg-warning'"
-          style="border-radius: 3px; max-height: 15px; font-size: 8px; text-align: center">
-          {{ props.tab.httpStatus }}
-          <q-tooltip class="tooltip">Tabsets has problems accessing this site.</q-tooltip>
-        </div>
+
         <!--        <div v-if="props.tab.reminder || monitor" class="text-center">-->
         <!--          <q-icon v-if="props.tab.reminder" name="o_alarm" @click="openReminderDialog()" size="14px">-->
         <!--            <q-tooltip class="tooltip-small"-->
@@ -82,26 +100,78 @@
         <!--              {{ props.tab.reminderComment ? ' - ' : '' }} {{ props.tab.reminderComment }}-->
         <!--            </q-tooltip>-->
         <!--          </q-icon>-->
-        <!--          <q-icon-->
-        <!--            v-if="monitor"-->
-        <!--            :name="monitor.changed ? 'o_notifications_active' : 'o_notifications'"-->
-        <!--            :color="monitor.changed ? 'negative' : ''"-->
-        <!--            size="14px">-->
-        <!--            <q-tooltip v-if="monitor.changed" class="tooltip-small"-->
-        <!--            >Tab's content has changed at {{ date.formatDate(monitor.changed, 'DD.MM.YYYY') }}-->
-        <!--            </q-tooltip>-->
-        <!--            <q-tooltip v-else class="tooltip-small">Tab is being monitored for content changes</q-tooltip>-->
-        <!--          </q-icon>-->
-        <!--        </div>-->
       </div>
       <div class="col fit q-ml-sm">
         <div class="columns">
           <div
-            class="col text-body2 q-mr-md q-my-xs"
+            class="col text-body2 q-mr-md q-my-xs text-blue-10"
             @click.stop="gotoTab()"
             :class="uiDensity === 'dense' ? 'ellipsis-2-lines ' : 'ellipsis-3-lines'">
             <Highlight :filter="props.filter" :text="props.tab.longDescription || props.tab.description || ''" />
           </div>
+          <div class="col text-caption"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- comments -->
+    <div
+      class="row fit"
+      v-if="
+        showCommentList ||
+        showWithMinDetails('MAXIMAL') ||
+        (props.tab?.details === 'MAXIMAL' && props.tab.comments.length > 0)
+      "
+      style="border: 0 solid brown">
+      <div class="col-1 q-ml-sm q-mt-xs"></div>
+      <div class="col">
+        <div
+          v-if="showCommentList"
+          v-for="c in props.tab.comments.sort((a: TabComment, b: TabComment) => b.date - a.date)"
+          class="row q-mr-md q-mt-sm q-pa-sm"
+          style="border: 1px solid #efefef; border-radius: 3px">
+          <div class="col-10 text-body2" @click.stop="editComment(c)">
+            {{ c.comment }}
+          </div>
+          <div class="col text-right">
+            <q-icon size="14px" color="primary" name="sym_o_delete" @click.stop="deleteComment(c)" />
+          </div>
+          <div class="col-12 text-right text-caption q-mt-xs">{{ formatDate(c.date) }}</div>
+        </div>
+        <div
+          v-else-if="props.tab.comments.length > 0"
+          class="q-ml-sm text-caption"
+          @click.stop="showCommentList = !showCommentList">
+          <q-icon name="sym_o_message" />
+          Comments: {{ props.tab?.comments.length }}
+        </div>
+      </div>
+    </div>
+
+    <!-- url -->
+    <div
+      class="row fit"
+      v-if="showWithMinDetails('SOME') || props.tab?.details === 'SOME' || props.tab?.details === 'MAXIMAL'"
+      style="border: 0 solid brown">
+      <div class="col-1 q-ml-sm q-mt-xs">
+        <div
+          v-if="props.tab?.httpInfo === 'UPDATED'"
+          class="q-my-xs q-mx-none q-pa-none text-white bg-positive items-center justify-center"
+          style="border-radius: 3px; max-height: 15px; font-size: 8px; text-align: center">
+          NEW
+          <q-tooltip class="tooltip">This page indicates that its content has changed in the meantime.</q-tooltip>
+        </div>
+
+        <!--        <div v-if="props.tab.reminder || monitor" class="text-center">-->
+        <!--          <q-icon v-if="props.tab.reminder" name="o_alarm" @click="openReminderDialog()" size="14px">-->
+        <!--            <q-tooltip class="tooltip-small"-->
+        <!--            >Reminder set to {{ date.formatDate(props.tab.reminder, 'DD.MM.YYYY') }}-->
+        <!--              {{ props.tab.reminderComment ? ' - ' : '' }} {{ props.tab.reminderComment }}-->
+        <!--            </q-tooltip>-->
+        <!--          </q-icon>-->
+      </div>
+      <div class="col fit q-ml-sm">
+        <div class="columns">
           <div class="col text-caption">
             <template v-if="props.tab.extension !== UrlExtension.RSS && props.tab.url">
               <short-url
@@ -109,44 +179,13 @@
                 :url="props.tab.url"
                 :hostname-only="!useUiStore().showFullUrls"
                 :filter="props.filter || ''" />
-              <!--              <q-icon-->
-              <!--                v-if="props.tab.matcher && useFeaturesStore().hasFeature(FeatureIdent.ADVANCED_TAB_MANAGEMENT)"-->
-              <!--                @click.stop="openTabAssignmentPage(props.tab)"-->
-              <!--                name="o_settings">-->
-              <!--                <q-tooltip class="tooltip">{{ matcherTooltip() }}</q-tooltip>-->
-              <!--              </q-icon>-->
-              <!-- <q-icon class="q-ml-xs" name="open_in_new"/>-->
-              <!--              <ul v-if="placeholders.length > 0">-->
-              <!--                <div v-for="placeholder in placeholders">-->
-              <!--                  <li>-->
-              <!--                    <short-url-->
-              <!--                      @click.stop="-->
-              <!--                    NavigationService.openOrCreateTab(-->
-              <!--                      [placeholder['url' as keyof object]],-->
-              <!--                      props.tab.matcher,-->
-              <!--                      props.tab.groupName ? [props.tab.groupName] : [],-->
-              <!--                    )-->
-              <!--                  "-->
-              <!--                      :label="placeholder['name' as keyof object]"-->
-              <!--                      :url="placeholder['url' as keyof object]"-->
-              <!--                      :hostname-only="true"-->
-              <!--                      :filter="props.filter" />-->
-              <!--                  </li>-->
-              <!--                </div>-->
-              <!--              </ul>-->
             </template>
           </div>
-
-          <!--          <div class="col ellipsis">*** dfjkdf kldsjf kldsjf dksjfdsklf dsjkljdsfkldsjfdklsfjdslf</div>-->
         </div>
-        <!--        <div class="column fit">-->
-        <!--          <div class="col ellipsis" style="border: 1px solid red">-->
-        <!--            &lt;!&ndash; === description === &ndash;&gt;-->
-        <!--            &lt;!&ndash;                :class="props.tab?.extension === UrlExtension.RSS ? 'ellipsis-3-lines' : 'ellipsis-2-lines'"&ndash;&gt;-->
-        <!--          </div>-->
-        <!--        </div>-->
       </div>
     </div>
+
+    <!-- maximum details -->
     <div
       class="row fit"
       v-if="showWithMinDetails('MAXIMAL') || props.tab?.details === 'MAXIMAL'"
@@ -248,6 +287,7 @@
 
 <script setup lang="ts">
 import { formatDistance } from 'date-fns'
+import { date, useQuasar } from 'quasar'
 import BrowserApi from 'src/app/BrowserApi'
 import TabListIconIndicatorsHook from 'src/app/hooks/tabsets/TabListIconIndicatorsHook.vue'
 import { FeatureIdent } from 'src/app/models/FeatureIdent'
@@ -260,16 +300,20 @@ import ShortUrl from 'src/core/utils/ShortUrl.vue'
 import { useFeaturesStore } from 'src/features/stores/featuresStore'
 import { Suggestion } from 'src/suggestions/domain/models/Suggestion'
 import { useSuggestionsStore } from 'src/suggestions/stores/suggestionsStore'
+import { DeleteCommentCommand } from 'src/tabsets/commands/DeleteCommentCommand'
 import { OpenTabCommand } from 'src/tabsets/commands/OpenTabCommand'
-import { Tab, UrlExtension } from 'src/tabsets/models/Tab'
+import CommentDialog from 'src/tabsets/dialogues/CommentDialog.vue'
+import ReminderDialog from 'src/tabsets/dialogues/ReminderDialog.vue'
+import { Tab, TabComment, UrlExtension } from 'src/tabsets/models/Tab'
 import { MonitoredTab, Tabset } from 'src/tabsets/models/Tabset'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
+import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import Highlight from 'src/tabsets/widgets/Highlight.vue'
 import TabListActionsItem from 'src/tabsets/widgets/tabListItems/TabListActionsItem.vue'
 import TabListIconItem2 from 'src/tabsets/widgets/tabListItems/TabListIconItem2.vue'
 import TabListMainItem2 from 'src/tabsets/widgets/tabListItems/TabListMainItem2.vue'
 import { ListDetailLevel, useUiStore } from 'src/ui/stores/uiStore'
-import { inject, PropType, ref, watchEffect } from 'vue'
+import { inject, onMounted, PropType, ref, watchEffect } from 'vue'
 
 const { handleError } = useNotificationHandler()
 const { formatReadingTime } = useUtils()
@@ -282,6 +326,8 @@ const props = defineProps({
   detailLevel: { type: String as PropType<ListDetailLevel>, required: false },
 })
 
+const $q = useQuasar()
+
 const uiDensity = inject('ui.density')
 
 const suggestion = ref<Suggestion | undefined>(undefined)
@@ -289,6 +335,17 @@ const doShowDetails = ref(false)
 const showCommentList = ref(false)
 const showPlaceholderList = ref(false)
 const opensearchterm = ref<string | undefined>(undefined)
+const monitor = ref<MonitoredTab | undefined>(undefined)
+
+onMounted(() => {
+  // if (props.tabset?.id) {
+  //   newCommentIds.value = useEventsServices().listNewComments(props.tabset.id, props.tab)
+  // }
+  monitor.value =
+    props.tabset &&
+    props.tabset.monitoredTabs &&
+    props.tabset.monitoredTabs.find((mt: MonitoredTab) => mt.tabId === props.tab.id)
+})
 
 watchEffect(() => {
   if (props.tab.url) {
@@ -361,10 +418,6 @@ function hasReference(tab: Tab, refType: TabReferenceType) {
   return t.hasTabReference(refType)
 }
 
-const showOpenSearchInput = () => {
-  return props.tab ? hasReference(props.tab, TabReferenceType.OPEN_SEARCH) : false
-}
-
 const openSearch = () => {
   console.log('openSearch clicked')
   try {
@@ -381,6 +434,25 @@ const openSearch = () => {
     useNavigationService().browserTabFor(templateURL.replace('{searchTerms}', opensearchterm.value || ''))
   } catch (err: any) {
     handleError(err, NotificationType.NOTIFY)
+  }
+}
+
+const openReminderDialog = () =>
+  $q.dialog({
+    component: ReminderDialog,
+    componentProps: { tabId: props.tab.id, date: props.tab.reminder, comment: props.tab?.reminderComment },
+  })
+
+const deleteComment = (c: TabComment) =>
+  useCommandExecutor().executeFromUi(new DeleteCommentCommand(props.tab.id, c.id))
+
+const editComment = (c: TabComment) => {
+  const currentTs = useTabsetsStore().getCurrentTabset
+  if (currentTs) {
+    $q.dialog({
+      component: CommentDialog,
+      componentProps: { tabId: props.tab.id, sharedId: currentTs.sharing?.sharedId, comment: c },
+    })
   }
 }
 </script>

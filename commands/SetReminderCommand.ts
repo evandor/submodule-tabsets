@@ -22,7 +22,12 @@ export class SetReminderCommand implements Command<any> {
       return Promise.reject('could not get current tabset')
     }
     const tab: Tab = tabset.tabs.filter((t: Tab) => t.id === this.tabId)[0]!
-    tab.reminder = this.reminderDate ? date.extractDate(this.reminderDate, 'YYYY/MM/DD').getTime() : undefined
+    if (this.reminderDate) {
+      const theDate = date.extractDate(this.reminderDate, 'YYYY/MM/DD')
+      tab.reminder = new Date(theDate.getFullYear(), theDate.getMonth(), theDate.getDate()).getTime()
+    } else {
+      tab.reminder = undefined
+    }
     tab.reminderComment = sanitizeAsText(this.comment ?? '')
     return useTabsetService()
       .saveTabset(tabset)
@@ -34,5 +39,5 @@ export class SetReminderCommand implements Command<any> {
 }
 
 SetReminderCommand.prototype.toString = function cmdToString() {
-  return `SetReminderCommand: {tabId=${this.tabId}}`
+  return `SetReminderCommand: {tabId=${this.tabId}, {reminderDate:${this.reminderDate}}`
 }
