@@ -33,6 +33,15 @@
             <div class="text-body2 text-warning">{{ newTabsetDialogWarning() }}</div>
           </q-card-section>
 
+          <q-card-section class="q-pt-none q-mt-none">
+            <div class="row">
+              <div class="col-5 q-mt-sm"><b>Detail Level</b></div>
+              <div class="col">
+                <q-select borderless dense options-dense v-model="detailLevel" :options="detailLevelOptions" />
+              </div>
+            </div>
+          </q-card-section>
+
           <template v-if="useFeaturesStore().hasFeature(FeatureIdent.DEV_MODE)">
             <q-card-section class="q-pt-none" v-if="placeholders.length > 0">
               <b>Substitutions for</b>
@@ -71,7 +80,10 @@ import { useFeaturesStore } from 'src/features/stores/featuresStore'
 import { UpdateTabCommand } from 'src/tabsets/commands/UpdateTabCommand'
 import { Tab } from 'src/tabsets/models/Tab'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+import { ListDetailLevel } from 'src/ui/stores/uiStore'
 import { computed, PropType, ref, watchEffect } from 'vue'
+
+type SelectOption = { label: string; value: ListDetailLevel }
 
 defineEmits([...useDialogPluginComponent.emits])
 
@@ -88,6 +100,19 @@ const newTabUrlExists = ref(false)
 const hideWarning = ref(false)
 const placeholders = ref<string[]>([])
 const placeholderValues = ref<Map<string, string>>(new Map())
+const detailLevel = ref<SelectOption>({ label: 'Default', value: 'DEFAULT' })
+
+const detailLevelOptions: SelectOption[] = [
+  { label: 'Default', value: 'DEFAULT' },
+  { label: 'Minimal', value: 'MINIMAL' },
+  { label: 'Some', value: 'SOME' },
+  { label: 'Maximal', value: 'MAXIMAL' },
+]
+
+detailLevel.value = detailLevelOptions.filter((o: SelectOption) => o.value === props.tab?.details)[0] || {
+  label: 'Default',
+  value: 'DEFAULT',
+}
 
 const placeholderReg = /\$\{(.*?)}/gm
 
@@ -107,10 +132,6 @@ watchEffect(() => {
   }
 })
 
-watchEffect(() => {
-  console.log('placeholderValues', placeholderValues.value)
-})
-
 const updateTab = () =>
   useCommandExecutor().executeFromUi(
     new UpdateTabCommand(
@@ -118,6 +139,7 @@ const updateTab = () =>
       newTabUrl.value,
       newTabName.value || '',
       newTabDescription.value || '',
+      detailLevel.value.value,
       placeholders.value,
       placeholderValues.value,
     ),

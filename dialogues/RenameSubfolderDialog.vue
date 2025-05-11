@@ -19,14 +19,8 @@
       </q-card-section>
 
       <q-card-actions align="right" class="text-primary">
-        <q-btn label="Cancel" size="sm" color="accent" @click="onDialogCancel" />
-        <q-btn
-          label="Update"
-          size="sm"
-          color="warning"
-          :disable="disableSubmit()"
-          v-close-popup
-          @click="updateSubfolder()" />
+        <DialogButton label="Cancel" @click="onDialogCancel" />
+        <DialogButton label="Update" :default-action="true" @wasClicked="updateSubfolder()" />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -35,6 +29,7 @@
 <script lang="ts" setup>
 import { useDialogPluginComponent } from 'quasar'
 import { STRIP_CHARS_IN_USER_INPUT } from 'src/boot/constants'
+import DialogButton from 'src/core/dialog/buttons/DialogButton.vue'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import { RenameFolderCommand } from 'src/tabsets/commands/RenameFolderCommand'
 import { Tabset } from 'src/tabsets/models/Tabset'

@@ -14,7 +14,7 @@
           </div>
         </q-card-section>
         <q-card-actions align="right">
-          <DialogButton label="Cancel" color="accent" @click="onDialogCancel()" />
+          <DialogButton label="Cancel" @click="onDialogCancel()" />
           <DialogButton
             label="Display"
             type="submit"

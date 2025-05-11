@@ -16,8 +16,7 @@
         :preventDragAndDrop="false"
         :tabsetType="props.tabsetType"
         :tabset="props.tabset!"
-        :show-tabsets="props.showTabsets"
-        :hide-menu="props.hideMenu">
+        :show-tabsets="props.showTabsets">
         <template v-slot:actionPart>
           <span>&nbsp;</span>
         </template>
@@ -35,8 +34,7 @@
       :preventDragAndDrop="true"
       :tabsetType="props.tabsetType"
       :tabset="props.tabset!"
-      :show-tabsets="props.showTabsets"
-      :hide-menu="props.hideMenu" />
+      :show-tabsets="props.showTabsets" />
   </q-list>
 
   <audio id="myAudio">

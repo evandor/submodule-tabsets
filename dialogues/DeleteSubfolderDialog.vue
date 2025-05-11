@@ -11,14 +11,12 @@
           </div>
         </q-card-section>
         <q-card-actions align="right">
-          <DialogButton label="Cancel" color="accent" v-close-popup />
+          <DialogButton label="Cancel" v-close-popup />
           <DialogButton
             label="Delete"
-            type="submit"
-            :autofocus="true"
+            :default-action="true"
             @keyup.enter="deleteFolder()"
-            @wasClicked="deleteFolder()"
-            v-close-popup />
+            @wasClicked="deleteFolder()" />
         </q-card-actions>
       </q-card>
     </div>

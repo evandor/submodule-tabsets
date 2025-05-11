@@ -154,6 +154,10 @@
       </q-item>
 
       <q-separator />
+      <q-item clickable v-close-popup @click.stop="exportTabset(tabset)">
+        <q-icon name="o_folder_copy" class="q-my-xs q-mr-xs" color="grey-5" style="position: relative; top: -1px" />
+        Export Tabset...
+      </q-item>
       <q-item clickable v-close-popup @click.stop="copyTabset(tabset)">
         <q-icon name="o_folder_copy" class="q-my-xs q-mr-xs" color="grey-5" style="position: relative; top: -1px" />
         Copy tabset...
@@ -183,6 +187,7 @@ import { DeleteTabsetCommand } from 'src/tabsets/commands/DeleteTabsetCommand'
 import { MarkTabsetAsArchivedCommand } from 'src/tabsets/commands/MarkTabsetAsArchived'
 import { RestoreTabsetCommand } from 'src/tabsets/commands/RestoreTabset'
 import DeleteTabsetDialog from 'src/tabsets/dialogues/DeleteTabsetDialog.vue'
+import ExportDialog from 'src/tabsets/dialogues/ExportDialog.vue'
 import RestoreTabsetDialog from 'src/tabsets/dialogues/RestoreTabsetDialog.vue'
 import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset, TabsetStatus, TabsetType } from 'src/tabsets/models/Tabset'
@@ -303,6 +308,15 @@ const removeFromSpace = (tabset: Tabset, spaceId: string) => {
 
 const copyTabset = (tabset: Tabset) => {
   useCommandExecutor().executeFromUi(new CopyTabsetCommand(tabset))
+}
+
+const exportTabset = (tabset: Tabset) => {
+  const filename = `tabset-${props.tabset.name}-${import.meta.env.PACKAGE_VERSION}.json`
+  $q.dialog({ component: ExportDialog, componentProps: { filename: filename, tabset: props.tabset } }).onOk(
+    (tabsetId: any) => {
+      //useTabsetService().selectTabset(tabsetId)
+    },
+  )
 }
 
 const deleteDialog = (tabset: Tabset) => {

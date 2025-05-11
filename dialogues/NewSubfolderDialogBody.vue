@@ -27,9 +27,7 @@
 
           <template v-if="inBexMode()">
             <q-checkbox data-testid="newTabsetAutoAdd" v-model="addAllOpenTabs">
-              <slot
-                ><span>Add all {{ openTabsCount }} open tabs</span></slot
-              >
+              <slot><span>Add all open tabs</span></slot>
             </q-checkbox>
             &nbsp;
             <q-icon name="sym_o_help" color="primary" size="1em">

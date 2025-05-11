@@ -30,7 +30,7 @@ export class DefaultAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
 
   defaultAction(): ActionContext {
     const limitReached = useAuthStore().limitExceeded('TABS', useTabsetsStore().allTabsCount + 1).exceeded
-    return new ActionContext('Add Tab')
+    return new ActionContext('Add Tab', 'sym_o_add')
       .setColor(() => {
         const tabUrl = useContentStore().getCurrentTabUrl
         if (tabUrl) {
