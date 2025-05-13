@@ -49,8 +49,10 @@ export const useTabsetsStore = defineStore('tabsets', () => {
   const reminderTabset = ref<Tabset>(new Tabset('reminders', 'reminder'))
 
   const getCurrentTabsetId = async (): Promise<string | undefined> => {
-    if (chrome && chrome.windows) {
+    try {
       return useSelectedTabsetService().getSelectedTabsetId()
+    } catch (error) {
+      console.debug("can't check for newtab extension", error)
     }
     return currentTabsetId.value
   }
