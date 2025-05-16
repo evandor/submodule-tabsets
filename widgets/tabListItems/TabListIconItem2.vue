@@ -14,6 +14,13 @@
           :src="thumbnail"
           width="30px" />
         <!--        :preventDragAndDrop="props.preventDragAndDrop"-->
+        <q-icon
+          v-else-if="
+            props.tab.favIconUrl &&
+            (!props.tab.favIconUrl.startsWith('https://') || !props.tab.favIconUrl.startsWith('https://'))
+          "
+          size="sm"
+          :name="props.tab.favIconUrl" />
         <TabFaviconWidget
           v-else
           v-once
