@@ -3,6 +3,7 @@ import { STRIP_CHARS_IN_USER_INPUT } from 'src/boot/constants'
 import { TabReference, TabReferenceType } from 'src/content/models/TabReference'
 import { useUtils } from 'src/core/services/Utils'
 import { ExcalidrawStorage } from 'src/tabsets/actionHandling/model/ExcalidrawStorage'
+import { Page } from 'src/tabsets/models/cms/backend'
 import { Placeholders } from 'src/tabsets/models/Placeholders'
 import { TabLog } from 'src/tabsets/models/TabLog'
 import { ListDetailLevel } from 'src/ui/stores/uiStore'
@@ -185,6 +186,8 @@ export class Tab {
   useInIframe: boolean = true
 
   details: ListDetailLevel = 'DEFAULT'
+
+  page: Page | undefined = undefined
 
   constructor(
     public id: string,

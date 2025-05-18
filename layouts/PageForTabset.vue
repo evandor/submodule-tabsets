@@ -9,12 +9,9 @@
 <script setup lang="ts">
 // without this, getting "EvalError: Refused to evaluate a string as JavaScript because 'unsafe-eval' is not an allowed"
 import 'regenerator-runtime/runtime'
-import EditorJS, { OutputData } from '@editorjs/editorjs'
 import { useUtils } from 'src/core/services/Utils'
-import EditorJsConfig from 'src/notes/editorjs/EditorJsConfig'
 import { Tab } from 'src/tabsets/models/Tab'
-import { Tabset, TabsetSharing } from 'src/tabsets/models/Tabset'
-import { useTabsetService } from 'src/tabsets/services/TabsetService2'
+import { Tabset } from 'src/tabsets/models/Tabset'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { ref, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
@@ -30,8 +27,6 @@ const dirty = ref(false)
 
 let savingInterval: NodeJS.Timeout | undefined = undefined
 
-let editorJS2: EditorJS = undefined as unknown as EditorJS
-
 watchEffect(() => {
   tabsetId.value = route.params.tabsetId as string
   if (tabsetId.value) {
@@ -39,17 +34,17 @@ watchEffect(() => {
     tabset.value = useTabsetsStore().getTabset(tabsetId.value)
     useTabsetsStore().selectCurrentTabset(tabsetId.value)
 
-    if (tabset.value && !editorJS2) {
-      // && !editorJS2.isReady) {
-      editorJS2 = new EditorJS({
-        holder: 'editorjs',
-        autofocus: true,
-        readOnly: false,
-        data: (tabset.value.page || {}) as OutputData,
-        // @ts-expect-error xxx
-        tools: EditorJsConfig.toolsconfig,
-      })
-    }
+    // if (tabset.value && !editorJS2) {
+    //   // && !editorJS2.isReady) {
+    //   editorJS2 = new EditorJS({
+    //     holder: 'editorjs',
+    //     autofocus: true,
+    //     readOnly: false,
+    //     data: (tabset.value.page || {}) as OutputData,
+    //     // @ts-expect-error xxx
+    //     tools: EditorJsConfig.toolsconfig,
+    //   })
+    // }
   }
 })
 
@@ -65,39 +60,6 @@ const keyUpEvent = () => {
 
 const saveWork = () => {
   console.log('saving', tabsetId.value)
-
-  editorJS2
-    .save()
-    .then((outputData: any) => {
-      if (tabsetId.value) {
-        console.log('tabset', tabset, tab.value)
-        if (tabset.value) {
-          tabset.value.page = outputData // TODO sanitize?
-          console.log('saving tabset page content', tabset, tabsetId.value)
-          // needed to update the content in the side panel
-          //sendMsg('note-changed', {tab: tab.value, tabsetId: tabsetId.value, noteId: noteId.value})
-          sendMsg('reload-tabset', { tabsetId: tabsetId.value })
-
-          // Sharing
-          if (tabset.value.sharing?.sharedId && tabset.value.sharing.sharing === TabsetSharing.PUBLIC_LINK) {
-            tabset.value.sharing.sharing = TabsetSharing.PUBLIC_LINK_OUTDATED
-            tabset.value.sharing.sharedAt = new Date().getTime()
-          }
-
-          useTabsetService().saveTabset(tabset.value as Tabset)
-          dirty.value = false
-          if (savingInterval) {
-            console.log('clearing interval')
-            clearInterval(savingInterval)
-          }
-        }
-      } else {
-        console.warn('tabset id missing')
-      }
-    })
-    .catch((error: any) => {
-      console.log('Saving failed: ', error)
-    })
 }
 </script>
 

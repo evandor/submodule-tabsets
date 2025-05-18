@@ -64,7 +64,7 @@ const startSession = () => {
         BrowserApi.closeAllTabs(false)
       })
       .then(() => {
-        const tabsetId = callback.collection['value' as keyof object]
+        const tabsetId = callback.collection ? callback.collection['value' as keyof object] : undefined
         //useCommandExecutor().executeFromUi(new CreateTabsetCommand(callback['sessionName' as keyof object], []))
         if (tabsetId) {
           useTabsetService().selectTabset(tabsetId)

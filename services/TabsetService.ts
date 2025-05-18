@@ -5,11 +5,9 @@ import AppEventDispatcher from 'src/app/AppEventDispatcher'
 import BrowserApi from 'src/app/BrowserApi'
 import { ContentItem } from 'src/content/models/ContentItem'
 import { useContentService } from 'src/content/services/ContentService'
-import { Notebook } from 'src/notes/models/Notebook'
-import { useNotesStore } from 'src/notes/stores/NotesStore'
 import { Space } from 'src/spaces/models/Space'
 import { useSpacesStore } from 'src/spaces/stores/spacesStore'
-import { NoteEvent, SpaceEvent, TabEvent, TabsetEvent } from 'src/tabsets/commands/github/GithubWriteEventCommand'
+import { SpaceEvent, TabEvent, TabsetEvent } from 'src/tabsets/commands/github/GithubWriteEventCommand'
 import { Tab, UrlExtension } from 'src/tabsets/models/Tab'
 import { Tabset, TabsetSharing, TabsetStatus } from 'src/tabsets/models/Tabset'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
@@ -29,11 +27,11 @@ class TabsetService {
         const event = new TabEvent('added', ts.id, tab.id, tab.title || tab.name || '???', tab.url, tab.favIconUrl)
         lines.push(event.format())
       }
-      const notes = await useNotesStore().getNotesFor(ts.id)
-      for (const note of notes) {
-        const event = new NoteEvent('added', ts.id, note.title, note)
-        lines.push(event.format())
-      }
+      // const notes = await useNotesStore().getNotesFor(ts.id)
+      // for (const note of notes) {
+      //   const event = new NoteEvent('added', ts.id, note.title, note)
+      //   lines.push(event.format())
+      // }
       const folders = await this.eventsFor(ts.folders, ts.id)
       folders.forEach((l) => lines.push(l))
     }
@@ -175,7 +173,6 @@ class TabsetService {
       data = JSON.stringify({
         tabsets: tabsets.filter((ts: Tabset) => ts.status !== TabsetStatus.DELETED),
         spaces: [...spacesStore.spaces.values()],
-        notebooks: await useNotesStore().getNotebookList(),
       })
       return this.createFile(data, filename)
     } else if (exportAs === 'events') {
@@ -253,10 +250,6 @@ class TabsetService {
           favIconUrl: tab.favIconUrl || '',
         })
       })
-    })
-
-    _.forEach(notebooks, (notebook: Notebook) => {
-      useNotesStore().saveNotebook(notebook)
     })
   }
 

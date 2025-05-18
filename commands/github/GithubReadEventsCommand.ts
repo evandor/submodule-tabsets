@@ -2,18 +2,10 @@ import { LocalStorage } from 'quasar'
 import BrowserApi from 'src/app/BrowserApi'
 import { GITHUB_AUTO_SYNC, GITHUB_AUTO_SYNC_LASTUPDATE } from 'src/boot/constants'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
-import { Notebook } from 'src/notes/models/Notebook'
-import { useNotesStore } from 'src/notes/stores/NotesStore'
 import { Space } from 'src/spaces/models/Space'
 import { useSpacesStore } from 'src/spaces/stores/spacesStore'
 import { GithubCommands } from 'src/tabsets/commands/github/GithubCommands'
-import {
-  NoteEvent,
-  SpaceEvent,
-  TabEvent,
-  TabsetEvent,
-  TabsetEventType,
-} from 'src/tabsets/commands/github/GithubWriteEventCommand'
+import { SpaceEvent, TabEvent, TabsetEvent, TabsetEventType } from 'src/tabsets/commands/github/GithubWriteEventCommand'
 import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset } from 'src/tabsets/models/Tabset'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
@@ -165,20 +157,20 @@ export class GithubReadEventsCommand extends GithubCommands<string> {
                   }
                 }
                 break
-              case 'note':
-                // console.log('processing line', line)
-                if (parts[3]) {
-                  const decoded = atob(parts[5]!)
-                  //console.log('decoded', decoded)
-                  const noteEvent = new NoteEvent(parts[2] as TabsetEventType, parts[3], parts[4]!, JSON.parse(decoded))
-                  if (noteEvent.event === 'added') {
-                    //console.log('noteEvent', noteEvent)
-                    // const notebook = new Notebook(uid(), noteEvent.tabsetId, NotebookType.TABSET, noteEvent.name)
-                    // console.log('notebook', notebook)
-                    await useNotesStore().saveNotebook(noteEvent.content as unknown as Notebook)
-                  }
-                }
-                break
+              // case 'note':
+              //   // console.log('processing line', line)
+              //   if (parts[3]) {
+              //     const decoded = atob(parts[5]!)
+              //     //console.log('decoded', decoded)
+              //     const noteEvent = new NoteEvent(parts[2] as TabsetEventType, parts[3], parts[4]!, JSON.parse(decoded))
+              //     if (noteEvent.event === 'added') {
+              //       //console.log('noteEvent', noteEvent)
+              //       // const notebook = new Notebook(uid(), noteEvent.tabsetId, NotebookType.TABSET, noteEvent.name)
+              //       // console.log('notebook', notebook)
+              //       //await useNotesStore().saveNotebook(noteEvent.content as unknown as Notebook)
+              //     }
+              //   }
+              //   break
               default:
                 console.log(`unknown part '${parts[1]}' in '${line}'`)
             }

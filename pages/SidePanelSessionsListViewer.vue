@@ -39,30 +39,25 @@
               open session
             </div>
             <div v-for="tab in session.tabs" class="q-my-none tabBorder q-mb-xs">
-              {{ tab.id }}
+              {{ tab.title }}
             </div>
           </q-card-section>
         </q-card>
       </q-expansion-item>
-      <q-expansion-item
-        group="browserWindowSessions"
-        v-for="session in recentlyClosedBrowserSessions.filter((s: chrome.sessions.Session) => s.window)"
-        expand-separator
-        :label="'' + session.lastModified"
-        :caption="'Browser Windows Session - ' + session.window?.tabs?.length + ' tabs(s)'">
-        <q-card>
-          <q-card-section>
-            <div
-              class="q-ma-none q-mb-md cursor-pointer text-right text-caption"
-              @click="restoreSession(session.window?.sessionId)">
-              restore session
-            </div>
-            <div v-for="tab in session.window?.tabs" class="q-my-none tabBorder q-mb-xs" :style="cardStyle(tab)">
-              <SimpleBrowserTabCard :chromeTab="tab" />
-            </div>
-          </q-card-section>
-        </q-card>
-      </q-expansion-item>
+      <!--      <q-expansion-item group="browserWindowSessions" expand-separator label="Recently Closed Tabs">-->
+      <!--        <q-card>-->
+      <!--          <q-card-section>-->
+      <!--            &lt;!&ndash;            <div&ndash;&gt;-->
+      <!--            &lt;!&ndash;              class="q-ma-none q-mb-md cursor-pointer text-right text-caption"&ndash;&gt;-->
+      <!--            &lt;!&ndash;              @click="restoreSession(session.window?.sessionId)">&ndash;&gt;-->
+      <!--            &lt;!&ndash;              restore session&ndash;&gt;-->
+      <!--            &lt;!&ndash;            </div>&ndash;&gt;-->
+      <!--            <div v-for="session in recentlyClosedBrowserSessions" class="q-my-none tabBorder q-mb-xs">-->
+      <!--              <SimpleBrowserTabCard v-if="session.tab" :chromeTab="session.tab" />-->
+      <!--            </div>-->
+      <!--          </q-card-section>-->
+      <!--        </q-card>-->
+      <!--      </q-expansion-item>-->
     </q-list>
   </div>
 </template>
@@ -71,7 +66,6 @@
 import _ from 'lodash'
 import { SidePanelViews } from 'src/app/models/SidePanelViews'
 import Analytics from 'src/core/utils/google-analytics'
-import SimpleBrowserTabCard from 'src/tabsets/components/helper/SimpleBrowserTabCard.vue'
 import { Tabset, TabsetType } from 'src/tabsets/models/Tabset'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
@@ -90,7 +84,10 @@ const tabs = ref<chrome.tabs.Tab[]>([])
 onMounted(async () => {
   Analytics.firePageViewEvent('SidePanelSessionsListViewer', document.location.href)
   recentlyClosedBrowserSessions.value = await chrome.sessions.getRecentlyClosed()
+  console.log('recently closed', recentlyClosedBrowserSessions.value)
   tabsetsSessions.value = [...useTabsetsStore().tabsets.values()].filter((ts: Tabset) => ts.type === TabsetType.SESSION)
+
+  //chrome.sessions.getDevices()
 })
 
 watchEffect(() => {

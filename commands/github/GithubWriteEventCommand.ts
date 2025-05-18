@@ -1,7 +1,6 @@
 import { LocalStorage } from 'quasar'
 import { GITHUB_AUTO_SYNC, GITHUB_AUTO_SYNC_READONLY } from 'src/boot/constants'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
-import { NotesPage } from 'src/notes/models/NotesPage'
 import { GithubCommands } from 'src/tabsets/commands/github/GithubCommands'
 
 export type TabsetEventClass = 'tab' | 'tabset' | 'space' | 'note'
@@ -74,26 +73,26 @@ export class SpaceEvent {
   }
 }
 
-export class NoteEvent {
-  timestamp: number
-  clazz: TabsetEventClass
-
-  constructor(
-    public event: TabsetEventType,
-    public tabsetId: string,
-    public name: string,
-    public content: NotesPage,
-  ) {
-    this.timestamp = new Date().getTime()
-    this.name = this.name.trim()
-    this.clazz = 'note'
-  }
-  format() {
-    const encoded = btoa(JSON.stringify(this.content))
-    console.log('content', this.content, encoded)
-    return `${this.timestamp}|${this.clazz}|${this.event}|${this.tabsetId}|${this.name.replaceAll('|', '').replace(/\s/g, ' ').trim()}|${encoded}\n`
-  }
-}
+// export class NoteEvent {
+//   timestamp: number
+//   clazz: TabsetEventClass
+//
+//   constructor(
+//     public event: TabsetEventType,
+//     public tabsetId: string,
+//     public name: string,
+//     public content: NotesPage,
+//   ) {
+//     this.timestamp = new Date().getTime()
+//     this.name = this.name.trim()
+//     this.clazz = 'note'
+//   }
+//   format() {
+//     const encoded = btoa(JSON.stringify(this.content))
+//     console.log('content', this.content, encoded)
+//     return `${this.timestamp}|${this.clazz}|${this.event}|${this.tabsetId}|${this.name.replaceAll('|', '').replace(/\s/g, ' ').trim()}|${encoded}\n`
+//   }
+// }
 
 export class GithubWriteEventCommand extends GithubCommands<string> {
   constructor(public event: TabsetEvent | TabEvent) {

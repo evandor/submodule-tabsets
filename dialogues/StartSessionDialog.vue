@@ -20,14 +20,14 @@
           </div>
         </q-card-section>
         <q-card-actions align="right">
-          <DialogButton label="Cancel" v-close-popup />
+          <DialogButton label="Cancel" @wasClicked="onDialogHide" />
           <DialogButton
-            label="Start"
+            label="Save Session"
             type="submit"
             :autofocus="true"
             @keyup.enter="display()"
             @wasClicked="display()"
-            v-close-popup />
+            :default-action="true" />
         </q-card-actions>
       </q-card>
     </div>
