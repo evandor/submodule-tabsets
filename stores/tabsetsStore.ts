@@ -359,7 +359,10 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     var count = 0
 
     function countAllTabs(ts: Tabset): number {
-      const directCount: number = ts.tabs?.length || 0
+      if (!ts || !ts.tabs) {
+        return 0
+      }
+      const directCount: number = ts.tabs.length
       const childrenCount: number = ts.folders?.map((f: Tabset) => countAllTabs(f)).reduce((a, b) => a + b, 0)
       return directCount + childrenCount
     }
@@ -450,6 +453,13 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     return chain
   }
 
+  const getPageTabs = (tabset: Tabset | undefined): Tab[] => {
+    if (!tabset) {
+      return []
+    }
+    return tabset.tabs.filter((t: Tab) => t.page !== undefined)
+  }
+
   const loadPublicTabset = (sharedId: string) => storage.loadPublicTabset(sharedId)
 
   const removeReminder = (tab: Tab) =>
@@ -522,5 +532,6 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     loaded,
     lastUpdate,
     getParentChainForTabId,
+    getPageTabs,
   }
 })

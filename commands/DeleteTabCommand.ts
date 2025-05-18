@@ -3,11 +3,11 @@ import AppEventDispatcher from 'src/app/AppEventDispatcher'
 import { FeatureIdent } from 'src/app/models/FeatureIdent'
 import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
+import { useLogger } from 'src/core/services/Logger'
 import { useUtils } from 'src/core/services/Utils'
 import Analytics from 'src/core/utils/google-analytics'
 import { useFeaturesStore } from 'src/features/stores/featuresStore'
 import { useMessagesStore } from 'src/messages/stores/messagesStore'
-import { useLogger } from 'src/core/services/Logger'
 import { Message } from 'src/tabsets/models/Message'
 import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset } from 'src/tabsets/models/Tabset'
@@ -48,7 +48,7 @@ export class DeleteTabCommand implements Command<Tabset> {
     // }
     info('tab deleted')
     sendMsg('tab-deleted', { tabsetId: tabset.id })
-    const result = await AppEventDispatcher.dispatchEvent('tab-deleted', { url: this.tab.url })
+    const result = await AppEventDispatcher.dispatchEvent('tab-deleted', { url: this.tab.url, tabId: this.tab.id })
     console.log('bookmarksToDelete', result, result['bookmarks' as keyof object] as number)
     if (
       result &&
