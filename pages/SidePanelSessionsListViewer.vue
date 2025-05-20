@@ -33,16 +33,39 @@
         expand-separator
         :label="'' + session.name"
         :caption="'Tabsets Session - ' + session.tabs.length + ' tabs(s)'">
-        <q-card>
-          <q-card-section>
-            <div class="q-ma-none q-mb-md cursor-pointer text-right text-caption" @click="openSession(session)">
-              open session
+        <q-list class="q-ma-none">
+          <q-item>
+            <div class="row fit">
+              <div class="col-12 text-right">
+                <q-icon name="sym_o_delete" class="cursor-pointer" @click="deleteStash(session)">
+                  <q-tooltip class="tooltip-small">Delete this stash</q-tooltip>
+                </q-icon>
+              </div>
             </div>
-            <div v-for="tab in session.tabs" class="q-my-none tabBorder q-mb-xs">
-              {{ tab.title }}
-            </div>
-          </q-card-section>
-        </q-card>
+          </q-item>
+          <q-item v-for="tab in session.tabs" clickable v-ripple class="q-ma-none q-pa-sm">
+            <PanelTabListElementWidget :tab="tab">
+              <template v-slot:actionPart>
+                <span>&nbsp;</span>
+              </template>
+            </PanelTabListElementWidget>
+          </q-item>
+        </q-list>
+
+        <!--        <q-card>-->
+        <!--          <q-card-section>-->
+        <!--            &lt;!&ndash;            <div class="q-ma-none q-mb-md cursor-pointer text-right text-caption" @click="openSession(session)">&ndash;&gt;-->
+        <!--            &lt;!&ndash;              open session&ndash;&gt;-->
+        <!--            &lt;!&ndash;            </div>&ndash;&gt;-->
+        <!--            <div v-for="tab in session.tabs">-->
+        <!--              <PanelTabListElementWidget :tab="tab">-->
+        <!--                <template v-slot:actionPart>-->
+        <!--                  <span>&nbsp;</span>-->
+        <!--                </template>-->
+        <!--              </PanelTabListElementWidget>-->
+        <!--            </div>-->
+        <!--          </q-card-section>-->
+        <!--        </q-card>-->
       </q-expansion-item>
       <!--      <q-expansion-item group="browserWindowSessions" expand-separator label="Recently Closed Tabs">-->
       <!--        <q-card>-->
@@ -64,18 +87,17 @@
 
 <script setup lang="ts">
 import _ from 'lodash'
-import { SidePanelViews } from 'src/app/models/SidePanelViews'
+import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import Analytics from 'src/core/utils/google-analytics'
+import { DeleteTabsetCommand } from 'src/tabsets/commands/DeleteTabsetCommand'
 import { Tabset, TabsetType } from 'src/tabsets/models/Tabset'
-import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { useTabsStore2 } from 'src/tabsets/stores/tabsStore2'
+import PanelTabListElementWidget from 'src/tabsets/widgets/PanelTabListElementWidget.vue'
 import { useUiStore } from 'src/ui/stores/uiStore'
 import { onMounted, ref, watchEffect } from 'vue'
 
-const recentlyClosedBrowserSessions = ref<chrome.sessions.Session[]>([])
 const tabsetsSessions = ref<Tabset[]>([])
-const useSelection = ref(false)
 const userCanSelect = ref(false)
 
 const tabSelection = ref<Set<string>>(new Set<string>())
@@ -83,11 +105,10 @@ const tabs = ref<chrome.tabs.Tab[]>([])
 
 onMounted(async () => {
   Analytics.firePageViewEvent('SidePanelSessionsListViewer', document.location.href)
-  recentlyClosedBrowserSessions.value = await chrome.sessions.getRecentlyClosed()
-  console.log('recently closed', recentlyClosedBrowserSessions.value)
-  tabsetsSessions.value = [...useTabsetsStore().tabsets.values()].filter((ts: Tabset) => ts.type === TabsetType.SESSION)
+})
 
-  //chrome.sessions.getDevices()
+watchEffect(() => {
+  tabsetsSessions.value = [...useTabsetsStore().tabsets.values()].filter((ts: Tabset) => ts.type === TabsetType.SESSION)
 })
 
 watchEffect(() => {
@@ -115,25 +136,8 @@ const tabSelectionChanged = (a: any) => {
   }
 }
 
-const openSession = (session: Tabset) => {
-  useTabsetService().selectTabset(session.id)
-  useUiStore().sidePanelSetActiveView(SidePanelViews.MAIN)
-}
-
-const restoreSession = async (sessionId?: string) => {
-  const reason = await chrome.sessions.restore(sessionId) //.then((reason: any) => {
-  console.log('restored session', reason)
-  recentlyClosedBrowserSessions.value = await chrome.sessions.getRecentlyClosed()
-}
-
-const cardStyle = (tab: chrome.tabs.Tab) => {
-  let background = ''
-  if (useTabsetService().urlExistsInCurrentTabset(tab.url || '')) {
-    background = 'background: #efefef'
-  } else {
-    // emits('hasSelectable', true)
-  }
-  return `${background}`
+const deleteStash = (stash: Tabset) => {
+  useCommandExecutor().executeFromUi(new DeleteTabsetCommand(stash.id))
 }
 </script>
 

@@ -11,19 +11,6 @@
           class="q-ma-mone">
           <q-tooltip class="tooltip_small">This tab is marked as favorite</q-tooltip>
         </q-icon>
-        <!-- small icons in minimal view -->
-        <template v-if="showDetailsForThreshold('MINIMAL')">
-          <span v-if="(props.tab as Tab).placeholders">
-            <q-icon
-              name="sym_o_dynamic_feed"
-              size="12px"
-              style="position: relative; top: -4px"
-              class="q-mr-xs"
-              @click.stop="toggleShowWith('placeholder')">
-              <q-tooltip class="tooltip-small">There are placeholders defined for this tab</q-tooltip>
-            </q-icon>
-          </span>
-        </template>
 
         <Highlight :filter="props.filter" :text="nameOrTitle(props.tab as Tab) || ''">
           <template v-slot:popup>
@@ -46,7 +33,6 @@
 </template>
 
 <script setup lang="ts">
-import { formatDistance } from 'date-fns'
 import { QPopupEdit, uid, useQuasar } from 'quasar'
 import BrowserApi from 'src/app/BrowserApi'
 import { FeatureIdent } from 'src/app/models/FeatureIdent'
@@ -59,17 +45,13 @@ import { useUtils } from 'src/core/services/Utils'
 import { useEventsServices } from 'src/events/services/EventsServices'
 import { useFeaturesStore } from 'src/features/stores/featuresStore'
 import { RestTab } from 'src/rest/models/RestTab'
-import NavigationService from 'src/services/NavigationService'
 import TabService from 'src/services/TabService'
-import { SavedBlob } from 'src/snapshots/models/SavedBlob'
-import { Suggestion } from 'src/suggestions/domain/models/Suggestion'
-import { AddCommentCommand } from 'src/tabsets/commands/AddCommentCommand'
 import { CreateFolderCommand } from 'src/tabsets/commands/CreateFolderCommand'
 import { OpenTabCommand } from 'src/tabsets/commands/OpenTabCommand'
 import { UpdateTabNameCommand } from 'src/tabsets/commands/UpdateTabName'
 import AddRssFeedDialog from 'src/tabsets/dialogues/actions/AddRssFeedDialog.vue'
 import { PlaceholdersType } from 'src/tabsets/models/Placeholders'
-import { Tab, TabComment, TabFavorite, UrlExtension } from 'src/tabsets/models/Tab'
+import { Tab, TabFavorite, UrlExtension } from 'src/tabsets/models/Tab'
 import { MonitoredTab, Tabset, TabsetType } from 'src/tabsets/models/Tabset'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
@@ -92,7 +74,6 @@ const props = defineProps<{
   header?: string | undefined
   filter?: string | undefined
   showTabsets?: string
-  showCommentsForMinimalDetails?: boolean | undefined
 }>()
 
 const showButtonsProp = ref<boolean>(false)
@@ -100,10 +81,7 @@ const tsBadges = ref<object[]>([])
 const showCommentList = ref(false)
 const showPlaceholderList = ref(false)
 const placeholders = ref<Object[]>([])
-const suggestion = ref<Suggestion | undefined>(undefined)
-const pngs = ref<SavedBlob[]>([])
 const opensearchterm = ref<string | undefined>(undefined)
-const sendComment = ref<string>('')
 const newCommentIds = ref<string[]>([])
 const monitor = ref<MonitoredTab | undefined>(undefined)
 const popupEdit = ref(false)
@@ -321,53 +299,6 @@ const ignore = (rss: TabReference) => {
   if (tabReference && props.tabset) {
     tabReference.status = 'IGNORED'
     useTabsetService().saveTabset(props.tabset)
-  }
-}
-
-const hideAll = () => rssTabReferences.value.forEach((r: TabReference) => ignore(r))
-
-const send = () => {
-  if (sendComment.value.trim() !== '') {
-    useCommandExecutor()
-      .executeFromUi(new AddCommentCommand(props.tab.id, sendComment.value))
-      .then(() => (sendComment.value = ''))
-  }
-}
-
-const oldComments = () =>
-  props.tab.comments.filter((c: TabComment) => newCommentIds.value.findIndex((id: string) => id === c.id) < 0)
-const newComments = () =>
-  props.tab.comments.filter((c: TabComment) => newCommentIds.value.findIndex((id: string) => id === c.id) >= 0)
-
-const showComments = () => props.showCommentsForMinimalDetails && props.tab.comments.length > 0
-
-const showInReadingMode = () =>
-  useNavigationService().browserTabFor(chrome.runtime.getURL(`/www/index.html#/mainpanel/readingmode/${props.tab.id}`))
-
-const openTabAssignmentPage = (tab: Tab) =>
-  NavigationService.openOrCreateTab([chrome.runtime.getURL('/www/index.html#/mainpanel/tabAssignment/' + tab.id)])
-
-const matcherTooltip = () => {
-  const split = props.tab.matcher?.split('|')
-  if (split && split.length > 1) {
-    if (split[0] === 'sw') {
-      // 'sw' = 'startsWith'
-      return 'This tab will open in any tab with an URL starting with ' + split[1]
-    }
-  }
-  return 'This tab will open in any tab which url matches ' + props.tab.matcher
-}
-
-const formatDate = (timestamp: number | undefined) =>
-  timestamp ? formatDistance(timestamp, new Date(), { addSuffix: true }) : ''
-
-const openTabset = (badge: any) => {
-  console.log('clicked badge', badge)
-  useTabsetService().selectTabset(badge.tabsetId)
-  if (!inBexMode() || !chrome.sidePanel) {
-    router.push('/sidepanel/tabsets/' + badge.tabsetId + '?highlight=' + badge.encodedUrl)
-  } else {
-    router.push('/sidepanel' + '?highlight=' + badge.encodedUrl)
   }
 }
 </script>

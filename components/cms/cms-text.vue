@@ -12,6 +12,7 @@
       " />
   </div>
   <div
+    class="q-mb-md"
     :class="getClass('text-body1')"
     ref="htmlRef"
     @blur.stop="update()"

@@ -1,9 +1,18 @@
 <template>
-  <q-header style="background-color: grey">
+  <q-header :style="edit ? 'background-color: grey' : 'background-color: white'">
     <div class="row">
       <div class="col-12 text-right">
-        <q-icon v-if="!props.edit" name="edit" size="xs" class="q-mx-md q-my-xs cursor-pointer" @click="editPage()" />
-        <q-icon v-else name="edit_off" size="xs" class="q-mx-md q-my-xs cursor-pointer" @click="editOff()" />
+        <q-icon
+          v-if="!props.edit"
+          name="edit"
+          color="primary"
+          size="xs"
+          class="q-mx-md q-my-xs cursor-pointer"
+          @click="editPage()" />
+        <template v-else>
+          {{ page?.version }} - {{ date.formatDate(page?.changed || 0, 'DD.MM.YYYY HH:MM:SS') }}
+          <q-icon name="edit_off" size="xs" class="q-mx-md q-my-xs cursor-pointer" @click="editOff()" />
+        </template>
       </div>
     </div>
   </q-header>
@@ -12,21 +21,27 @@
     <div class="row">
       <div class="col-2 q-pa-md q-mr-xl">
         <q-list>
-          <q-item clickable v-ripple v-for="p in pageTabs">
-            <q-item-section>{{ p.name || '?' }}</q-item-section>
+          <q-item clickable v-ripple v-for="p in pageTabs" @click="switchPage(p)">
+            <q-item-section>{{ p.name || p.title || '?' }}</q-item-section>
           </q-item>
         </q-list>
       </div>
       <div class="col q-mt-lg">
         <component-list :page="page" :editable="props.edit" @content-changed="savePage()"></component-list>
       </div>
-      <div class="col-2"></div>
+      <div class="col-2">
+        <div v-for="heading in headings()">
+          {{ heading.data['text' as keyof object] }}
+        </div>
+      </div>
     </div>
   </q-page>
 </template>
 <script lang="ts" setup>
+import { date } from 'quasar'
 import ComponentList from 'src/tabsets/components/cms/ComponentList.vue'
 import { Page } from 'src/tabsets/models/cms/backend'
+import { ContentBlock, ContentBlockType } from 'src/tabsets/models/cms/frontend'
 import { Tab } from 'src/tabsets/models/Tab'
 import { TabAndTabsetId } from 'src/tabsets/models/TabAndTabsetId'
 import { Tabset } from 'src/tabsets/models/Tabset'
@@ -47,6 +62,7 @@ const pageId = route.params.pageId as string
 
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
 watchEffect(async () => {
+  console.log('pageId', pageId)
   tabAndTabsetId.value = useTabsetsStore().getTabAndTabsetId(pageId)
   if (tabAndTabsetId.value) {
     page.value = tabAndTabsetId.value.tab.page
@@ -54,18 +70,6 @@ watchEffect(async () => {
 
     pageTabs.value = useTabsetsStore().getPageTabs(tabset.value)
   }
-
-  // if (usePagesStore().initialized) {
-  //   usePagesStore()
-  //     .loadPage(pageId)
-  //     .then((p: Page) => {
-  //       page.value = p
-  //     })
-  //   const currentTsId = await useTabsetsStore().getCurrentTabsetId()
-  //   if (currentTsId) {
-  //     pages.value = await usePagesStore().loadPages(currentTsId)
-  //   }
-  // }
 })
 
 const editOff = () => {
@@ -79,8 +83,19 @@ const savePage = () => {
   if (page.value && tabAndTabsetId.value) {
     //usePagesStore().updatePage(page.value)
     if (tabset.value) {
+      page.value.version++
+      page.value.changed = new Date().getTime()
       useTabsetsStore().saveTabset(tabset.value)
     }
   }
+}
+
+const switchPage = (page: Tab) => {
+  const prefixUrl = chrome.runtime.getURL('www/index.html#/mainpanel/pages/' + page.id)
+  window.location.replace(props.edit ? prefixUrl + '/edit' : prefixUrl)
+}
+
+const headings = (): ContentBlock[] => {
+  return page.value?.elements.filter((c: ContentBlock) => c.data.kind == ContentBlockType.ContentBlockHeading) || []
 }
 </script>

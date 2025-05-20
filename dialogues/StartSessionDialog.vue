@@ -3,26 +3,33 @@
     <div>
       <q-card class="q-dialog-plugin" style="max-width: 100%">
         <q-card-section>
-          <div class="text-h6">Sessions</div>
+          <div class="text-h6">Stashing</div>
         </q-card-section>
         <q-card-section>
-          <div class="text-body">You can save and hide your current tabs and start a new session.</div>
+          <div class="text-body">
+            You can <b>save and hide your current tabs</b> and start with a clean browser window.
+          </div>
         </q-card-section>
         <q-card-section>
-          <div class="text-body">Your current tabs can later be restored from 'Session {{ oldSessionName }}'.</div>
+          <div class="text-caption">Your current tabs will be stashed away and can be restored later.</div>
         </q-card-section>
         <q-card-section>
-          <div class="text-body">Clicking 'start' will close all open tabs in this window but not the pinned ones.</div>
+          <div class="text-caption">
+            Clicking 'start' will close all open tabs in this window (but not the pinned ones).
+          </div>
+        </q-card-section>
+        <q-card-section>
+          <div class="text-caption">Additionally, you can select a tabset to be opened automatically.</div>
         </q-card-section>
         <q-card-section>
           <div>
-            <q-select class="q-ml-md" v-model="collection" :options="collections" label="Open Collection" />
+            <q-select class="q-ml-md" v-model="collection" :options="collections" label="Open Tabset" />
           </div>
         </q-card-section>
         <q-card-actions align="right">
           <DialogButton label="Cancel" @wasClicked="onDialogHide" />
           <DialogButton
-            label="Save Session"
+            label="Stash open tabs"
             type="submit"
             :autofocus="true"
             @keyup.enter="display()"

@@ -12,10 +12,7 @@ export function useComponent(block: ContentBlock, htmlRef: Ref<any, any>, emits:
   }
 
   const hovered = () => {
-    // if (editable) {
-    console.log('emitting hovered', block.id)
     emits('hovered', block.id)
-    // }
   }
 
   const deleteBlock = () => {
