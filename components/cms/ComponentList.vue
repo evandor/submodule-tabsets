@@ -49,27 +49,35 @@ const getTypeFor = (c: ContentBlock): string => {
   return c.data.kind
 }
 
-const addBlock = (type: ContentBlockType) => {
-  console.log('adding block', type, props.page)
+const addBlock = (type: ContentBlockType, position: string, referenceBlockId: string) => {
+  console.log('adding block', type, props.page, position, referenceBlockId)
   if (props.page) {
+    let newBlock: ContentBlock | undefined = undefined
     switch (type) {
       case ContentBlockType.ContentBlockHeading:
-        props.page?.elements.push(new ContentBlock(uid(), createHeading('hallo')))
+        newBlock = new ContentBlock(uid(), createHeading('hallo'))
+        // props.page?.elements.push()
         break
       case ContentBlockType.ContentBlockText:
-        props.page?.elements.push(new ContentBlock(uid(), createText('hallo')))
+        // props.page?.elements.push(new ContentBlock(uid(), createText('hallo')))
+        newBlock = new ContentBlock(uid(), createText('hallo'))
         break
       case ContentBlockType.ContentBlockList:
-        props.page?.elements.push(new ContentBlock(uid(), createList('hallo')))
+        // props.page?.elements.push(new ContentBlock(uid(), createList('hallo')))
+        newBlock = new ContentBlock(uid(), createList('hallo'))
         break
       case ContentBlockType.ContentBlockBanner:
-        props.page?.elements.push(new ContentBlock(uid(), createBanner('hallo')))
+        // props.page?.elements.push(new ContentBlock(uid(), createBanner('hallo')))
+        newBlock = new ContentBlock(uid(), createBanner('hallo'))
         break
       default:
         console.warn('unknown type', type)
     }
-    // usePagesStore().updatePage(props.page)
-    emits('content-changed')
+    if (newBlock) {
+      const elementIndex = props.page.elements.findIndex((b: ContentBlock) => b.id === referenceBlockId)
+      props.page.elements.splice(elementIndex + 1, 0, newBlock)
+      emits('content-changed')
+    }
   }
 }
 

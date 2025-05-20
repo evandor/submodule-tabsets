@@ -3,7 +3,7 @@ import BrowserApi from 'src/app/BrowserApi'
 import Command from 'src/core/domain/Command'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { Page } from 'src/tabsets/models/cms/backend'
-import { ContentBlock, createHeading } from 'src/tabsets/models/cms/frontend'
+import { ContentBlock, createHeading, createText } from 'src/tabsets/models/cms/frontend'
 import { Tab } from 'src/tabsets/models/Tab'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 
@@ -26,7 +26,8 @@ export class CreatePageCommand implements Command<Tab> {
         ),
       )
       const page = new Page(tabId, 'newPage', currentTs.id, 1, new Date().getTime(), 0, 0, [
-        new ContentBlock(uid(), createHeading('heading')),
+        new ContentBlock(uid(), createHeading('New Page'), {}, ['text-h3']),
+        new ContentBlock(uid(), createText('click upper right icon to edit...')),
       ])
       pageTab.page = page
       currentTs.tabs.push(pageTab)

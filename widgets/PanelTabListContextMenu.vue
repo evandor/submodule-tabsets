@@ -140,10 +140,10 @@ import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import { useFeaturesStore } from 'src/features/stores/featuresStore'
 import NavigationService from 'src/services/NavigationService'
 import { DeleteTabCommand } from 'src/tabsets/commands/DeleteTabCommand'
-import { MonitorCommand } from 'src/tabsets/commands/MonitorCommand'
 import { UpdateTabColorCommand } from 'src/tabsets/commands/UpdateTabColor'
 import CommentDialog from 'src/tabsets/dialogues/CommentDialog.vue'
 import EditUrlDialog from 'src/tabsets/dialogues/EditUrlDialog.vue'
+import MonitorChangesDialog from 'src/tabsets/dialogues/MonitorChangesDialog.vue'
 import ReminderDialog from 'src/tabsets/dialogues/ReminderDialog.vue'
 import { PlaceholdersType } from 'src/tabsets/models/Placeholders'
 import { Tab } from 'src/tabsets/models/Tab'
@@ -228,23 +228,21 @@ const openReminderDialog = () =>
     component: ReminderDialog,
     componentProps: { tabId: props.tab.id, date: props.tab.reminder, comment: props.tab?.reminderComment },
   })
+
+const isMonitoring = (): boolean => {
+  const ts = useTabsetsStore().getCurrentTabset
+  return (
+    (ts && ts.monitoredTabs && ts.monitoredTabs.findIndex((mt: MonitoredTab) => mt.tabId === props.tab.id) >= 0) ||
+    false
+  )
+}
+
 const openMonitoringDialog = () => {
   const monitored = isMonitoring()
   $q.dialog({
-    title: 'Check for changes',
-    message: monitored
-      ? 'Stop monitoring website for changes'
-      : 'Click ok to start periodical checks if this website has changed. This information is not reliable and may not work for all websites.',
-    cancel: true,
-    persistent: true,
-  }).onOk(() => {
-    useCommandExecutor().executeFromUi(new MonitorCommand(props.tab.id, !monitored))
+    component: MonitorChangesDialog,
+    componentProps: { monitored: monitored, tab: props.tab },
   })
-}
-
-const isMonitoring = () => {
-  const ts = useTabsetsStore().getCurrentTabset
-  return ts && ts.monitoredTabs && ts.monitoredTabs.find((mt: MonitoredTab) => mt.tabId === props.tab.id)
 }
 
 const hasSubfolder = () => {

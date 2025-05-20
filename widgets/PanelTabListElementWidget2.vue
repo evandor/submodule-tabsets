@@ -14,11 +14,22 @@
               :tabset="props.tabset"
               :filter="props.filter || undefined"
               :tab="tab"
-              :showCommentsForMinimalDetails="showCommentList"
               :detail-level="props.detailLevel" />
           </div>
-          <div class="text-right" style="border: 0 solid green">
+          <div
+            class="text-right"
+            :style="TabService.isCurrentTab(props.tab) ? 'border-right:3px solid #1565C0;border-radius:3px' : ''">
             <slot name="actionPart">
+              <q-icon
+                v-if="(props.tab as Tab).placeholders"
+                name="sym_o_dynamic_feed"
+                size="16px"
+                class="q-ma-none q-pa-none"
+                color="primary"
+                @click.stop="toggleShowWith('placeholder')">
+                <q-tooltip class="tooltip-small">There are placeholders defined for this tab</q-tooltip>
+              </q-icon>
+
               <q-icon
                 v-if="showReadingMode()"
                 name="o_menu_book"
@@ -72,6 +83,21 @@
                 color="primary">
                 <q-tooltip class="tooltip-small">This tab is pinned, i.e. it appears in all subfolders</q-tooltip>
               </q-icon>
+
+              <q-icon
+                v-if="
+                  props.tab?.tabReferences.filter(
+                    (r: TabReference) => r.type === TabReferenceType.RSS && r.status !== 'IGNORED',
+                  ).length > 0
+                "
+                name="sym_o_rss_feed"
+                size="16px"
+                class="q-ma-none q-pa-none cursor-pointer"
+                color="warning"
+                @click.stop="toggleShowWith('rssfeed')">
+                <q-tooltip class="tooltip-small">This tab links to an RSS Feed</q-tooltip>
+              </q-icon>
+
               <TabListActionsItem :tabset="props.tabset!" :tab="tab" :detail-level="props.detailLevel" />
             </slot>
           </div>
@@ -145,6 +171,66 @@
           <q-icon name="sym_o_message" />
           Comments: {{ props.tab?.comments.length }}
         </div>
+      </div>
+    </div>
+
+    <!-- rss feeds -->
+    <div class="row fit" v-if="showPlaceholderList" style="border: 0 solid brown">
+      <div class="col-1 q-ml-sm q-mt-xs"></div>
+      <div class="col q-mr-xs">
+        <Transition name="fade" mode="out-in">
+          <q-item-label>
+            <ul>
+              <li v-for="placeholder in placeholders()">
+                <short-url
+                  @click.stop="useNavigationService().browserTabFor(placeholder.url)"
+                  :label="placeholder.name"
+                  :url="placeholder['url' as keyof object]"
+                  :hostname-only="true" />
+              </li>
+            </ul>
+          </q-item-label>
+        </Transition>
+      </div>
+    </div>
+
+    <!-- rss feeds -->
+    <div
+      class="row fit"
+      v-if="
+        showRssFeedList ||
+        showWithMinDetails('MAXIMAL') ||
+        (props.tab?.details === 'MAXIMAL' && props.tab.comments.length > 0)
+      "
+      style="border: 0 solid brown">
+      <div class="col-1 q-ml-sm q-mt-xs"></div>
+      <div class="col q-mr-xs">
+        <Transition name="fade" mode="out-in">
+          <q-item-label>
+            <div class="row q-ma-none q-pa-none q-my-xs" v-for="ref in rssTabReferences">
+              <div class="col-1 text-body2" style="font-size: smaller">
+                <q-icon name="rss_feed" class="q-ma-none q-pa-none" color="warning" size="xs" />
+              </div>
+              <div class="col-7 ellipsis" style="font-size: smaller" @click="openRssDialog(ref)">
+                {{ ref.title }}
+                <q-tooltip v-if="ref.title.length > 20" class="tooltip-small">{{ ref.title }}</q-tooltip>
+              </div>
+              <div class="col text-right">
+                <q-btn icon="o_open_in_new" flat size="xs" class="q-ma-none q-pa-none" @click="openRssLink(ref)" />
+                <q-btn icon="o_close" flat size="xs" class="q-ma-none q-pa-none" @click="ignore(ref)" />
+              </div>
+            </div>
+            <q-item-label v-if="rssTabReferences?.length > 2">
+              <div class="row q-ma-none q-pa-none q-my-xs">
+                <div class="col-1 text-body2" style="font-size: smaller"></div>
+                <div class="col-7 cursor-pointer text-blue-8" style="font-size: smaller" @click="hideAll()">
+                  Hide all
+                </div>
+                <div class="col text-right"></div>
+              </div>
+            </q-item-label>
+          </q-item-label>
+        </Transition>
       </div>
     </div>
 
@@ -286,26 +372,30 @@
 </template>
 
 <script setup lang="ts">
+import { STRIP_CHARS_IN_USER_INPUT } from 'boot/constants'
 import { formatDistance } from 'date-fns'
-import { date, useQuasar } from 'quasar'
+import { date, uid, useQuasar } from 'quasar'
 import BrowserApi from 'src/app/BrowserApi'
 import TabListIconIndicatorsHook from 'src/app/hooks/tabsets/TabListIconIndicatorsHook.vue'
 import { FeatureIdent } from 'src/app/models/FeatureIdent'
-import { TabReferenceType } from 'src/content/models/TabReference'
+import { TabReference, TabReferenceType } from 'src/content/models/TabReference'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import { NotificationType, useNotificationHandler } from 'src/core/services/ErrorHandler'
 import { useNavigationService } from 'src/core/services/NavigationService'
 import { useUtils } from 'src/core/services/Utils'
 import ShortUrl from 'src/core/utils/ShortUrl.vue'
 import { useFeaturesStore } from 'src/features/stores/featuresStore'
+import TabService from 'src/services/TabService'
 import { Suggestion } from 'src/suggestions/domain/models/Suggestion'
 import { useSuggestionsStore } from 'src/suggestions/stores/suggestionsStore'
+import { CreateFolderCommand } from 'src/tabsets/commands/CreateFolderCommand'
 import { DeleteCommentCommand } from 'src/tabsets/commands/DeleteCommentCommand'
 import { OpenTabCommand } from 'src/tabsets/commands/OpenTabCommand'
+import AddRssFeedDialog from 'src/tabsets/dialogues/actions/AddRssFeedDialog.vue'
 import CommentDialog from 'src/tabsets/dialogues/CommentDialog.vue'
 import ReminderDialog from 'src/tabsets/dialogues/ReminderDialog.vue'
 import { Tab, TabComment, UrlExtension } from 'src/tabsets/models/Tab'
-import { MonitoredTab, Tabset } from 'src/tabsets/models/Tabset'
+import { MonitoredTab, Tabset, TabsetType } from 'src/tabsets/models/Tabset'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import Highlight from 'src/tabsets/widgets/Highlight.vue'
@@ -333,9 +423,13 @@ const uiDensity = inject('ui.density')
 const suggestion = ref<Suggestion | undefined>(undefined)
 const doShowDetails = ref(false)
 const showCommentList = ref(false)
+const showRssFeedList = ref(false)
 const showPlaceholderList = ref(false)
 const opensearchterm = ref<string | undefined>(undefined)
 const monitor = ref<MonitoredTab | undefined>(undefined)
+const rssTabReferences = ref<TabReference[]>(
+  props.tab.tabReferences?.filter((r: TabReference) => r.type === TabReferenceType.RSS && r.status !== 'IGNORED'),
+)
 
 onMounted(() => {
   // if (props.tabset?.id) {
@@ -375,6 +469,9 @@ const toggleLists = (ident: string) => {
       break
     case 'placeholder':
       showPlaceholderList.value = !showPlaceholderList.value
+      break
+    case 'rssfeed':
+      showRssFeedList.value = !showRssFeedList.value
       break
     default:
       console.log('undefined ident for toggle lists', ident)
@@ -454,6 +551,84 @@ const editComment = (c: TabComment) => {
       componentProps: { tabId: props.tab.id, sharedId: currentTs.sharing?.sharedId, comment: c },
     })
   }
+}
+
+const showRssReferencesInfo = () => {
+  // prettier-ignore
+  return props.tab
+    ? hasReference(props.tab, TabReferenceType.RSS) && TabService.isCurrentTab(props.tab)
+    : false
+}
+
+const openRssDialog = (rss: TabReference) => {
+  console.log('openRssDialog', rss)
+  $q.dialog({
+    component: AddRssFeedDialog,
+    componentProps: { rssTabReference: rss },
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  }).onOk(async (data: any) => {
+    console.log('hier', data)
+    const ts = useTabsetsStore().getCurrentTabset
+    if (ts) {
+      await useCommandExecutor().executeFromUi(
+        new CreateFolderCommand(
+          uid(),
+          data['feedName' as keyof object].replace(STRIP_CHARS_IN_USER_INPUT, ''),
+          [],
+          ts.id,
+          undefined,
+          data['rssUrl' as keyof object],
+          TabsetType.RSS_FOLDER,
+        ),
+      )
+    }
+  })
+}
+
+const openRssLink = (rss: TabReference) => {
+  let useUrl = rss.href!
+  if (useUrl.startsWith('/')) {
+    try {
+      const url = new URL(props.tab.url!)
+      useUrl = url.protocol + '//' + url.hostname + rss.href!
+    } catch (err) {}
+  }
+  //console.log('useUrl', useUrl)
+  useNavigationService().browserTabFor(useUrl)
+}
+
+const ignore = (rss: TabReference) => {
+  const tabReference = props.tab.tabReferences.find((tr: TabReference) => tr.id === rss.id)
+  if (tabReference && props.tabset) {
+    tabReference.status = 'IGNORED'
+    useTabsetService().saveTabset(props.tabset)
+  }
+}
+
+const hideAll = () => rssTabReferences.value.forEach((r: TabReference) => ignore(r))
+
+const placeholders = (): { url: string; name: string }[] => {
+  const phs: { url: string; name: string }[] = []
+  if (props.tab.placeholders) {
+    const subs = props.tab.placeholders.config
+    Object.entries(subs).forEach((e) => {
+      const name = e[0]
+      const val = e[1]
+      val.split(',').forEach((v: string) => {
+        const substitution = v.trim()
+        if (substitution.length > 0) {
+          let useUrl = props.tab.url || ''
+          let useName = props.tab.name || props.tab.title || ''
+          Object.entries(subs).forEach((e1) => {
+            useUrl = useUrl.replaceAll('${' + name + '}', substitution)
+            useName = useName.replaceAll('${' + name + '}', substitution)
+          })
+          phs.push({ url: useUrl, name: substitution })
+        }
+      })
+    })
+  }
+  return phs
 }
 </script>
 
