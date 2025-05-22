@@ -42,7 +42,7 @@
             </div>
           </q-card-section>
 
-          <template v-if="useFeaturesStore().hasFeature(FeatureIdent.DEV_MODE)">
+          <template v-if="useSettingsStore().has('DEV_MODE')">
             <q-card-section class="q-pt-none" v-if="placeholders.length > 0">
               <b>Substitutions for</b>
             </q-card-section>
@@ -73,10 +73,9 @@
 
 <script lang="ts" setup>
 import { QForm, useDialogPluginComponent } from 'quasar'
-import { FeatureIdent } from 'src/app/models/FeatureIdent'
 import DialogButton from 'src/core/dialog/buttons/DialogButton.vue'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
-import { useFeaturesStore } from 'src/features/stores/featuresStore'
+import { useSettingsStore } from 'src/core/stores/settingsStore'
 import { UpdateTabCommand } from 'src/tabsets/commands/UpdateTabCommand'
 import { Tab } from 'src/tabsets/models/Tab'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'

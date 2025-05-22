@@ -1,9 +1,9 @@
 <template>
   <!-- === name or title === -->
-  <div class="row">
+  <div class="row" style="border: 0 solid black" @click.stop="handleNameClick">
     <div class="q-pr-none q-mr-xs cursor-pointer ellipsis fit q-mt-xs">
       <span v-if="props.tab?.extension === UrlExtension.NOTE" v-html="nameOrTitle(props.tab as Tab)" />
-      <span v-else :class="TabService.isCurrentTab(props.tab) ? 'text-bold' : ''" @click.stop="handleNameClick">
+      <span v-else :class="TabService.isCurrentTab(props.tab) ? 'text-bold' : ''">
         <q-icon
           v-if="props.tab?.favorite && props.tab?.favorite !== TabFavorite.NONE"
           :color="props.tab.favorite === TabFavorite.TABSET ? 'warning' : 'positive'"

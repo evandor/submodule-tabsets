@@ -18,12 +18,13 @@ export class DynamicUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   //   private folder?: Tabset
   // ) {
   // }
-  urlMatcher() {
-    return /.*/
+
+  tabMatcher(url: string, content: string, metas: object): boolean {
+    return false
   }
 
-  contentMatcher(content: string) {
-    return false
+  injectScript(): Promise<void> {
+    return Promise.resolve()
   }
 
   defaultAction(): ActionContext {

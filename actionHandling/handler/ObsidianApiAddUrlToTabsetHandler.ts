@@ -15,12 +15,12 @@ import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { Component } from 'vue'
 
 export class ObsidianApiAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
-  urlMatcher(): RegExp {
-    return /^http:\/\/127.0.0.1:27123\/$/
+  tabMatcher(url: string, content: string, metas: object): boolean {
+    return url.match(/^http:\/\/127.0.0.1:27123\/$/) !== null
   }
 
-  contentMatcher(content: string): boolean {
-    return false
+  injectScript(): Promise<void> {
+    return Promise.resolve()
   }
 
   defaultAction(): ActionContext {

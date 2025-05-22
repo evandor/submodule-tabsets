@@ -23,11 +23,10 @@ import { Component } from 'vue'
 export class RssUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   constructor(public $q: QVueGlobals) {}
 
-  urlMatcher(): RegExp {
-    return /.*\.rss$/
-  }
-
-  contentMatcher(content: string) {
+  tabMatcher(url: string, content: string, metas: object): boolean {
+    if (url.match(/.*\.rss$/)) {
+      return true
+    }
     //console.log('content', content.indexOf('<rss '), content.substring(0, 300))
     const request = useRequestsStore().getCurrentTabRequest
     //console.log('request', request)
@@ -50,6 +49,10 @@ export class RssUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
       content.indexOf('<feed ') >= 0 ||
       content.indexOf('&lt;feed ') >= 0
     )
+  }
+
+  injectScript(): Promise<void> {
+    return Promise.resolve()
   }
 
   defaultAction(): ActionContext {

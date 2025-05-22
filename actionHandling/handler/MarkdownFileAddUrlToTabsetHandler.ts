@@ -20,12 +20,12 @@ import { Component } from 'vue'
 export class MarkdownFileAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   constructor(public $q: QVueGlobals) {}
 
-  urlMatcher(): RegExp {
-    return /.*\.md$/
+  tabMatcher(url: string, content: string, metas: object): boolean {
+    return url.match(/.*\.md$/) !== null
   }
 
-  contentMatcher(content: string) {
-    return false
+  injectScript(): Promise<void> {
+    return Promise.resolve()
   }
 
   defaultAction(): ActionContext {

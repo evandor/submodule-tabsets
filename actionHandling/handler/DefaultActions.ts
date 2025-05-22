@@ -39,7 +39,7 @@ export class DefaultActions {
     //    actions.push(OpenAllInMenuAction)
     actions.push(ShareTabsetAction)
 
-    // if (useFeaturesStore().hasFeature(FeatureIdent.DEV_MODE)) {
+    // if (useSettingsStore().has('DEV_MODE')) {
     //   actions.push(ExportTabsetAction)
     // }
 

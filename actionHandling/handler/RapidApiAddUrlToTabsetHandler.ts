@@ -25,16 +25,16 @@ import { Component } from 'vue'
 export class RapidApiAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   constructor(public $q: QVueGlobals) {}
 
-  urlMatcher(): RegExp {
-    return /^https:\/\/rapidapi.com\/(.)*\/api\/(.)*\/playground/
+  tabMatcher(url: string, content: string, metas: object): boolean {
+    return url.match(/^https:\/\/rapidapi.com\/(.)*\/api\/(.)*\/playground/) !== null
   }
 
-  contentMatcher(content: string): boolean {
-    return false
+  injectScript(): Promise<void> {
+    return Promise.resolve()
   }
 
   defaultAction(): ActionContext {
-    return new ActionContext('Add Rapid API') //.onClicked(this.clicked)
+    return new ActionContext('Add Rapid API', 'save') //.onClicked(this.clicked)
       .withDialog(this.addRapidApi, this.$q)
       .onOk(this.onOk)
   }
@@ -115,6 +115,7 @@ export class RapidApiAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
         } else {
           await useCommandExecutor().executeFromUi(new AddTabToTabsetCommand(tab, currentTs, currentTs.folderActive))
         }
+        return Promise.resolve(new ExecutionResult('done', 'done'))
       }
     }
 
@@ -173,7 +174,15 @@ export class RapidApiAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   }
 
   onOk = (data: any): ClickedHandler => {
-    // console.log('hier!!', data)
+    console.log('hier!!', data)
+    // return (
+    //   browserTab: chrome.tabs.Tab,
+    //   ts: Tabset,
+    //   folder?: Tabset,
+    //   additionalData?: AddUrlToTabsetHandlerAdditionalData,
+    // ): Promise<ExecutionResult<any>> => {
+    //   return Promise.reject("hi")
+    // }
     return this.clicked
   }
 

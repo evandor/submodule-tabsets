@@ -27,13 +27,19 @@ export class AddUrlToTabsetHandlers {
     this.handlers.push(new FileProtocolUrlAddUrlToTabsetHandler(this.quasar))
   }
 
-  handlerFor(url: string, content: string, folder?: Tabset): AddUrlToTabsetHandler {
-    //console.log(`checking handler for ${url}`)
+  handlerFor(url: string, content: string, metas: object = {}, folder?: Tabset): AddUrlToTabsetHandler {
+    //console.log(`checking handler for ${url}`, metas, content.length)
     const handler = this.handlers.filter(
-      (h: AddUrlToTabsetHandler) => url.match(h.urlMatcher()) || h.contentMatcher(content),
+      // (h: AddUrlToTabsetHandler) => url.match(h.urlMatcher()) || h.contentMatcher(content) || h.metasMatcher(metas),
+      (h: AddUrlToTabsetHandler) => h.tabMatcher(url, content, metas),
     )
     if (handler && handler.length > 0) {
       //handler[0].setFolder(folder)
+      //if (!this.injectedUrls.includes(url)) {
+      //console.log('injecting to url', url)
+      //await handler[0]!.injectScript()
+      //this.injectedUrls.push(url)
+      //}
       return handler[0]!
     }
     return new DefaultAddUrlToTabsetHandler(this.quasar!)

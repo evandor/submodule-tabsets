@@ -140,6 +140,16 @@
       </div>
     </div>
 
+    <!-- === RestTab === -->
+    <div v-if="'params' in props.tab && 'api' in props.tab">
+      <!--      <div v-for="p in props.tab.params">-->
+      <!--        <q-input type="text" v-model="p['val' as keyof object]" :label="p['name' as keyof object]" />-->
+      <!--      </div>-->
+      <div>
+        <q-btn label="Call API" type="submit" @click="callRestApi(props.tab)" size="xs" />
+      </div>
+    </div>
+
     <!-- comments -->
     <div
       class="row fit"
@@ -385,6 +395,7 @@ import { useNavigationService } from 'src/core/services/NavigationService'
 import { useUtils } from 'src/core/services/Utils'
 import ShortUrl from 'src/core/utils/ShortUrl.vue'
 import { useFeaturesStore } from 'src/features/stores/featuresStore'
+import { RestTab } from 'src/rest/models/RestTab'
 import TabService from 'src/services/TabService'
 import { Suggestion } from 'src/suggestions/domain/models/Suggestion'
 import { useSuggestionsStore } from 'src/suggestions/stores/suggestionsStore'
@@ -629,6 +640,12 @@ const placeholders = (): { url: string; name: string }[] => {
     })
   }
   return phs
+}
+
+const callRestApi = (tab: Tab) => {
+  const restTab = tab as RestTab
+  console.log(`about to call ${restTab.api} with ${JSON.stringify(restTab.params)}`)
+  useNavigationService().browserTabFor(chrome.runtime.getURL('www/index.html/#/mainpanel/restapi/' + restTab.id))
 }
 </script>
 

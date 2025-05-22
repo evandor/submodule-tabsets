@@ -12,13 +12,19 @@
         <q-item-section>{{ defaultAction.label }}</q-item-section>
       </q-item>
 
-      <template v-for="l in handler.actions(currentTabsetId, { tabset: props.tabset, level: props.level })">
+      <template
+        v-for="l in handler.actions(currentTabsetId, {
+          tabset: props.tabset,
+          level: props.level,
+          currentChromeTab: props.currentChromeTab,
+        })">
         <template v-if="'context' in l">
           <component
             :key="l.component.name"
             :is="l.component"
             :tabset="props.tabset"
             :folder="props.folder"
+            :currentChromeTab="props.currentChromeTab"
             :level="props.level"
             :context="'context' in l ? l.context : {}" />
         </template>
@@ -32,18 +38,11 @@
 
 <script lang="ts" setup>
 import { useQuasar } from 'quasar'
-import { FeatureIdent } from 'src/app/models/FeatureIdent'
-import { useCommandExecutor } from 'src/core/services/CommandExecutor'
-import { useFeaturesStore } from 'src/features/stores/featuresStore'
-import NavigationService from 'src/services/NavigationService'
 import { useActionHandlers } from 'src/tabsets/actionHandling/ActionHandlers'
 import { AddUrlToTabsetHandler } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { NoopAddUrlToTabsetHandler } from 'src/tabsets/actionHandling/handler/NoopAddUrlToTabsetHandler'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext' // const props = defineProps({
 import { ActionHandlerButtonClickedHolder } from 'src/tabsets/actionHandling/model/ActionHandlerButtonClickedHolder'
-import { UpdateTabColorCommand } from 'src/tabsets/commands/UpdateTabColor'
-import EditUrlDialog from 'src/tabsets/dialogues/EditUrlDialog.vue'
-import { PlaceholdersType } from 'src/tabsets/models/Placeholders'
 import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset } from 'src/tabsets/models/Tabset'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
@@ -76,6 +75,7 @@ const { getHandler } = useActionHandlers($q)
 
 watchEffect(() => {
   handler.value = getHandler(props.currentChromeTab.url, props.folder)
+  console.log('handler!!!', handler.value)
   defaultAction.value = handler.value.defaultAction()
 })
 
@@ -95,39 +95,5 @@ async function tabToUse(tab: Tab) {
     }
   }
   return useTab
-}
-
-const showTabDetails = async (tab: Tab) => {
-  const useTab: Tab = await tabToUse(tab)
-  console.log('showing tab details for', useTab)
-  router.push('/sidepanel/tab/' + useTab.id)
-}
-
-const showTabDetailsMenuEntry = (tab: Tab) => useFeaturesStore().hasFeature(FeatureIdent.DEV_MODE) && !fullpageView
-
-const deleteTabLabel = (tab: Tab) =>
-  tab.placeholders && tab.placeholders.type === PlaceholdersType.URL_SUBSTITUTION ? 'Delete all' : 'Delete Tab'
-
-const editURL = async (tab: Tab) => {
-  let useTab = await tabToUse(tab)
-  $q.dialog({
-    component: EditUrlDialog,
-    componentProps: {
-      tab: useTab,
-    },
-  })
-}
-
-const assignTab = async (tab: Tab) =>
-  await NavigationService.openOrCreateTab([chrome.runtime.getURL('/www/index.html#/mainpanel/tabAssignment/' + tab.id)])
-
-const setColor = (tab: Tab) => useCommandExecutor().execute(new UpdateTabColorCommand(tab, theColor.value))
-
-const hasSubfolder = () => {
-  if (!props.tabset) {
-    return false
-  }
-  const activeFolder = useTabsetsStore().getActiveFolder(props.tabset)
-  return activeFolder ? activeFolder.folders.length > 0 : false
 }
 </script>
