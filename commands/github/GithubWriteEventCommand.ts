@@ -21,6 +21,7 @@ export class TabsetEvent {
     this.name = this.name.trim()
     this.clazz = 'tabset'
   }
+
   format() {
     let line = `${this.timestamp}|`
     line += `${this.clazz}|${this.event}|`
@@ -49,6 +50,7 @@ export class TabEvent {
     this.name = this.name.trim()
     this.clazz = 'tab'
   }
+
   format() {
     return `${this.timestamp}|${this.clazz}|${this.event}|${this.tabsetId}|${this.tabId}|${this.name.replaceAll('|', '').replace(/\s/g, ' ').trim()}|${this.url}|${this.favIconUrl}\n`
   }
@@ -68,6 +70,7 @@ export class SpaceEvent {
     this.name = this.name.trim()
     this.clazz = 'space'
   }
+
   format() {
     return `${this.timestamp}|${this.clazz}|${this.event}|${this.spaceId}|${this.tabsetId ? this.tabsetId : ''}|${this.name.replaceAll('|', '').replace(/\s/g, ' ').trim()}\n`
   }
@@ -102,10 +105,10 @@ export class GithubWriteEventCommand extends GithubCommands<string> {
   async execute(): Promise<ExecutionResult<string>> {
     const githubPath = 'events'
     const useData = this.event.format()
-    console.log('useData', useData, this.event)
     if (!LocalStorage.getItem(GITHUB_AUTO_SYNC) || LocalStorage.getItem(GITHUB_AUTO_SYNC_READONLY)) {
       return Promise.resolve(new ExecutionResult('done', 'not active'))
     }
+    console.log('useData', useData, this.event)
     try {
       const events = await this.githubGetContentRequest(githubPath)
       console.log('events', events.status)

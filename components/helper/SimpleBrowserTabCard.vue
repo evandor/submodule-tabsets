@@ -9,7 +9,7 @@
       :class="TabService.isCurrentTab(toTab(chromeTab)) ? 'text-bold' : ''"
       @click="useNavigationService().browserTabFor(chromeTab.url!)">
       {{ chromeTab?.title }}
-      <q-tooltip class="tooltip" v-if="useFeaturesStore().hasFeature(FeatureIdent.DEV_MODE)">
+      <q-tooltip class="tooltip" v-if="useSettingsStore().has('DEV_MODE')">
         {{ chromeTab.id }} / {{ chromeTab.url }} / {{ chromeTab.index }}
       </q-tooltip>
       <q-tooltip class="tooltip" v-else>
@@ -41,10 +41,9 @@
 
 <script setup lang="ts">
 import { uid } from 'quasar'
-import { FeatureIdent } from 'src/app/models/FeatureIdent'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import { useNavigationService } from 'src/core/services/NavigationService'
-import { useFeaturesStore } from 'src/features/stores/featuresStore'
+import { useSettingsStore } from 'src/core/stores/settingsStore'
 import NavigationService from 'src/services/NavigationService'
 import TabService from 'src/services/TabService'
 import { CreateTabFromOpenTabsCommand } from 'src/tabsets/commands/CreateTabFromOpenTabs'

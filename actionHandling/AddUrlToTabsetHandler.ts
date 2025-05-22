@@ -26,6 +26,7 @@ export type ClickedHandler = (
 
 export type ComponentContext = {
   label?: string
+  chromeTab?: chrome.tabs.Tab
 }
 
 export type ComponentWithContext = {
@@ -34,9 +35,9 @@ export type ComponentWithContext = {
 }
 
 export interface AddUrlToTabsetHandler {
-  urlMatcher: () => RegExp
+  tabMatcher(url: string, content: string, metas: object): boolean
 
-  contentMatcher: (content: string) => boolean
+  injectScript: () => Promise<void>
 
   defaultAction: () => ActionContext | undefined
 

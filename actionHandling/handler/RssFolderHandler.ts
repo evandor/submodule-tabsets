@@ -24,12 +24,12 @@ const { sanitizeAsPlainText } = useUtils()
 export class RssFolderHandler implements AddUrlToTabsetHandler {
   constructor(public $q: QVueGlobals | undefined) {}
 
-  urlMatcher(): RegExp {
-    return /.*\.rss$/
+  tabMatcher(url: string, content: string, metas: object): boolean {
+    return url.match(/.*\.rss$/) !== null
   }
 
-  contentMatcher(content: string) {
-    return true
+  injectScript(): Promise<void> {
+    return Promise.resolve()
   }
 
   defaultAction(): ActionContext {

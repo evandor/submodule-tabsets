@@ -14,12 +14,12 @@ export class FileProtocolUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandl
   chromePattern = /addRow\("([^"]*)","([^"]*)",([^,]*),([^,]*),"([^"]*)",([^,]*),"([^"])*"\)/gm
 
   // disabled, see https://issues.chromium.org/issues/40240444
-  urlMatcher(): RegExp {
-    return /^fileXXX:\/\/.*\/$/
+  tabMatcher(url: string, content: string, metas: object): boolean {
+    return url.match(/^fileXXX:\/\/.*\/$/) !== null
   }
 
-  contentMatcher(content: string): boolean {
-    return false
+  injectScript(): Promise<void> {
+    return Promise.resolve()
   }
 
   defaultAction(): ActionContext {

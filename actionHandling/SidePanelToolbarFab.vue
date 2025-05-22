@@ -1,8 +1,13 @@
 <template>
   <!-- SpecialUrlAddToTabsetComponent -->
-  <!--  {{ handler.actions(currentTabsetId, { tabset: props.tabset, level: props.level }) }}-->
   <template
-    v-if="handler.actions(currentTabsetId, { tabset: props.tabset, level: 'root' }).length == 0 && defaultAction">
+    v-if="
+      handler.actions(currentTabsetId, {
+        tabset: props.tabset,
+        level: 'root',
+        currentChromeTab: props.currentChromeTab,
+      }).length == 0 && defaultAction
+    ">
     <q-btn
       padding="xs"
       fab-mini
@@ -17,7 +22,7 @@
       <!--      <div>{{ defaultAction.label }}</div>-->
       <!--                  <q-icon right class="q-ma-none q-pa-none" size="2em" name="o_south" />-->
     </q-btn>
-    <q-tooltip class="tooltip-small" v-if="alreadyInTabset"> Already in current tabset</q-tooltip>
+    <q-tooltip class="tooltip-small" v-if="alreadyInTabset">Already in current tabset</q-tooltip>
     <q-tooltip class="tooltip-small" v-else-if="containedInTsCount > 0">
       {{ tooltipAlreadyInOtherTabsets(props.tabset!.name) }}
     </q-tooltip>
@@ -28,21 +33,18 @@
 
   <!-- SpecialUrlAddToTabsetComponent handlerDefaultAction -->
   <template v-else-if="showExtraMenuItems()">
-    <!-- :disable="!handler.actions()[0]!.active(props.currentChromeTab)"-->
     <q-btn
-      fab-mini
-      glossy
       padding="xs"
-      rounded
+      fab-mini
+      unelevated
       @click.stop="emits('buttonClicked', new ActionHandlerButtonClickedHolder(handler, defaultAction))"
-      class="q-ma-none q-pa-none"
+      class="q-ma-none q-px-sm q-py-none"
       :icon="defaultAction?.icon"
       :class="{ shakeWithColor: animateAddtabButton, 'cursor-pointer': !alreadyInTabset }"
       :color="alreadyInTabset ? 'grey-5' : containedInTsCount > 0 ? 'primary' : 'warning'"
+      size="12px"
       data-testid="saveInTabsetBtn">
-      <!--      <div>{{ defaultAction.label }}</div>-->
-      <!--                  <q-icon right class="q-ma-none q-pa-none" size="2em" name="o_south" />-->
-      <q-tooltip class="tooltip-small" v-if="alreadyInTabset"> Already in current tabset</q-tooltip>
+      <q-tooltip class="tooltip-small" v-if="alreadyInTabset">Already in current tabset {{ defaultAction }}</q-tooltip>
       <q-tooltip class="tooltip-small" v-else-if="containedInTsCount > 0">
         {{ tooltipAlreadyInOtherTabsets(props.tabset!.name) }}
       </q-tooltip>
@@ -56,13 +58,19 @@
         <q-btn flat icon="more_vert" text-color="primary" class="cursor-pointer q-ma-none q-pa-none" size="md" />
         <q-menu :offset="[0, 0]" @click.stop="">
           <q-list dense style="min-width: 200px">
-            <template v-for="l in handler.actions(currentTabsetId, { tabset: props.tabset, level: 'root' })">
+            <template
+              v-for="l in handler.actions(currentTabsetId, {
+                tabset: props.tabset,
+                level: 'root',
+                currentChromeTab: props.currentChromeTab,
+              })">
               <template v-if="'context' in l">
                 <component
                   :key="l.component.name"
                   :is="l.component"
                   :tabset="props.tabset"
                   :folder="props.folder"
+                  :currentChromeTab="props.currentChromeTab"
                   :level="'root'"
                   :context="'context' in l ? l.context : {}" />
               </template>
@@ -84,9 +92,7 @@ import { AddUrlToTabsetHandler } from 'src/tabsets/actionHandling/AddUrlToTabset
 import { NoopAddUrlToTabsetHandler } from 'src/tabsets/actionHandling/handler/NoopAddUrlToTabsetHandler'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
 import { ActionHandlerButtonClickedHolder } from 'src/tabsets/actionHandling/model/ActionHandlerButtonClickedHolder'
-import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
-import { useUiStore } from 'src/ui/stores/uiStore'
 import { ref, watchEffect } from 'vue'
 import { Tabset } from '../models/Tabset'
 
@@ -118,29 +124,33 @@ watchEffect(() => {
 
 const showExtraMenuItems = () => {
   const res: boolean =
-    handler.value.actions(currentTabsetId.value, { tabset: props.tabset, level: 'root' }).length > 0 &&
-    defaultAction.value !== undefined
+    handler.value.actions(currentTabsetId.value, {
+      tabset: props.tabset,
+      level: 'root',
+      currentChromeTab: props.currentChromeTab,
+    }).length > 0 && defaultAction.value !== undefined
   emits('extraSpaceNeeded', res)
   return res
 }
 
 watchEffect(() => {
+  //console.log('defaultAction!!', props.currentChromeTab.url, props.folder)
   handler.value = getHandler(props.currentChromeTab.url, props.folder)
   defaultAction.value = handler.value.defaultAction()
   showExtraMenuItems()
 })
 
-watchEffect(() => {
-  containedInTsCount.value = useTabsetService().tabsetsFor(props.currentChromeTab.url!).length
-})
-
-watchEffect(() => {
-  animateAddtabButton.value = useUiStore().animateAddtabButton
-})
-
-watchEffect(() => {
-  alreadyInTabset.value = useTabsetService().urlExistsInCurrentTabset(props.currentChromeTab.url)
-})
+// watchEffect(() => {
+//   containedInTsCount.value = useTabsetService().tabsetsFor(props.currentChromeTab.url!).length
+// })
+//
+// watchEffect(() => {
+//   animateAddtabButton.value = useUiStore().animateAddtabButton
+// })
+//
+// watchEffect(() => {
+//   alreadyInTabset.value = useTabsetService().urlExistsInCurrentTabset(props.currentChromeTab.url)
+// })
 
 const activeFolderNameFor = (ts: Tabset, activeFolder: string) => {
   const folder = useTabsetsStore().getActiveFolder(ts, activeFolder)

@@ -1,8 +1,13 @@
 import _ from 'lodash'
-import { uid } from 'quasar'
+import { LocalStorage, uid } from 'quasar'
 import AppEventDispatcher from 'src/app/AppEventDispatcher'
 import ChromeApi from 'src/app/BrowserApi'
-import { STRIP_CHARS_IN_COLOR_INPUT, STRIP_CHARS_IN_USER_INPUT } from 'src/boot/constants'
+import {
+  GITHUB_AUTO_SYNC,
+  GITHUB_AUTO_SYNC_READONLY,
+  STRIP_CHARS_IN_COLOR_INPUT,
+  STRIP_CHARS_IN_USER_INPUT,
+} from 'src/boot/constants'
 import { ContentItem } from 'src/content/models/ContentItem'
 import { useContentService } from 'src/content/services/ContentService'
 import { TabPredicate } from 'src/core/domain/Types'
@@ -215,10 +220,11 @@ export function useTabsetService() {
       console.log('setting next key to', nextKey)
       selectTabset(nextKey)
 
-      useCommandExecutor()
-        .execute(new GithubWriteEventCommand(new TabsetEvent('deleted', tabsetId, undefined, '', [])))
-        .catch((err) => console.warn(err))
-
+      if (LocalStorage.getItem(GITHUB_AUTO_SYNC) && !LocalStorage.getItem(GITHUB_AUTO_SYNC_READONLY)) {
+        useCommandExecutor()
+          .execute(new GithubWriteEventCommand(new TabsetEvent('deleted', tabsetId, undefined, '', [])))
+          .catch((err) => console.warn(err))
+      }
       return Promise.resolve('ok')
     }
     return Promise.reject('could not get tabset for id')
@@ -445,13 +451,15 @@ export function useTabsetService() {
     handleTags(ts, tab)
     addToTabsetWithIndex(ts, tab, useIndex)
 
-    useCommandExecutor()
-      .execute(
-        new GithubWriteEventCommand(
-          new TabEvent('added', ts.id, tab.id, tab.name || tab.title || '', tab.url, tab.favIconUrl),
-        ),
-      )
-      .catch((err) => console.warn(err))
+    if (LocalStorage.getItem(GITHUB_AUTO_SYNC) && !LocalStorage.getItem(GITHUB_AUTO_SYNC_READONLY)) {
+      useCommandExecutor()
+        .execute(
+          new GithubWriteEventCommand(
+            new TabEvent('added', ts.id, tab.id, tab.name || tab.title || '', tab.url, tab.favIconUrl),
+          ),
+        )
+        .catch((err) => console.warn(err))
+    }
 
     return Promise.resolve(ts)
   }

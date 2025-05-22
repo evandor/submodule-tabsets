@@ -1,4 +1,5 @@
 import { DialogChainObject, QVueGlobals, uid } from 'quasar'
+import { useTabsStore } from 'src/bookmarks/stores/tabsStore'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import {
@@ -22,15 +23,54 @@ import { Tabset } from 'src/tabsets/models/Tabset'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { Component } from 'vue'
 
+const urlMatcher = /^https:\/\/excalidraw\.com\/$/
+
 export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   constructor(public $q: QVueGlobals | undefined) {}
 
-  urlMatcher(): RegExp {
-    return /^https:\/\/excalidraw\.com\/$/
+  tabMatcher(url: string, content: string, metas: object): boolean {
+    return url.match(urlMatcher) !== null || 'https://excalidraw.com' === metas['og:url' as keyof object]
   }
 
-  contentMatcher(content: string) {
-    return false
+  async injectScript(): Promise<void> {
+    const currentBrowserTab = useTabsStore().currentChromeTab
+    if (!currentBrowserTab || !currentBrowserTab.id) {
+      return Promise.reject('no current browser tab found')
+    }
+    console.log('hier---', currentBrowserTab.id)
+    await chrome.scripting
+      .executeScript({
+        target: { tabId: currentBrowserTab.id },
+        func: (timestamp: number) => {
+          const newDataState = localStorage.getItem('excalidraw')
+          console.log('getting  dataState from localstorage', timestamp)
+          addEventListener('storage', (event) => {
+            console.log('event', event)
+          })
+          // setInterval(() => {
+          //   console.log('hier')
+          // }, 10000)
+          // if (newDataState > timestamp - 10000) {
+          //   console.log('dirty!!!')
+          // }
+          // //localStorage.setItem("tabsets_name", val)
+          // if (tabId.trim() !== '') {
+          //   localStorage.setItem('tabsets_tabId', tabId)
+          // }
+          // localStorage.setItem('tabsets_ts', '' + new Date().getTime())
+          // return {
+          //   excalidraw: localStorage.getItem('excalidraw'),
+          //   excalidrawState: localStorage.getItem('excalidraw-state'),
+          //   versionFiles: localStorage.getItem('version-files'),
+          //   versionDataState: localStorage.getItem('version-dataState'),
+          // }
+        },
+        args: [new Date().getTime()],
+      })
+      .then((results) => {
+        // console.log('results', results)
+      })
+    return Promise.resolve()
   }
 
   defaultAction(): ActionContext | undefined {
@@ -38,17 +78,19 @@ export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
     if (tabset) {
       var actions = tabset.tabs
         .filter((t: Tab) => t.url !== undefined)
-        .filter((t: Tab) => t.url!.match(this.urlMatcher()))
+        .filter((t: Tab) => t.url!.match(urlMatcher))
         .map((t: Tab) => {
-          return new ActionContext(t.title || 'undefined').onClicked(this.updateInTabset)
+          return new ActionContext(t.name || t.title || 'undefined', 'save').onClicked(this.updateInTabset)
         })
       const res =
         actions.length > 0
           ? actions
-              .concat([new ActionContext('Save as new file').withDialog(this.newFileDialog, this.$q!).onOk(this.onOk)])
+              .concat([
+                new ActionContext('Save as new file', 'save').withDialog(this.newFileDialog, this.$q!).onOk(this.onOk),
+              ])
               .concat([new ActionContext('Clear canvas')])
           : actions.concat([
-              new ActionContext('Add Excalidraw').withDialog(this.newFileDialog, this.$q!).onOk(this.onOk),
+              new ActionContext('Add Excalidraw', 'add').withDialog(this.newFileDialog, this.$q!).onOk(this.onOk),
             ])
       return res[0]
     }
@@ -60,24 +102,17 @@ export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
     if (tabset) {
       const actions: (ComponentWithContext | Component)[] = tabset.tabs
         .filter((t: Tab) => t.url !== undefined)
-        .filter((t: Tab) => t.url!.match(this.urlMatcher()))
+        .filter((t: Tab) => t.url!.match(urlMatcher))
         .map((t: Tab) => {
           return { component: ExcalidrawUpdateFileAction, context: { label: t.title || 'undef' } }
         })
       const list: Component[] =
         actions.length > 0
-          ? actions
-              // .concat([new ActionContext('Save as new file').withDialog(this.newFileDialog, this.$q!).onOk(this.onOk)])
-              .concat([
-                ExcalidrawSaveAsFileAction,
-                { component: ExcalidrawUpdateFileAction, context: { label: 'Clear Canvas' } },
-              ])
-          : //.concat([new ActionContext('Clear canvas')])
-            actions.concat([
-              // new ActionContext('Add Excalidraw').withDialog(this.newFileDialog, this.$q!).onOk(this.onOk),
-              { component: ExcalidrawUpdateFileAction, context: { label: 'Add Excalidraw' } },
+          ? actions.concat([
+              ExcalidrawSaveAsFileAction,
+              { component: ExcalidrawUpdateFileAction, context: { label: 'Clear Canvas' } },
             ])
-      // console.log('list', list)
+          : actions.concat([{ component: ExcalidrawUpdateFileAction, context: { label: 'Update Excalidraw' } }])
       return list.concat(DefaultActions.getDefaultActions(tabset, actionProps))
     } else {
       return [EditTabsetAction, CreateSubfolderAction, OpenAllInMenuAction, DeleteTabsetAction]
@@ -90,12 +125,13 @@ export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
     folder?: Tabset,
     additionalData?: AddUrlToTabsetHandlerAdditionalData,
   ): Promise<ExecutionResult<any>> {
-    console.log('saving...', chromeTab.id, additionalData)
+    // console.log('saving...', chromeTab)
+    // console.log('saving...', ts)
+    // console.log('saving...', folder)
+    // console.log('saving...', additionalData)
     try {
       const filename: string | undefined =
-        additionalData && additionalData.dialog
-          ? (additionalData.dialog['filename' as keyof object] as unknown as string)
-          : undefined
+        additionalData && additionalData.data ? additionalData.data['filename'] : undefined
       if (!filename) {
         throw new Error('filename is missing')
       }
@@ -133,13 +169,15 @@ export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   ): Promise<ExecutionResult<any>> {
     console.log('updating...', chromeTab.id, additionalData)
     try {
-      const filename = additionalData!.dialog as unknown as string
-      if (!filename) {
-        throw new Error('filename is missing')
-      }
-      const returned = await ExcalidrawAddUrlToTabsetHandler.queryBrowserTab(chromeTab, '', filename)
+      // const filename = additionalData!.data!['filename' as keyof object] as unknown as string
+      // if (!filename) {
+      //   throw new Error('filename is missing')
+      // }
+      const returned = await ExcalidrawAddUrlToTabsetHandler.queryBrowserTab(chromeTab, '', 'filename')
+      console.log('returned', returned, this)
       if (returned.length > 0) {
-        const tabCandidates = ts.tabs.filter((t: Tab) => t.url!.match(this.urlMatcher()) && t.title === filename)
+        // const tabCandidates = ts.tabs.filter((t: Tab) => t.url!.match(this.urlMatcher()) && t.title === filename)
+        const tabCandidates = ts.tabs.filter((t: Tab) => t.url!.match(urlMatcher)) //&& t.title === filename)
         const firstFrameReturned = returned.at(0)
         if (firstFrameReturned && firstFrameReturned.result && tabCandidates.length > 0) {
           tabCandidates[0]!.storage = new ExcalidrawStorage(
@@ -215,7 +253,7 @@ export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
 
   async newFileDialog($q: QVueGlobals, filename: string = ''): Promise<DialogChainObject> {
     return $q.dialog({
-      title: 'Save as Excalidraw File',
+      title: 'Save as new Excalidraw File',
       message: 'Please Provide a name (min 3 characters)',
       prompt: { model: filename, isValid: (val: string) => val.length > 2, type: 'text' },
       cancel: true,
@@ -224,7 +262,7 @@ export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   }
 
   onOk = (data: string[]) => {
-    //console.log('data!', data)
-    return this.clicked // handler could depend on data
+    console.log('data!!', data, typeof data)
+    return this.clicked // handled by ActionHandlers.handleClick
   }
 }

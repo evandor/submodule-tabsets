@@ -24,10 +24,7 @@
       </q-item>
 
       <template
-        v-if="
-          useFeaturesStore().hasFeature(FeatureIdent.DEV_MODE) &&
-          props.tabset?.type.toString() !== TabsetType.DYNAMIC.toString()
-        ">
+        v-if="useSettingsStore().has('DEV_MODE') && props.tabset?.type.toString() !== TabsetType.DYNAMIC.toString()">
         <q-item clickable v-close-popup @click.stop="addCommentDialog()">
           <q-item-section style="padding-right: 0; min-width: 25px; max-width: 25px">
             <q-icon size="xs" name="o_note" color="info" />
@@ -137,6 +134,7 @@ import PanelTabListContextMenuHook from 'src/app/hooks/tabsets/PanelTabListConte
 import { FeatureIdent } from 'src/app/models/FeatureIdent'
 import ColorSelector from 'src/core/dialog/ColorSelector.vue'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
+import { useSettingsStore } from 'src/core/stores/settingsStore'
 import { useFeaturesStore } from 'src/features/stores/featuresStore'
 import NavigationService from 'src/services/NavigationService'
 import { DeleteTabCommand } from 'src/tabsets/commands/DeleteTabCommand'
@@ -197,7 +195,7 @@ const showTabDetails = async (tab: Tab) => {
   router.push('/sidepanel/tab/' + useTab.id)
 }
 
-const showTabDetailsMenuEntry = (tab: Tab) => useFeaturesStore().hasFeature(FeatureIdent.DEV_MODE) && !fullpageView
+const showTabDetailsMenuEntry = (tab: Tab) => useSettingsStore().has('DEV_MODE') && !fullpageView
 
 const deleteTabLabel = (tab: Tab) =>
   tab.placeholders && tab.placeholders.type === PlaceholdersType.URL_SUBSTITUTION ? 'Delete all' : 'Delete Tab'

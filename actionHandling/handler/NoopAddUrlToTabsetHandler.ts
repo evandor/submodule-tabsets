@@ -8,12 +8,12 @@ import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset } from 'src/tabsets/models/Tabset'
 
 export class NoopAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
-  urlMatcher() {
-    return /.*/
+  tabMatcher(url: string, content: string, metas: object): boolean {
+    return true
   }
 
-  contentMatcher(content: string) {
-    return true
+  injectScript(): Promise<void> {
+    return Promise.resolve()
   }
 
   defaultAction(): ActionContext {

@@ -20,12 +20,12 @@ import { Component } from 'vue'
 export class DefaultAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   constructor(public $q: QVueGlobals) {}
 
-  urlMatcher(): RegExp {
-    return /.*/
+  tabMatcher(url: string, content: string, metas: object): boolean {
+    return true
   }
 
-  contentMatcher(content: string) {
-    return true
+  injectScript(): Promise<void> {
+    return Promise.resolve()
   }
 
   defaultAction(): ActionContext {

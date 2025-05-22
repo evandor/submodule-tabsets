@@ -37,7 +37,7 @@ export class DefaultActions {
 
     //    actions.push(OpenAllInMenuAction)
 
-    // if (useFeaturesStore().hasFeature(FeatureIdent.DEV_MODE)) {
+    // if (useSettingsStore().has('DEV_MODE')) {
     //   actions.push(ExportTabsetAction)
     // }
 

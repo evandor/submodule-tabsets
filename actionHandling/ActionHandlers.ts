@@ -14,11 +14,11 @@ export function useActionHandlers($q: QVueGlobals | undefined) {
     if (folder && folder.type === TabsetType.RSS_FOLDER) {
       return new RssFolderHandler($q)
     }
+    const metas = useContentStore().getCurrentTabMetas
     const content = useContentStore().getCurrentTabContent
     const handler = url
-      ? actionHandlerRepo.handlerFor(url, content || '', folder)
+      ? actionHandlerRepo.handlerFor(url, content || '', metas || {}, folder)
       : actionHandlerRepo.defaultAddUrlToTabsetHandler
-    // console.log('getting url handler for ', url, handler)
     return handler
   }
 
@@ -44,75 +44,18 @@ export function useActionHandlers($q: QVueGlobals | undefined) {
       const r = await args.actionContext.dialog.apply(null, [args.actionContext.$q!])
 
       r.onOk((payload: any) => {
-        console.log('payload', payload)
+        console.log('-payload-', payload)
         const onOkHandler: (payload: any) => ClickedHandler = args.actionContext!.ok!
         const h = onOkHandler.apply(null, [payload])
-        h.apply(null, [chromeTab, tabset, folder, { action: args.actionContext!, dialog: payload }])
+        h.apply(null, [
+          chromeTab,
+          tabset,
+          folder,
+          { action: args.actionContext!, data: { filename: payload }, dialog: payload },
+        ])
       })
       return
     }
-
-    //console.log('handleClick: ', tabset.id, handler, args.actionContext?.identifier)
-    // switch (args.actionContext?.identifier) {
-    // case ButtonActions.AddTab:
-    //   await handler.clicked(chromeTab, tabset, folder, { action: args.actionContext })
-    //   break
-    // case ButtonActions.OpenTab:
-    //   await handler.clicked(chromeTab, tabset, folder, { action: args.actionContext })
-    //   break
-    // case ButtonActions.AddTabWithDynamicFolder:
-    //   handler.withDialog(args.actionContext?.identifier)?.onOk((data: string[]) => {
-    //     console.log('data', data)
-    //     handler.clicked(chromeTab, tabset, undefined, {
-    //       data: { useForLinks: data.indexOf('useForLinks') >= 0 },
-    //     })
-    //   })
-    //   break
-    // case ButtonActions.NewFile:
-    //   handler.withDialog(args.actionContext?.identifier)?.onOk((filename: string) => {
-    //     handler.clicked(chromeTab, tabset, undefined, { data: { filename } })
-    //   })
-    //   break
-    // case ButtonActions.Save:
-    //   await handler.updateInTabset(chromeTab, tabset, args.additionalData)
-    //   break
-    // case ButtonActions.SaveAs:
-    //   handler.withDialog(args.actionContext?.identifier)?.onOk((filename: string) => {
-    //     handler.clicked(chromeTab, tabset, undefined, { data: { filename } })
-    //   })
-    //   break
-    // case ButtonActions.DynamicLoad:
-    //   console.log(`loading dynamic data for tabset/folder ${tabset.id}/${args['folder' as keyof object]} `)
-    //   await useCommandExecutor().execute(new LoadDynamicTabsCommand(tabset, args['folder' as keyof object]))
-    //   break
-    // case ButtonActions.AddRssFeed:
-    //   console.log('===>', args.actionContext)
-    //   handler.withDialog(args.actionContext?.identifier)?.onOk((data: { b: boolean; s: string }) => {
-    //     console.log('in', data)
-    //     handler.clicked(chromeTab, tabset, undefined, { data: { more: data } })
-    //   })
-    //   break
-    // case ButtonActions.LoadRssFeed:
-    //   await handler.clicked(chromeTab, tabset, folder)
-    //   break
-    // case ButtonActions.ClearCanvas:
-    //   await handler.clicked(chromeTab, tabset, folder, {})
-    //   break;
-    // case ButtonActions.ImportChromeBookmarks:
-    //   console.log('===>', args.actionContext)
-    //   handler.withDialog(args.actionContext?.identifier)?.onOk((input: string[]) => {
-    //     console.log('data', input)
-    //     handler.clicked(chromeTab, tabset, undefined, {
-    //       action: new ActionContext('Import', ButtonActions.ImportChromeBookmarks),
-    //       data: {
-    //         recursive: input.indexOf('recursive') >= 0,
-    //       },
-    //     })
-    //   })
-    // break
-    // default:
-    //   console.log('no action defined for ', args.actionContext?.identifier)
-    // }
   }
 
   return {

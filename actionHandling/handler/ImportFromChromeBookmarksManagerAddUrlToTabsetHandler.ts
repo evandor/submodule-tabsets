@@ -7,11 +7,14 @@ import {
   ClickedHandler,
 } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
+import ImportChromeBookmarksAction from 'src/tabsets/actions/bookmarks/ImportChromeBookmarksAction.vue'
+import { ActionProps } from 'src/tabsets/actions/models/ActionProps'
 import { CreateTabsetFromBookmarksRecursive } from 'src/tabsets/commands/CreateTabsetFromBookmarksRecursive'
 import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset } from 'src/tabsets/models/Tabset'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+import { Component } from 'vue'
 
 function getBmFolderId(chromeTab: chrome.tabs.Tab) {
   return chromeTab.url?.split('?')[1]?.split('=')[1] || undefined
@@ -20,46 +23,52 @@ function getBmFolderId(chromeTab: chrome.tabs.Tab) {
 export class ImportFromChromeBookmarksManagerAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   constructor(public $q: QVueGlobals) {}
 
-  urlMatcher(): RegExp {
-    return /^chrome:\/\/bookmarks.*$/
+  tabMatcher(url: string, content: string, metas: object): boolean {
+    return url.match(/^chrome:\/\/bookmarks.*$/) !== null
   }
 
-  contentMatcher(content: string) {
-    return false
+  injectScript(): Promise<void> {
+    return Promise.resolve()
   }
 
   defaultAction(): ActionContext {
-    return null as unknown as ActionContext
+    return new ActionContext('hi', 'save')
   }
 
-  actions(): ActionContext[] {
+  actions(currentTabsetId: string | undefined, actionProps: ActionProps): Component[] {
+    // const folderId = getBmFolderId(t)
+    console.log('actions', actionProps)
     return [
-      // {
-      //   label: 'Import...',
-      //   identifier: ButtonActions.ImportChromeBookmarks,
-      //   active: (t: chrome.tabs.Tab) => {
-      //     const folderId = getBmFolderId(t)
-      //     return !folderId ? false : (useTabsetsStore().getCurrentTabset?.bookmarkId || '') !== folderId
-      //   },
-      // },
-      new ActionContext('Import...', undefined, undefined, {}, (t: chrome.tabs.Tab) => {
-        const folderId = getBmFolderId(t)
-        return !folderId ? false : (useTabsetsStore().getCurrentTabset?.bookmarkId || '') !== folderId
-      })
-        .withDialog(this.importChromeBookmarksDialog, this.$q)
-        .onOk(this.onOk),
-      // {
-      //   label: 'Add Tab',
-      //   identifier: ButtonActions.AddTab,
-      //   active: (t: chrome.tabs.Tab) => !useTabsetService().urlExistsInCurrentTabset(t.url),
-      // },
-      new ActionContext(
-        'Add Tab',
-        undefined,
-        undefined,
-        {},
-        (t: chrome.tabs.Tab) => !useTabsetService().urlExistsInCurrentTabset(t.url),
-      ).onClicked(this.clicked),
+      {
+        component: ImportChromeBookmarksAction,
+        context: { label: 'Clear Canvas!', chromeTab: actionProps.currentChromeTab },
+      },
+      // // {
+      // //   label: 'Import...',
+      // //   identifier: ButtonActions.ImportChromeBookmarks,
+      // //   active: (t: chrome.tabs.Tab) => {
+      // //     const folderId = getBmFolderId(t)
+      // //     return !folderId ? false : (useTabsetsStore().getCurrentTabset?.bookmarkId || '') !== folderId
+      // //   },
+      // // },
+      // new ActionContext('Import...', undefined, undefined, {}, (t: chrome.tabs.Tab) => {
+      //   const folderId = getBmFolderId(t)
+      //   return !folderId ? false : (useTabsetsStore().getCurrentTabset?.bookmarkId || '') !== folderId
+      // })
+      //   .withDialog(this.importChromeBookmarksDialog, this.$q)
+      //   .onOk(this.onOk),
+      // // {
+      // //   label: 'Add Tab',
+      // //   identifier: ButtonActions.AddTab,
+      // //   active: (t: chrome.tabs.Tab) => !useTabsetService().urlExistsInCurrentTabset(t.url),
+      // // },
+      // new ActionContext(
+      //   'Add Tab',
+      //   undefined,
+      //   undefined,
+      //   {},
+      //   (t: chrome.tabs.Tab) => !useTabsetService().urlExistsInCurrentTabset(t.url),
+      // ).onClicked(this.clicked),
     ]
   }
 
