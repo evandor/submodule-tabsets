@@ -7,8 +7,8 @@ import { Tabset } from 'src/tabsets/models/Tabset'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useUiStore } from 'src/ui/stores/uiStore'
 
-async function createTabsetFrom(name: string, bookmarkId: string, recurse: boolean) {
-  console.log('creating recursively', name, bookmarkId)
+async function createTabsetFrom(name: string, bookmarkId: string, recurse: boolean): Promise<Tabset> {
+  console.log('creating recursively', name, bookmarkId, recurse)
   const subTree: chrome.bookmarks.BookmarkTreeNode[] = await BrowserApi.childrenFor(bookmarkId)
   const folders = _.filter(subTree, (e: chrome.bookmarks.BookmarkTreeNode) => e.url === undefined)
   const nodes = _.filter(subTree, (e: chrome.bookmarks.BookmarkTreeNode) => e.url !== undefined)

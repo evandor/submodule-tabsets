@@ -3,6 +3,7 @@ import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import {
   AddUrlToTabsetHandler,
   AddUrlToTabsetHandlerAdditionalData,
+  ComponentWithContext,
 } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
 import { Tab } from 'src/tabsets/models/Tab'
@@ -26,7 +27,7 @@ export class FileProtocolUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandl
     return null as unknown as ActionContext
   }
 
-  actions(): ActionContext[] {
+  actions(): ComponentWithContext[] {
     // new ActionContext('Save Local Directory', ButtonActions.Save)
     return []
   }

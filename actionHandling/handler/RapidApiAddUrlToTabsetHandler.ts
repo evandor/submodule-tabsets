@@ -9,6 +9,7 @@ import {
   AddUrlToTabsetHandler,
   AddUrlToTabsetHandlerAdditionalData,
   ClickedHandler,
+  ComponentWithContext,
 } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { DefaultActions } from 'src/tabsets/actionHandling/handler/DefaultActions'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
@@ -20,7 +21,6 @@ import { Tabset } from 'src/tabsets/models/Tabset'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { useTabsStore2 } from 'src/tabsets/stores/tabsStore2'
-import { Component } from 'vue'
 
 export class RapidApiAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   constructor(public $q: QVueGlobals) {}
@@ -39,7 +39,7 @@ export class RapidApiAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
       .onOk(this.onOk)
   }
 
-  actions(currentTabsetId: string | undefined, actionProps: ActionProps): Component[] {
+  actions(currentTabsetId: string | undefined, actionProps: ActionProps): ComponentWithContext[] {
     const url = useContentStore().getCurrentTabUrl
     const currentTabset = useTabsetsStore().getCurrentTabset
 

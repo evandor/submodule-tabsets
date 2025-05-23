@@ -39,13 +39,13 @@ export interface AddUrlToTabsetHandler {
 
   injectScript: () => Promise<void>
 
-  defaultAction: () => ActionContext | undefined
+  //defaultAction: () => ActionContext | undefined
 
-  actions: (currentTabsetId: string | undefined, actionProps: ActionProps) => (ComponentWithContext | Component)[]
+  actions: (currentTabsetId: string | undefined, actionProps: ActionProps) => ComponentWithContext[]
 
-  clicked: ClickedHandler
+  //clicked: ClickedHandler
 
-  updateInTabset: ClickedHandler
+  //updateInTabset: ClickedHandler
 
   handleOpenedTab: (browserTab: chrome.tabs.Tab, tab: Tab) => void
 }

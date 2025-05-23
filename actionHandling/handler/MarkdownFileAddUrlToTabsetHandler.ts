@@ -5,6 +5,7 @@ import {
   AddUrlToTabsetHandler,
   AddUrlToTabsetHandlerAdditionalData,
   ClickedHandler,
+  ComponentWithContext,
 } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
 import CreateSubfolderAction from 'src/tabsets/actions/CreateSubfolderAction.vue'
@@ -15,7 +16,6 @@ import { AddTabToTabsetCommand } from 'src/tabsets/commands/AddTabToTabsetComman
 import { LoadDynamicTabsCommand } from 'src/tabsets/commands/LoadDynamicTabsCommand'
 import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset } from 'src/tabsets/models/Tabset'
-import { Component } from 'vue'
 
 export class MarkdownFileAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   constructor(public $q: QVueGlobals) {}
@@ -32,9 +32,14 @@ export class MarkdownFileAddUrlToTabsetHandler implements AddUrlToTabsetHandler 
     return new ActionContext('Add Markdown').withDialog(this.analyseMarkdownDialog, this.$q).onOk(this.onOk)
   }
 
-  actions(): Component[] {
+  actions(): ComponentWithContext[] {
     // return [new ActionContext('Add Markdown Page').withDialog(this.analyseMarkdownDialog, this.$q).onOk(this.onOk)]
-    return [EditTabsetAction, CreateSubfolderAction, OpenAllInMenuAction, DeleteTabsetAction]
+    return [
+      { component: EditTabsetAction, context: {} },
+      { component: CreateSubfolderAction, context: {} },
+      { component: OpenAllInMenuAction, context: {} },
+      { component: DeleteTabsetAction, context: {} },
+    ]
   }
 
   withDialog(): DialogChainObject | undefined {

@@ -6,6 +6,7 @@
         tabset: props.tabset,
         level: 'root',
         currentChromeTab: props.currentChromeTab,
+        element: 'contextmenu',
       }).length == 0 && defaultAction
     ">
     <q-btn
@@ -63,6 +64,7 @@
                 tabset: props.tabset,
                 level: 'root',
                 currentChromeTab: props.currentChromeTab,
+                element: 'contextmenu',
               })">
               <template v-if="'context' in l">
                 <component
@@ -73,9 +75,6 @@
                   :currentChromeTab="props.currentChromeTab"
                   :level="'root'"
                   :context="'context' in l ? l.context : {}" />
-              </template>
-              <template v-else>
-                <component :key="l.name" :is="l" :tabset="props.tabset" :folder="props.folder" :level="'root'" />
               </template>
             </template>
           </q-list>
@@ -92,7 +91,9 @@ import { AddUrlToTabsetHandler } from 'src/tabsets/actionHandling/AddUrlToTabset
 import { NoopAddUrlToTabsetHandler } from 'src/tabsets/actionHandling/handler/NoopAddUrlToTabsetHandler'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
 import { ActionHandlerButtonClickedHolder } from 'src/tabsets/actionHandling/model/ActionHandlerButtonClickedHolder'
+import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+import { useUiStore } from 'src/ui/stores/uiStore'
 import { ref, watchEffect } from 'vue'
 import { Tabset } from '../models/Tabset'
 
@@ -128,6 +129,7 @@ const showExtraMenuItems = () => {
       tabset: props.tabset,
       level: 'root',
       currentChromeTab: props.currentChromeTab,
+      element: 'contextmenu',
     }).length > 0 && defaultAction.value !== undefined
   emits('extraSpaceNeeded', res)
   return res
@@ -140,17 +142,17 @@ watchEffect(() => {
   showExtraMenuItems()
 })
 
-// watchEffect(() => {
-//   containedInTsCount.value = useTabsetService().tabsetsFor(props.currentChromeTab.url!).length
-// })
-//
-// watchEffect(() => {
-//   animateAddtabButton.value = useUiStore().animateAddtabButton
-// })
-//
-// watchEffect(() => {
-//   alreadyInTabset.value = useTabsetService().urlExistsInCurrentTabset(props.currentChromeTab.url)
-// })
+watchEffect(() => {
+  containedInTsCount.value = useTabsetService().tabsetsFor(props.currentChromeTab.url!).length
+})
+
+watchEffect(() => {
+  animateAddtabButton.value = useUiStore().animateAddtabButton
+})
+
+watchEffect(() => {
+  alreadyInTabset.value = useTabsetService().urlExistsInCurrentTabset(props.currentChromeTab.url)
+})
 
 const activeFolderNameFor = (ts: Tabset, activeFolder: string) => {
   const folder = useTabsetsStore().getActiveFolder(ts, activeFolder)

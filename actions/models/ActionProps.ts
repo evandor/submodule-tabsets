@@ -5,4 +5,5 @@ export type ActionProps = {
   folder?: Tabset
   currentChromeTab?: chrome.tabs.Tab
   level: 'root' | 'folder'
+  element: 'contextmenu' | 'btn'
 }

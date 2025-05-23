@@ -2,8 +2,8 @@ import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import {
   AddUrlToTabsetHandler,
   AddUrlToTabsetHandlerAdditionalData,
+  ComponentWithContext,
 } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
-import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
 import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset } from 'src/tabsets/models/Tabset'
 
@@ -16,11 +16,7 @@ export class NoopAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
     return Promise.resolve()
   }
 
-  defaultAction(): ActionContext {
-    return null as unknown as ActionContext
-  }
-
-  actions(): ActionContext[] {
+  actions(): ComponentWithContext[] {
     return []
   }
 

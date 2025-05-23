@@ -8,51 +8,34 @@ import NewTabAction from 'src/tabsets/actions/NewTabAction.vue'
 import OpenTabsetAction from 'src/tabsets/actions/OpenTabsetAction.vue'
 import { Tabset, TabsetType } from 'src/tabsets/models/Tabset'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
-import { Component } from 'vue'
 
 export class DefaultActions {
-  static getDefaultActions(
-    currentTabset: Tabset | undefined,
-    actionProps: ActionProps,
-  ): (ComponentWithContext | Component)[] {
-    const actions: (ComponentWithContext | Component)[] = []
+  static getDefaultActions(currentTabset: Tabset | undefined, actionProps: ActionProps): ComponentWithContext[] {
+    const actions: ComponentWithContext[] = []
     // if (actionProps.level === 'folder') {
     //   actions.push(EditFolderAction)
     // }
 
-    // if (useFeaturesStore().hasFeature(FeatureIdent.NOTES)) {
-    //   actions.push(CreateNoteAction)
-    // }
-
-    // if (
-    //   currentTabset &&
-    //   useFeaturesStore().hasFeature(FeatureIdent.ARCHIVE_TABSET) &&
-    //   currentTabset.status === TabsetStatus.DEFAULT
-    // ) {
-    //   actions.push(ArchiveTabsetAction)
-    // }
     if (currentTabset && currentTabset.type === TabsetType.SESSION) {
-      actions.push(ConvertToCollectionAction)
+      actions.push({ component: ConvertToCollectionAction, context: {} })
     }
-
-    //    actions.push(OpenAllInMenuAction)
 
     // if (useSettingsStore().has('DEV_MODE')) {
     //   actions.push(ExportTabsetAction)
     // }
 
     if (LocalStorage.getItem('ui.newtab.installed') && actionProps.level === 'root') {
-      actions.push(NewTabAction)
+      actions.push({ component: NewTabAction, context: {} })
     }
 
     // open existing tabset for url
     if (!DefaultActions.alreadyInTabset() && DefaultActions.tabsetsForUrl().length > 0) {
-      actions.push(OpenTabsetAction)
+      actions.push({ component: OpenTabsetAction, context: {} })
     }
 
     // actions.push(DeleteTabsetAction)
     if (actionProps.level === 'folder') {
-      actions.push(DeleteFolderAction)
+      actions.push({ component: DeleteFolderAction, context: {} })
     }
     // console.log('action', actions)
     return actions

@@ -6,6 +6,7 @@ import {
   AddUrlToTabsetHandler,
   AddUrlToTabsetHandlerAdditionalData,
   ClickedHandler,
+  ComponentWithContext,
 } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
 import { AddTabToTabsetCommand } from 'src/tabsets/commands/AddTabToTabsetCommand'
@@ -13,7 +14,6 @@ import { CreateFolderCommand } from 'src/tabsets/commands/CreateFolderCommand'
 import AddRssFeedDialog from 'src/tabsets/dialogues/actions/AddRssFeedDialog.vue'
 import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset, TabsetType } from 'src/tabsets/models/Tabset'
-import { Component } from 'vue'
 
 /**
  * examples
@@ -59,7 +59,7 @@ export class RssUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
     return new ActionContext('Add RSS Feed').withDialog(this.storeAsFeed, this.$q).onOk(this.onOk)
   }
 
-  actions(): Component[] {
+  actions(): ComponentWithContext[] {
     return []
   }
 
