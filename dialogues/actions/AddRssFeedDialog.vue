@@ -55,6 +55,6 @@ onMounted(() => {
 })
 
 const display = () => {
-  onDialogOK({ displayFeed: true, rssUrl: props.rssTabReference?.href, feedName: feedName.value })
+  onDialogOK({ rssUrl: props.rssTabReference?.href, feedName: feedName.value })
 }
 </script>

@@ -1,18 +1,19 @@
 import { QVueGlobals } from 'quasar'
 import { FeatureIdent } from 'src/app/models/FeatureIdent'
 import { useFeaturesStore } from 'src/features/stores/featuresStore'
-import { AddUrlToTabsetHandler, ComponentWithContext } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { DefaultActions } from 'src/tabsets/actionHandling/handler/DefaultActions'
+import { ComponentWithContext, TabActionMatcher } from 'src/tabsets/actionHandling/TabActionMatcher'
 import AddFolderAction from 'src/tabsets/actions/AddFolderAction.vue'
 import AddTabAction from 'src/tabsets/actions/AddTabAction.vue'
 import { ActionProps } from 'src/tabsets/actions/models/ActionProps'
+import { Tab } from 'src/tabsets/models/Tab'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 
-export class DefaultAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
+export class DefaultTabActionMatcher implements TabActionMatcher {
   constructor(public $q: QVueGlobals) {}
 
   tabMatcher(url: string, content: string, metas: object): boolean {
-    return true // 'default' matches always
+    return true // 'default' matches always, last one in TabActionMatchers
   }
 
   injectScript(): Promise<void> {
@@ -28,4 +29,6 @@ export class DefaultAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
     actions.unshift({ component: AddTabAction, context: {} }) // first action
     return actions
   }
+
+  handleOpenedTab(browserTab: chrome.tabs.Tab, tab: Tab): void {}
 }

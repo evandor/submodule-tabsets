@@ -123,8 +123,8 @@
 import { useQuasar } from 'quasar'
 import { useSettingsStore } from 'src/core/stores/settingsStore'
 import { useActionHandlers } from 'src/tabsets/actionHandling/ActionHandlers'
-import { AddUrlToTabsetHandler, ComponentWithContext } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { NoopAddUrlToTabsetHandler } from 'src/tabsets/actionHandling/handler/NoopAddUrlToTabsetHandler'
+import { ComponentWithContext, TabActionMatcher } from 'src/tabsets/actionHandling/TabActionMatcher'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { useUiStore } from 'src/ui/stores/uiStore'
@@ -143,7 +143,7 @@ const $q = useQuasar()
 
 const { getHandler } = useActionHandlers($q)
 
-const handler = ref<AddUrlToTabsetHandler>(new NoopAddUrlToTabsetHandler())
+const handler = ref<TabActionMatcher>(new NoopAddUrlToTabsetHandler())
 // const defaultAction = ref<ActionContext | undefined>(undefined)
 const containedInTsCount = ref(0)
 const animateAddtabButton = ref(false)

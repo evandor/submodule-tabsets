@@ -6,13 +6,13 @@ import BrowserApi from 'src/app/BrowserApi'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import { useUtils } from 'src/core/services/Utils'
-import {
-  AddUrlToTabsetHandler,
-  AddUrlToTabsetHandlerAdditionalData,
-  ComponentWithContext,
-} from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { DefaultActions } from 'src/tabsets/actionHandling/handler/DefaultActions'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
+import {
+  AddUrlToTabsetHandlerAdditionalData,
+  ComponentWithContext,
+  TabActionMatcher,
+} from 'src/tabsets/actionHandling/TabActionMatcher'
 import { ActionProps } from 'src/tabsets/actions/models/ActionProps'
 import { AddTabToTabsetCommand } from 'src/tabsets/commands/AddTabToTabsetCommand'
 import { Tab, UrlExtension } from 'src/tabsets/models/Tab'
@@ -21,7 +21,7 @@ import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 
 const { sanitizeAsPlainText } = useUtils()
 
-export class RssFolderHandler implements AddUrlToTabsetHandler {
+export class RssFolderHandler implements TabActionMatcher {
   constructor(public $q: QVueGlobals | undefined) {}
 
   tabMatcher(url: string, content: string, metas: object): boolean {

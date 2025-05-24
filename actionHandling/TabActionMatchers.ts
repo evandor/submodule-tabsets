@@ -1,19 +1,20 @@
 import { QVueGlobals } from 'quasar'
-import { AddUrlToTabsetHandler } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
-import { DefaultAddUrlToTabsetHandler } from 'src/tabsets/actionHandling/handler/DefaultAddUrlToTabsetHandler'
+import { DefaultTabActionMatcher } from 'src/tabsets/actionHandling/handler/DefaultTabActionMatcher'
 import { ExcalidrawAddUrlToTabsetHandler } from 'src/tabsets/actionHandling/handler/ExcalidrawAddUrlToTabsetHandler'
 import { FileProtocolUrlAddUrlToTabsetHandler } from 'src/tabsets/actionHandling/handler/FileProtocolUrlAddUrlToTabsetHandler'
 import { ImportFromChromeBookmarksManagerAddUrlToTabsetHandler } from 'src/tabsets/actionHandling/handler/ImportFromChromeBookmarksManagerAddUrlToTabsetHandler'
 import { MarkdownFileAddUrlToTabsetHandler } from 'src/tabsets/actionHandling/handler/MarkdownFileAddUrlToTabsetHandler'
 import { ObsidianApiAddUrlToTabsetHandler } from 'src/tabsets/actionHandling/handler/ObsidianApiAddUrlToTabsetHandler'
+import { PublicTabsetsTabActionMatcher } from 'src/tabsets/actionHandling/handler/PublicTabsetsTabActionMatcher'
 import { RapidApiAddUrlToTabsetHandler } from 'src/tabsets/actionHandling/handler/RapidApiAddUrlToTabsetHandler'
 import { RssUrlAddUrlToTabsetHandler } from 'src/tabsets/actionHandling/handler/RssUrlAddUrlToTabsetHandler'
+import { TabActionMatcher } from 'src/tabsets/actionHandling/TabActionMatcher'
 import { Tabset } from 'src/tabsets/models/Tabset'
 
-export class AddUrlToTabsetHandlers {
-  defaultAddUrlToTabsetHandler = new DefaultAddUrlToTabsetHandler(null as unknown as QVueGlobals)
+export class TabActionMatchers {
+  defaultAddUrlToTabsetHandler = new DefaultTabActionMatcher(null as unknown as QVueGlobals)
 
-  handlers: AddUrlToTabsetHandler[] = []
+  handlers: TabActionMatcher[] = []
 
   constructor(public quasar: QVueGlobals | undefined) {
     // this.handlers.push(new DynamicUrlAddUrlToTabsetHandler(this.quasar))
@@ -23,17 +24,19 @@ export class AddUrlToTabsetHandlers {
     this.handlers.push(new MarkdownFileAddUrlToTabsetHandler(this.quasar!))
     this.handlers.push(new ImportFromChromeBookmarksManagerAddUrlToTabsetHandler(this.quasar!))
     this.handlers.push(new RssUrlAddUrlToTabsetHandler(this.quasar!))
+    this.handlers.push(new PublicTabsetsTabActionMatcher(this.quasar!))
     // this.handlers.push(new TtlUrlAddUrlToTabsetHandler(this.quasar))
     this.handlers.push(new FileProtocolUrlAddUrlToTabsetHandler(this.quasar))
   }
 
-  handlerFor(url: string, content: string, metas: object = {}, folder?: Tabset): AddUrlToTabsetHandler {
+  handlerFor(url: string, content: string, metas: object = {}, folder?: Tabset): TabActionMatcher {
     //console.log(`checking handler for ${url}`, metas, content.length)
     const handler = this.handlers.filter(
-      // (h: AddUrlToTabsetHandler) => url.match(h.urlMatcher()) || h.contentMatcher(content) || h.metasMatcher(metas),
-      (h: AddUrlToTabsetHandler) => h.tabMatcher(url, content, metas),
+      // (h: ActionMatcher) => url.match(h.urlMatcher()) || h.contentMatcher(content) || h.metasMatcher(metas),
+      (h: TabActionMatcher) => h.tabMatcher(url, content, metas),
     )
     if (handler && handler.length > 0) {
+      //console.log('chosen', handler[0])
       //handler[0].setFolder(folder)
       //if (!this.injectedUrls.includes(url)) {
       //console.log('injecting to url', url)
@@ -42,6 +45,6 @@ export class AddUrlToTabsetHandlers {
       //}
       return handler[0]!
     }
-    return new DefaultAddUrlToTabsetHandler(this.quasar!)
+    return new DefaultTabActionMatcher(this.quasar!)
   }
 }

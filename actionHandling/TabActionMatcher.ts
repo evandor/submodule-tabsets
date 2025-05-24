@@ -27,6 +27,7 @@ export type ClickedHandler = (
 export type ComponentContext = {
   label?: string
   chromeTab?: chrome.tabs.Tab
+  currentTabset?: Tabset
 }
 
 export type ComponentWithContext = {
@@ -34,16 +35,16 @@ export type ComponentWithContext = {
   context: ComponentContext
 }
 
-export interface AddUrlToTabsetHandler {
+/**
+ * Implementors define if they want to provide specific actions for the current tab's url and/or content and/or meta information.
+ * If the tabMatcher matches, the provided actions (a certain type of Component) are returned and can be used in context menues and the like.
+ */
+export interface TabActionMatcher {
   tabMatcher(url: string, content: string, metas: object): boolean
-
-  injectScript: () => Promise<void>
-
-  //defaultAction: () => ActionContext | undefined
 
   actions: (currentTabsetId: string | undefined, actionProps: ActionProps) => ComponentWithContext[]
 
-  //clicked: ClickedHandler
+  injectScript: () => Promise<void>
 
   //updateInTabset: ClickedHandler
 

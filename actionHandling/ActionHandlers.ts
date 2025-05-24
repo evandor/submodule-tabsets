@@ -1,19 +1,18 @@
 import { QVueGlobals } from 'quasar'
 import { useContentStore } from 'src/content/stores/contentStore'
-import { AddUrlToTabsetHandler, ClickedHandler } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
-import { AddUrlToTabsetHandlers } from 'src/tabsets/actionHandling/AddUrlToTabsetHandlers'
-import { RssFolderHandler } from 'src/tabsets/actionHandling/handler/RssFolderHandler'
 import { ActionHandlerButtonClickedHolder } from 'src/tabsets/actionHandling/model/ActionHandlerButtonClickedHolder'
-import { Tabset, TabsetType } from 'src/tabsets/models/Tabset'
+import { ClickedHandler, TabActionMatcher } from 'src/tabsets/actionHandling/TabActionMatcher'
+import { TabActionMatchers } from 'src/tabsets/actionHandling/TabActionMatchers'
+import { Tabset } from 'src/tabsets/models/Tabset'
 
 export function useActionHandlers($q: QVueGlobals | undefined) {
-  const actionHandlerRepo = new AddUrlToTabsetHandlers($q)
+  const actionHandlerRepo = new TabActionMatchers($q)
 
-  function getHandler(url?: string, folder?: Tabset): AddUrlToTabsetHandler {
+  function getHandler(url?: string, folder?: Tabset): TabActionMatcher {
     //console.log(`getHandler for '${url}', folderId=${folder?.id}, type=${folder?.type}`)
-    if (folder && folder.type === TabsetType.RSS_FOLDER) {
-      return new RssFolderHandler($q)
-    }
+    // if (folder && folder.type === TabsetType.RSS_FOLDER) {
+    //   return new RssFolderHandler($q)
+    // }
     const metas = useContentStore().getCurrentTabMetas
     const content = useContentStore().getCurrentTabContent
     const handler = url

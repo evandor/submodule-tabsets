@@ -2,13 +2,13 @@ import { DialogChainObject, QVueGlobals, uid } from 'quasar'
 import { useTabsStore } from 'src/bookmarks/stores/tabsStore'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
-import {
-  AddUrlToTabsetHandler,
-  AddUrlToTabsetHandlerAdditionalData,
-  ComponentWithContext,
-} from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { DefaultActions } from 'src/tabsets/actionHandling/handler/DefaultActions'
 import { ExcalidrawStorage } from 'src/tabsets/actionHandling/model/ExcalidrawStorage'
+import {
+  AddUrlToTabsetHandlerAdditionalData,
+  ComponentWithContext,
+  TabActionMatcher,
+} from 'src/tabsets/actionHandling/TabActionMatcher'
 import ExcalidrawSaveAsFileAction from 'src/tabsets/actions/excalidraw/ExcalidrawSaveAsFileAction.vue'
 import { ActionProps } from 'src/tabsets/actions/models/ActionProps'
 import { AddTabToTabsetCommand } from 'src/tabsets/commands/AddTabToTabsetCommand'
@@ -18,7 +18,7 @@ import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 
 const urlMatcher = /^https:\/\/excalidraw\.com\/$/
 
-export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
+export class ExcalidrawAddUrlToTabsetHandler implements TabActionMatcher {
   constructor(public $q: QVueGlobals | undefined) {}
 
   tabMatcher(url: string, content: string, metas: object): boolean {

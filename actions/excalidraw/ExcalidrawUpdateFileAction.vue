@@ -11,7 +11,7 @@
 <script setup lang="ts">
 import { useQuasar } from 'quasar'
 import ContextMenuItem from 'src/core/components/helper/ContextMenuItem.vue'
-import { ComponentContext } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
+import { ComponentContext } from 'src/tabsets/actionHandling/TabActionMatcher'
 import EditTabsetDialog from 'src/tabsets/dialogues/EditTabsetDialog.vue'
 import { Tabset } from 'src/tabsets/models/Tabset'
 import { useUiStore } from 'src/ui/stores/uiStore'

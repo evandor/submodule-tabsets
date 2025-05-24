@@ -5,7 +5,7 @@ import { useNavigationService } from 'src/core/services/NavigationService'
 import { useUtils } from 'src/core/services/Utils'
 import Analytics from 'src/core/utils/google-analytics'
 import { useActionHandlers } from 'src/tabsets/actionHandling/ActionHandlers'
-import { AddUrlToTabsetHandler } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
+import { TabActionMatcher } from 'src/tabsets/actionHandling/TabActionMatcher'
 import { Tab } from 'src/tabsets/models/Tab'
 import { ChangeInfo } from 'src/tabsets/models/Tabset'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
@@ -39,7 +39,7 @@ export class OpenTabCommand implements Command<string> {
           break
       }
 
-      const handler = ref<AddUrlToTabsetHandler>(this.getHandler(this.tab.url))
+      const handler = ref<TabActionMatcher>(this.getHandler(this.tab.url))
       const browserTab = await useNavigationService().browserTabFor(this.tab.url!, this.tab.id)
       handler.value.handleOpenedTab(browserTab, this.tab)
       //useContentStore().currentTabId = this.tab.id

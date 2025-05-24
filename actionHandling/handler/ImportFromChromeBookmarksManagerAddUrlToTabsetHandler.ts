@@ -3,14 +3,14 @@ import { FeatureIdent } from 'src/app/models/FeatureIdent'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import { useFeaturesStore } from 'src/features/stores/featuresStore'
+import { DefaultActions } from 'src/tabsets/actionHandling/handler/DefaultActions'
+import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
 import {
-  AddUrlToTabsetHandler,
   AddUrlToTabsetHandlerAdditionalData,
   ClickedHandler,
   ComponentWithContext,
-} from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
-import { DefaultActions } from 'src/tabsets/actionHandling/handler/DefaultActions'
-import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
+  TabActionMatcher,
+} from 'src/tabsets/actionHandling/TabActionMatcher'
 import AddFolderAction from 'src/tabsets/actions/AddFolderAction.vue'
 import AddTabAction from 'src/tabsets/actions/AddTabAction.vue'
 import ImportChromeBookmarksAction from 'src/tabsets/actions/bookmarks/ImportChromeBookmarksAction.vue'
@@ -25,7 +25,7 @@ function getBmFolderId(chromeTab: chrome.tabs.Tab) {
   return chromeTab.url?.split('?')[1]?.split('=')[1] || undefined
 }
 
-export class ImportFromChromeBookmarksManagerAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
+export class ImportFromChromeBookmarksManagerAddUrlToTabsetHandler implements TabActionMatcher {
   constructor(public $q: QVueGlobals) {}
 
   tabMatcher(url: string, content: string, metas: object): boolean {

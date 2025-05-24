@@ -1,11 +1,6 @@
 <template>
   <q-separator inset />
-  <ContextMenuItem
-    v-close-popup
-    @was-clicked="clicked()"
-    icon="o_file_download"
-    color="primary"
-    label="Export Tabset" />
+  <ContextMenuItem v-close-popup @was-clicked="clicked()" icon="o_file_download" color="primary" label="Export..." />
 </template>
 
 <script lang="ts" setup>
