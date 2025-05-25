@@ -117,14 +117,12 @@ const animateAddtabButton = ref(false)
 const currentTabsetId = ref<string | undefined>(undefined)
 const alreadyInTabset = ref(false)
 
-// eslint-disable-next-line @typescript-eslint/no-misused-promises
 watchEffect(() => {
   useTabsetsStore()
     .getCurrentTabsetId()
     .then((tsId: string | undefined) => (currentTabsetId.value = tsId))
 })
 
-// eslint-disable-next-line @typescript-eslint/no-misused-promises
 watchEffect(() => {
   handler.value = getHandler(props.currentChromeTab.url, props.folder)
   defaultAction.value = handler.value.defaultAction()

@@ -1,13 +1,13 @@
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import {
-  AddUrlToTabsetHandler,
   AddUrlToTabsetHandlerAdditionalData,
-} from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
-import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
+  ComponentWithContext,
+  TabActionMatcher,
+} from 'src/tabsets/actionHandling/TabActionMatcher'
 import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset } from 'src/tabsets/models/Tabset'
 
-export class NoopAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
+export class NoopAddUrlToTabsetHandler implements TabActionMatcher {
   tabMatcher(url: string, content: string, metas: object): boolean {
     return true
   }
@@ -16,11 +16,7 @@ export class NoopAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
     return Promise.resolve()
   }
 
-  defaultAction(): ActionContext {
-    return null as unknown as ActionContext
-  }
-
-  actions(): ActionContext[] {
+  actions(): ComponentWithContext[] {
     return []
   }
 

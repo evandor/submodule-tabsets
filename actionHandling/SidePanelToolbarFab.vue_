@@ -64,6 +64,7 @@
                 level: 'root',
                 currentChromeTab: props.currentChromeTab,
               })">
+              <!--              <div>{{ l }}</div>-->
               <template v-if="'context' in l">
                 <component
                   :key="l.component.name"

@@ -1,14 +1,14 @@
 import { QVueGlobals } from 'quasar'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import {
-  AddUrlToTabsetHandler,
   AddUrlToTabsetHandlerAdditionalData,
-} from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
-import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
+  ComponentWithContext,
+  TabActionMatcher,
+} from 'src/tabsets/actionHandling/TabActionMatcher'
 import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset } from 'src/tabsets/models/Tabset'
 
-export class FileProtocolUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
+export class FileProtocolUrlAddUrlToTabsetHandler implements TabActionMatcher {
   constructor(public $q: QVueGlobals | undefined) {}
 
   chromePattern = /addRow\("([^"]*)","([^"]*)",([^,]*),([^,]*),"([^"]*)",([^,]*),"([^"])*"\)/gm
@@ -22,11 +22,7 @@ export class FileProtocolUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandl
     return Promise.resolve()
   }
 
-  defaultAction(): ActionContext {
-    return null as unknown as ActionContext
-  }
-
-  actions(): ActionContext[] {
+  actions(): ComponentWithContext[] {
     // new ActionContext('Save Local Directory', ButtonActions.Save)
     return []
   }

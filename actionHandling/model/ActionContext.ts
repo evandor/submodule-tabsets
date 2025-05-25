@@ -1,6 +1,6 @@
 import { DialogChainObject, QVueGlobals } from 'quasar'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
-import { AddUrlToTabsetHandlerAdditionalData, ClickedHandler } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
+import { AddUrlToTabsetHandlerAdditionalData, ClickedHandler } from 'src/tabsets/actionHandling/TabActionMatcher'
 import { Tabset } from 'src/tabsets/models/Tabset'
 
 export class ActionContext {

@@ -187,8 +187,8 @@ export class Website {
     // console.log("2", _.map(this.navigation, n => n.currentOrder))
     // console.log("3", _.map(this.navigation, n => n.originalOrder) !== _.map(this.navigation, n => n.currentOrder))
     return (
-      JSON.stringify(_.map(this.navigation, (n) => n.originalOrder)) !==
-      JSON.stringify(_.map(this.navigation, (n) => n.currentOrder))
+      JSON.stringify(_.map(this.navigation, (n: Nav) => n.originalOrder)) !==
+      JSON.stringify(_.map(this.navigation, (n: Nav) => n.currentOrder))
     )
   }
 
@@ -203,9 +203,9 @@ export class Website {
   private applyNavigation() {
     //console.log("this.navigation", this.navigation)
     if (this.navigation) {
-      const originalNav = _.map(_.orderBy(this.navigation, 'originalOrder'), (n) => n.id)
+      const originalNav = _.map(_.orderBy(this.navigation, 'originalOrder'), (n: Nav) => n.id)
       this.originalPages.sort((a, b) => originalNav.indexOf(a.id) - originalNav.indexOf(b.id))
-      const currentNav = _.map(_.orderBy(this.navigation, 'currentOrder'), (n) => n.id)
+      const currentNav = _.map(_.orderBy(this.navigation, 'currentOrder'), (n: Nav) => n.id)
       this.currentPages.sort((a, b) => currentNav.indexOf(a.id) - currentNav.indexOf(b.id))
     }
   }

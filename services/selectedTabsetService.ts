@@ -92,9 +92,14 @@ export function useSelectedTabsetService() {
   }
 
   const getSelectedTabsetId = async (): Promise<any> => {
-    const w = await chrome.windows.getCurrent({})
-    const ident = getWindowIdentifier(w)
-    return w ? useTabsetToWindowStore().currentTabsetToWindowMap.get(ident) : defaultCurrentTabsetId
+    try {
+      const w = await chrome.windows.getCurrent({})
+      const ident = getWindowIdentifier(w)
+      return w ? useTabsetToWindowStore().currentTabsetToWindowMap.get(ident) : defaultCurrentTabsetId
+    } catch (error) {
+      console.debug('returning defaultCurrentTabsetId', defaultCurrentTabsetId)
+      return Promise.resolve(defaultCurrentTabsetId)
+    }
   }
 
   /**

@@ -74,7 +74,7 @@ onMounted(() => {
 
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
 watchEffect(async () => {
-  console.log('hier', notebookId.value)
+  console.log('hier!', notebookId.value)
   if (useNotesStore().loaded) {
     // noteId.value = route.params.noteId as string
     // const sharedById = useTabsetsStore().getTabset(sourceId)?.sharing.sharedById

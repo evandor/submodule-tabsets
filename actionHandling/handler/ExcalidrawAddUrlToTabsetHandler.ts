@@ -2,30 +2,23 @@ import { DialogChainObject, QVueGlobals, uid } from 'quasar'
 import { useTabsStore } from 'src/bookmarks/stores/tabsStore'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
+import { DefaultActions } from 'src/tabsets/actionHandling/handler/DefaultActions'
+import { ExcalidrawStorage } from 'src/tabsets/actionHandling/model/ExcalidrawStorage'
 import {
-  AddUrlToTabsetHandler,
   AddUrlToTabsetHandlerAdditionalData,
   ComponentWithContext,
-} from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
-import { DefaultActions } from 'src/tabsets/actionHandling/handler/DefaultActions'
-import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
-import { ExcalidrawStorage } from 'src/tabsets/actionHandling/model/ExcalidrawStorage'
-import CreateSubfolderAction from 'src/tabsets/actions/CreateSubfolderAction.vue'
-import DeleteTabsetAction from 'src/tabsets/actions/DeleteTabsetAction.vue'
-import EditTabsetAction from 'src/tabsets/actions/EditTabsetAction.vue'
+  TabActionMatcher,
+} from 'src/tabsets/actionHandling/TabActionMatcher'
 import ExcalidrawSaveAsFileAction from 'src/tabsets/actions/excalidraw/ExcalidrawSaveAsFileAction.vue'
-import ExcalidrawUpdateFileAction from 'src/tabsets/actions/excalidraw/ExcalidrawUpdateFileAction.vue'
 import { ActionProps } from 'src/tabsets/actions/models/ActionProps'
-import OpenAllInMenuAction from 'src/tabsets/actions/OpenAllInMenuAction.vue'
 import { AddTabToTabsetCommand } from 'src/tabsets/commands/AddTabToTabsetCommand'
 import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset } from 'src/tabsets/models/Tabset'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
-import { Component } from 'vue'
 
 const urlMatcher = /^https:\/\/excalidraw\.com\/$/
 
-export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
+export class ExcalidrawAddUrlToTabsetHandler implements TabActionMatcher {
   constructor(public $q: QVueGlobals | undefined) {}
 
   tabMatcher(url: string, content: string, metas: object): boolean {
@@ -73,50 +66,61 @@ export class ExcalidrawAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
     return Promise.resolve()
   }
 
-  defaultAction(): ActionContext | undefined {
-    const tabset: Tabset | undefined = useTabsetsStore().getCurrentTabset
-    if (tabset) {
-      var actions = tabset.tabs
-        .filter((t: Tab) => t.url !== undefined)
-        .filter((t: Tab) => t.url!.match(urlMatcher))
-        .map((t: Tab) => {
-          return new ActionContext(t.name || t.title || 'undefined', 'save').onClicked(this.updateInTabset)
-        })
-      const res =
-        actions.length > 0
-          ? actions
-              .concat([
-                new ActionContext('Save as new file', 'save').withDialog(this.newFileDialog, this.$q!).onOk(this.onOk),
-              ])
-              .concat([new ActionContext('Clear canvas')])
-          : actions.concat([
-              new ActionContext('Add Excalidraw', 'add').withDialog(this.newFileDialog, this.$q!).onOk(this.onOk),
-            ])
-      return res[0]
-    }
-    return undefined
-  }
+  // defaultAction(): ActionContext | undefined {
+  //   const tabset: Tabset | undefined = useTabsetsStore().getCurrentTabset
+  //   if (tabset) {
+  //     var actions = tabset.tabs
+  //       .filter((t: Tab) => t.url !== undefined)
+  //       .filter((t: Tab) => t.url!.match(urlMatcher))
+  //       .map((t: Tab) => {
+  //         return new ActionContext(t.name || t.title || 'undefined', 'save').onClicked(this.updateInTabset)
+  //       })
+  //     const res =
+  //       actions.length > 0
+  //         ? actions
+  //             .concat([
+  //               new ActionContext('Save as new file', 'save').withDialog(this.newFileDialog, this.$q!).onOk(this.onOk),
+  //             ])
+  //             .concat([new ActionContext('Clear canvas')])
+  //         : actions.concat([
+  //             new ActionContext('Add Excalidraw', 'add').withDialog(this.newFileDialog, this.$q!).onOk(this.onOk),
+  //           ])
+  //     return res[0]
+  //   }
+  //   return undefined
+  // }
 
-  actions(currentTabsetId: string | undefined, actionProps: ActionProps): Component[] {
-    const tabset: Tabset | undefined = useTabsetsStore().getCurrentTabset
-    if (tabset) {
-      const actions: (ComponentWithContext | Component)[] = tabset.tabs
-        .filter((t: Tab) => t.url !== undefined)
-        .filter((t: Tab) => t.url!.match(urlMatcher))
-        .map((t: Tab) => {
-          return { component: ExcalidrawUpdateFileAction, context: { label: t.title || 'undef' } }
-        })
-      const list: Component[] =
-        actions.length > 0
-          ? actions.concat([
-              ExcalidrawSaveAsFileAction,
-              { component: ExcalidrawUpdateFileAction, context: { label: 'Clear Canvas' } },
-            ])
-          : actions.concat([{ component: ExcalidrawUpdateFileAction, context: { label: 'Update Excalidraw' } }])
-      return list.concat(DefaultActions.getDefaultActions(tabset, actionProps))
-    } else {
-      return [EditTabsetAction, CreateSubfolderAction, OpenAllInMenuAction, DeleteTabsetAction]
-    }
+  actions(currentTabsetId: string | undefined, actionProps: ActionProps): ComponentWithContext[] {
+    const currentTabset: Tabset | undefined = useTabsetsStore().getCurrentTabset
+    let result: ComponentWithContext[] = DefaultActions.getDefaultActions(currentTabset, actionProps)
+    // if (currentTabset) {
+    //   const actions: ComponentWithContext[] = currentTabset.tabs
+    //     .filter((t: Tab) => t.url !== undefined)
+    //     .filter((t: Tab) => t.url!.match(urlMatcher))
+    //     .map((t: Tab) => {
+    //       return { component: ExcalidrawUpdateFileAction, context: { label: t.title || 'undef' } }
+    //     })
+    //   const list: ComponentWithContext[] =
+    //     actions.length > 0
+    //       ? actions.concat([
+    //           { component: ExcalidrawSaveAsFileAction, context: {} },
+    //           { component: ExcalidrawUpdateFileAction, context: { label: 'Clear Canvas' } },
+    //         ])
+    //       : actions.concat([{ component: ExcalidrawUpdateFileAction, context: { label: 'Update Excalidraw' } }])
+    //   result = list.concat(DefaultActions.getDefaultActions(currentTabset, actionProps))
+    // } else {
+    //   result = [
+    //     { component: EditTabsetAction, context: {} },
+    //     {
+    //       component: CreateSubfolderAction,
+    //       context: {},
+    //     },
+    //     { component: OpenAllInMenuAction, context: {} },
+    //     { component: DeleteTabsetAction, context: {} },
+    //   ]
+    // }
+    result.unshift({ component: ExcalidrawSaveAsFileAction, context: {} })
+    return result
   }
 
   async clicked(

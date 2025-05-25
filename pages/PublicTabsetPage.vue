@@ -1,5 +1,6 @@
 <!-- TabsetsPage -->
 <template>
+  {{ activeTab?.url || '???' }}
   <embed v-if="activeTab" :src="activeTab.url || ''" width="100%" height="1000px" />
 </template>
 
@@ -20,6 +21,7 @@ onMounted(() => {
 
 watchEffect(() => {
   const tabId = route.params.tabId as string
+  console.log('got tabid', tabId)
   activeTab.value = useTabsetsStore().getTabAndTabsetId(tabId)?.tab
 })
 </script>

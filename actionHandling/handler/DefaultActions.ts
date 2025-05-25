@@ -1,60 +1,56 @@
 import { LocalStorage } from 'quasar'
+import { FeatureIdent } from 'src/app/models/FeatureIdent'
 import { useContentStore } from 'src/content/stores/contentStore'
-import { ComponentWithContext } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
+import { useSettingsStore } from 'src/core/stores/settingsStore'
+import { useFeaturesStore } from 'src/features/stores/featuresStore'
+import { ComponentWithContext } from 'src/tabsets/actionHandling/TabActionMatcher'
 import ConvertToCollectionAction from 'src/tabsets/actions/ConvertToCollectionAction.vue'
 import DeleteFolderAction from 'src/tabsets/actions/DeleteFolderAction.vue'
+import EditFolderAction from 'src/tabsets/actions/EditFolderAction.vue'
+import ExportTabsetAction from 'src/tabsets/actions/ExportTabsetAction.vue'
 import { ActionProps } from 'src/tabsets/actions/models/ActionProps'
 import NewTabAction from 'src/tabsets/actions/NewTabAction.vue'
 import OpenTabsetAction from 'src/tabsets/actions/OpenTabsetAction.vue'
+import LoadRssFeedAction from 'src/tabsets/actions/rss/LoadRssFeedAction.vue'
 import ShareTabsetAction from 'src/tabsets/actions/ShareTabsetAction.vue'
-import { Tabset, TabsetStatus, TabsetType } from 'src/tabsets/models/Tabset'
+import { Tabset, TabsetType } from 'src/tabsets/models/Tabset'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
-import { Component } from 'vue'
 
 export class DefaultActions {
-  static getDefaultActions(
-    currentTabset: Tabset | undefined,
-    actionProps: ActionProps,
-  ): (ComponentWithContext | Component)[] {
-    const actions: (ComponentWithContext | Component)[] = []
-    // if (actionProps.level === 'folder') {
-    //   actions.push(EditFolderAction)
-    // }
+  static getDefaultActions(currentTabset: Tabset | undefined, actionProps: ActionProps): ComponentWithContext[] {
+    const actions: ComponentWithContext[] = []
+    if (actionProps.level === 'folder') {
+      actions.push({ component: EditFolderAction, context: {} })
+    }
 
-    // if (useFeaturesStore().hasFeature(FeatureIdent.NOTES)) {
-    //   actions.push(CreateNoteAction)
-    // }
-
-    // if (
-    //   currentTabset &&
-    //   useFeaturesStore().hasFeature(FeatureIdent.ARCHIVE_TABSET) &&
-    //   currentTabset.status === TabsetStatus.DEFAULT
-    // ) {
-    //   actions.push(ArchiveTabsetAction)
-    // }
     if (currentTabset && currentTabset.type === TabsetType.SESSION) {
-      actions.push(ConvertToCollectionAction)
+      actions.push({ component: ConvertToCollectionAction, context: {} })
+    }
+
+    if (useSettingsStore().has('DEV_MODE')) {
+      actions.push({ component: ExportTabsetAction, context: {} })
     }
 
     //    actions.push(OpenAllInMenuAction)
-    actions.push(ShareTabsetAction)
-
-    // if (useSettingsStore().has('DEV_MODE')) {
-    //   actions.push(ExportTabsetAction)
-    // }
+    if (useFeaturesStore().hasFeature(FeatureIdent.TABSETS_SHARING)) {
+      actions.push({ component: ShareTabsetAction, context: {} })
+    }
 
     if (LocalStorage.getItem('ui.newtab.installed') && actionProps.level === 'root') {
-      actions.push(NewTabAction)
+      actions.push({ component: NewTabAction, context: {} })
     }
 
     // open existing tabset for url
     if (!DefaultActions.alreadyInTabset() && DefaultActions.tabsetsForUrl().length > 0) {
-      actions.push(OpenTabsetAction)
+      actions.push({ component: OpenTabsetAction, context: {} })
     }
 
     // actions.push(DeleteTabsetAction)
     if (actionProps.level === 'folder') {
-      actions.push(DeleteFolderAction)
+      if (actionProps.folder && actionProps.folder.type === TabsetType.RSS_FOLDER) {
+        actions.unshift({ component: LoadRssFeedAction, context: {} })
+      }
+      actions.push({ component: DeleteFolderAction, context: {} })
     }
     // console.log('action', actions)
     return actions

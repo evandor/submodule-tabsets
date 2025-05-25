@@ -1,10 +1,11 @@
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { RestApiDefinitions } from 'src/rest/RestApiDefinitions'
-import {
-  AddUrlToTabsetHandler,
-  AddUrlToTabsetHandlerAdditionalData,
-} from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
+import {
+  AddUrlToTabsetHandlerAdditionalData,
+  ComponentWithContext,
+  TabActionMatcher,
+} from 'src/tabsets/actionHandling/TabActionMatcher'
 import CreateSubfolderAction from 'src/tabsets/actions/CreateSubfolderAction.vue'
 import DeleteTabsetAction from 'src/tabsets/actions/DeleteTabsetAction.vue'
 import EditTabsetAction from 'src/tabsets/actions/EditTabsetAction.vue'
@@ -12,9 +13,8 @@ import OpenAllInMenuAction from 'src/tabsets/actions/OpenAllInMenuAction.vue'
 import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset } from 'src/tabsets/models/Tabset'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
-import { Component } from 'vue'
 
-export class ObsidianApiAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
+export class ObsidianApiAddUrlToTabsetHandler implements TabActionMatcher {
   tabMatcher(url: string, content: string, metas: object): boolean {
     return url.match(/^http:\/\/127.0.0.1:27123\/$/) !== null
   }
@@ -27,8 +27,13 @@ export class ObsidianApiAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
     return new ActionContext('Add Obsidian vault').onClicked(this.clicked)
   }
 
-  actions(): Component[] {
-    return [EditTabsetAction, CreateSubfolderAction, OpenAllInMenuAction, DeleteTabsetAction]
+  actions(): ComponentWithContext[] {
+    return [
+      { component: EditTabsetAction, context: {} },
+      { component: CreateSubfolderAction, context: {} },
+      { component: OpenAllInMenuAction, context: {} },
+      { component: DeleteTabsetAction, context: {} },
+    ]
   }
 
   async clicked(

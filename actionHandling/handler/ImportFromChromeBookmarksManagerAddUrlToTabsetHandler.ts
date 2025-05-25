@@ -1,12 +1,18 @@
 import { DialogChainObject, QVueGlobals } from 'quasar'
+import { FeatureIdent } from 'src/app/models/FeatureIdent'
 import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
+import { useFeaturesStore } from 'src/features/stores/featuresStore'
+import { DefaultActions } from 'src/tabsets/actionHandling/handler/DefaultActions'
+import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
 import {
-  AddUrlToTabsetHandler,
   AddUrlToTabsetHandlerAdditionalData,
   ClickedHandler,
-} from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
-import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
+  ComponentWithContext,
+  TabActionMatcher,
+} from 'src/tabsets/actionHandling/TabActionMatcher'
+import AddFolderAction from 'src/tabsets/actions/AddFolderAction.vue'
+import AddTabAction from 'src/tabsets/actions/AddTabAction.vue'
 import ImportChromeBookmarksAction from 'src/tabsets/actions/bookmarks/ImportChromeBookmarksAction.vue'
 import { ActionProps } from 'src/tabsets/actions/models/ActionProps'
 import { CreateTabsetFromBookmarksRecursive } from 'src/tabsets/commands/CreateTabsetFromBookmarksRecursive'
@@ -14,13 +20,12 @@ import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset } from 'src/tabsets/models/Tabset'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
-import { Component } from 'vue'
 
 function getBmFolderId(chromeTab: chrome.tabs.Tab) {
   return chromeTab.url?.split('?')[1]?.split('=')[1] || undefined
 }
 
-export class ImportFromChromeBookmarksManagerAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
+export class ImportFromChromeBookmarksManagerAddUrlToTabsetHandler implements TabActionMatcher {
   constructor(public $q: QVueGlobals) {}
 
   tabMatcher(url: string, content: string, metas: object): boolean {
@@ -31,45 +36,50 @@ export class ImportFromChromeBookmarksManagerAddUrlToTabsetHandler implements Ad
     return Promise.resolve()
   }
 
-  defaultAction(): ActionContext {
-    return new ActionContext('hi', 'save')
-  }
-
-  actions(currentTabsetId: string | undefined, actionProps: ActionProps): Component[] {
+  actions(currentTabsetId: string | undefined, actionProps: ActionProps): ComponentWithContext[] {
     // const folderId = getBmFolderId(t)
-    console.log('actions', actionProps)
-    return [
-      {
-        component: ImportChromeBookmarksAction,
-        context: { label: 'Clear Canvas!', chromeTab: actionProps.currentChromeTab },
-      },
-      // // {
-      // //   label: 'Import...',
-      // //   identifier: ButtonActions.ImportChromeBookmarks,
-      // //   active: (t: chrome.tabs.Tab) => {
-      // //     const folderId = getBmFolderId(t)
-      // //     return !folderId ? false : (useTabsetsStore().getCurrentTabset?.bookmarkId || '') !== folderId
-      // //   },
-      // // },
-      // new ActionContext('Import...', undefined, undefined, {}, (t: chrome.tabs.Tab) => {
-      //   const folderId = getBmFolderId(t)
-      //   return !folderId ? false : (useTabsetsStore().getCurrentTabset?.bookmarkId || '') !== folderId
-      // })
-      //   .withDialog(this.importChromeBookmarksDialog, this.$q)
-      //   .onOk(this.onOk),
-      // // {
-      // //   label: 'Add Tab',
-      // //   identifier: ButtonActions.AddTab,
-      // //   active: (t: chrome.tabs.Tab) => !useTabsetService().urlExistsInCurrentTabset(t.url),
-      // // },
-      // new ActionContext(
-      //   'Add Tab',
-      //   undefined,
-      //   undefined,
-      //   {},
-      //   (t: chrome.tabs.Tab) => !useTabsetService().urlExistsInCurrentTabset(t.url),
-      // ).onClicked(this.clicked),
-    ]
+    //console.log('actions', actionProps)
+    const currentTabset = useTabsetsStore().getCurrentTabset
+    const actions = DefaultActions.getDefaultActions(currentTabset, actionProps)
+
+    if (useFeaturesStore().hasFeature(FeatureIdent.FOLDER)) {
+      actions.unshift({ component: AddFolderAction, context: {} })
+    }
+    actions.unshift({ component: AddTabAction, context: {} })
+    actions.push({
+      component: ImportChromeBookmarksAction,
+      context: {},
+    })
+    // return [
+    //   ,
+    // // {
+    // //   label: 'Import...',
+    // //   identifier: ButtonActions.ImportChromeBookmarks,
+    // //   active: (t: chrome.tabs.Tab) => {
+    // //     const folderId = getBmFolderId(t)
+    // //     return !folderId ? false : (useTabsetsStore().getCurrentTabset?.bookmarkId || '') !== folderId
+    // //   },
+    // // },
+    // new ActionContext('Import...', undefined, undefined, {}, (t: chrome.tabs.Tab) => {
+    //   const folderId = getBmFolderId(t)
+    //   return !folderId ? false : (useTabsetsStore().getCurrentTabset?.bookmarkId || '') !== folderId
+    // })
+    //   .withDialog(this.importChromeBookmarksDialog, this.$q)
+    //   .onOk(this.onOk),
+    // // {
+    // //   label: 'Add Tab',
+    // //   identifier: ButtonActions.AddTab,
+    // //   active: (t: chrome.tabs.Tab) => !useTabsetService().urlExistsInCurrentTabset(t.url),
+    // // },
+    // new ActionContext(
+    //   'Add Tab',
+    //   undefined,
+    //   undefined,
+    //   {},
+    //   (t: chrome.tabs.Tab) => !useTabsetService().urlExistsInCurrentTabset(t.url),
+    // ).onClicked(this.clicked),
+    //]
+    return actions
   }
 
   async clicked(

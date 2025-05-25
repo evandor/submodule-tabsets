@@ -17,7 +17,6 @@ import { useSpacesStore } from 'src/spaces/stores/spacesStore'
 import { ActionProps } from 'src/tabsets/actions/models/ActionProps'
 import NewTabsetDialog from 'src/tabsets/dialogues/NewTabsetDialog.vue'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
-import { useAuthStore } from 'stores/authStore'
 
 const $q = useQuasar()
 const props = defineProps<ActionProps>()
@@ -33,6 +32,5 @@ const clicked = () => {
   })
 }
 
-const cannotCreateCollection = () =>
-  useAuthStore().limitExceeded('TABSETS', useTabsetsStore().tabsets.size + 1).exceeded
+const cannotCreateCollection = () => false
 </script>

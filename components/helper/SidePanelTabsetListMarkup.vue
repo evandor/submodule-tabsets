@@ -47,7 +47,6 @@ import { ref, watchEffect } from 'vue'
 const lastTabsets = ref<Pick<Tabset, 'id' | 'name' | 'status'>[]>([])
 const currentTabsetId = ref<string | undefined>(undefined)
 
-// eslint-disable-next-line @typescript-eslint/no-misused-promises
 watchEffect(() => {
   useTabsetsStore()
     .getCurrentTabsetId()

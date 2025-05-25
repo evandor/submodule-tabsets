@@ -4,12 +4,12 @@ import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import {
   AddUrlToTabsetHandler,
   AddUrlToTabsetHandlerAdditionalData,
+  ComponentWithContext,
 } from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
 import { AddTabToTabsetCommand } from 'src/tabsets/commands/AddTabToTabsetCommand'
 import { Tab } from 'src/tabsets/models/Tab'
 import { Tabset } from 'src/tabsets/models/Tabset'
-import { Component } from 'vue'
 
 export class DynamicUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
   constructor(public $q: QVueGlobals | undefined) {}
@@ -31,7 +31,7 @@ export class DynamicUrlAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
     return null as unknown as ActionContext
   }
 
-  actions(): Component[] {
+  actions(): ComponentWithContext[] {
     // return [new ActionContext("Dynamic Load", ButtonActions.DynamicLoad, this.folder)]
     // new ActionContext('Dynamic Load', ButtonActions.DynamicLoad, undefined)
     return []

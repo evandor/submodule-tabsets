@@ -5,13 +5,14 @@ import { ExecutionResult } from 'src/core/domain/ExecutionResult'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import { RestParam, RestTab } from 'src/rest/models/RestTab'
 import { RestApiDefinitions } from 'src/rest/RestApiDefinitions'
-import {
-  AddUrlToTabsetHandler,
-  AddUrlToTabsetHandlerAdditionalData,
-  ClickedHandler,
-} from 'src/tabsets/actionHandling/AddUrlToTabsetHandler'
 import { DefaultActions } from 'src/tabsets/actionHandling/handler/DefaultActions'
 import { ActionContext } from 'src/tabsets/actionHandling/model/ActionContext'
+import {
+  AddUrlToTabsetHandlerAdditionalData,
+  ClickedHandler,
+  ComponentWithContext,
+  TabActionMatcher,
+} from 'src/tabsets/actionHandling/TabActionMatcher'
 import { ActionProps } from 'src/tabsets/actions/models/ActionProps'
 import { AddTabToTabsetCommand } from 'src/tabsets/commands/AddTabToTabsetCommand'
 import { CreateFolderCommand } from 'src/tabsets/commands/CreateFolderCommand'
@@ -20,9 +21,8 @@ import { Tabset } from 'src/tabsets/models/Tabset'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { useTabsStore2 } from 'src/tabsets/stores/tabsStore2'
-import { Component } from 'vue'
 
-export class RapidApiAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
+export class RapidApiAddUrlToTabsetHandler implements TabActionMatcher {
   constructor(public $q: QVueGlobals) {}
 
   tabMatcher(url: string, content: string, metas: object): boolean {
@@ -39,7 +39,7 @@ export class RapidApiAddUrlToTabsetHandler implements AddUrlToTabsetHandler {
       .onOk(this.onOk)
   }
 
-  actions(currentTabsetId: string | undefined, actionProps: ActionProps): Component[] {
+  actions(currentTabsetId: string | undefined, actionProps: ActionProps): ComponentWithContext[] {
     const url = useContentStore().getCurrentTabUrl
     const currentTabset = useTabsetsStore().getCurrentTabset
 
