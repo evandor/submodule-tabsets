@@ -10,10 +10,7 @@ import {
   getDocs,
   setDoc,
 } from 'firebase/firestore'
-import { sha256 } from 'js-sha256'
 import { LocalStorage, uid } from 'quasar'
-import { useNotificationHandler } from 'src/core/services/ErrorHandler'
-import { useNotesStore } from 'src/notes/stores/NotesStore'
 import FirebaseServices from 'src/services/firebase/FirebaseServices'
 import { useEmailTemplates } from 'src/tabsets/emails/EmailTemplates'
 import { Tab } from 'src/tabsets/models/Tab'
@@ -23,8 +20,6 @@ import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { useThumbnailsService } from 'src/thumbnails/services/ThumbnailsService'
 import { useUiStore } from 'src/ui/stores/uiStore'
 import { useAuthStore } from 'stores/authStore'
-
-const { handleError } = useNotificationHandler()
 
 const STORE_IDENT = 'tabsets'
 
@@ -166,13 +161,6 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
         console.log('updating with ts', ts)
         await setDoc(doc(firestore, 'public-tabsets', sharedId), JSON.parse(JSON.stringify(ts)))
         await this.saveTabset(ts)
-
-        const notesForTabset = await useNotesStore().getNotesFor(ts.id)
-        console.log('found notes for tabset', ts.id, notesForTabset)
-        // for (const note of notesForTabset) {
-        //   //await setDoc(doc(firestore, "public-notes", note.id), JSON.parse(JSON.stringify(note)))
-        // }
-
         return
       } else {
         ts.sharing.sharedAt = new Date().getTime()
@@ -188,15 +176,6 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
         ts.id = 'publicly-shared-tabset'
         //ts.sharing?.sharedById = sha256(ts.sharing?.sharedById)
         await setDoc(doc(firestore, 'public-tabsets', publicId), JSON.parse(JSON.stringify(ts)))
-
-        const notesForTabset = await useNotesStore().getNotesFor(ts.id)
-        console.log('found notes for tabset', ts.id, notesForTabset)
-        for (const note of notesForTabset) {
-          note.sharedById = sha256(ts.sharing.sharedById)
-          note.sharedId = publicId
-          await setDoc(doc(firestore, 'public-notes', note.id), JSON.parse(JSON.stringify(note)))
-        }
-
         return
       }
     } catch (e) {
