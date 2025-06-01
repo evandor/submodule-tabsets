@@ -25,21 +25,7 @@
               </q-icon>
             </span>
           </template>
-
-          <Highlight :filter="props.filter" :text="nameOrTitle(props.tab as Tab) || ''">
-            <template v-slot:popup>
-              <q-popup-edit
-                v-if="popupEdit"
-                ref="popupRef"
-                @hide="popupEdit = false"
-                :model-value="nameOrTitle(props.tab as Tab)"
-                @update:model-value="(val: string) => setCustomTitle(tab, val)"
-                v-slot="scope"
-                anchor="center middle">
-                <q-input v-model="scope.value" dense autofocus counter @keyup.enter="scope.set" />
-              </q-popup-edit>
-            </template>
-          </Highlight>
+          <span class="text-subtitle2">{{ nameOrTitle(props.tab as Tab) || '' }}</span>
         </span>
         <div v-if="props.header" class="text-caption">{{ props.header }}</div>
       </div>
@@ -290,18 +276,30 @@
   </q-item-label>
 
   <!-- === comments === -->
-  <q-item-label v-if="showComments()" class="text-grey-5">
+  <q-item-label class="text-grey-5">
     <CommentChatMessages :comments="oldComments()" :tab="props.tab" :tabset-id="props.tabset?.id" />
     <h6 v-if="newComments().length > 0">new Message(s)</h6>
     <CommentChatMessages :comments="newComments()" :tab="props.tab" :tabset-id="props.tabset?.id" />
 
     <div class="row">
-      <div class="col-6 text-right">&nbsp;</div>
-      <div class="col text-right">
-        <q-input dense filled v-model="sendComment" />
-      </div>
-      <div class="col-1">
-        <q-btn icon="send" size="sm" @click="send()" />
+      <div class="col-3">&nbsp;</div>
+      <div class="col text-right" style="border: 0 solid green">
+        <div class="row">
+          <div class="col-4 q-mx-sm">
+            <q-input dense filled v-model="author" label="Your Name" />
+          </div>
+          <div class="col-6 q-mx-sm">
+            <q-input dense filled v-model="sendComment" label="Reply" />
+          </div>
+          <div class="col q-ml-sm q-mr-md items-baseline">
+            <q-btn
+              icon="send"
+              size="sm"
+              @click="send()"
+              :disable="disableSend()"
+              :color="disableSend() ? 'grey' : 'warning'" />
+          </div>
+        </div>
       </div>
     </div>
   </q-item-label>
@@ -328,11 +326,11 @@
 
 <script setup lang="ts">
 import { formatDistance } from 'date-fns'
-import { QPopupEdit, uid, useQuasar } from 'quasar'
+import { LocalStorage, uid, useQuasar } from 'quasar'
 import BrowserApi from 'src/app/BrowserApi'
 import TabListIconIndicatorsHook from 'src/app/hooks/tabsets/TabListIconIndicatorsHook.vue'
 import { FeatureIdent } from 'src/app/models/FeatureIdent'
-import { STRIP_CHARS_IN_USER_INPUT } from 'src/boot/constants'
+import { SHARING_AUTHOR_IDENT, STRIP_CHARS_IN_USER_INPUT } from 'src/boot/constants'
 import { TabReference, TabReferenceType } from 'src/content/models/TabReference'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import { NotificationType, useNotificationHandler } from 'src/core/services/ErrorHandler'
@@ -382,7 +380,7 @@ const props = defineProps<{
 
 const showButtonsProp = ref<boolean>(false)
 const tsBadges = ref<object[]>([])
-const showCommentList = ref(false)
+const showCommentList = ref(true)
 const showPlaceholderList = ref(false)
 const placeholders = ref<Object[]>([])
 const suggestion = ref<Suggestion | undefined>(undefined)
@@ -397,6 +395,7 @@ const doShowDetails = ref(false)
 const rssTabReferences = ref<TabReference[]>(
   props.tab?.tabReferences?.filter((r: TabReference) => r.type === TabReferenceType.RSS && r.status !== 'IGNORED'),
 )
+const author = ref<string>(LocalStorage.getItem(SHARING_AUTHOR_IDENT) || '')
 
 onMounted(() => {
   if (props.tabset?.id) {
@@ -613,6 +612,7 @@ const hideAll = () => rssTabReferences.value.forEach((r: TabReference) => ignore
 
 const send = () => {
   if (sendComment.value.trim() !== '') {
+    useUiStore().sharingAuthor = author.value
     useCommandExecutor()
       .executeFromUi(new AddCommentCommand(props.tab.id, sendComment.value))
       .then(() => (sendComment.value = ''))
@@ -632,7 +632,7 @@ const showSuggestion = () => {
 const openImage = () =>
   window.open(chrome.runtime.getURL('www/index.html#/mainpanel/png/' + props.tab.id + '/' + pngs.value[0]!.id))
 
-const showComments = () => props.showCommentsForMinimalDetails && props.tab.comments.length > 0
+const showComments = () => showCommentList.value && props.tab.comments.length > 0
 
 const showInReadingMode = () =>
   useNavigationService().browserTabFor(chrome.runtime.getURL(`/www/index.html#/mainpanel/readingmode/${props.tab.id}`))
@@ -663,4 +663,7 @@ const openTabset = (badge: any) => {
     router.push('/sidepanel' + '?highlight=' + badge.encodedUrl)
   }
 }
+
+const disableSend = () =>
+  !author.value || author.value.trim().length == 0 || !sendComment.value || sendComment.value.trim().length == 0
 </script>

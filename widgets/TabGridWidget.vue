@@ -2,32 +2,7 @@
   <q-card flat bordered style="border: 0px solid green">
     <q-card-section class="q-ma-none q-pa-xs cursor-pointer bg-primary text-white" style="width: 100%">
       <div class="row items-baseline">
-        <q-img
-          v-if="thumbnail"
-          style="border: 0 dotted white; border-radius: 3px; cursor: move"
-          :ratio="16 / 9"
-          :src="thumbnail">
-        </q-img>
-        <q-img
-          v-else-if="props.tab.image && props.tab.image.startsWith('blob://')"
-          no-spinner
-          style="border: 0 dotted white; border-radius: 5px"
-          :src="imgFromBlob">
-          <q-tooltip class="tooltip">Custom Screenshot</q-tooltip>
-        </q-img>
-        <q-img
-          v-else-if="props.tab.image"
-          style="border: 0 dotted white; border-radius: 5px"
-          :src="props.tab.image"
-          no-spinner>
-          <q-tooltip class="tooltip">Custom Screenshot</q-tooltip>
-        </q-img>
-        <q-img
-          v-else
-          no-spinner
-          style="border: 0 dotted white; border-radius: 3px; cursor: move"
-          :ratio="16 / 9"
-          src="https://placehold.co/600x400?text=no+thumbnail" />
+        <ImageForTab :tab="props.tab" :shared-by-id="props.sharedById" />
       </div>
     </q-card-section>
     <q-card-section class="q-ma-none q-pa-xs bg-primary text-white">
@@ -46,6 +21,7 @@ import NavigationService from 'src/services/NavigationService'
 import { useAuthStore } from 'src/stores/authStore'
 import { Tab } from 'src/tabsets/models/Tab'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
+import ImageForTab from 'src/tabsets/widgets/ImageForTab.vue'
 import TabFaviconWidget from 'src/tabsets/widgets/TabFaviconWidget.vue'
 import { useThumbnailsService } from 'src/thumbnails/services/ThumbnailsService'
 import { onMounted, ref, watchEffect } from 'vue'

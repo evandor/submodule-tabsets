@@ -212,16 +212,17 @@ export const useTabsetsStore = defineStore('tabsets', () => {
   }
 
   async function selectCurrentTabset(tabsetId: string): Promise<Tabset | undefined> {
-    //console.log('selectCurrentTabset', tabsetId)
-    await useSelectedTabsetService().setCurrentTabsetId(tabsetId)
+    console.log('selectCurrentTabset', tabsetId, [...tabsets.value.values()].map((ts: Tabset) => ts.id).join(','))
 
-    const found = _.find([...tabsets.value.values()] as Tabset[], (k: any) => {
+    const found = _.find([...tabsets.value.values()] as Tabset[], (k: Tabset) => {
+      console.log('checking tabset', k?.id)
       const ts = k || new Tabset('', '', [])
       return ts.id === tabsetId
     })
     if (found) {
       currentTabsetId.value = found.id
       currentTabsetFolderId.value = found.folderActive
+      await useSelectedTabsetService().setCurrentTabsetId(tabsetId)
       return found
     } else {
       console.debug(`did not find tabset ${tabsetId}, not trying to reload`)
@@ -460,7 +461,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     return tabset.tabs.filter((t: Tab) => t.page !== undefined)
   }
 
-  const loadPublicTabset = (sharedId: string) => storage.loadPublicTabset(sharedId)
+  const loadPublicTabset = (sharedId: string) => storage.loadPublicTabset(sharedId, undefined)
 
   const removeReminder = (tab: Tab) =>
     (reminderTabset.value.tabs = reminderTabset.value.tabs.filter((t: Tab) => t.id !== tab.id))

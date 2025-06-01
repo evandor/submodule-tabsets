@@ -1,8 +1,6 @@
 import { LocalStorage } from 'quasar'
-import { FeatureIdent } from 'src/app/models/FeatureIdent'
 import { useContentStore } from 'src/content/stores/contentStore'
 import { useSettingsStore } from 'src/core/stores/settingsStore'
-import { useFeaturesStore } from 'src/features/stores/featuresStore'
 import { ComponentWithContext } from 'src/tabsets/actionHandling/TabActionMatcher'
 import ConvertToCollectionAction from 'src/tabsets/actions/ConvertToCollectionAction.vue'
 import DeleteFolderAction from 'src/tabsets/actions/DeleteFolderAction.vue'
@@ -12,7 +10,6 @@ import { ActionProps } from 'src/tabsets/actions/models/ActionProps'
 import NewTabAction from 'src/tabsets/actions/NewTabAction.vue'
 import OpenTabsetAction from 'src/tabsets/actions/OpenTabsetAction.vue'
 import LoadRssFeedAction from 'src/tabsets/actions/rss/LoadRssFeedAction.vue'
-import ShareTabsetAction from 'src/tabsets/actions/ShareTabsetAction.vue'
 import { Tabset, TabsetType } from 'src/tabsets/models/Tabset'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 
@@ -32,9 +29,9 @@ export class DefaultActions {
     }
 
     //    actions.push(OpenAllInMenuAction)
-    if (useFeaturesStore().hasFeature(FeatureIdent.TABSETS_SHARING)) {
-      actions.push({ component: ShareTabsetAction, context: {} })
-    }
+    // if (useFeaturesStore().hasFeature(FeatureIdent.TABSETS_SHARING)) {
+    //   actions.push({ component: ShareTabsetAction, context: {} })
+    // }
 
     if (LocalStorage.getItem('ui.newtab.installed') && actionProps.level === 'root') {
       actions.push({ component: NewTabAction, context: {} })

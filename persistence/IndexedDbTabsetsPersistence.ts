@@ -101,7 +101,7 @@ class IndexedDbTabsetsPersistence implements TabsetsPersistence {
   loadPublicTabset(sharedId: string): Promise<Tabset> {
     const useDb = useDB().tabsetsDb
     // delegate to cloud db
-    return useDb.loadPublicTabset(sharedId)
+    return useDb.loadPublicTabset(sharedId, '???')
   }
 
   shareWith(

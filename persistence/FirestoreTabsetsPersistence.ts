@@ -8,6 +8,7 @@ import {
   Firestore,
   getDoc,
   getDocs,
+  QuerySnapshot,
   setDoc,
 } from 'firebase/firestore'
 import { LocalStorage, uid } from 'quasar'
@@ -17,7 +18,6 @@ import { Tab } from 'src/tabsets/models/Tab'
 import { AugmentedData, Tabset, TabsetSharing } from 'src/tabsets/models/Tabset'
 import TabsetsPersistence from 'src/tabsets/persistence/TabsetsPersistence'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
-import { useThumbnailsService } from 'src/thumbnails/services/ThumbnailsService'
 import { useUiStore } from 'src/ui/stores/uiStore'
 import { useAuthStore } from 'stores/authStore'
 
@@ -29,12 +29,20 @@ function tabsetDoc(tabsetId: string) {
   return doc(FirebaseServices.getFirestore(), 'users', useAuthStore().user.uid, STORE_IDENT, tabsetId)
 }
 
-function publicTabsetDoc(sharedId: string) {
-  return doc(FirebaseServices.getFirestore(), 'public-tabsets', sharedId)
+function publicTabsetDoc(sharedId: string, sharedBy: string) {
+  return doc(FirebaseServices.getFirestore(), 'users', sharedBy, 'tabsets', sharedId)
 }
 
 function tabsetsCollection() {
   return collection(FirebaseServices.getFirestore(), 'users', useAuthStore().user.uid, STORE_IDENT)
+}
+
+function publicTabsetsCollection() {
+  return collection(FirebaseServices.getFirestore(), 'public-tabsets')
+}
+
+function publicTabsetsDoc(docId: string) {
+  return doc(FirebaseServices.getFirestore(), 'public-tabsets', docId)
 }
 
 class FirestoreTabsetsPersistence implements TabsetsPersistence {
@@ -53,19 +61,34 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
   }
 
   async loadTabsets(): Promise<any> {
-    //console.log(' ...loading tabsets', this.getServiceName())
-    const docs = await getDocs(tabsetsCollection())
-    for (const doc of docs.docs) {
-      let newItem = doc.data()
-      newItem.id = doc.id
+    const isAnonymous = useAuthStore().user?.isAnonymous
+    console.log(' ...loading tabsets', this.getServiceName(), isAnonymous)
+    let docs: QuerySnapshot
+    if (isAnonymous) {
+      const publicTabsetsRefs = await getDocs(publicTabsetsCollection())
+      for (const d of publicTabsetsRefs.docs) {
+        const doc = d.data()
+        //console.log('doc', doc)
+        const publicTS = await this.loadPublicTabset(doc.tabsetId, doc.sharedBy)
+        //console.log('loaded', publicTS, doc)
+        publicTS.loaded = new Date().getTime()
+        useTabsetsStore().setTabset(publicTS)
+      }
+    } else {
+      docs = await getDocs(tabsetsCollection())
+      for (const doc of docs.docs) {
+        let newItem = doc.data()
+        newItem.id = doc.id
 
-      if (newItem['reference']) {
-        await this.loadFromReference(newItem as { reference: DocumentReference; readonly: boolean; sharedAt: number })
-      } else {
-        newItem.loaded = new Date().getTime()
-        useTabsetsStore().setTabset(newItem as Tabset)
+        if (newItem['reference']) {
+          await this.loadFromReference(newItem as { reference: DocumentReference; readonly: boolean; sharedAt: number })
+        } else {
+          newItem.loaded = new Date().getTime()
+          useTabsetsStore().setTabset(newItem as Tabset)
+        }
       }
     }
+
     console.log('loading tabsets, found ', useTabsetsStore().tabsets.size)
     // useUiStore().syncing = false
     return Promise.resolve(undefined)
@@ -115,7 +138,9 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
   ): Promise<TabsetSharing | void> {
     console.log(`setting property 'sharing' to ${sharingType} for tabset  ${ts.id} with sharedId ${sharedId}`, ts)
     // const ts = getTabset(tabsetId) ?? throwIdNotFound("tabset", tabsetId)
-
+    // if (new Date().getTime() != 0) {
+    //   return
+    // }
     const firestore: Firestore = FirebaseServices.getFirestore()
 
     ts.sharing.sharing = sharingType
@@ -125,7 +150,7 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
     if (sharingType === TabsetSharing.UNSHARED) {
       console.log('deleting share for tabset', ts.sharing?.sharedId)
       if (sharedId) {
-        await deleteDoc(doc(firestore, 'public-tabsets', sharedId))
+        //await deleteDoc(doc(firestore, 'public-tabsets', sharedId))
         ts.sharing.sharedBy = undefined
         ts.sharing.sharedById = undefined
         ts.sharing.sharedId = undefined
@@ -145,15 +170,16 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
       }
     }
 
-    console.log('setting thumbnails as images')
-    for (const tab of ts.tabs) {
-      const thumb = await useThumbnailsService().getThumbnailFor(tab.id, useAuthStore().user.uid)
-      if (thumb) {
-        if (thumb && thumb['thumbnail' as keyof object]) {
-          tab.image = thumb['thumbnail' as keyof object]!
-        }
-      }
-    }
+    // console.log('setting thumbnails as images')
+    // for (const tab of ts.tabs) {
+    //   try {
+    //     const thumb = await useThumbnailsService().getThumbnailFor(tab.id, useAuthStore().user.uid)
+    //     console.log(`got thumbnail for ${tab.id} (user ${useAuthStore().user.uid}): ${thumb}`)
+    //     if (thumb) {
+    //       tab.image = thumb
+    //     }
+    //   } catch (e) {}
+    // }
 
     try {
       if (sharedId) {
@@ -168,14 +194,18 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
         const publicId = uid()
         console.log('setting shared id to ', publicId)
 
-        ts.sharing.sharedId = publicId
+        ts.sharing.sharedId = ts.id // use the internal id (for now?)
         ts.sharing.sharedById = useAuthStore().user.uid
         await this.saveTabset(ts)
 
         // avoid id leakage
-        ts.id = 'publicly-shared-tabset'
+        //ts.id = 'publicly-shared-tabset'
         //ts.sharing?.sharedById = sha256(ts.sharing?.sharedById)
-        await setDoc(doc(firestore, 'public-tabsets', publicId), JSON.parse(JSON.stringify(ts)))
+        // console.log('adding to public-tabsets', publicId, ts.sharing.sharedById)
+        // await setDoc(doc(firestore, 'public-tabsets', publicId), {
+        //   sharedBy: ts.sharing.sharedById,
+        //   sharedId: publicId,
+        // })
         return
       }
     } catch (e) {
@@ -229,8 +259,15 @@ class FirestoreTabsetsPersistence implements TabsetsPersistence {
     await useTabsetsStore().saveTabset(ts)
   }
 
-  async loadPublicTabset(sharedId: string): Promise<Tabset> {
-    const res = await getDoc(publicTabsetDoc(sharedId))
+  async loadPublicTabset(sharedId: string, sharedBy: string | undefined = undefined): Promise<Tabset> {
+    if (!sharedBy) {
+      const sharedData = await getDoc(publicTabsetsDoc(sharedId))
+      if (sharedData.data()) {
+        const sBy = sharedData.data()!['sharedBy']
+        return (await getDoc(publicTabsetDoc(sharedId, sBy))).data() as Tabset
+      }
+    }
+    const res = await getDoc(publicTabsetDoc(sharedId, sharedBy!))
     return res.data() as Tabset
   }
 

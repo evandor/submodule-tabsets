@@ -40,16 +40,17 @@
                 <q-tooltip class="tooltip-small">Click here to open in Reading Mode</q-tooltip>
               </q-icon>
 
-              <q-icon
+              <q-btn
                 v-if="(props.tab as Tab).comments && (props.tab as Tab).comments.length > 0"
-                name="o_chat"
-                size="16px"
-                color="primary"
-                style="position: relative; top: 1px"
-                class="q-ma-none q-pa-none q-ml-xs"
+                icon="o_chat"
+                flat
+                size="12px"
+                style="position: relative; top: 4px"
+                class="q-ma-none q-pa-none q-mx-xs"
                 @click.stop="toggleShowWith('comments')">
+                <q-badge floating color="warning" text-color="primary">{{ newCommentsCount() }}</q-badge>
                 <q-tooltip class="tooltip-small">There are comments for this tab</q-tooltip>
-              </q-icon>
+              </q-btn>
 
               <q-icon
                 v-if="props.tab.reminder"
@@ -161,19 +162,36 @@
       style="border: 0 solid brown">
       <div class="col-1 q-ml-sm q-mt-xs"></div>
       <div class="col">
-        <div
-          v-if="showCommentList"
-          v-for="c in props.tab.comments.sort((a: TabComment, b: TabComment) => b.date - a.date)"
-          class="row q-mr-md q-mt-sm q-pa-sm"
-          style="border: 1px solid #efefef; border-radius: 3px">
-          <div class="col-10 text-body2" @click.stop="editComment(c)">
-            {{ c.comment }}
+        <template v-if="showCommentList">
+          <div
+            v-if="showCommentList"
+            v-for="c in props.tab.comments.sort((a: TabComment, b: TabComment) => a.date - b.date)"
+            class="row q-mr-md q-mt-sm q-pa-sm"
+            :style="
+              c.date > commentsUpdateThreshold
+                ? 'border: 1px solid blue; border-radius: 3px'
+                : 'border: 1px solid #efefef; border-radius: 3px'
+            ">
+            <div class="col-10 text-body2" @click.stop="editComment(c)">{{ c.comment }}</div>
+            <div class="col text-right">
+              <q-icon size="14px" color="primary" name="sym_o_delete" @click.stop="deleteComment(c)" />
+            </div>
+            <div class="col-12 text-right text-caption q-mt-xs">{{ formatDate(c.date) }}</div>
           </div>
-          <div class="col text-right">
-            <q-icon size="14px" color="primary" name="sym_o_delete" @click.stop="deleteComment(c)" />
+          <div class="row">
+            <div class="col-10 q-mx-sm">
+              <q-input type="text" filled dense autogrow v-model="newComment" />
+            </div>
+            <div class="col q-pr-sm" style="border: 0 solid green; display: flex">
+              <q-icon
+                name="send"
+                @click="addComment()"
+                color="warning"
+                style="align-self: center; margin-left: auto"
+                :disable="!newComment" />
+            </div>
           </div>
-          <div class="col-12 text-right text-caption q-mt-xs">{{ formatDate(c.date) }}</div>
-        </div>
+        </template>
         <div
           v-else-if="props.tab.comments.length > 0"
           class="q-ml-sm text-caption"
@@ -399,6 +417,7 @@ import { RestTab } from 'src/rest/models/RestTab'
 import TabService from 'src/services/TabService'
 import { Suggestion } from 'src/suggestions/domain/models/Suggestion'
 import { useSuggestionsStore } from 'src/suggestions/stores/suggestionsStore'
+import { AddCommentCommand } from 'src/tabsets/commands/AddCommentCommand'
 import { CreateFolderCommand } from 'src/tabsets/commands/CreateFolderCommand'
 import { DeleteCommentCommand } from 'src/tabsets/commands/DeleteCommentCommand'
 import { OpenTabCommand } from 'src/tabsets/commands/OpenTabCommand'
@@ -435,14 +454,17 @@ const suggestion = ref<Suggestion | undefined>(undefined)
 const doShowDetails = ref(false)
 const showCommentList = ref(false)
 const showRssFeedList = ref(false)
+const commentsUpdateThreshold = ref(0)
 const showPlaceholderList = ref(false)
 const opensearchterm = ref<string | undefined>(undefined)
 const monitor = ref<MonitoredTab | undefined>(undefined)
 const rssTabReferences = ref<TabReference[]>(
   props.tab.tabReferences?.filter((r: TabReference) => r.type === TabReferenceType.RSS && r.status !== 'IGNORED'),
 )
+const newComment = ref<string | undefined>(undefined)
 
 onMounted(() => {
+  commentsUpdateThreshold.value = props.tab.commentsLastUpdated || 0
   // if (props.tabset?.id) {
   //   newCommentIds.value = useEventsServices().listNewComments(props.tabset.id, props.tab)
   // }
@@ -477,6 +499,10 @@ const toggleLists = (ident: string) => {
     case 'comments':
       showCommentList.value = !showCommentList.value
       console.log('showCommentList set to', showCommentList.value)
+      if (showCommentList.value && props.tab) {
+        props.tab.commentsLastUpdated = new Date().getTime()
+        console.log('***', props.tab.commentsLastUpdated)
+      }
       break
     case 'placeholder':
       showPlaceholderList.value = !showPlaceholderList.value
@@ -647,6 +673,15 @@ const callRestApi = (tab: Tab) => {
   console.log(`about to call ${restTab.api} with ${JSON.stringify(restTab.params)}`)
   useNavigationService().browserTabFor(chrome.runtime.getURL('www/index.html/#/mainpanel/restapi/' + restTab.id))
 }
+
+const addComment = () => {
+  if (newComment.value) {
+    useCommandExecutor().executeFromUi(new AddCommentCommand(props.tab.id, newComment.value))
+  }
+}
+
+const newCommentsCount = () =>
+  props.tab.comments.filter((c: TabComment) => c.date > commentsUpdateThreshold.value).length
 </script>
 
 <style lang="scss" src="src/tabsets/widgets/css/panelTabListElementWidget.scss" />

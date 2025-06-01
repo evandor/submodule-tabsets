@@ -1,27 +1,39 @@
-<!-- TabsetsPage -->
+<!-- PublicTabsetPage -->
 <template>
-  {{ activeTab?.url || '???' }}
-  <embed v-if="activeTab" :src="activeTab.url || ''" width="100%" height="1000px" />
+  <TabList
+    v-if="tabset"
+    group="otherTabs"
+    :tabsetId="tabset.id"
+    :tabset="tabset"
+    :tabsetSorting="tabset.sorting"
+    :tabsetSharedId="tabset.sharing?.sharedId!"
+    :tabs="tabset.tabs"
+    :detailLevel="'SOME'" />
 </template>
 
 <script setup lang="ts">
 import Analytics from 'src/core/utils/google-analytics'
-import { Tab } from 'src/tabsets/models/Tab'
+import { Tabset } from 'src/tabsets/models/Tabset'
+import TabList from 'src/tabsets/pages/pwa/TabList.vue'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
 import { onMounted, ref, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
 
-const activeTab = ref<Tab | undefined>(undefined)
+const tabset = ref<Tabset | undefined>(undefined)
 
 onMounted(() => {
   Analytics.firePageViewEvent('PublicTabsetPage', document.location.href)
 })
 
 watchEffect(() => {
-  const tabId = route.params.tabId as string
-  console.log('got tabid', tabId)
-  activeTab.value = useTabsetsStore().getTabAndTabsetId(tabId)?.tab
+  if (route.params.tabsetId) {
+    useTabsetsStore()
+      .selectCurrentTabset(route.params.tabsetId as string)
+      .then((ts: Tabset | undefined) => (tabset.value = ts))
+  } else {
+    tabset.value = useTabsetsStore().getCurrentTabset
+  }
 })
 </script>

@@ -11,7 +11,13 @@
           <q-item-section style="padding-right: 0; min-width: 25px; max-width: 25px">
             <q-icon size="xs" name="o_info" color="accent" />
           </q-item-section>
-          <q-item-section> Tab Details (dev)</q-item-section>
+          <q-item-section>Tab Details (dev)</q-item-section>
+        </q-item>
+        <q-item clickable v-close-popup @click.stop="showTabsJson(props['tab' as keyof object])">
+          <q-item-section style="padding-right: 0; min-width: 25px; max-width: 25px">
+            <q-icon size="xs" name="o_info" color="accent" />
+          </q-item-section>
+          <q-item-section>Tab's JSON</q-item-section>
         </q-item>
       </template>
 
@@ -23,8 +29,7 @@
         <q-item-section> Edit Tab</q-item-section>
       </q-item>
 
-      <template
-        v-if="useSettingsStore().has('DEV_MODE') && props.tabset?.type.toString() !== TabsetType.DYNAMIC.toString()">
+      <template v-if="props.tabset?.type.toString() !== TabsetType.DYNAMIC.toString()">
         <q-item clickable v-close-popup @click.stop="addCommentDialog()">
           <q-item-section style="padding-right: 0; min-width: 25px; max-width: 25px">
             <q-icon size="xs" name="o_note" color="info" />
@@ -134,6 +139,7 @@ import PanelTabListContextMenuHook from 'src/app/hooks/tabsets/PanelTabListConte
 import { FeatureIdent } from 'src/app/models/FeatureIdent'
 import ColorSelector from 'src/core/dialog/ColorSelector.vue'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
+import { useNavigationService } from 'src/core/services/NavigationService'
 import { useSettingsStore } from 'src/core/stores/settingsStore'
 import { useFeaturesStore } from 'src/features/stores/featuresStore'
 import NavigationService from 'src/services/NavigationService'
@@ -191,8 +197,12 @@ const deleteTab = async () => {
 
 const showTabDetails = async (tab: Tab) => {
   const useTab: Tab = await tabToUse(tab)
-  console.log('showing tab details for', useTab)
   router.push('/sidepanel/tab/' + useTab.id)
+}
+
+const showTabsJson = async (tab: Tab) => {
+  const useTab: Tab = await tabToUse(tab)
+  useNavigationService().browserTabFor(chrome.runtime.getURL(`/www/index.html#/mainpanel/tab/${useTab.id}?tab=debug`))
 }
 
 const showTabDetailsMenuEntry = (tab: Tab) => useSettingsStore().has('DEV_MODE') && !fullpageView

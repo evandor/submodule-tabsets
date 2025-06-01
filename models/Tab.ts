@@ -162,6 +162,7 @@ export class Tab {
   // canvasHeight: number | undefined
 
   comments: TabComment[] = []
+  commentsLastUpdated: number = 0
 
   snippets: TabSnippet[] = []
 
