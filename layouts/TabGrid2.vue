@@ -47,7 +47,7 @@
       >
       <q-menu touch-position context-menu v-if="inBexMode()">
         <q-list dense style="min-width: 100px">
-          <q-item clickable v-close-popup @click="createThumbnail(item.tab)">
+          <q-item clickable v-close-popup @click="createThumbnail(item.tab, props.tabset)">
             <q-item-section>(re-)create thumbnail</q-item-section>
           </q-item>
         </q-list>
@@ -223,7 +223,7 @@ const movedEvent = (i: any, newX: any, newY: any) => {
   }
 }
 
-const createThumbnail = async (tab: Tab) => {
+const createThumbnail = async (tab: Tab, tabset: Tabset) => {
   if (!tab || !tab.url) {
     return
   }
@@ -234,10 +234,10 @@ const createThumbnail = async (tab: Tab) => {
   if (openTab) {
     console.log('found open tab', openTab.id)
     await chrome.tabs.update(openTab.id || 0, { active: true })
-    useThumbnailsService().captureVisibleTab(tab.id, '?????', (tabId: string, tabsetId: string, dataUrl: string) => {
+    useThumbnailsService().captureVisibleTab(tab.id, tabset.id, (tabId: string, tabsetId: string, dataUrl: string) => {
       AppEventDispatcher.dispatchEvent('capture-screenshot', {
         tabId: tabId,
-        tabsetId: '?????',
+        tabsetId: tabset.id,
         data: dataUrl,
       })
       if (currentTab) {

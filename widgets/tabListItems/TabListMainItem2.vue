@@ -26,6 +26,9 @@
             </q-popup-edit>
           </template>
         </Highlight>
+        <q-tooltip class="tooltip-small" v-if="useSettingsStore().has('DEBUG_MODE')"
+          >TabID: {{ props.tab.id }}</q-tooltip
+        >
       </span>
       <div v-if="props.header" class="text-caption">{{ props.header }}</div>
     </div>
@@ -42,6 +45,7 @@ import { useCommandExecutor } from 'src/core/services/CommandExecutor'
 import { NotificationType, useNotificationHandler } from 'src/core/services/ErrorHandler'
 import { useNavigationService } from 'src/core/services/NavigationService'
 import { useUtils } from 'src/core/services/Utils'
+import { useSettingsStore } from 'src/core/stores/settingsStore'
 import { useEventsServices } from 'src/events/services/EventsServices'
 import { useFeaturesStore } from 'src/features/stores/featuresStore'
 import { RestTab } from 'src/rest/models/RestTab'

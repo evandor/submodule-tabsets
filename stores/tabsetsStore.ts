@@ -460,7 +460,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     return tabset.tabs.filter((t: Tab) => t.page !== undefined)
   }
 
-  const loadPublicTabset = (sharedId: string) => storage.loadPublicTabset(sharedId)
+  const loadPublicTabset = (sharedId: string) => storage.loadPublicTabset(sharedId, undefined)
 
   const removeReminder = (tab: Tab) =>
     (reminderTabset.value.tabs = reminderTabset.value.tabs.filter((t: Tab) => t.id !== tab.id))

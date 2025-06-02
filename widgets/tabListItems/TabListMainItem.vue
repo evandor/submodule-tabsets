@@ -24,17 +24,6 @@
                 <q-tooltip class="tooltip-small">There are placeholders defined for this tab</q-tooltip>
               </q-icon>
             </span>
-            <!--              <span v-if="showRssReferencesInfo()">-->
-            <!--                <q-icon-->
-            <!--                  name="rss_feed"-->
-            <!--                  size="12px"-->
-            <!--                  color="primary"-->
-            <!--                  style="position: relative; top: -5px"-->
-            <!--                  class="q-mr-xs"-->
-            <!--                  @click.stop="toggleShowWith('comments')">-->
-            <!--                  <q-tooltip class="tooltip-small">There are comments for this tab</q-tooltip>-->
-            <!--                </q-icon>-->
-            <!--              </span>-->
           </template>
 
           <Highlight :filter="props.filter" :text="nameOrTitle(props.tab as Tab) || ''">

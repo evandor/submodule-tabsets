@@ -34,7 +34,7 @@ interface TabsetsPersistence {
     sharedBy: string | undefined,
   ): Promise<TabsetSharing | void>
 
-  loadPublicTabset(sharedId: string): Promise<Tabset>
+  loadPublicTabset(sharedId: string, sharedBy: string | undefined): Promise<Tabset>
 
   // optional migration code for 0.4.11 to 0.5.0
   migrate(): any
