@@ -18,7 +18,11 @@
           </div>
           <div
             class="text-right"
-            :style="TabService.isCurrentTab(props.tab) ? 'border-right:3px solid #1565C0;border-radius:3px' : ''">
+            :style="
+              TabService.isCurrentTab(props.tab)
+                ? 'border-right:3px solid #1565C0;border-radius:3px'
+                : 'border-right:3px solid #F5F5F5;border-radius:3px'
+            ">
             <slot name="actionPart">
               <q-icon
                 v-if="(props.tab as Tab).placeholders"

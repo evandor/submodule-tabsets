@@ -28,11 +28,6 @@ export class DefaultActions {
       actions.push({ component: ExportTabsetAction, context: {} })
     }
 
-    //    actions.push(OpenAllInMenuAction)
-    // if (useFeaturesStore().hasFeature(FeatureIdent.TABSETS_SHARING)) {
-    //   actions.push({ component: ShareTabsetAction, context: {} })
-    // }
-
     if (LocalStorage.getItem('ui.newtab.installed') && actionProps.level === 'root') {
       actions.push({ component: NewTabAction, context: {} })
     }
