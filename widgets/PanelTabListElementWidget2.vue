@@ -306,7 +306,7 @@
     <!-- maximum details -->
     <div
       class="row fit"
-      v-if="showWithMinDetails('MAXIMAL') || props.tab?.details === 'MAXIMAL'"
+      v-if="showOpenSearchInput() && (showWithMinDetails('MAXIMAL') || props.tab?.details === 'MAXIMAL')"
       style="border: 0 solid red">
       <div class="col-1 q-ml-sm q-mt-xs"></div>
       <div class="col fit q-ml-sm" @click="gotoTab()">
@@ -686,6 +686,8 @@ const addComment = () => {
 
 const newCommentsCount = () =>
   props.tab.comments.filter((c: TabComment) => c.date > commentsUpdateThreshold.value).length
+
+const showOpenSearchInput = () => (props.tab ? hasReference(props.tab, TabReferenceType.OPEN_SEARCH) : false)
 </script>
 
 <style lang="scss" src="src/tabsets/widgets/css/panelTabListElementWidget.scss" />

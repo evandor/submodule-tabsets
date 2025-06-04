@@ -139,6 +139,7 @@ import PanelTabListContextMenuHook from 'src/app/hooks/tabsets/PanelTabListConte
 import { FeatureIdent } from 'src/app/models/FeatureIdent'
 import ColorSelector from 'src/core/dialog/ColorSelector.vue'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
+import { useNavigationService } from 'src/core/services/NavigationService'
 import { useSettingsStore } from 'src/core/stores/settingsStore'
 import { useFeaturesStore } from 'src/features/stores/featuresStore'
 import NavigationService from 'src/services/NavigationService'
