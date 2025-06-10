@@ -44,6 +44,8 @@ export const useTabsStore2 = defineStore('browsertabs', () => {
   const { inBexMode, addListenerOnce } = useUtils()
 
   // === listeners ===
+  const onTabActivatedListener = (activeInfo: chrome.tabs.TabActiveInfo) => onTabActivated(activeInfo)
+
   const onTabUpdatedListener = (tabId: number, changeInfo: chrome.tabs.TabChangeInfo, tab: chrome.tabs.Tab) =>
     onTabUpdated(tabId, changeInfo, tab)
 
@@ -77,8 +79,12 @@ export const useTabsStore2 = defineStore('browsertabs', () => {
    */
   async function initialize() {
     if (inBexMode()) {
+      console.log('initializing tabsStore2')
       browserTabs.value = await queryTabs()
+      await setCurrentTab()
 
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      addListenerOnce(chrome.tabs.onActivated, onTabActivatedListener)
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       addListenerOnce(chrome.tabs.onUpdated, onTabUpdatedListener)
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
@@ -88,15 +94,21 @@ export const useTabsStore2 = defineStore('browsertabs', () => {
     }
   }
 
+  async function onTabActivated(activeInfo: chrome.tabs.TabActiveInfo) {
+    console.log(`tabActivated!: ${JSON.stringify(activeInfo)}`)
+    //browserTabs.value = await queryTabs()
+    //await setCurrentTab()
+  }
+
   // #region snippet
   async function onTabUpdated(number: number, info: chrome.tabs.TabChangeInfo, chromeTab: chrome.tabs.Tab) {
     if (info.status !== 'complete') {
       return
     }
-    //console.debug(`tabUpdate: ${chromeTab.url?.substring(0, 30)}`)
+    console.log(`tabUpdate (complete): ${chromeTab.url?.substring(0, 30)}, ${JSON.stringify(info)}`)
     browserTabs.value = await queryTabs()
+    await setCurrentTab()
   }
-
   // #endregion snippet
 
   async function onTabRemoved(tabId: number, removeInfo: chrome.tabs.TabRemoveInfo) {
@@ -112,6 +124,8 @@ export const useTabsStore2 = defineStore('browsertabs', () => {
   //async function loadTabs(eventName: string) {}
 
   function setCurrentChromeTab(tab: chrome.tabs.Tab) {
+    console.log(`setting currentChromeTab to ${JSON.stringify(tab)}`)
+
     currentChromeTab.value = tab
     currentChromeTabs.value.set(tab.windowId, tab)
     const MAX_HISTORY_LENGTH = 12
@@ -239,6 +253,30 @@ export const useTabsStore2 = defineStore('browsertabs', () => {
       return { tabsetId: maxOverlapTs!.id, tabsetName: maxOverlapTs!.name, folder: undefined }
     }
     return undefined
+  }
+
+  async function setCurrentTab(): Promise<chrome.tabs.Tab> {
+    const tabs = await chrome.tabs.query({ active: true, lastFocusedWindow: true })
+    if (chrome.runtime.lastError) {
+      console.warn('got runtime error:' + JSON.stringify(chrome.runtime.lastError))
+    }
+    console.debug('setting current tab', tabs)
+    if (tabs && tabs[0]) {
+      setCurrentChromeTab(tabs[0] as unknown as chrome.tabs.Tab)
+      return Promise.resolve(tabs[0])
+    } else {
+      // Seems to be necessary when creating a new chrome group
+      const tabs2 = await chrome.tabs.query({ active: true })
+      if (chrome.runtime.lastError) {
+        console.warn('got runtime error:' + JSON.stringify(chrome.runtime.lastError))
+      }
+      //console.log("setting current tab II", tabs2)
+      if (tabs2 && tabs2[0]) {
+        setCurrentChromeTab(tabs2[0] as unknown as chrome.tabs.Tab)
+        return Promise.resolve(tabs2[0])
+      }
+    }
+    return Promise.reject('not able to determine current tab')
   }
 
   return {

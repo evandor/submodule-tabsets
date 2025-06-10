@@ -167,12 +167,13 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     // are deprecated
     let foundSomething = false
     ts.tabs.forEach((t: Tab) => {
+      if (!t.comments) {
+        foundSomething = true
+        t.comments = []
+      }
       if (t.note && t.note.trim().length > 0) {
         foundSomething = true
         console.warn('deprecated property: found tab with note, turning into comment')
-        if (!t.comments) {
-          t.comments = []
-        }
         t.comments.push(new TabComment('', t.note))
         delete t['note' as keyof object]
       }

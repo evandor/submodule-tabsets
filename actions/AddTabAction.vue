@@ -4,6 +4,7 @@
   </template>
   <template v-else>
     <fab-like-btn
+      :disabled="props.disable"
       @button-clicked="clicked()"
       :color="alreadyInTabset ? 'grey-5' : containedInTsCount > 0 ? 'primary' : 'warning'"
       :class="{ shakeWithColor: animateAddtabButton, 'cursor-pointer': !alreadyInTabset }"
