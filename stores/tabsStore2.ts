@@ -1,9 +1,16 @@
 import _ from 'lodash'
 import { defineStore } from 'pinia'
+import { LocalStorage, uid } from 'quasar'
+import { useContentStore } from 'src/content/stores/contentStore'
 import { useUtils } from 'src/core/services/Utils'
+import { Suggestion } from 'src/suggestions/domain/models/Suggestion'
+import { useSuggestionsStore } from 'src/suggestions/stores/suggestionsStore'
 import { Tab } from 'src/tabsets/models/Tab'
-import { Tabset } from 'src/tabsets/models/Tabset'
+import { TabAndTabsetId } from 'src/tabsets/models/TabAndTabsetId'
+import { ChangeInfo, Tabset } from 'src/tabsets/models/Tabset'
+import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useTabsetsStore } from 'src/tabsets/stores/tabsetsStore'
+import { useTabsetsUiStore } from 'src/tabsets/stores/tabsetsUiStore'
 import { computed, ComputedRef, ref } from 'vue'
 
 async function queryTabs(): Promise<chrome.tabs.Tab[]> {
@@ -71,6 +78,10 @@ export const useTabsStore2 = defineStore('browsertabs', () => {
   // we are currently navigating through the history?
   const chromeTabsHistoryNavigating = ref(false)
 
+  // timers (reading time)
+  let timer: { time: number; start: number; url: string } = { time: 0, start: new Date().getTime(), url: '' }
+  const timers = new Map<string, number>()
+
   // *** actions ***
 
   /**
@@ -79,7 +90,7 @@ export const useTabsStore2 = defineStore('browsertabs', () => {
    */
   async function initialize() {
     if (inBexMode()) {
-      console.log('initializing tabsStore2')
+      //console.log('initializing tabsStore2')
       browserTabs.value = await queryTabs()
       await setCurrentTab()
 
@@ -94,10 +105,71 @@ export const useTabsStore2 = defineStore('browsertabs', () => {
     }
   }
 
+  async function stopTimer(url: string) {
+    const duration = new Date().getTime() - timer.start
+    //console.log(`stopping timer for ${url}: ${timer.time} + ${duration}`)
+    const tabsForUrl: TabAndTabsetId[] = useTabsetsStore().tabsForUrl(url)
+    for (const tabWithTsId of tabsForUrl) {
+      //console.log('found', tabWithTsId)
+      tabWithTsId.tab.readingTime += Math.min(duration, 60000)
+      const ts = useTabsetsStore().getTabset(tabWithTsId.tabsetId)
+      if (ts) {
+        //console.log('saving', ts)
+        await useTabsetService().saveTabset(
+          ts,
+          new ChangeInfo('tab', 'edited', tabWithTsId.tab.id, tabWithTsId.tab.url),
+        )
+      }
+    }
+    if (tabsForUrl.length === 0) {
+      timers.set(url, timer.time + duration)
+    }
+    //console.log('timers', timers)
+  }
+
+  function startTimer(url: string | undefined) {
+    if (url) {
+      if (timer.url !== url) {
+        stopTimer(timer.url) // stop 'old' timer
+      }
+      timer = { start: new Date().getTime(), url: url, time: timers.get(url) || 0 }
+      //console.log('started timer', timer)
+    }
+  }
+
   async function onTabActivated(activeInfo: chrome.tabs.TabActiveInfo) {
-    console.log(`tabActivated!: ${JSON.stringify(activeInfo)}`)
-    //browserTabs.value = await queryTabs()
-    //await setCurrentTab()
+    console.log(`tabActivated: ${JSON.stringify(activeInfo)}`)
+    useTabsetsUiStore().updateExtensionIcon(activeInfo.tabId)
+    const tab: chrome.tabs.Tab = await chrome.tabs.get(activeInfo.tabId)
+    await useContentStore().resetFor(tab)
+    useTabsetService().urlWasActivated(tab.url)
+    useTabsetsUiStore().setMatchingTabsFor(tab.url)
+    startTimer(tab.url)
+  }
+
+  async function checkSwitchTabsetSuggestion(windowId: number) {
+    if (!LocalStorage.getItem('ui.overlapIndicator')) {
+      return Promise.resolve()
+    }
+    const suggestedTabsetAndFolder = await useTabsStore2().suggestTabsetAndFolder(0.6)
+    if (suggestedTabsetAndFolder) {
+      console.log('suggestedTabsetAndFolder', suggestedTabsetAndFolder)
+      const suggestion = new Suggestion(
+        uid(), //'SWITCH_TABSET',
+        'Switch Tabset?',
+        'Your currently open tabs match a different tabset: ' +
+          suggestedTabsetAndFolder?.tabsetName +
+          '. Do you want to switch to this tabset?',
+        'tabset://' + suggestedTabsetAndFolder?.tabsetId + '/' + suggestedTabsetAndFolder?.folder,
+        'SWITCH_TABSET',
+      )
+      //  .setImage('o_tab')
+      // .setState('PRIO')
+      //  .setWindowId(windowId)
+      suggestion.applyLabel = 'switch'
+      suggestion.windowId = windowId
+      await useSuggestionsStore().addSuggestion(suggestion)
+    }
   }
 
   // #region snippet
@@ -108,6 +180,12 @@ export const useTabsStore2 = defineStore('browsertabs', () => {
     console.log(`tabUpdate (complete): ${chromeTab.url?.substring(0, 30)}, ${JSON.stringify(info)}`)
     browserTabs.value = await queryTabs()
     await setCurrentTab()
+
+    useTabsetsUiStore().setMatchingTabsFor(chromeTab.url)
+    useTabsetService().urlWasActivated(chromeTab.url)
+    useTabsetsUiStore().updateExtensionIcon(chromeTab.id)
+
+    await checkSwitchTabsetSuggestion(chromeTab.windowId)
   }
   // #endregion snippet
 
@@ -124,7 +202,7 @@ export const useTabsStore2 = defineStore('browsertabs', () => {
   //async function loadTabs(eventName: string) {}
 
   function setCurrentChromeTab(tab: chrome.tabs.Tab) {
-    console.log(`setting currentChromeTab to ${JSON.stringify(tab)}`)
+    //console.log(`setting currentChromeTab to ${JSON.stringify(tab)}`)
 
     currentChromeTab.value = tab
     currentChromeTabs.value.set(tab.windowId, tab)
