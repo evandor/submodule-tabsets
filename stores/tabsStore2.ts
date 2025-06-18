@@ -59,6 +59,8 @@ export const useTabsStore2 = defineStore('browsertabs', () => {
   const onTabRemovedListener = (tabId: number, removeInfo: chrome.tabs.TabRemoveInfo) => onTabRemoved(tabId, removeInfo)
   const onTabMovedListener = (tabId: number, removeInfo: chrome.tabs.TabMoveInfo) => onTabMoved(tabId, removeInfo)
 
+  const onWindowFocusChangedListener = (windowId: number) => onWindowFocusChanged(windowId)
+
   // === state ===
   // browser's current windows tabs, reloaded on various events
   const browserTabs = ref<chrome.tabs.Tab[]>([])
@@ -102,7 +104,13 @@ export const useTabsStore2 = defineStore('browsertabs', () => {
       addListenerOnce(chrome.tabs.onRemoved, onTabRemovedListener)
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       addListenerOnce(chrome.tabs.onMoved, onTabMovedListener)
+
+      addListenerOnce(chrome.windows.onFocusChanged, onWindowFocusChangedListener)
     }
+  }
+
+  function stopTimers() {
+    timer = { time: 0, start: new Date().getTime(), url: '' }
   }
 
   async function stopTimer(url: string) {
@@ -187,6 +195,7 @@ export const useTabsStore2 = defineStore('browsertabs', () => {
 
     await checkSwitchTabsetSuggestion(chromeTab.windowId)
   }
+
   // #endregion snippet
 
   async function onTabRemoved(tabId: number, removeInfo: chrome.tabs.TabRemoveInfo) {
@@ -197,6 +206,12 @@ export const useTabsStore2 = defineStore('browsertabs', () => {
   async function onTabMoved(tabId: number, moveInfo: chrome.tabs.TabMoveInfo) {
     console.log('onTabMoved', tabId, moveInfo)
     browserTabs.value = await queryTabs()
+  }
+
+  function onWindowFocusChanged(windowId: number) {
+    if (windowId === chrome.windows.WINDOW_ID_NONE) {
+      stopTimers()
+    }
   }
 
   //async function loadTabs(eventName: string) {}
