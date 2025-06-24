@@ -10,6 +10,7 @@ import { STRIP_CHARS_IN_COLOR_INPUT, STRIP_CHARS_IN_USER_INPUT } from 'src/boot/
 import { useFeaturesStore } from 'src/features/stores/featuresStore'
 import NavigationService from 'src/services/NavigationService'
 import { useAuthStore } from 'src/stores/authStore'
+import { FolderNode } from 'src/tabsets/models/FolderNode'
 import { Tab, TabComment } from 'src/tabsets/models/Tab'
 import { TabAndTabsetId } from 'src/tabsets/models/TabAndTabsetId'
 import { ChangeInfo, Tabset, TabsetSharing, TabsetStatus } from 'src/tabsets/models/Tabset'
@@ -316,11 +317,11 @@ export const useTabsetsStore = defineStore('tabsets', () => {
   const tabsForUrl = computed((): ((url: string) => TabAndTabsetId[]) => {
     const placeholderPattern = /\${[^}]*}/gm
     return (url: string) => {
+      // console.log('---', url, [...tabsets.value.values()] as Tabset[])
       const tabsAndTabsetId: TabAndTabsetId[] = []
       forEach([...tabsets.value.values()] as Tabset[], (ts: Tabset) => {
-        //console.log(`checking ts ${Tabset.logIdent(ts)}:`)
+        // console.log(`checking ts ${Tabset.logIdent(ts)}:`)
         forEach(ts.tabs, (t: Tab) => {
-          // console.log('checking', t.url)
           if (t.url && t.url.replaceAll(placeholderPattern, '') === url) {
             // console.log('checking***', t.url)
             tabsAndTabsetId.push(new TabAndTabsetId(t, ts.id))
@@ -454,6 +455,20 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     return chain
   }
 
+  function addFolders(f: FolderNode, folders: Tabset[]) {
+    for (const folder of folders) {
+      const child = new FolderNode(folder.name, folder.id, [])
+      f.children.push(child)
+      addFolders(child, folder.folders)
+    }
+  }
+
+  const getFolderTree = (tabset: Tabset): FolderNode => {
+    const f: FolderNode = new FolderNode('root', tabset.id, [])
+    addFolders(f, tabset.folders)
+    return f
+  }
+
   const getPageTabs = (tabset: Tabset | undefined): Tab[] => {
     if (!tabset) {
       return []
@@ -523,6 +538,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
     loadTabsets,
     getActiveFolder,
     getFolderChain,
+    getFolderTree,
     share,
     shareWith,
     loadPublicTabset,

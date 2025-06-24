@@ -147,8 +147,8 @@ export const useTabsStore2 = defineStore('browsertabs', () => {
 
   async function onTabActivated(activeInfo: chrome.tabs.TabActiveInfo) {
     console.log(`tabActivated: ${JSON.stringify(activeInfo)}`)
-    useTabsetsUiStore().updateExtensionIcon(activeInfo.tabId)
     const tab: chrome.tabs.Tab = await chrome.tabs.get(activeInfo.tabId)
+    useTabsetsUiStore().updateExtensionIcon(tab)
     await useContentStore().resetFor(tab)
     useTabsetService().urlWasActivated(tab.url)
     useTabsetsUiStore().setMatchingTabsFor(tab.url)
@@ -191,7 +191,7 @@ export const useTabsStore2 = defineStore('browsertabs', () => {
 
     useTabsetsUiStore().setMatchingTabsFor(chromeTab.url)
     useTabsetService().urlWasActivated(chromeTab.url)
-    useTabsetsUiStore().updateExtensionIcon(chromeTab.id)
+    useTabsetsUiStore().updateExtensionIcon(chromeTab)
 
     await checkSwitchTabsetSuggestion(chromeTab.windowId)
   }
