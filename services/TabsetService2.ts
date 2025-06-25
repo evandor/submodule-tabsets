@@ -13,9 +13,10 @@ import { ContentItem } from 'src/content/models/ContentItem'
 import { useContentService } from 'src/content/services/ContentService'
 import { TabPredicate } from 'src/core/domain/Types'
 import { useCommandExecutor } from 'src/core/services/CommandExecutor'
+import { useNavigationService } from 'src/core/services/NavigationService'
 import JsUtils from 'src/core/utils/JsUtils'
 import { useFeaturesStore } from 'src/features/stores/featuresStore'
-import NavigationService from 'src/services/NavigationService'
+// import NavigationService from 'src/services/NavigationService'
 import { useSpacesStore } from 'src/spaces/stores/spacesStore'
 import { useAuthStore } from 'src/stores/authStore'
 import { GithubWriteEventCommand, TabEvent, TabsetEvent } from 'src/tabsets/commands/github/GithubWriteEventCommand'
@@ -1014,11 +1015,11 @@ export function useTabsetService() {
   const limitExceeded = async () => {
     const exceedInfo = useAuthStore().limitExceeded('TABS', useTabsetsStore().allTabsCount)
     if (exceedInfo.exceeded) {
-      await NavigationService.openOrCreateTab([
+      await useNavigationService().browserTabFor(
         chrome.runtime.getURL(
           `/www/index.html#/mainpanel/settings?tab=account&exceeded=tabs&limit=${exceedInfo.limit}`,
         ),
-      ])
+      )
       return true
     }
     return false

@@ -1,14 +1,10 @@
-// ? expected diffs to localstorage
-// ? expected diffs to localstorage
-// ? expected diffs to localstorage
-// ? expected diffs to localstorage
 import _, { forEach } from 'lodash'
 import { defineStore } from 'pinia'
 import { uid } from 'quasar'
 import { FeatureIdent } from 'src/app/models/FeatureIdent'
 import { STRIP_CHARS_IN_COLOR_INPUT, STRIP_CHARS_IN_USER_INPUT } from 'src/boot/constants'
+import { useNavigationService } from 'src/core/services/NavigationService'
 import { useFeaturesStore } from 'src/features/stores/featuresStore'
-import NavigationService from 'src/services/NavigationService'
 import { useAuthStore } from 'src/stores/authStore'
 import { FolderNode } from 'src/tabsets/models/FolderNode'
 import { Tab, TabComment } from 'src/tabsets/models/Tab'
@@ -18,6 +14,7 @@ import TabsetsPersistence from 'src/tabsets/persistence/TabsetsPersistence'
 import { useSelectedTabsetService } from 'src/tabsets/services/selectedTabsetService'
 import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { useWindowsStore } from 'src/windows/stores/windowsStore'
+// import { useTabsetService } from 'src/tabsets/services/TabsetService2'
 import { computed, ref, watch } from 'vue'
 
 /**
@@ -118,11 +115,11 @@ export const useTabsetsStore = defineStore('tabsets', () => {
   ): Promise<Tabset> {
     const exceedInfo = useAuthStore().limitExceeded('TABSETS', tabsets.value.size + 1)
     if (exceedInfo.exceeded) {
-      await NavigationService.openOrCreateTab([
+      await useNavigationService().browserTabFor(
         chrome.runtime.getURL(
           `/www/index.html#/mainpanel/settings?tab=account&exceeded=tabsets&limit=${exceedInfo.limit}`,
         ),
-      ])
+      )
       return Promise.reject('tabsetLimitExceeded')
     }
 
@@ -391,7 +388,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
 
   const getAllUrls = (): string[] => {
     return _.map(
-      _.flatMap([...useTabsetsStore().tabsets.values()] as Tabset[], (ts: Tabset) => ts.tabs),
+      _.flatMap([...tabsets.value.values()] as Tabset[], (ts: Tabset) => ts.tabs),
       (t: Tab) => {
         //console.log('t', t)
         return t.url || ''
