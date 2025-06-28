@@ -84,12 +84,14 @@ export const useTabsetsUiStore = defineStore('tabsetsUi', () => {
   async function updateExtensionIcon(currentBrowserTab: chrome.tabs.Tab) {
     if (currentBrowserTab.url) {
       // console.log('updating extension icon', currentBrowserTab.url, tabId)
-      chrome.action.setBadgeText({ text: '' })
-      chrome.action.setTitle({ title: 'Tabsets' })
+
+      // TODO setBadgeText is managed in background/content script! - other stuff as well?
+      //chrome.action.setBadgeText({ text: '' })
+      //chrome.action.setTitle({ title: 'Tabsets' })
       setMatchingTabsFor(currentBrowserTab.url)
       if (matchingTabs.value.length > 0) {
         //console.log('matching tabs', matchingTabs.value)
-        chrome.action.setBadgeText({ tabId: currentBrowserTab.id, text: '' + matchingTabs.value.length })
+        //chrome.action.setBadgeText({ tabId: currentBrowserTab.id, text: '' + matchingTabs.value.length })
         chrome.action.setBadgeBackgroundColor({ tabId: currentBrowserTab.id, color: 'orange' })
         chrome.action.setTitle({
           tabId: currentBrowserTab.id,
@@ -112,7 +114,7 @@ export const useTabsetsUiStore = defineStore('tabsetsUi', () => {
           })
       } else {
         if (process.env.TABSETS_STAGE === 'DEV') {
-          chrome.action.setBadgeText({ tabId: currentBrowserTab.id, text: 'D' })
+          //chrome.action.setBadgeText({ tabId: currentBrowserTab.id, text: 'D' })
         }
       }
     }

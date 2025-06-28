@@ -442,7 +442,7 @@ export const useTabsetsStore = defineStore('tabsets', () => {
       } else {
         if (f.folders.length > 0) {
           const subChain = getFolderChain(folderId, f.folders, chain, level + 1)
-          console.log('subchain', subChain)
+          //console.log('subchain', subChain)
           if (subChain.length > 0) {
             return subChain.concat(f.id)
           }
